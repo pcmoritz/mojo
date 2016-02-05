@@ -178,10 +178,14 @@ class MockSlaveProcessDelegate : public embedder::SlaveProcessDelegate {
 
 class ConnectionManagerTest : public testing::Test {
  protected:
-  ConnectionManagerTest() : message_loop_(CreateTestMessageLoop()) {}
+  ConnectionManagerTest()
+      : platform_support_(embedder::CreateSimplePlatformSupport()),
+        message_loop_(CreateTestMessageLoop()) {}
   ~ConnectionManagerTest() override {}
 
-  embedder::PlatformSupport* platform_support() { return &platform_support_; }
+  embedder::PlatformSupport* platform_support() {
+    return platform_support_.get();
+  }
   MessageLoop* message_loop() { return message_loop_.get(); }
   const RefPtr<TaskRunner>& task_runner() {
     return message_loop_->GetTaskRunner();
@@ -207,7 +211,7 @@ class ConnectionManagerTest : public testing::Test {
   }
 
  private:
-  embedder::SimplePlatformSupport platform_support_;
+  std::unique_ptr<embedder::PlatformSupport> platform_support_;
   std::unique_ptr<MessageLoop> message_loop_;
   MockMasterProcessDelegate master_process_delegate_;
 

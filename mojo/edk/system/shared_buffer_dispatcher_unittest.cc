@@ -5,6 +5,7 @@
 #include "mojo/edk/system/shared_buffer_dispatcher.h"
 
 #include <limits>
+#include <memory>
 
 #include "mojo/edk/embedder/simple_platform_support.h"
 #include "mojo/edk/platform/platform_shared_buffer.h"
@@ -44,13 +45,16 @@ void RevalidateCreateOptions(
 
 class SharedBufferDispatcherTest : public testing::Test {
  public:
-  SharedBufferDispatcherTest() {}
+  SharedBufferDispatcherTest()
+      : platform_support_(embedder::CreateSimplePlatformSupport()) {}
   ~SharedBufferDispatcherTest() override {}
 
-  embedder::PlatformSupport* platform_support() { return &platform_support_; }
+  embedder::PlatformSupport* platform_support() {
+    return platform_support_.get();
+  }
 
  private:
-  embedder::SimplePlatformSupport platform_support_;
+  std::unique_ptr<embedder::PlatformSupport> platform_support_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(SharedBufferDispatcherTest);
 };

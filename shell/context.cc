@@ -57,9 +57,7 @@ namespace {
 class Setup {
  public:
   Setup() {
-    // TODO(vtl): Use make_unique when C++14 is available.
-    mojo::embedder::Init(std::unique_ptr<mojo::embedder::PlatformSupport>(
-        new mojo::embedder::SimplePlatformSupport()));
+    mojo::embedder::Init(mojo::embedder::CreateSimplePlatformSupport());
   }
 
   ~Setup() {}

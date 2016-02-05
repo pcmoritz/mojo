@@ -36,9 +36,10 @@ namespace {
 class ChannelManagerTest : public testing::Test {
  public:
   ChannelManagerTest()
-      : platform_handle_watcher_(nullptr),
+      : platform_support_(embedder::CreateSimplePlatformSupport()),
+        platform_handle_watcher_(nullptr),
         message_loop_(CreateTestMessageLoopForIO(&platform_handle_watcher_)),
-        channel_manager_(&platform_support_,
+        channel_manager_(platform_support_.get(),
                          message_loop_->GetTaskRunner().Clone(),
                          platform_handle_watcher_,
                          nullptr) {}
@@ -52,7 +53,7 @@ class ChannelManagerTest : public testing::Test {
   ChannelManager& channel_manager() { return channel_manager_; }
 
  private:
-  embedder::SimplePlatformSupport platform_support_;
+  std::unique_ptr<embedder::PlatformSupport> platform_support_;
   // TODO(vtl): The |PlatformHandleWatcher| and |MessageLoop| should be injected
   // into the |ChannelManager|.
   // Valid while |message_loop_| is valid.

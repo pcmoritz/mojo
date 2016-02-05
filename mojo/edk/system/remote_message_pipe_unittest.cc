@@ -54,7 +54,9 @@ const MojoHandleSignals kAllSignals = MOJO_HANDLE_SIGNAL_READABLE |
 
 class RemoteMessagePipeTest : public testing::Test {
  public:
-  RemoteMessagePipeTest() : io_thread_(test::TestIOThread::StartMode::AUTO) {}
+  RemoteMessagePipeTest()
+      : platform_support_(embedder::CreateSimplePlatformSupport()),
+        io_thread_(test::TestIOThread::StartMode::AUTO) {}
   ~RemoteMessagePipeTest() override {}
 
   void SetUp() override {
@@ -92,7 +94,9 @@ class RemoteMessagePipeTest : public testing::Test {
     io_thread_.PostTaskAndWait([this]() { RestoreInitialStateOnIOThread(); });
   }
 
-  embedder::PlatformSupport* platform_support() { return &platform_support_; }
+  embedder::PlatformSupport* platform_support() {
+    return platform_support_.get();
+  }
   test::TestIOThread* io_thread() { return &io_thread_; }
   // Warning: It's up to the caller to ensure that the returned channel
   // is/remains valid.
@@ -125,7 +129,7 @@ class RemoteMessagePipeTest : public testing::Test {
     CHECK(channel_index == 0 || channel_index == 1);
     CHECK(!channels_[channel_index]);
 
-    channels_[channel_index] = MakeRefCounted<Channel>(&platform_support_);
+    channels_[channel_index] = MakeRefCounted<Channel>(platform_support_.get());
     channels_[channel_index]->Init(
         io_thread()->task_runner().Clone(),
         io_thread()->platform_handle_watcher(),
@@ -161,7 +165,7 @@ class RemoteMessagePipeTest : public testing::Test {
     SetUpOnIOThread();
   }
 
-  embedder::SimplePlatformSupport platform_support_;
+  std::unique_ptr<embedder::PlatformSupport> platform_support_;
   test::TestIOThread io_thread_;
   ScopedPlatformHandle platform_handles_[2];
   RefPtr<Channel> channels_[2];

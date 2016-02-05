@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "base/logging.h"
+#include "mojo/edk/embedder/simple_platform_support.h"
 #include "mojo/edk/platform/platform_pipe.h"
 #include "mojo/edk/system/raw_channel.h"
 
@@ -18,10 +19,10 @@ namespace system {
 namespace test {
 
 ChannelTestBase::ChannelTestBase()
-    : io_thread_(TestIOThread::StartMode::AUTO) {}
+    : platform_support_(embedder::CreateSimplePlatformSupport()),
+      io_thread_(TestIOThread::StartMode::AUTO) {}
 
-ChannelTestBase::~ChannelTestBase() {
-}
+ChannelTestBase::~ChannelTestBase() {}
 
 void ChannelTestBase::SetUp() {
   io_thread_.PostTaskAndWait([this]() { SetUpOnIOThread(); });
@@ -31,7 +32,7 @@ void ChannelTestBase::CreateChannelOnIOThread(unsigned i) {
   CHECK(io_thread()->IsCurrentAndRunning());
 
   CHECK(!channels_[i]);
-  channels_[i] = MakeRefCounted<Channel>(&platform_support_);
+  channels_[i] = MakeRefCounted<Channel>(platform_support_.get());
 }
 
 void ChannelTestBase::InitChannelOnIOThread(unsigned i) {

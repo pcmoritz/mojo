@@ -8,30 +8,48 @@
 
 #include "mojo/edk/embedder/simple_platform_shared_buffer.h"
 #include "mojo/edk/platform/random.h"
+#include "mojo/edk/util/make_unique.h"
+#include "mojo/public/cpp/system/macros.h"
 
 using mojo::platform::PlatformSharedBuffer;
 using mojo::platform::ScopedPlatformHandle;
+using mojo::util::MakeUnique;
 using mojo::util::RefPtr;
 
 namespace mojo {
 namespace embedder {
 
-void SimplePlatformSupport::GetCryptoRandomBytes(void* bytes,
-                                                 size_t num_bytes) {
-  platform::GetCryptoRandomBytes(bytes, num_bytes);
-}
+namespace {
 
-RefPtr<PlatformSharedBuffer> SimplePlatformSupport::CreateSharedBuffer(
-    size_t num_bytes) {
-  return SimplePlatformSharedBuffer::Create(num_bytes);
-}
+class SimplePlatformSupport final : public PlatformSupport {
+ public:
+  SimplePlatformSupport() {}
+  ~SimplePlatformSupport() override {}
 
-RefPtr<PlatformSharedBuffer>
-SimplePlatformSupport::CreateSharedBufferFromHandle(
-    size_t num_bytes,
-    ScopedPlatformHandle platform_handle) {
-  return SimplePlatformSharedBuffer::CreateFromPlatformHandle(
-      num_bytes, std::move(platform_handle));
+  void GetCryptoRandomBytes(void* bytes, size_t num_bytes) override {
+    platform::GetCryptoRandomBytes(bytes, num_bytes);
+  }
+
+  util::RefPtr<platform::PlatformSharedBuffer> CreateSharedBuffer(
+      size_t num_bytes) override {
+    return SimplePlatformSharedBuffer::Create(num_bytes);
+  }
+
+  util::RefPtr<platform::PlatformSharedBuffer> CreateSharedBufferFromHandle(
+      size_t num_bytes,
+      platform::ScopedPlatformHandle platform_handle) override {
+    return SimplePlatformSharedBuffer::CreateFromPlatformHandle(
+        num_bytes, std::move(platform_handle));
+  }
+
+ private:
+  MOJO_DISALLOW_COPY_AND_ASSIGN(SimplePlatformSupport);
+};
+
+}  // namespace
+
+std::unique_ptr<PlatformSupport> CreateSimplePlatformSupport() {
+  return MakeUnique<SimplePlatformSupport>();
 }
 
 }  // namespace embedder

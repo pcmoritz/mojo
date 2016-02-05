@@ -13,6 +13,7 @@
 
 #include "base/logging.h"
 #include "build/build_config.h"  // TODO(vtl): Remove this.
+#include "mojo/edk/embedder/simple_platform_support.h"
 #include "mojo/edk/platform/platform_handle_utils_posix.h"
 #include "mojo/edk/platform/platform_shared_buffer.h"
 #include "mojo/edk/platform/scoped_platform_handle.h"
@@ -46,8 +47,9 @@ class MultiprocessMessagePipeTest
 // (which it doesn't reply to). It'll return the number of messages received,
 // not including any "quitquitquit" message, modulo 100.
 MOJO_MULTIPROCESS_TEST_CHILD_MAIN(EchoEcho) {
-  embedder::SimplePlatformSupport platform_support;
-  test::ChannelThread channel_thread(&platform_support);
+  std::unique_ptr<embedder::PlatformSupport> platform_support(
+      embedder::CreateSimplePlatformSupport());
+  test::ChannelThread channel_thread(platform_support.get());
   ScopedPlatformHandle client_platform_handle =
       mojo::test::MultiprocessTestHelper::client_platform_handle.Pass();
   CHECK(client_platform_handle.is_valid());
@@ -209,8 +211,9 @@ TEST_F(MultiprocessMessagePipeTest, DISABLED_QueueMessages) {
 }
 
 MOJO_MULTIPROCESS_TEST_CHILD_MAIN(CheckSharedBuffer) {
-  embedder::SimplePlatformSupport platform_support;
-  test::ChannelThread channel_thread(&platform_support);
+  std::unique_ptr<embedder::PlatformSupport> platform_support(
+      embedder::CreateSimplePlatformSupport());
+  test::ChannelThread channel_thread(platform_support.get());
   ScopedPlatformHandle client_platform_handle =
       mojo::test::MultiprocessTestHelper::client_platform_handle.Pass();
   CHECK(client_platform_handle.is_valid());
@@ -390,8 +393,9 @@ TEST_F(MultiprocessMessagePipeTest, MAYBE_SharedBufferPassing) {
 }
 
 MOJO_MULTIPROCESS_TEST_CHILD_MAIN(CheckPlatformHandleFile) {
-  embedder::SimplePlatformSupport platform_support;
-  test::ChannelThread channel_thread(&platform_support);
+  std::unique_ptr<embedder::PlatformSupport> platform_support(
+      embedder::CreateSimplePlatformSupport());
+  test::ChannelThread channel_thread(platform_support.get());
   ScopedPlatformHandle client_platform_handle =
       mojo::test::MultiprocessTestHelper::client_platform_handle.Pass();
   CHECK(client_platform_handle.is_valid());

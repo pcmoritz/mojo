@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 
+#include <memory>
 #include <utility>
 
 #include "base/logging.h"
@@ -41,7 +42,9 @@ const MojoHandleSignals kAllSignals = MOJO_HANDLE_SIGNAL_READABLE |
 
 class RemoteDataPipeImplTest : public testing::Test {
  public:
-  RemoteDataPipeImplTest() : io_thread_(test::TestIOThread::StartMode::AUTO) {}
+  RemoteDataPipeImplTest()
+      : platform_support_(embedder::CreateSimplePlatformSupport()),
+        io_thread_(test::TestIOThread::StartMode::AUTO) {}
   ~RemoteDataPipeImplTest() override {}
 
   void SetUp() override {
@@ -89,12 +92,12 @@ class RemoteDataPipeImplTest : public testing::Test {
     CHECK(io_thread_.IsCurrentAndRunning());
 
     PlatformPipe channel_pair;
-    channels_[0] = MakeRefCounted<Channel>(&platform_support_);
+    channels_[0] = MakeRefCounted<Channel>(platform_support_.get());
     channels_[0]->Init(io_thread_.task_runner().Clone(),
                        io_thread_.platform_handle_watcher(),
                        RawChannel::Create(channel_pair.handle0.Pass()));
     channels_[0]->SetBootstrapEndpoint(std::move(ep0));
-    channels_[1] = MakeRefCounted<Channel>(&platform_support_);
+    channels_[1] = MakeRefCounted<Channel>(platform_support_.get());
     channels_[1]->Init(io_thread_.task_runner().Clone(),
                        io_thread_.platform_handle_watcher(),
                        RawChannel::Create(channel_pair.handle1.Pass()));
@@ -114,7 +117,7 @@ class RemoteDataPipeImplTest : public testing::Test {
     }
   }
 
-  embedder::SimplePlatformSupport platform_support_;
+  std::unique_ptr<embedder::PlatformSupport> platform_support_;
   test::TestIOThread io_thread_;
   RefPtr<Channel> channels_[2];
   RefPtr<MessagePipe> message_pipes_[2];

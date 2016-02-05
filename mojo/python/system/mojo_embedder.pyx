@@ -27,8 +27,7 @@ cdef extern from "mojo/edk/embedder/platform_support.h" \
 
 cdef extern from "mojo/edk/embedder/simple_platform_support.h" \
     namespace "mojo::embedder" nogil:
-  cdef cppclass SimplePlatformSupport(PlatformSupport):
-    SimplePlatformSupport()
+  cdef unique_ptr[PlatformSupport] CreateSimplePlatformSupport()
 
 cdef extern from "mojo/edk/embedder/embedder.h" nogil:
   cdef void InitCEmbedder "mojo::embedder::Init"(
@@ -43,7 +42,7 @@ cdef extern from "mojo/edk/embedder/test_embedder.h" nogil:
   cdef bool ShutdownCEmbedderForTest "mojo::embedder::test::Shutdown"()
 
 def Init():
-  InitCEmbedder(unique_ptr[PlatformSupport](new SimplePlatformSupport()))
+  InitCEmbedder(CreateSimplePlatformSupport())
   cdef MojoSystemThunks thunks = MojoMakeSystemThunks()
   mojo_system.SetSystemThunks(<uintptr_t>(&thunks))
   mojo_system_impl.SetSystemThunks(<uintptr_t>(&thunks))
