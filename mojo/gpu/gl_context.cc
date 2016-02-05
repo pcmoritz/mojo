@@ -15,7 +15,7 @@ GLContext::Observer::~Observer() {}
 GLContext::GLContext(CommandBufferPtr command_buffer) : weak_factory_(this) {
   context_ = MGLCreateContext(
       MGL_API_VERSION_GLES2,
-      command_buffer.PassInterface().PassHandle().release().value(),
+      command_buffer.PassInterfaceHandle().PassHandle().release().value(),
       MGL_NO_CONTEXT, &ContextLostThunk, this,
       Environment::GetDefaultAsyncWaiter());
   DCHECK(context_ != MGL_NO_CONTEXT);

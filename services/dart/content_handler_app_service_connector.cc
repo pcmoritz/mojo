@@ -54,7 +54,7 @@ MojoHandle ContentHandlerAppServiceConnector::ConnectToService(
           application_name,
           base::Passed(GetProxy(&interface_ptr))));
       // Return proxy end of pipe to caller.
-      return interface_ptr.PassInterface().PassHandle().release().value();
+      return interface_ptr.PassInterfaceHandle().PassHandle().release().value();
     }
     case mojo::dart::DartControllerServiceConnector::kFilesServiceId: {
       std::string application_name = "mojo:files";
@@ -65,7 +65,7 @@ MojoHandle ContentHandlerAppServiceConnector::ConnectToService(
           weak_ptr_factory_.GetWeakPtr(),
           application_name,
           base::Passed(GetProxy(&interface_ptr))));
-      return interface_ptr.PassInterface().PassHandle().release().value();
+      return interface_ptr.PassInterfaceHandle().PassHandle().release().value();
     }
     break;
     default:

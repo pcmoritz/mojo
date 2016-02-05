@@ -55,7 +55,8 @@ class LogClient {
 };
 
 LogClient::LogClient(log::LogPtr log, const MojoLogger* fallback_logger)
-    : log_interface_(log.PassInterface()), fallback_logger_(fallback_logger) {
+    : log_interface_(log.PassInterfaceHandle()),
+      fallback_logger_(fallback_logger) {
   assert(log_interface_.is_valid());
   assert(fallback_logger_);
 }

@@ -135,7 +135,7 @@ void GLES2ClientImpl::HandleInputEvent(const mojo::Event& event) {
 void GLES2ClientImpl::ContextCreated(mojo::CommandBufferPtr command_buffer) {
   context_ = MGLCreateContext(
       MGL_API_VERSION_GLES2,
-      command_buffer.PassInterface().PassHandle().release().value(),
+      command_buffer.PassInterfaceHandle().PassHandle().release().value(),
       MGL_NO_CONTEXT, &ContextLostThunk, this,
       mojo::Environment::GetDefaultAsyncWaiter());
   MGLMakeCurrent(context_);

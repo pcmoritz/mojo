@@ -109,7 +109,7 @@ class IndirectServiceDemoAppDelegate : public ApplicationDelegate {
       // We're passing the integer_service_ proxy to another thread, so
       // use its MessagePipe.
       tasks_.push_back(
-          new DemoTask(integer_service.PassInterface().PassHandle(),
+          new DemoTask(integer_service.PassInterfaceHandle().PassHandle(),
                        finished_callback, kTaskIterationCount));
     }
   }

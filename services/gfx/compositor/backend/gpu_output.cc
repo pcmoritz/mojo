@@ -44,8 +44,9 @@ GpuOutput::GpuOutput(mojo::ContextProviderPtr context_provider,
       FROM_HERE,
       base::Bind(&RasterizerDelegate::CreateRasterizer,
                  base::Unretained(rasterizer_delegate_.get()),
-                 base::Passed(context_provider.PassInterface()), scheduler_,
-                 base::MessageLoop::current()->task_runner(), error_callback));
+                 base::Passed(context_provider.PassInterfaceHandle()),
+                 scheduler_, base::MessageLoop::current()->task_runner(),
+                 error_callback));
 }
 
 GpuOutput::~GpuOutput() {

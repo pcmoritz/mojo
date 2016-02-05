@@ -68,7 +68,7 @@ NoodlesView::NoodlesView(
       base::Bind(&RasterizerDelegate::CreateRasterizer,
                  base::Unretained(rasterizer_delegate_.get()),
                  base::Passed(app_impl->CreateApplicationConnector()),
-                 base::Passed(TakeScene().PassInterface())));
+                 base::Passed(TakeScene().PassInterfaceHandle())));
 }
 
 NoodlesView::~NoodlesView() {
