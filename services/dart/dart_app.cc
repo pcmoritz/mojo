@@ -26,7 +26,10 @@ DartApp::DartApp(mojo::InterfaceRequest<Application> application_request,
                  const std::string& base_uri,
                  const base::FilePath& application_dir,
                  bool strict,
-                 bool run_on_message_loop)
+                 bool run_on_message_loop,
+                 bool override_pause_isolates_flags,
+                 bool pause_isolates_on_start,
+                 bool pause_isolates_on_exit)
     : application_request_(application_request.Pass()),
       application_dir_(application_dir),
       main_isolate_(nullptr) {
@@ -46,6 +49,10 @@ DartApp::DartApp(mojo::InterfaceRequest<Application> application_request,
   config_.application_data = reinterpret_cast<void*>(this);
   config_.strict_compilation = strict;
   config_.SetVmFlags(nullptr, 0);
+  if (override_pause_isolates_flags) {
+    config_.OverridePauseIsolateFlags(pause_isolates_on_start,
+                                      pause_isolates_on_exit);
+  }
 
   base::MessageLoop::current()->PostTask(FROM_HERE,
       base::Bind(&DartApp::OnAppLoaded, base::Unretained(this)));
@@ -86,7 +93,10 @@ static bool IsFileScheme(std::string url) {
 DartApp::DartApp(mojo::InterfaceRequest<Application> application_request,
                  const std::string& url,
                  bool strict,
-                 bool run_on_message_loop)
+                 bool run_on_message_loop,
+                 bool override_pause_isolates_flags,
+                 bool pause_isolates_on_start,
+                 bool pause_isolates_on_exit)
     : application_request_(application_request.Pass()),
       main_isolate_(nullptr) {
   config_.application_data = reinterpret_cast<void*>(this);
@@ -105,6 +115,10 @@ DartApp::DartApp(mojo::InterfaceRequest<Application> application_request,
     config_.use_network_loader = true;
   }
   config_.SetVmFlags(nullptr, 0);
+  if (override_pause_isolates_flags) {
+    config_.OverridePauseIsolateFlags(pause_isolates_on_start,
+                                      pause_isolates_on_exit);
+  }
 
   base::MessageLoop::current()->PostTask(FROM_HERE,
       base::Bind(&DartApp::OnAppLoaded, base::Unretained(this)));

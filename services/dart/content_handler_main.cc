@@ -27,17 +27,79 @@
 
 namespace dart {
 
-const char kCompleteTimeline[] = "--complete-timeline";
+// Flags for the content handler:
 const char kDartTimeline[] = "--dart-timeline";
-const char kEnableStrictMode[] = "--enable-strict-mode";
 const char kDisableObservatory[] = "--disable-observatory";
-const char kTraceStartup[] = "--trace-startup";
+const char kEnableStrictMode[] = "--enable-strict-mode";
 const char kRunOnMessageLoop[] = "--run-on-message-loop";
+const char kTraceStartup[] = "--trace-startup";
+// Flags forwarded to the Dart VM:
+const char kCompleteTimeline[] = "--complete-timeline";
+const char kPauseIsolatesOnStart[] = "--pause-isolates-on-start";
+const char kPauseIsolatesOnExit[] = "--pause-isolates-on-exit";
 
 static bool IsDartZip(std::string url) {
   // If the url doesn't end with ".dart" we assume it is a zipped up
   // dart application.
   return !base::EndsWith(url, ".dart", base::CompareCase::INSENSITIVE_ASCII);
+}
+
+// Returns true if |requestedUrl| has a boolean query parameter named |param|.
+static bool HasBoolQueryParam(const std::string& requestedUrl,
+                              const std::string& param) {
+  std::string param_true = param + "=true";
+  std::string param_false = param + "=false";
+
+  GURL url(requestedUrl);
+  if (url.has_query()) {
+    std::vector<std::string> query_parameters = base::SplitString(
+        url.query(), "&", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+    bool has_true =
+        std::find(query_parameters.begin(),
+                  query_parameters.end(),
+                  param_true) != query_parameters.end();
+    bool has_false =
+        std::find(query_parameters.begin(),
+                  query_parameters.end(),
+                  param_false) != query_parameters.end();
+    return has_true || has_false;
+  }
+  return false;
+}
+
+// Returns the value of the boolean query parameter named |param|, or
+// |default_value| if it |param| is not present.
+static bool BoolQueryParamValue(const std::string& requestedUrl,
+                                const std::string& param,
+                                bool default_value) {
+  if (!HasBoolQueryParam(requestedUrl, param)) {
+    return default_value;
+  }
+  std::string param_true = param + "=true";
+  std::string param_false = param + "=false";
+  GURL url(requestedUrl);
+  DCHECK(url.has_query());
+  std::vector<std::string> query_parameters = base::SplitString(
+      url.query(), "&", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+  bool has_true =
+      std::find(query_parameters.begin(),
+                query_parameters.end(),
+                param_true) != query_parameters.end();
+  bool has_false =
+      std::find(query_parameters.begin(),
+                query_parameters.end(),
+                param_false) != query_parameters.end();
+  if (has_true) {
+    return has_true;
+  }
+  if (has_false) {
+    return false;
+  }
+  return default_value;
+}
+
+static bool HasStrictQueryParam(const std::string& requestedUrl) {
+  return BoolQueryParamValue(requestedUrl, "strict", false);
 }
 
 class DartContentHandlerApp;
@@ -128,16 +190,9 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
       run_on_message_loop_ = true;
     }
 
-    const char* timeline_arg = nullptr;
-    int timeline_arg_count = 0;
-    if (app->HasArg(kCompleteTimeline)) {
-      timeline_arg = kCompleteTimeline;
-      timeline_arg_count = 1;
-    }
-
-    bool observatory_enabled = true;
+    bool enable_observatory = true;
     if (app->HasArg(kDisableObservatory)) {
-      observatory_enabled = false;
+      enable_observatory = false;
     }
 
     bool enable_dart_timeline = false;
@@ -145,13 +200,27 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
       enable_dart_timeline = true;
     }
 
+    std::vector<const char*> extra_args;
+
+    if (app->HasArg(kPauseIsolatesOnStart)) {
+      extra_args.push_back(kPauseIsolatesOnStart);
+    }
+
+    if (app->HasArg(kPauseIsolatesOnExit)) {
+      extra_args.push_back(kPauseIsolatesOnExit);
+    }
+
+    if (app->HasArg(kCompleteTimeline)) {
+      extra_args.push_back(kCompleteTimeline);
+    }
+
     bool success = mojo::dart::DartController::Initialize(
         service_connector_,
         default_strict_,
-        observatory_enabled,
+        enable_observatory,
         enable_dart_timeline,
-        &timeline_arg,
-        timeline_arg_count);
+        extra_args.data(),
+        extra_args.size());
 
     if (app->HasArg(kTraceStartup)) {
       DartTimelineController::EnableAll();
@@ -159,19 +228,6 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
     if (!success) {
       LOG(ERROR) << "Dart VM Initialization failed";
     }
-  }
-
-  bool HasStrictQueryParam(const std::string& requestedUrl) {
-    bool strict_compilation = false;
-    GURL url(requestedUrl);
-    if (url.has_query()) {
-      std::vector<std::string> query_parameters = base::SplitString(
-          url.query(), "&", base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-      strict_compilation =
-          std::find(query_parameters.begin(), query_parameters.end(),
-                    "strict=true") != query_parameters.end();
-    }
-    return strict_compilation;
   }
 
   // Overridden from ApplicationDelegate:
@@ -220,6 +276,19 @@ DartContentHandler::CreateApplication(
   const bool run_on_message_loop = app_->run_on_message_loop();
   base::FilePath application_dir;
   std::string url = response->url.get();
+  const char* kPauseIsolatesOnStart = "pauseIsolatesOnStart";
+  const char* kPauseIsolatesOnExit = "pauseIsolatesOnExit";
+  const bool override_pause_isolates_flags =
+      HasBoolQueryParam(url, kPauseIsolatesOnStart) ||
+      HasBoolQueryParam(url, kPauseIsolatesOnExit);
+  const bool pause_isolates_on_start = BoolQueryParamValue(
+      url,
+      kPauseIsolatesOnStart,
+      mojo::dart::DartControllerConfig::kDefaultPauseOnStart);
+  const bool pause_isolates_on_exit = BoolQueryParamValue(
+      url,
+      kPauseIsolatesOnExit,
+      mojo::dart::DartControllerConfig::kDefaultPauseOnExit);
   if (IsDartZip(response->url.get())) {
     // Loading a zipped snapshot:
     // 1) Extract the zip file.
@@ -239,14 +308,20 @@ DartContentHandler::CreateApplication(
                     url,
                     application_dir,
                     strict_,
-                    run_on_message_loop));
+                    run_on_message_loop,
+                    override_pause_isolates_flags,
+                    pause_isolates_on_start,
+                    pause_isolates_on_exit));
   } else {
     // Loading a raw .dart file pointed at by |url|.
     return make_scoped_ptr(
         new DartApp(application_request.Pass(),
                     url,
                     strict_,
-                    run_on_message_loop));
+                    run_on_message_loop,
+                    override_pause_isolates_flags,
+                    pause_isolates_on_start,
+                    pause_isolates_on_exit));
   }
 }
 

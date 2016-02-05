@@ -8,6 +8,7 @@
 #include "tonic/dart_converter.h"
 #include "tonic/dart_exception_factory.h"
 #include "tonic/dart_library_loader.h"
+#include "tonic/dart_message_handler.h"
 #include "tonic/dart_timer_heap.h"
 
 namespace tonic {
@@ -27,7 +28,8 @@ DartState::DartState()
           new DartLibraryLoader(this))),
       timer_heap_(std::unique_ptr<DartTimerHeap>(
           new DartTimerHeap())),
-      message_notify_callback_(nullptr),
+      message_handler_(std::unique_ptr<DartMessageHandler>(
+          new DartMessageHandler())),
       weak_factory_(this) {
 }
 

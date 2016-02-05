@@ -27,12 +27,18 @@ class DartApp : public mojo::ContentHandlerFactory::HandledApplicationHolder {
           const std::string& base_uri,
           const base::FilePath& application_dir,
           bool strict,
-          bool run_on_message_loop);
+          bool run_on_message_loop,
+          bool override_pause_isolates_flags,
+          bool pause_isolates_on_start,
+          bool pause_isolates_on_exit);
   // When running from a dart file.
   DartApp(mojo::InterfaceRequest<mojo::Application> application_request,
           const std::string& url,
           bool strict,
-          bool run_on_message_loop);
+          bool run_on_message_loop,
+          bool override_pause_isolates_flags,
+          bool pause_isolates_on_start,
+          bool pause_isolates_on_exit);
   virtual ~DartApp();
 
  private:

@@ -40,8 +40,7 @@ class MojoDartState : public tonic::DartState {
         package_root_(package_root),
         library_provider_(nullptr),
         use_network_loader_(use_network_loader),
-        use_dart_run_loop_(use_dart_run_loop),
-        task_runner_(nullptr) {
+        use_dart_run_loop_(use_dart_run_loop) {
   }
 
   void* application_data() const { return application_data_; }
@@ -82,15 +81,6 @@ class MojoDartState : public tonic::DartState {
     return library_provider_.get();
   }
 
-  scoped_refptr<base::SingleThreadTaskRunner> task_runner() const {
-    return task_runner_;
-  }
-
-  void set_task_runner(
-      const scoped_refptr<base::SingleThreadTaskRunner>& runner) {
-    task_runner_ = runner;
-  }
-
   static MojoDartState* From(Dart_Isolate isolate) {
     return reinterpret_cast<MojoDartState*>(DartState::From(isolate));
   }
@@ -113,7 +103,6 @@ class MojoDartState : public tonic::DartState {
   mojo::NetworkServicePtr network_service_;
   bool use_network_loader_;
   bool use_dart_run_loop_;
-  scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
 };
 
 }  // namespace dart

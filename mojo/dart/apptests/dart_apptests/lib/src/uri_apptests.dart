@@ -13,7 +13,8 @@ import 'package:mojo/bindings.dart';
 import 'package:mojo/core.dart';
 
 void checkBaseUri(String uriBaseAsString) {
-  expect(uriBaseAsString.endsWith('dart_apptests.mojo'), isTrue);
+  Uri uri = Uri.parse(uriBaseAsString);
+  expect(uri.path.endsWith('dart_apptests.mojo'), isTrue);
 }
 
 void getBaseUri(sendPort) {

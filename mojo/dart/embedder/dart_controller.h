@@ -24,6 +24,8 @@ struct DartControllerConfig {
   static const bool kDefaultUseNetworkLoader = false;
   static const bool kDefaultUseDartRunLoop = true;
   static const bool kDefaultStrictCompilation = false;
+  static const bool kDefaultPauseOnStart = false;
+  static const bool kDefaultPauseOnExit = false;
 
   DartControllerConfig()
       : application_data(nullptr),
@@ -37,7 +39,10 @@ struct DartControllerConfig {
         compile_all(false),
         error(nullptr),
         use_network_loader(kDefaultUseNetworkLoader),
-        use_dart_run_loop(kDefaultUseDartRunLoop) {
+        use_dart_run_loop(kDefaultUseDartRunLoop),
+        override_pause_isolate_flags(false),
+        pause_isolate_on_start(kDefaultPauseOnStart),
+        pause_isolate_on_exit(kDefaultPauseOnExit) {
   }
 
   void SetVmFlags(const char** vm_flags, intptr_t vm_flags_count) {
@@ -48,6 +53,12 @@ struct DartControllerConfig {
   void SetScriptFlags(const char** script_flags, intptr_t script_flags_count) {
     this->script_flags = script_flags;
     this->script_flags_count = script_flags_count;
+  }
+
+  void OverridePauseIsolateFlags(bool pause_on_start, bool pause_on_exit) {
+    override_pause_isolate_flags = true;
+    pause_isolate_on_start = pause_on_start;
+    pause_isolate_on_exit = pause_on_exit;
   }
 
   void* application_data;
@@ -66,6 +77,9 @@ struct DartControllerConfig {
   char** error;
   bool use_network_loader;
   bool use_dart_run_loop;
+  bool override_pause_isolate_flags;
+  bool pause_isolate_on_start;
+  bool pause_isolate_on_exit;
 };
 
 // The DartController may need to request for services to be connected
@@ -101,8 +115,8 @@ class DartController {
                          bool strict_compilation,
                          bool enable_observatory,
                          bool enable_dart_timeline,
-                         const char** extra_args,
-                         int extra_args_count);
+                         const char** vm_flags,
+                         int vm_flags_count);
 
   // Setup an isolate to run the program specified in |config|. Invokes
   // the main function and then exits.
@@ -151,18 +165,12 @@ class DartController {
   // Dart API callback helper(s).
   static Dart_Isolate CreateIsolateHelper(void* dart_app,
                                           Dart_IsolateFlags* flags,
-                                          IsolateCallbacks callbacks,
-                                          std::string script_uri,
-                                          std::string base_uri,
-                                          const std::string& package_root,
-                                          char** error,
-                                          bool use_network_loader,
-                                          bool use_dart_run_loop);
+                                          const DartControllerConfig& config);
 
   static void InitVmIfNeeded(Dart_EntropySource entropy,
                              bool enable_dart_timeline,
-                             const char** arguments,
-                             int arguments_count);
+                             const char** vm_flags,
+                             int vm_flags_count);
 
   static void BlockForServiceIsolate();
   static void BlockForServiceIsolateLocked();

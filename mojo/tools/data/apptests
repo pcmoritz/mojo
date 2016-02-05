@@ -112,12 +112,20 @@ if target_os == 'android':
 if target_os != 'android':
   tests += [
     {
-      "test": "mojo:js_apptests",
-      "type": "gtest_isolated",
+      "test": "mojo:dart_apptests",
+      "name": "mojo:dart_apptests (message loop)",
+      "type": "dart",
+      "shell-args": [
+        "--args-for=mojo:dart_content_handler --run-on-message-loop"
+      ],
     },
     {
       "test": "mojo:dart_apptests",
       "type": "dart",
+    },
+    {
+      "test": "mojo:js_apptests",
+      "type": "gtest_isolated",
     },
     {
       # These tests rely on various things in /bin.

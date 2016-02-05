@@ -18,6 +18,7 @@ class DartClassLibrary;
 class DartExceptionFactory;
 class DartLibraryLoader;
 class DartTimerHeap;
+class DartMessageHandler;
 
 // DartState represents the state associated with a given Dart isolate. The
 // lifetime of this object is controlled by the DartVM. If you want to hold a
@@ -51,14 +52,7 @@ class DartState : public base::SupportsUserData {
   DartExceptionFactory& exception_factory() { return *exception_factory_; }
   DartLibraryLoader& library_loader() { return *library_loader_; }
   DartTimerHeap& timer_heap() { return *timer_heap_; }
-
-  void set_message_notify_callback(Dart_MessageNotifyCallback callback) {
-    message_notify_callback_ = callback;
-  }
-
-  Dart_MessageNotifyCallback message_notify_callback() {
-    return message_notify_callback_;
-  }
+  DartMessageHandler& message_handler() { return *message_handler_; }
 
   virtual void DidSetIsolate() {}
 
@@ -68,7 +62,7 @@ class DartState : public base::SupportsUserData {
   std::unique_ptr<DartExceptionFactory> exception_factory_;
   std::unique_ptr<DartLibraryLoader> library_loader_;
   std::unique_ptr<DartTimerHeap> timer_heap_;
-  Dart_MessageNotifyCallback message_notify_callback_;
+  std::unique_ptr<DartMessageHandler> message_handler_;
 
  protected:
   base::WeakPtrFactory<DartState> weak_factory_;
