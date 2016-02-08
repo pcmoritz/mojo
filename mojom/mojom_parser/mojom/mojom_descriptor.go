@@ -78,10 +78,15 @@ type MojomFile struct {
 	// occurrence in the source.
 	// It is the union of Interfaces, Structs, Unions, Enums and Constants.
 	DeclaredObjects []DeclaredObject
+
+	// FinalComments is the list of comments at the end of the file after all
+	// declarations.
+	FinalComments []lexer.Token
 }
 
 // An ImportedFile represents an element of the "import" list of a .mojom file.
 type ImportedFile struct {
+	CommentsAttachment
 	// The name as specified in the import statement.
 	SpecifiedName string
 
@@ -110,6 +115,10 @@ func NewImportedFile(specifiedName string, nameToken *lexer.Token) (importedFile
 		importedFile.NameToken = *nameToken
 	}
 	return
+}
+
+func (f *ImportedFile) MainToken() *lexer.Token {
+	return &f.NameToken
 }
 
 func newMojomFile(fileName, specifiedName string, descriptor *MojomDescriptor,
@@ -658,6 +667,7 @@ func resolveSpecialEnumValueAssignment(ref *UserValueRef) bool {
 // ModuleNamespace represents the identifier declared via the "module"
 // declaration in the .mojom file.
 type ModuleNamespace struct {
+	CommentsAttachment
 	// Identifier is the name of the namespace. The identifier from the "module" declaration.
 	Identifier string
 	// Token is the token from which the Identifier was extracted.
@@ -665,8 +675,15 @@ type ModuleNamespace struct {
 }
 
 // NewModuleNamespace creates a module namespace and returns a pointer to it.
-func NewModuleNamespace(identifier string, token *lexer.Token) *ModuleNamespace {
-	return &ModuleNamespace{identifier, token}
+func NewModuleNamespace(identifier string, token *lexer.Token) (moduleNamespace *ModuleNamespace) {
+	moduleNamespace = new(ModuleNamespace)
+	moduleNamespace.Identifier = identifier
+	moduleNamespace.Token = token
+	return
+}
+
+func (ns *ModuleNamespace) MainToken() *lexer.Token {
+	return ns.Token
 }
 
 func (ns *ModuleNamespace) String() string {

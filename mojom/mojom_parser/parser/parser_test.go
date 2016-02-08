@@ -60,9 +60,9 @@ func TestSuccessfulParsing(t *testing.T) {
 	////////////////////////////////////////////////////////////
 	startTestCase("mojom.test")
 	cases[testCaseNum].mojomContents = `[cool=true]module mojom.test;`
-	expectedFile.Attributes = mojom.NewAttributes()
+	expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 	expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-		mojom.MojomAttribute{"cool", mojom.MakeBoolLiteralValue(true), nil})
+		mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true)))
 	endTestCase()
 
 	////////////////////////////////////////////////////////////
@@ -96,9 +96,9 @@ func TestSuccessfulParsing(t *testing.T) {
 
 	import "a.file";`
 	{
-		expectedFile.Attributes = mojom.NewAttributes()
+		expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 		expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-			mojom.MojomAttribute{"cool", mojom.MakeBoolLiteralValue(true), nil})
+			mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true)))
 		expectedFile.AddImport(mojom.NewImportedFile("a.file", nil))
 		endTestCase()
 	}
@@ -206,8 +206,8 @@ func TestSuccessfulParsing(t *testing.T) {
 
 		structFoo := mojom.NewMojomStruct(mojom.DeclTestData("Foo"))
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
-		attributes := mojom.NewAttributes()
-		attributes.List = append(attributes.List, mojom.MojomAttribute{"happy", mojom.MakeBoolLiteralValue(true), nil})
+		attributes := mojom.NewAttributes(lexer.Token{})
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("happy", nil, mojom.MakeBoolLiteralValue(true)))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataAWithOrdinal("x", attributes, 4), mojom.SimpleTypeInt32, nil))
 		expectedFile.AddStruct(structFoo)
 	}
@@ -236,9 +236,9 @@ func TestSuccessfulParsing(t *testing.T) {
 		structFoo := mojom.NewMojomStruct(mojom.DeclTestData("Foo"))
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("x", 4), mojom.SimpleTypeInt32, mojom.MakeInt8LiteralValue(42)))
-		attributes := mojom.NewAttributes()
-		attributes.List = append(attributes.List, mojom.MojomAttribute{"age", mojom.MakeInt8LiteralValue(7), nil})
-		attributes.List = append(attributes.List, mojom.MojomAttribute{"level", mojom.MakeStringLiteralValue("high"), nil})
+		attributes := mojom.NewAttributes(lexer.Token{})
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("age", nil, mojom.MakeInt8LiteralValue(7)))
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("level", nil, mojom.MakeStringLiteralValue("high")))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataA("y", attributes), mojom.BuiltInType("string"), mojom.MakeStringLiteralValue("Howdy!")))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestData("z"), mojom.BuiltInType("string?"), nil))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("w", 6), mojom.BuiltInType("bool"), mojom.MakeBoolLiteralValue(false)))
@@ -316,8 +316,8 @@ func TestSuccessfulParsing(t *testing.T) {
 	{
 		expectedFile.AddImport(mojom.NewImportedFile("gpu/interfaces/command_buffer.mojom", nil))
 
-		attributes := mojom.NewAttributes()
-		attributes.List = append(attributes.List, mojom.MojomAttribute{"ServiceName", mojom.MakeStringLiteralValue("mojo::Gpu"), nil})
+		attributes := mojom.NewAttributes(lexer.Token{})
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("ServiceName", nil, mojom.MakeStringLiteralValue("mojo::Gpu")))
 		interfaceGpu := mojom.NewMojomInterface(mojom.DeclTestDataA("Gpu", attributes))
 		expectedFile.AddInterface(interfaceGpu)
 	}
@@ -354,9 +354,9 @@ func TestSuccessfulParsing(t *testing.T) {
 
 	`
 	{
-		expectedFile.Attributes = mojom.NewAttributes()
+		expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 		expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-			mojom.MojomAttribute{"php_namespace", mojom.MakeStringLiteralValue("mojom.test.php"), nil})
+			mojom.NewMojomAttribute("php_namespace", nil, mojom.MakeStringLiteralValue("mojom.test.php")))
 
 		expectedFile.AddImport(mojom.NewImportedFile("another.file", nil))
 		expectedFile.AddImport(mojom.NewImportedFile("and.another.file", nil))

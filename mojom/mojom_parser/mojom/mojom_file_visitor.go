@@ -4,8 +4,23 @@
 
 package mojom
 
+import (
+	"mojom/mojom_parser/lexer"
+)
+
 type MojomElement interface {
-	// TODO(azani): Make this more restrictive.
+	// AttachedComments returns the AttachedComments object stored by the
+	// MojomElement. If no AttachedComments object is currently stored in
+	// MojomElement, return nil.
+	AttachedComments() *AttachedComments
+	// NewAttachedComments creates a new AttachedComments object, stores it in
+	// the MojomElement and returns a pointer to it.
+	// If NewAttachedComments is called again, the old AttachedComments object is
+	// discarded and a new one created.
+	NewAttachedComments() *AttachedComments
+	// MainToken returns a pointer to the token which best describes the location
+	// of the MojomElement in the mojom file.
+	MainToken() *lexer.Token
 }
 
 // MojomElementStream is a stream that yields MojomElements in the order
@@ -116,7 +131,9 @@ func (v *mojomFileVisitor) visitMojomFile(file *MojomFile) {
 		v.visitAttributes(file.Attributes)
 	}
 
-	v.elementChan <- file.ModuleNamespace
+	if file.ModuleNamespace != nil && file.ModuleNamespace.Identifier != "" {
+		v.elementChan <- file.ModuleNamespace
+	}
 
 	for _, importedFile := range file.Imports {
 		v.elementChan <- importedFile
@@ -126,6 +143,5 @@ func (v *mojomFileVisitor) visitMojomFile(file *MojomFile) {
 		v.visitDeclaredObject(object)
 	}
 
-	v.elementChan <- nil
 	close(v.elementChan)
 }

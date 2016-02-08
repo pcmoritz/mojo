@@ -48,6 +48,7 @@ func (k UserDefinedTypeKind) String() string {
 // A DeclaredObject is anything that can be registered in a scope:
 // A UserDefinedType, a UserDefinedValue, a method or a struct field.
 type DeclaredObject interface {
+	MojomElement
 	Attributes() *Attributes
 	SimpleName() string
 	NameToken() lexer.Token
@@ -1112,6 +1113,10 @@ func (b BuiltInConstantValue) NameToken() lexer.Token {
 	panic("Do not ask for the NameToken of a BuiltInConstantValue.")
 }
 
+func (b BuiltInConstantValue) MainToken() *lexer.Token {
+	panic("Do not ask for the main token of a BuiltInConstantValue.")
+}
+
 func (b BuiltInConstantValue) FullyQualifiedName() string {
 	return b.String()
 }
@@ -1136,6 +1141,14 @@ func (b BuiltInConstantValue) RegisterInScope(scope *Scope) DuplicateNameError {
 	panic("Do not register a BuiltInConstantValue in a scope.")
 }
 
+func (b BuiltInConstantValue) AttachedComments() *AttachedComments {
+	panic("BuiltInConstantValue has no attached comments.")
+}
+
+func (b BuiltInConstantValue) NewAttachedComments() *AttachedComments {
+	panic("BuiltInConstantValue cannot have attached comments.")
+}
+
 /////////////////////////////////////////////////////////////
 // Declaration Data
 /////////////////////////////////////////////////////////////
@@ -1143,6 +1156,7 @@ func (b BuiltInConstantValue) RegisterInScope(scope *Scope) DuplicateNameError {
 // This struct is embedded in UserDefinedTypeBase, UserDefinedValueBase,
 // StructField, UnionField and MojomMethod.
 type DeclarationData struct {
+	CommentsAttachment
 	// A pointer to the DeclaredObject to which this DeclarationData belongs.
 	declaredObject DeclaredObject
 
@@ -1181,6 +1195,10 @@ func (d *DeclarationData) NameToken() lexer.Token {
 	return d.nameToken
 }
 
+func (d *DeclarationData) MainToken() *lexer.Token {
+	return &d.nameToken
+}
+
 func (d *DeclarationData) LineNumber() uint32 {
 	return uint32(d.nameToken.LineNo)
 }
@@ -1217,8 +1235,10 @@ func (d *DeclarationData) DeclaredObject() DeclaredObject {
 }
 
 type Attributes struct {
+	CommentsAttachment
 	// The attributes are listed in order of occurrence in the source.
-	List []MojomAttribute
+	List             []MojomAttribute
+	LeftBracketToken lexer.Token
 }
 
 func (a *Attributes) String() string {
@@ -1228,13 +1248,19 @@ func (a *Attributes) String() string {
 	return fmt.Sprintf("%s", a.List)
 }
 
-func NewAttributes() *Attributes {
+func NewAttributes(leftBracket lexer.Token) *Attributes {
 	attributes := new(Attributes)
 	attributes.List = make([]MojomAttribute, 0)
+	attributes.LeftBracketToken = leftBracket
 	return attributes
 }
 
+func (a *Attributes) MainToken() *lexer.Token {
+	return &a.LeftBracketToken
+}
+
 type MojomAttribute struct {
+	CommentsAttachment
 	Key string
 	// TODO(rudominer) Decide if we support attribute values as Names.
 	// See https://github.com/domokit/mojo/issues/561.
@@ -1244,6 +1270,10 @@ type MojomAttribute struct {
 
 func (ma MojomAttribute) String() string {
 	return fmt.Sprintf("%s=%s ", ma.Key, ma.Value)
+}
+
+func (ma *MojomAttribute) MainToken() *lexer.Token {
+	return ma.KeyToken
 }
 
 func NewMojomAttribute(key string, keyToken *lexer.Token, value LiteralValue) (mojomAttribute MojomAttribute) {

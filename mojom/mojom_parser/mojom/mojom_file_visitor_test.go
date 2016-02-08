@@ -1,3 +1,7 @@
+// Copyright 2016 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 package mojom
 
 import (
@@ -18,7 +22,7 @@ func DummyDeclData(name string) DeclarationData {
 func TestMojomFileVisitor(t *testing.T) {
 	descriptor := NewMojomDescriptor()
 	file := newMojomFile("filename", "specifiedName", descriptor, nil, "fake source code")
-	file.Attributes = NewAttributes()
+	file.Attributes = NewAttributes(lexer.Token{})
 	file.Attributes.List = append(file.Attributes.List, NewMojomAttribute("attr1", nil, LiteralValue{}))
 	file.Attributes.List = append(file.Attributes.List, NewMojomAttribute("attr2", nil, LiteralValue{}))
 	file.InitializeFileScope(NewModuleNamespace("module.ns", nil))
@@ -30,7 +34,7 @@ func TestMojomFileVisitor(t *testing.T) {
 	interface1 := NewMojomInterface(DummyDeclData("interface1"))
 	interface1.InitAsScope(NewTestFileScope("filename"))
 
-	method11Attrs := NewAttributes()
+	method11Attrs := NewAttributes(lexer.Token{})
 	method11Attrs.List = append(method11Attrs.List, NewMojomAttribute("method11_attr1", nil, LiteralValue{}))
 	method11Attrs.List = append(method11Attrs.List, NewMojomAttribute("method11_attr2", nil, LiteralValue{}))
 	method11 := NewMojomMethod(DeclData("method11", nil, lexer.Token{}, method11Attrs), nil, nil)
@@ -68,7 +72,7 @@ func TestMojomFileVisitor(t *testing.T) {
 	enum1.AddEnumValue(DummyDeclData("enum_value1"), nil)
 	file.AddEnum(enum1)
 
-	const1Attrs := NewAttributes()
+	const1Attrs := NewAttributes(lexer.Token{})
 	const1Attrs.List = append(const1Attrs.List, NewMojomAttribute("const1_attr1", nil, LiteralValue{}))
 	const1Attrs.List = append(const1Attrs.List, NewMojomAttribute("const1_attr2", nil, LiteralValue{}))
 	const1 := NewUserDefinedConstant(DeclData("const1", nil, lexer.Token{}, const1Attrs), nil, nil)
@@ -120,4 +124,13 @@ func TestMojomFileVisitor(t *testing.T) {
 	checkEq(t, "const1", v.Next().(*UserDefinedConstant).DeclarationData.simpleName)
 
 	checkEq(t, nil, v.Next())
+}
+
+func TestEmptyMojomFile(t *testing.T) {
+	descriptor := NewMojomDescriptor()
+	file := newMojomFile("filename", "specifiedName", descriptor, nil, "fake source code")
+	v := NewMojomFileVisitor(file)
+	if el := v.Peek(); el != nil {
+		t.Fatalf("An empty mojom file should have no elements. Instead got: %v", el)
+	}
 }

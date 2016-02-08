@@ -283,7 +283,7 @@ func (p *Parser) parseAttributes() (attributes *mojom.Attributes) {
 	p.pushChildNode("attributes")
 	defer p.popNode()
 
-	attributes = mojom.NewAttributes()
+	attributes = mojom.NewAttributes(p.lastConsumed)
 
 	nextToken := p.lastConsumed
 	for nextToken.Kind != lexer.RBracket {

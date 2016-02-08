@@ -116,6 +116,12 @@ func (p *Parser) GetMojomFile() *mojom.MojomFile {
 	return p.mojomFile
 }
 
+// After Parse() is done call this method to obtain the comment tokens that were
+// filtered out.
+func (p *Parser) GetComments() []lexer.Token {
+	return p.inputStream.(*lexer.FilteredTokenStream).FilteredTokens()
+}
+
 // Returns the root of the parse tree if this Parser is in debug mode.
 // Otherwise returns nil.
 func (p *Parser) GetParseTree() *ParseNode {
