@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// Factory functions for creating "simple" |PlatformSharedBuffer|s. These are
+// implemented in a simple/obvious way, and may not work in a sandbox.
+
 #ifndef MOJO_EDK_EMBEDDER_SIMPLE_PLATFORM_SHARED_BUFFER_H_
 #define MOJO_EDK_EMBEDDER_SIMPLE_PLATFORM_SHARED_BUFFER_H_
 
@@ -9,87 +12,24 @@
 
 #include "mojo/edk/platform/platform_shared_buffer.h"
 #include "mojo/edk/util/ref_ptr.h"
-#include "mojo/public/cpp/system/macros.h"
 
 namespace mojo {
 namespace embedder {
 
-// A simple implementation of |platform::PlatformSharedBuffer|.
-class SimplePlatformSharedBuffer final : public platform::PlatformSharedBuffer {
- public:
-  // Creates a shared buffer of size |num_bytes| bytes (initially zero-filled).
-  // |num_bytes| must be nonzero. Returns null on failure.
-  static util::RefPtr<SimplePlatformSharedBuffer> Create(size_t num_bytes);
+// Creates a shared buffer of size |num_bytes| bytes (initially zero-filled).
+// |num_bytes| must be nonzero. Returns null on failure.
+util::RefPtr<platform::PlatformSharedBuffer> CreateSimplePlatformSharedBuffer(
+    size_t num_bytes);
 
-  static util::RefPtr<SimplePlatformSharedBuffer> CreateFromPlatformHandle(
-      size_t num_bytes,
-      platform::ScopedPlatformHandle platform_handle);
-
-  // |platform::PlatformSharedBuffer| implementation:
-  size_t GetNumBytes() const override;
-  std::unique_ptr<platform::PlatformSharedBufferMapping> Map(
-      size_t offset,
-      size_t length) override;
-  bool IsValidMap(size_t offset, size_t length) override;
-  std::unique_ptr<platform::PlatformSharedBufferMapping> MapNoCheck(
-      size_t offset,
-      size_t length) override;
-  platform::ScopedPlatformHandle DuplicatePlatformHandle() override;
-  platform::ScopedPlatformHandle PassPlatformHandle() override;
-
- private:
-  explicit SimplePlatformSharedBuffer(size_t num_bytes);
-  ~SimplePlatformSharedBuffer() override;
-
-  // This is called by |Create()| before this object is given to anyone.
-  bool Init();
-
-  // This is like |Init()|, but for |CreateFromPlatformHandle()|. (Note: It
-  // should verify that |platform_handle| is an appropriate handle for the
-  // claimed |num_bytes_|.)
-  bool InitFromPlatformHandle(platform::ScopedPlatformHandle platform_handle);
-
-  const size_t num_bytes_;
-
-  // This is set in |Init()|/|InitFromPlatformHandle()| and never modified
-  // (except by |PassPlatformHandle()|; see the comments above its declaration),
-  // hence does not need to be protected by a lock.
-  platform::ScopedPlatformHandle handle_;
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(SimplePlatformSharedBuffer);
-};
-
-// An implementation of |platform::PlatformSharedBufferMapping|, produced by
-// |SimplePlatformSharedBuffer|.
-class SimplePlatformSharedBufferMapping final
-    : public platform::PlatformSharedBufferMapping {
- public:
-  ~SimplePlatformSharedBufferMapping() override;
-
-  void* GetBase() const override;
-  size_t GetLength() const override;
-
- private:
-  friend class SimplePlatformSharedBuffer;
-
-  SimplePlatformSharedBufferMapping(void* base,
-                                    size_t length,
-                                    void* real_base,
-                                    size_t real_length)
-      : base_(base),
-        length_(length),
-        real_base_(real_base),
-        real_length_(real_length) {}
-  void Unmap();
-
-  void* const base_;
-  const size_t length_;
-
-  void* const real_base_;
-  const size_t real_length_;
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(SimplePlatformSharedBufferMapping);
-};
+// Creates a shared buffer of size |num_bytes| bytes, "backed" by the given
+// |PlatformHandle|. This should be used only with |platform_handle|s obtained
+// (via |PassPlatformHandle()|) from |PlatformSharedBuffer|s created using
+// |CreateSimplePlatformSharedBuffer()| (above); |num_bytes| must be the same as
+// passed to |CreateSimplePlatformSharedBuffer()|.
+util::RefPtr<platform::PlatformSharedBuffer>
+CreateSimplePlatformSharedBufferFromPlatformHandle(
+    size_t num_bytes,
+    platform::ScopedPlatformHandle platform_handle);
 
 }  // namespace embedder
 }  // namespace mojo

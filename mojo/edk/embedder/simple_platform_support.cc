@@ -32,13 +32,13 @@ class SimplePlatformSupport final : public PlatformSupport {
 
   util::RefPtr<platform::PlatformSharedBuffer> CreateSharedBuffer(
       size_t num_bytes) override {
-    return SimplePlatformSharedBuffer::Create(num_bytes);
+    return CreateSimplePlatformSharedBuffer(num_bytes);
   }
 
   util::RefPtr<platform::PlatformSharedBuffer> CreateSharedBufferFromHandle(
       size_t num_bytes,
       platform::ScopedPlatformHandle platform_handle) override {
-    return SimplePlatformSharedBuffer::CreateFromPlatformHandle(
+    return CreateSimplePlatformSharedBufferFromPlatformHandle(
         num_bytes, std::move(platform_handle));
   }
 
