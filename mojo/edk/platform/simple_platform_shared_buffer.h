@@ -5,20 +5,21 @@
 // Factory functions for creating "simple" |PlatformSharedBuffer|s. These are
 // implemented in a simple/obvious way, and may not work in a sandbox.
 
-#ifndef MOJO_EDK_EMBEDDER_SIMPLE_PLATFORM_SHARED_BUFFER_H_
-#define MOJO_EDK_EMBEDDER_SIMPLE_PLATFORM_SHARED_BUFFER_H_
+#ifndef MOJO_EDK_PLATFORM_SIMPLE_PLATFORM_SHARED_BUFFER_H_
+#define MOJO_EDK_PLATFORM_SIMPLE_PLATFORM_SHARED_BUFFER_H_
 
 #include <stddef.h>
 
 #include "mojo/edk/platform/platform_shared_buffer.h"
+#include "mojo/edk/platform/scoped_platform_handle.h"
 #include "mojo/edk/util/ref_ptr.h"
 
 namespace mojo {
-namespace embedder {
+namespace platform {
 
 // Creates a shared buffer of size |num_bytes| bytes (initially zero-filled).
 // |num_bytes| must be nonzero. Returns null on failure.
-util::RefPtr<platform::PlatformSharedBuffer> CreateSimplePlatformSharedBuffer(
+util::RefPtr<PlatformSharedBuffer> CreateSimplePlatformSharedBuffer(
     size_t num_bytes);
 
 // Creates a shared buffer of size |num_bytes| bytes, "backed" by the given
@@ -26,12 +27,12 @@ util::RefPtr<platform::PlatformSharedBuffer> CreateSimplePlatformSharedBuffer(
 // (via |PassPlatformHandle()|) from |PlatformSharedBuffer|s created using
 // |CreateSimplePlatformSharedBuffer()| (above); |num_bytes| must be the same as
 // passed to |CreateSimplePlatformSharedBuffer()|.
-util::RefPtr<platform::PlatformSharedBuffer>
+util::RefPtr<PlatformSharedBuffer>
 CreateSimplePlatformSharedBufferFromPlatformHandle(
     size_t num_bytes,
-    platform::ScopedPlatformHandle platform_handle);
+    ScopedPlatformHandle platform_handle);
 
-}  // namespace embedder
+}  // namespace platform
 }  // namespace mojo
 
-#endif  // MOJO_EDK_EMBEDDER_SIMPLE_PLATFORM_SHARED_BUFFER_H_
+#endif  // MOJO_EDK_PLATFORM_SIMPLE_PLATFORM_SHARED_BUFFER_H_

@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/edk/embedder/simple_platform_shared_buffer.h"
+// This file implements the factory functions declared in
+// //mojo/edk/platform/simple_platform_shared_buffer.h.
+
+#include "mojo/edk/platform/simple_platform_shared_buffer.h"
 
 #include <stdint.h>
 #include <stdio.h>     // For |fileno()|.
@@ -27,10 +30,6 @@
 #include "third_party/ashmem/ashmem.h"
 #endif  // defined(OS_ANDROID)
 
-using mojo::platform::PlatformHandle;
-using mojo::platform::PlatformSharedBuffer;
-using mojo::platform::PlatformSharedBufferMapping;
-using mojo::platform::ScopedPlatformHandle;
 using mojo::util::RefPtr;
 
 // We assume that |size_t| and |off_t| (type for |ftruncate()|) fits in a
@@ -39,15 +38,15 @@ static_assert(sizeof(size_t) <= sizeof(uint64_t), "size_t too big");
 static_assert(sizeof(off_t) <= sizeof(uint64_t), "off_t too big");
 
 namespace mojo {
-namespace embedder {
+namespace platform {
 namespace {
 
 // SimplePlatformSharedBufferMapping -------------------------------------------
 
-// An implementation of |platform::PlatformSharedBufferMapping|, produced by
+// An implementation of |PlatformSharedBufferMapping|, produced by
 // |SimplePlatformSharedBuffer| (declared further below).
 class SimplePlatformSharedBufferMapping final
-    : public platform::PlatformSharedBufferMapping {
+    : public PlatformSharedBufferMapping {
  public:
   ~SimplePlatformSharedBufferMapping() override { Unmap(); }
 
@@ -82,8 +81,8 @@ class SimplePlatformSharedBufferMapping final
 
 // SimplePlatformSharedBuffer --------------------------------------------------
 
-// A simple implementation of |platform::PlatformSharedBuffer|.
-class SimplePlatformSharedBuffer final : public platform::PlatformSharedBuffer {
+// A simple implementation of |PlatformSharedBuffer|.
+class SimplePlatformSharedBuffer final : public PlatformSharedBuffer {
  public:
   explicit SimplePlatformSharedBuffer(size_t num_bytes)
       : num_bytes_(num_bytes) {}
@@ -96,19 +95,18 @@ class SimplePlatformSharedBuffer final : public platform::PlatformSharedBuffer {
   // |CreateSimplePlatformSharedBufferFromPlatformHandle()|. (Note: It should
   // verify that |platform_handle| is an appropriate handle for the claimed
   // |num_bytes_|.)
-  bool InitFromPlatformHandle(platform::ScopedPlatformHandle platform_handle);
+  bool InitFromPlatformHandle(ScopedPlatformHandle platform_handle);
 
-  // |platform::PlatformSharedBuffer| implementation:
+  // |PlatformSharedBuffer| implementation:
   size_t GetNumBytes() const override;
-  std::unique_ptr<platform::PlatformSharedBufferMapping> Map(
-      size_t offset,
-      size_t length) override;
+  std::unique_ptr<PlatformSharedBufferMapping> Map(size_t offset,
+                                                   size_t length) override;
   bool IsValidMap(size_t offset, size_t length) override;
-  std::unique_ptr<platform::PlatformSharedBufferMapping> MapNoCheck(
+  std::unique_ptr<PlatformSharedBufferMapping> MapNoCheck(
       size_t offset,
       size_t length) override;
-  platform::ScopedPlatformHandle DuplicatePlatformHandle() override;
-  platform::ScopedPlatformHandle PassPlatformHandle() override;
+  ScopedPlatformHandle DuplicatePlatformHandle() override;
+  ScopedPlatformHandle PassPlatformHandle() override;
 
  private:
   ~SimplePlatformSharedBuffer() override {}
@@ -118,7 +116,7 @@ class SimplePlatformSharedBuffer final : public platform::PlatformSharedBuffer {
   // This is set in |Init()|/|InitFromPlatformHandle()| and never modified
   // (except by |PassPlatformHandle()|; see the comments above its declaration),
   // hence does not need to be protected by a lock.
-  platform::ScopedPlatformHandle handle_;
+  ScopedPlatformHandle handle_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(SimplePlatformSharedBuffer);
 };
@@ -229,7 +227,7 @@ bool SimplePlatformSharedBuffer::InitFromPlatformHandle(
     return false;
   }
 
-  // TODO(vtl): More checks?
+// TODO(vtl): More checks?
 #endif  // defined(OS_ANDROID)
 
   handle_ = platform_handle.Pass();
@@ -328,5 +326,5 @@ RefPtr<PlatformSharedBuffer> CreateSimplePlatformSharedBufferFromPlatformHandle(
   return rv->InitFromPlatformHandle(std::move(platform_handle)) ? rv : nullptr;
 }
 
-}  // namespace embedder
+}  // namespace platform
 }  // namespace mojo

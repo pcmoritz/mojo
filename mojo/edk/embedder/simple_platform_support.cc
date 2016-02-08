@@ -6,11 +6,13 @@
 
 #include <utility>
 
-#include "mojo/edk/embedder/simple_platform_shared_buffer.h"
 #include "mojo/edk/platform/random.h"
+#include "mojo/edk/platform/simple_platform_shared_buffer.h"
 #include "mojo/edk/util/make_unique.h"
 #include "mojo/public/cpp/system/macros.h"
 
+using mojo::platform::CreateSimplePlatformSharedBuffer;
+using mojo::platform::CreateSimplePlatformSharedBufferFromPlatformHandle;
 using mojo::platform::PlatformSharedBuffer;
 using mojo::platform::ScopedPlatformHandle;
 using mojo::util::MakeUnique;

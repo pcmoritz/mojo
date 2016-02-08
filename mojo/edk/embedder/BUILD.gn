@@ -56,8 +56,6 @@ mojo_edk_source_set("platform") {
 
   sources = [
     "platform_support.h",
-    "simple_platform_shared_buffer.cc",
-    "simple_platform_shared_buffer.h",
     "simple_platform_support.cc",
     "simple_platform_support.h",
   ]
@@ -69,10 +67,6 @@ mojo_edk_source_set("platform") {
   deps = [
     "//base",
   ]
-
-  if (is_android) {
-    deps += [ "//third_party/ashmem" ]
-  }
 
   mojo_edk_deps = [ "mojo/edk/util" ]
 }
@@ -100,7 +94,6 @@ mojo_edk_unittests("mojo_edk_embedder_unittests") {
   sources = [
     "embedder_unittest.cc",
     "multiprocess_embedder_unittest.cc",
-    "simple_platform_shared_buffer_unittest.cc",
   ]
 
   deps = [

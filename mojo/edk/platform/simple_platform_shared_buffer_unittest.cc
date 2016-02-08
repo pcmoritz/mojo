@@ -2,17 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/edk/embedder/simple_platform_shared_buffer.h"
+#include "mojo/edk/platform/simple_platform_shared_buffer.h"
 
 #include <limits>
 
 #include "mojo/public/cpp/system/macros.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-using mojo::platform::PlatformSharedBufferMapping;
-
 namespace mojo {
-namespace embedder {
+namespace platform {
 namespace {
 
 TEST(SimplePlatformSharedBufferTest, Basic) {
@@ -179,5 +177,5 @@ TEST(SimplePlatformSharedBufferTest, MappingsOutliveBuffer) {
 }
 
 }  // namespace
-}  // namespace embedder
+}  // namespace platform
 }  // namespace mojo
