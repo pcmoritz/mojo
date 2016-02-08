@@ -17,42 +17,18 @@ import (
 	sort "sort"
 )
 
-// These IDs are the Mojom Identifiers / Type Keys.
-// Mojom libraries importing this one will use these identifiers when building
-// TypeReference objects.
-var ID_mojom_files_MojomFile__ string = "mojom_files_MojomFile__"
-var ID_mojom_files_MojomFileGraph__ string = "mojom_files_MojomFileGraph__"
-var ID_mojom_files_KeysByType__ string = "mojom_files_KeysByType__"
-
-var mojom_filesDesc__ = make(map[string]mojom_types.UserDefinedType)
-
-func init() {
-	mojom_filesDesc__["mojom_files_MojomFile__"] = &mojom_types.UserDefinedTypeStructType{
-		Value: mojom_files_MojomFile__(),
-	}
-	mojom_filesDesc__["mojom_files_MojomFileGraph__"] = &mojom_types.UserDefinedTypeStructType{
-		Value: mojom_files_MojomFileGraph__(),
-	}
-	mojom_filesDesc__["mojom_files_KeysByType__"] = &mojom_types.UserDefinedTypeStructType{
-		Value: mojom_files_KeysByType__(),
-	}
-
-}
-func GetAllMojomTypeDefinitions() map[string]mojom_types.UserDefinedType {
-	return mojom_filesDesc__
-}
-
 type MojomFile struct {
-	FileName             string
-	SpecifiedFileName    *string
-	ModuleNamespace      *string
-	Attributes           *[]mojom_types.Attribute
-	Imports              *[]string
-	DeclaredMojomObjects KeysByType
+	FileName                  string
+	SpecifiedFileName         *string
+	ModuleNamespace           *string
+	Attributes                *[]mojom_types.Attribute
+	Imports                   *[]string
+	DeclaredMojomObjects      KeysByType
+	SerializedRuntimeTypeInfo *[]uint8
 }
 
 func (s *MojomFile) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(48, 0)
+	encoder.StartStruct(56, 0)
 	if err := encoder.WritePointer(); err != nil {
 		return err
 	}
@@ -123,6 +99,22 @@ func (s *MojomFile) Encode(encoder *bindings.Encoder) error {
 	if err := s.DeclaredMojomObjects.Encode(encoder); err != nil {
 		return err
 	}
+	if s.SerializedRuntimeTypeInfo == nil {
+		encoder.WriteNullPointer()
+	} else {
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		encoder.StartArray(uint32(len((*s.SerializedRuntimeTypeInfo))), 8)
+		for _, elem0 := range *s.SerializedRuntimeTypeInfo {
+			if err := encoder.WriteUint8(elem0); err != nil {
+				return err
+			}
+		}
+		if err := encoder.Finish(); err != nil {
+			return err
+		}
+	}
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
@@ -130,7 +122,7 @@ func (s *MojomFile) Encode(encoder *bindings.Encoder) error {
 }
 
 var mojomFile_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{56, 0},
+	bindings.DataHeader{64, 0},
 }
 
 func (s *MojomFile) Decode(decoder *bindings.Decoder) error {
@@ -278,72 +270,36 @@ func (s *MojomFile) Decode(decoder *bindings.Decoder) error {
 			}
 		}
 	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			s.SerializedRuntimeTypeInfo = nil
+		} else {
+			s.SerializedRuntimeTypeInfo = new([]uint8)
+			len0, err := decoder.StartArray(8)
+			if err != nil {
+				return err
+			}
+			(*s.SerializedRuntimeTypeInfo) = make([]uint8, len0)
+			for i0 := uint32(0); i0 < len0; i0++ {
+				value1, err := decoder.ReadUint8()
+				if err != nil {
+					return err
+				}
+				(*s.SerializedRuntimeTypeInfo)[i0] = value1
+			}
+			if err := decoder.Finish(); err != nil {
+				return err
+			}
+		}
+	}
 	if err := decoder.Finish(); err != nil {
 		return err
 	}
 	return nil
-}
-
-// String names and labels used by the MojomStruct types.
-var (
-	structName_MojomFile                           = "MojomFile"
-	structFullIdentifier_MojomFile                 = "mojo.bindings.types.MojomFile"
-	structFieldName_MojomFile_FileName             = "FileName"
-	structFieldName_MojomFile_SpecifiedFileName    = "SpecifiedFileName"
-	structFieldName_MojomFile_ModuleNamespace      = "ModuleNamespace"
-	structFieldName_MojomFile_Attributes           = "Attributes"
-	structFieldName_MojomFile_Imports              = "Imports"
-	structFieldName_MojomFile_DeclaredMojomObjects = "DeclaredMojomObjects"
-)
-
-func mojom_files_MojomFile__() mojom_types.MojomStruct {
-	return mojom_types.MojomStruct{
-		DeclData: &mojom_types.DeclarationData{
-			ShortName:      &structName_MojomFile,
-			FullIdentifier: &structFullIdentifier_MojomFile,
-		}, Fields: []mojom_types.StructField{mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_FileName,
-			},
-			Type: &mojom_types.TypeStringType{mojom_types.StringType{false}},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_SpecifiedFileName,
-			},
-			Type: &mojom_types.TypeStringType{mojom_types.StringType{true}},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_ModuleNamespace,
-			},
-			Type: &mojom_types.TypeStringType{mojom_types.StringType{true}},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_Attributes,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeTypeReference{
-					Value: mojom_types.TypeReference{Identifier: &mojom_types.ID_mojom_types_Attribute__,
-						TypeKey: &mojom_types.ID_mojom_types_Attribute__},
-				},
-				},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_Imports,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFile_DeclaredMojomObjects,
-			},
-			Type: &mojom_types.TypeTypeReference{
-				Value: mojom_types.TypeReference{Identifier: &ID_mojom_files_KeysByType__,
-					TypeKey: &ID_mojom_files_KeysByType__},
-			},
-		}},
-	}
 }
 
 type MojomFileGraph struct {
@@ -797,60 +753,6 @@ func (s *MojomFileGraph) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-// String names and labels used by the MojomStruct types.
-var (
-	structName_MojomFileGraph                     = "MojomFileGraph"
-	structFullIdentifier_MojomFileGraph           = "mojo.bindings.types.MojomFileGraph"
-	structFieldName_MojomFileGraph_Files          = "Files"
-	structFieldName_MojomFileGraph_ResolvedTypes  = "ResolvedTypes"
-	structFieldName_MojomFileGraph_ResolvedValues = "ResolvedValues"
-)
-
-func mojom_files_MojomFileGraph__() mojom_types.MojomStruct {
-	return mojom_types.MojomStruct{
-		DeclData: &mojom_types.DeclarationData{
-			ShortName:      &structName_MojomFileGraph,
-			FullIdentifier: &structFullIdentifier_MojomFileGraph,
-		}, Fields: []mojom_types.StructField{mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFileGraph_Files,
-			},
-			Type: &mojom_types.TypeMapType{
-				Value: mojom_types.MapType{KeyType: &mojom_types.TypeStringType{mojom_types.StringType{false}},
-					ValueType: &mojom_types.TypeTypeReference{
-						Value: mojom_types.TypeReference{Identifier: &ID_mojom_files_MojomFile__,
-							TypeKey: &ID_mojom_files_MojomFile__},
-					},
-				},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFileGraph_ResolvedTypes,
-			},
-			Type: &mojom_types.TypeMapType{
-				Value: mojom_types.MapType{KeyType: &mojom_types.TypeStringType{mojom_types.StringType{false}},
-					ValueType: &mojom_types.TypeTypeReference{
-						Value: mojom_types.TypeReference{Identifier: &mojom_types.ID_mojom_types_UserDefinedType__,
-							TypeKey: &mojom_types.ID_mojom_types_UserDefinedType__},
-					},
-				},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_MojomFileGraph_ResolvedValues,
-			},
-			Type: &mojom_types.TypeMapType{
-				Value: mojom_types.MapType{KeyType: &mojom_types.TypeStringType{mojom_types.StringType{false}},
-					ValueType: &mojom_types.TypeTypeReference{
-						Value: mojom_types.TypeReference{Identifier: &mojom_types.ID_mojom_types_UserDefinedValue__,
-							TypeKey: &mojom_types.ID_mojom_types_UserDefinedValue__},
-					},
-				},
-			},
-		}},
-	}
-}
-
 type KeysByType struct {
 	Interfaces        *[]string
 	Structs           *[]string
@@ -1269,73 +1171,428 @@ func (s *KeysByType) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-// String names and labels used by the MojomStruct types.
-var (
-	structName_KeysByType                        = "KeysByType"
-	structFullIdentifier_KeysByType              = "mojo.bindings.types.KeysByType"
-	structFieldName_KeysByType_Interfaces        = "Interfaces"
-	structFieldName_KeysByType_Structs           = "Structs"
-	structFieldName_KeysByType_Unions            = "Unions"
-	structFieldName_KeysByType_TopLevelEnums     = "TopLevelEnums"
-	structFieldName_KeysByType_EmbeddedEnums     = "EmbeddedEnums"
-	structFieldName_KeysByType_TopLevelConstants = "TopLevelConstants"
-	structFieldName_KeysByType_EmbeddedConstants = "EmbeddedConstants"
-)
+type ServiceTypeInfo struct {
+	TopLevelInterface string
+	CompleteTypeSet   []string
+}
 
-func mojom_files_KeysByType__() mojom_types.MojomStruct {
-	return mojom_types.MojomStruct{
-		DeclData: &mojom_types.DeclarationData{
-			ShortName:      &structName_KeysByType,
-			FullIdentifier: &structFullIdentifier_KeysByType,
-		}, Fields: []mojom_types.StructField{mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_Interfaces,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_Structs,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_Unions,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_TopLevelEnums,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_EmbeddedEnums,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_TopLevelConstants,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}, mojom_types.StructField{
-			DeclData: &mojom_types.DeclarationData{
-				ShortName: &structFieldName_KeysByType_EmbeddedConstants,
-			},
-			Type: &mojom_types.TypeArrayType{
-				Value: mojom_types.ArrayType{Nullable: true, ElementType: &mojom_types.TypeStringType{mojom_types.StringType{false}}},
-			},
-		}},
+func (s *ServiceTypeInfo) Encode(encoder *bindings.Encoder) error {
+	encoder.StartStruct(16, 0)
+	if err := encoder.WritePointer(); err != nil {
+		return err
 	}
+	if err := encoder.WriteString(s.TopLevelInterface); err != nil {
+		return err
+	}
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	encoder.StartArray(uint32(len(s.CompleteTypeSet)), 64)
+	for _, elem0 := range s.CompleteTypeSet {
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		if err := encoder.WriteString(elem0); err != nil {
+			return err
+		}
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	return nil
+}
+
+var serviceTypeInfo_Versions []bindings.DataHeader = []bindings.DataHeader{
+	bindings.DataHeader{24, 0},
+}
+
+func (s *ServiceTypeInfo) Decode(decoder *bindings.Decoder) error {
+	header, err := decoder.StartStruct()
+	if err != nil {
+		return err
+	}
+	index := sort.Search(len(serviceTypeInfo_Versions), func(i int) bool {
+		return serviceTypeInfo_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
+	})
+	if index < len(serviceTypeInfo_Versions) {
+		if serviceTypeInfo_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
+			index--
+		}
+		expectedSize := serviceTypeInfo_Versions[index].Size
+		if expectedSize != header.Size {
+			return &bindings.ValidationError{bindings.UnexpectedStructHeader,
+				fmt.Sprintf("invalid struct header size: should be %d, but was %d", expectedSize, header.Size),
+			}
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			value0, err := decoder.ReadString()
+			if err != nil {
+				return err
+			}
+			s.TopLevelInterface = value0
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			len0, err := decoder.StartArray(64)
+			if err != nil {
+				return err
+			}
+			s.CompleteTypeSet = make([]string, len0)
+			for i0 := uint32(0); i0 < len0; i0++ {
+				pointer1, err := decoder.ReadPointer()
+				if err != nil {
+					return err
+				}
+				if pointer1 == 0 {
+					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+				} else {
+					value1, err := decoder.ReadString()
+					if err != nil {
+						return err
+					}
+					s.CompleteTypeSet[i0] = value1
+				}
+			}
+			if err := decoder.Finish(); err != nil {
+				return err
+			}
+		}
+	}
+	if err := decoder.Finish(); err != nil {
+		return err
+	}
+	return nil
+}
+
+type RuntimeTypeInfo struct {
+	ServicesByName map[string]ServiceTypeInfo
+	TypeMap        map[string]mojom_types.UserDefinedType
+}
+
+func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
+	encoder.StartStruct(16, 0)
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	encoder.StartMap()
+	{
+		var keys0 []string
+		var values0 []ServiceTypeInfo
+		for key0, value0 := range s.ServicesByName {
+			keys0 = append(keys0, key0)
+			values0 = append(values0, value0)
+		}
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		encoder.StartArray(uint32(len(keys0)), 64)
+		for _, elem1 := range keys0 {
+			if err := encoder.WritePointer(); err != nil {
+				return err
+			}
+			if err := encoder.WriteString(elem1); err != nil {
+				return err
+			}
+		}
+		if err := encoder.Finish(); err != nil {
+			return err
+		}
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		encoder.StartArray(uint32(len(values0)), 64)
+		for _, elem1 := range values0 {
+			if err := encoder.WritePointer(); err != nil {
+				return err
+			}
+			if err := elem1.Encode(encoder); err != nil {
+				return err
+			}
+		}
+		if err := encoder.Finish(); err != nil {
+			return err
+		}
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	encoder.StartMap()
+	{
+		var keys0 []string
+		var values0 []mojom_types.UserDefinedType
+		for key0, value0 := range s.TypeMap {
+			keys0 = append(keys0, key0)
+			values0 = append(values0, value0)
+		}
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		encoder.StartArray(uint32(len(keys0)), 64)
+		for _, elem1 := range keys0 {
+			if err := encoder.WritePointer(); err != nil {
+				return err
+			}
+			if err := encoder.WriteString(elem1); err != nil {
+				return err
+			}
+		}
+		if err := encoder.Finish(); err != nil {
+			return err
+		}
+		if err := encoder.WritePointer(); err != nil {
+			return err
+		}
+		encoder.StartArray(uint32(len(values0)), 128)
+		for _, elem1 := range values0 {
+			if elem1 == nil {
+				return &bindings.ValidationError{bindings.UnexpectedNullUnion, "unexpected null union"}
+			}
+			if err := elem1.Encode(encoder); err != nil {
+				return err
+			}
+		}
+		if err := encoder.Finish(); err != nil {
+			return err
+		}
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	return nil
+}
+
+var runtimeTypeInfo_Versions []bindings.DataHeader = []bindings.DataHeader{
+	bindings.DataHeader{24, 0},
+}
+
+func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
+	header, err := decoder.StartStruct()
+	if err != nil {
+		return err
+	}
+	index := sort.Search(len(runtimeTypeInfo_Versions), func(i int) bool {
+		return runtimeTypeInfo_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
+	})
+	if index < len(runtimeTypeInfo_Versions) {
+		if runtimeTypeInfo_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
+			index--
+		}
+		expectedSize := runtimeTypeInfo_Versions[index].Size
+		if expectedSize != header.Size {
+			return &bindings.ValidationError{bindings.UnexpectedStructHeader,
+				fmt.Sprintf("invalid struct header size: should be %d, but was %d", expectedSize, header.Size),
+			}
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			if err := decoder.StartMap(); err != nil {
+				return err
+			}
+			var keys0 []string
+			{
+				pointer1, err := decoder.ReadPointer()
+				if err != nil {
+					return err
+				}
+				if pointer1 == 0 {
+					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+				} else {
+					len1, err := decoder.StartArray(64)
+					if err != nil {
+						return err
+					}
+					keys0 = make([]string, len1)
+					for i1 := uint32(0); i1 < len1; i1++ {
+						pointer2, err := decoder.ReadPointer()
+						if err != nil {
+							return err
+						}
+						if pointer2 == 0 {
+							return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+						} else {
+							value2, err := decoder.ReadString()
+							if err != nil {
+								return err
+							}
+							keys0[i1] = value2
+						}
+					}
+					if err := decoder.Finish(); err != nil {
+						return err
+					}
+				}
+			}
+			var values0 []ServiceTypeInfo
+			{
+				pointer1, err := decoder.ReadPointer()
+				if err != nil {
+					return err
+				}
+				if pointer1 == 0 {
+					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+				} else {
+					len1, err := decoder.StartArray(64)
+					if err != nil {
+						return err
+					}
+					values0 = make([]ServiceTypeInfo, len1)
+					for i1 := uint32(0); i1 < len1; i1++ {
+						pointer2, err := decoder.ReadPointer()
+						if err != nil {
+							return err
+						}
+						if pointer2 == 0 {
+							return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+						} else {
+							if err := values0[i1].Decode(decoder); err != nil {
+								return err
+							}
+						}
+					}
+					if err := decoder.Finish(); err != nil {
+						return err
+					}
+				}
+			}
+			if len(keys0) != len(values0) {
+				return &bindings.ValidationError{bindings.DifferentSizedArraysInMap,
+					fmt.Sprintf("Number of keys %d is different from number of values %d", len(keys0), len(values0)),
+				}
+			}
+			if err := decoder.Finish(); err != nil {
+				return err
+			}
+			len0 := len(keys0)
+			map0 := make(map[string]ServiceTypeInfo)
+			for i0 := 0; i0 < len0; i0++ {
+				map0[keys0[i0]] = values0[i0]
+			}
+			s.ServicesByName = map0
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			if err := decoder.StartMap(); err != nil {
+				return err
+			}
+			var keys0 []string
+			{
+				pointer1, err := decoder.ReadPointer()
+				if err != nil {
+					return err
+				}
+				if pointer1 == 0 {
+					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+				} else {
+					len1, err := decoder.StartArray(64)
+					if err != nil {
+						return err
+					}
+					keys0 = make([]string, len1)
+					for i1 := uint32(0); i1 < len1; i1++ {
+						pointer2, err := decoder.ReadPointer()
+						if err != nil {
+							return err
+						}
+						if pointer2 == 0 {
+							return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+						} else {
+							value2, err := decoder.ReadString()
+							if err != nil {
+								return err
+							}
+							keys0[i1] = value2
+						}
+					}
+					if err := decoder.Finish(); err != nil {
+						return err
+					}
+				}
+			}
+			var values0 []mojom_types.UserDefinedType
+			{
+				pointer1, err := decoder.ReadPointer()
+				if err != nil {
+					return err
+				}
+				if pointer1 == 0 {
+					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+				} else {
+					len1, err := decoder.StartArray(128)
+					if err != nil {
+						return err
+					}
+					values0 = make([]mojom_types.UserDefinedType, len1)
+					for i1 := uint32(0); i1 < len1; i1++ {
+						var err error
+						values0[i1], err = mojom_types.DecodeUserDefinedType(decoder)
+						if err != nil {
+							return err
+						}
+						if values0[i1] == nil {
+							return &bindings.ValidationError{bindings.UnexpectedNullUnion, "unexpected null union"}
+						}
+					}
+					if err := decoder.Finish(); err != nil {
+						return err
+					}
+				}
+			}
+			if len(keys0) != len(values0) {
+				return &bindings.ValidationError{bindings.DifferentSizedArraysInMap,
+					fmt.Sprintf("Number of keys %d is different from number of values %d", len(keys0), len(values0)),
+				}
+			}
+			if err := decoder.Finish(); err != nil {
+				return err
+			}
+			len0 := len(keys0)
+			map0 := make(map[string]mojom_types.UserDefinedType)
+			for i0 := 0; i0 < len0; i0++ {
+				map0[keys0[i0]] = values0[i0]
+			}
+			s.TypeMap = map0
+		}
+	}
+	if err := decoder.Finish(); err != nil {
+		return err
+	}
+	return nil
 }
