@@ -54,7 +54,8 @@ void InputAssociate::SetListener(mojo::ui::ViewToken* view_token,
                                  mojo::ui::InputListenerPtr listener) {
   // TODO(jeffbrown): This simple hack just hooks up the first listener
   // ever seen.
-  listener_ = listener.Pass();
+  if (!listener_)
+    listener_ = listener.Pass();
 }
 
 void InputAssociate::DispatchEvent(mojo::ui::ViewTreeToken* view_tree_token,
