@@ -4,6 +4,8 @@
 
 # Define the sysroot directory.
 sysroot = "$root_out_dir/sysroot"
+sysroot_lib_dir = "${sysroot}/usr/lib"
+sysroot_include_dir = "${sysroot}/usr/include"
 
 config("fusl_config") {
   cflags = [
@@ -40,38 +42,6 @@ config("fusl_config") {
     "src/internal",
     "include",
   ]
-}
-
-# See the discussion below about what these files are, and their
-# relationship to other C runtime files.
-source_set("crt") {
-  cflags = []
-
-  configs = []
-  configs += [ ":fusl_config" ]
-
-  cflags += [
-    "-DCRT",
-    "-fno-stack-protector",
-  ]
-
-  sources = [
-    "crt/Scrt1.c",
-    "crt/crt1.c",
-    "crt/rcrt1.c",
-  ]
-
-  if (target_cpu == "x64") {
-    sources += [
-      "crt/x86_64/crti.s",
-      "crt/x86_64/crtn.s",
-    ]
-  } else {
-    sources += [
-      "crt/crti.c",
-      "crt/crtn.c",
-    ]
-  }
 }
 
 if (current_cpu != "x64") {
@@ -282,62 +252,6 @@ static_library("libm") {
   complete_static_lib = true
 }
 
-template("copy_objects") {
-  assert(defined(invoker.input_dir), "input_dir must be defined")
-  assert(defined(invoker.output_dir), "output_dir must be defined")
-  object_prefix = ""
-  if (defined(invoker.object_prefix)) {
-    object_prefix = invoker.object_prefix
-  }
-  foreach(file, invoker.sources) {
-    copy("copy_${file}") {
-      sources = [
-        rebase_path("${invoker.input_dir}/${object_prefix}${file}",
-                    "",
-                    target_out_dir),
-      ]
-      outputs = [
-        "${invoker.output_dir}/${file}",
-      ]
-      deps = [
-        ":crt",
-      ]
-    }
-  }
-  group(target_name) {
-    deps = [
-      ":crt",
-    ]
-    foreach(file, invoker.sources) {
-      deps += [ ":copy_$file" ]
-    }
-  }
-}
-
-sysroot_lib_dir = "${sysroot}/usr/lib"
-sysroot_include_dir = "${sysroot}/usr/include"
-
-copy_objects("copy_crt_objects") {
-  sources = [
-    "Scrt1.o",
-    "crt1.o",
-    "rcrt1.o",
-  ]
-  object_prefix = "crt."
-  input_dir = "crt"
-  output_dir = "${sysroot_lib_dir}"
-}
-
-copy_objects("copy_crt_x64_objects") {
-  sources = [
-    "crti.o",
-    "crtn.o",
-  ]
-  object_prefix = "crt."
-  input_dir = "crt/x86_64"
-  output_dir = "${sysroot_lib_dir}"
-}
-
 copy("copy_include") {
   sources = [
     "include",
@@ -377,74 +291,10 @@ copy("copy_libs") {
 
 group("copy_sysroot") {
   deps = [
-    ":copy_crt_objects",
     ":copy_include",
     ":copy_include_bits",
     ":copy_libs",
-  ]
-  if (current_cpu == "x64") {
-    deps += [ ":copy_crt_x64_objects" ]
-  }
-}
-
-# The crtXXX.o files that are copied elsewhere in this file define
-# _start, and the machinery to implement calling into the init and
-# fini sections. These things are libc dependent and hence part of
-# libc.
-#
-# Unlike the other crtXXX.o files, crtbegin and crtend, are provided
-# by the toolchain, not the libc. So we steal them from the host.
-#
-# crtbegin and crtend know how to call constructors and destructors.
-#
-# libgcc provides runtime support, and so also comes from the
-# compiler. Things in here are stack unwinding, arithmetic not
-# supported on the target architecture, and so on.
-#
-# The best document I am aware of describing the different variants of
-# these files (and crtXXX.o above) is
-# https://dev.gentoo.org/~vapier/crt.txt
-#
-# S and _s mean shared or PIE
-# T and _eh mean static
-action("finish_sysroot") {
-  script = "tools/populate_crt.py"
-
-  clang = "//third_party/llvm-build/Release+Asserts/bin/clang"
-  target = "$sysroot/usr/lib"
-
-  files = [
-    "crtbegin.o",
-    "crtbeginS.o",
-    "crtbeginT.o",
-    "crtend.o",
-    "crtendS.o",
-
-    "libgcc.a",
-    "libgcc_eh.a",
-    "libgcc_s.so",
-  ]
-
-  args = [
-    rebase_path(clang),
-    rebase_path(target),
-  ]
-  args += files
-
-  outputs = [
-    "$target/crtbegin.o",
-    "$target/crtbeginSo.o",
-    "$target/crtbeginT.o",
-    "$target/crtend.o",
-    "$target/crtendS.o",
-
-    "$target/libgcc.a",
-    "$target/libgcc_eh.a",
-    "$target/libgcc_s.so",
-  ]
-
-  deps = [
-    ":copy_sysroot",
+    "crt:copy_crt_objects",
   ]
 }
 
@@ -472,15 +322,14 @@ executable("empty_main") {
   ]
 
   deps = [
-    ":finish_sysroot",
+    ":copy_sysroot",
   ]
 }
 
 group("fusl") {
   deps = [
-    ":crt(//build/toolchain/fusl:fusl_$current_cpu)",
     ":empty_main(//build/toolchain/fusl:fusl_$current_cpu)",
-    ":finish_sysroot(//build/toolchain/fusl:fusl_$current_cpu)",
     ":libc(//build/toolchain/fusl:fusl_$current_cpu)",
+    "crt(//build/toolchain/fusl:fusl_$current_cpu)",
   ]
 }
