@@ -13,4 +13,10 @@ fusl_source_set("fenv") {
     "fesetround.c",
     "feupdateenv.c",
   ]
+
+  if (current_cpu == "x64") {
+    sources += [ "x86_64/fenv.s" ]
+  } else {
+    sources += [ "fenv.c" ]
+  }
 }

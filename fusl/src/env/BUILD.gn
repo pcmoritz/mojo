@@ -14,4 +14,18 @@ fusl_source_set("env") {
     "setenv.c",
     "unsetenv.c",
   ]
+
+  deps = [
+    ":no_stack_protector",
+  ]
+}
+
+fusl_source_set("no_stack_protector") {
+  configs = [ "//fusl:fusl_no_stack_protector_config" ]
+
+  sources = [
+    "__init_tls.c",
+    "__libc_start_main.c",
+    "__stack_chk_fail.c",
+  ]
 }

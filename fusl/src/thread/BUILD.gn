@@ -130,4 +130,32 @@ fusl_source_set("thread") {
     "tss_set.c",
     "vmlock.c",
   ]
+
+  deps = []
+  if (current_cpu == "x64") {
+    sources += [
+      "x86_64/__set_thread_area.s",
+      "x86_64/__unmapself.s",
+      "x86_64/clone.s",
+      "x86_64/syscall_cp.s",
+    ]
+  } else {
+    sources += [
+      "__unmapself.c",
+      "clone.c",
+      "syscall_cp.c",
+    ]
+
+    deps += [ ":generic_no_stack_protector" ]
+  }
+}
+
+if (current_cpu != "x64") {
+  fusl_source_set("generic_no_stack_protector") {
+    configs += [ "//fusl:fusl_no_stack_protector_config" ]
+
+    sources = [
+      "__set_thread_area.c",
+    ]
+  }
 }

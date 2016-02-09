@@ -15,4 +15,10 @@ fusl_source_set("internal") {
     "vdso.c",
     "version.c",
   ]
+
+  if (current_cpu == "x64") {
+    sources += [ "x86_64/syscall.s" ]
+  } else {
+    sources += [ "syscall.c" ]
+  }
 }

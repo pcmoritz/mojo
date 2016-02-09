@@ -44,149 +44,8 @@ config("fusl_config") {
   ]
 }
 
-if (current_cpu != "x64") {
-  source_set("libc_generic_no_stack_protector") {
-    cflags = []
-
-    configs = []
-    configs += [ ":fusl_config" ]
-
-    cflags += [ "-fno-stack-protector" ]
-
-    sources = [
-      "src/string/memcpy.c",
-      "src/string/memset.c",
-      "src/thread/__set_thread_area.c",
-    ]
-  }
-
-  source_set("libc_generic") {
-    configs = []
-    configs += [ ":fusl_config" ]
-
-    sources = [
-      "src/fenv/fenv.c",
-      "src/internal/syscall.c",
-      "src/ldso/dlsym.c",
-      "src/ldso/tlsdesc.c",
-      "src/math/__invtrigl.c",
-      "src/math/acosl.c",
-      "src/math/asinl.c",
-      "src/math/atan2l.c",
-      "src/math/atanl.c",
-      "src/math/ceill.c",
-      "src/math/exp2l.c",
-      "src/math/expl.c",
-      "src/math/expm1l.c",
-      "src/math/fabs.c",
-      "src/math/fabsf.c",
-      "src/math/fabsl.c",
-      "src/math/floorl.c",
-      "src/math/fmodl.c",
-      "src/math/llrint.c",
-      "src/math/llrintf.c",
-      "src/math/llrintl.c",
-      "src/math/log10l.c",
-      "src/math/log1pl.c",
-      "src/math/log2l.c",
-      "src/math/logl.c",
-      "src/math/lrint.c",
-      "src/math/lrintf.c",
-      "src/math/lrintl.c",
-      "src/math/remainderl.c",
-      "src/math/rintl.c",
-      "src/math/sqrt.c",
-      "src/math/sqrtf.c",
-      "src/math/sqrtl.c",
-      "src/math/truncl.c",
-      "src/process/vfork.c",
-      "src/setjmp/longjmp.c",
-      "src/setjmp/setjmp.c",
-      "src/signal/restore.c",
-      "src/signal/sigsetjmp.c",
-      "src/string/memmove.c",
-      "src/thread/__unmapself.c",
-      "src/thread/clone.c",
-      "src/thread/syscall_cp.c",
-    ]
-
-    deps = [
-      ":libc_generic_no_stack_protector",
-    ]
-  }
-}
-
-if (current_cpu == "x64") {
-  source_set("libc_x64") {
-    configs = []
-    configs += [ ":fusl_config" ]
-
-    sources = [
-      "src/fenv/x86_64/fenv.s",
-      "src/internal/x86_64/syscall.s",
-      "src/ldso/x86_64/dlsym.s",
-      "src/ldso/x86_64/tlsdesc.s",
-      "src/math/x86_64/__invtrigl.s",
-      "src/math/x86_64/acosl.s",
-      "src/math/x86_64/asinl.s",
-      "src/math/x86_64/atan2l.s",
-      "src/math/x86_64/atanl.s",
-      "src/math/x86_64/ceill.s",
-      "src/math/x86_64/exp2l.s",
-      "src/math/x86_64/expl.s",
-      "src/math/x86_64/expm1l.s",
-      "src/math/x86_64/fabs.s",
-      "src/math/x86_64/fabsf.s",
-      "src/math/x86_64/fabsl.s",
-      "src/math/x86_64/floorl.s",
-      "src/math/x86_64/fmodl.s",
-      "src/math/x86_64/llrint.s",
-      "src/math/x86_64/llrintf.s",
-      "src/math/x86_64/llrintl.s",
-      "src/math/x86_64/log10l.s",
-      "src/math/x86_64/log1pl.s",
-      "src/math/x86_64/log2l.s",
-      "src/math/x86_64/logl.s",
-      "src/math/x86_64/lrint.s",
-      "src/math/x86_64/lrintf.s",
-      "src/math/x86_64/lrintl.s",
-      "src/math/x86_64/remainderl.s",
-      "src/math/x86_64/rintl.s",
-      "src/math/x86_64/sqrt.s",
-      "src/math/x86_64/sqrtf.s",
-      "src/math/x86_64/sqrtl.s",
-      "src/math/x86_64/truncl.s",
-      "src/process/x86_64/vfork.s",
-      "src/setjmp/x86_64/longjmp.s",
-      "src/setjmp/x86_64/setjmp.s",
-      "src/signal/x86_64/restore.s",
-      "src/signal/x86_64/sigsetjmp.s",
-      "src/string/x86_64/memcpy.s",
-      "src/string/x86_64/memmove.s",
-      "src/string/x86_64/memset.s",
-      "src/thread/x86_64/__set_thread_area.s",
-      "src/thread/x86_64/__unmapself.s",
-      "src/thread/x86_64/clone.s",
-      "src/thread/x86_64/syscall_cp.s",
-    ]
-  }
-}
-
-source_set("libc_no_stack_protector") {
-  cflags = []
-
-  configs = []
-  configs += [ ":fusl_config" ]
-
-  cflags += [ "-fno-stack-protector" ]
-
-  sources = [
-    "src/env/__init_tls.c",
-    "src/env/__libc_start_main.c",
-    "src/env/__stack_chk_fail.c",
-    "src/ldso/dlstart.c",
-    "src/ldso/dynlink.c",
-  ]
+config("fusl_no_stack_protector_config") {
+  cflags = [ "-fno-stack-protector" ]
 }
 
 static_library("libc") {
@@ -196,7 +55,6 @@ static_library("libc") {
   complete_static_lib = true
 
   deps = [
-    ":libc_no_stack_protector",
     "src/aio",
     "src/complex",
     "src/conf",
@@ -240,9 +98,6 @@ static_library("libc") {
     "src/time",
     "src/unistd",
   ]
-
-  # Arch specific sources.
-  deps += [ ":libc_${current_cpu}" ]
 }
 
 # For simplicity, musl places all its symbols in libc. To support

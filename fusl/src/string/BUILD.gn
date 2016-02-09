@@ -77,4 +77,28 @@ fusl_source_set("string") {
     "wmemmove.c",
     "wmemset.c",
   ]
+
+  deps = []
+  if (current_cpu == "x64") {
+    sources += [
+      "x86_64/memcpy.s",
+      "x86_64/memmove.s",
+      "x86_64/memset.s",
+    ]
+  } else {
+    sources += [ "memmove.c" ]
+
+    deps += [ ":generic_no_stack_protector" ]
+  }
+}
+
+if (current_cpu != "x64") {
+  fusl_source_set("generic_no_stack_protector") {
+    configs += [ "//fusl:fusl_no_stack_protector_config" ]
+
+    sources = [
+      "memcpy.c",
+      "memset.c",
+    ]
+  }
 }

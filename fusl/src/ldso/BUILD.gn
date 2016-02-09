@@ -10,4 +10,29 @@ fusl_source_set("ldso") {
     "dladdr.c",
     "dlinfo.c",
   ]
+
+  if (current_cpu == "x64") {
+    sources += [
+      "x86_64/dlsym.s",
+      "x86_64/tlsdesc.s",
+    ]
+  } else {
+    sources += [
+      "dlsym.c",
+      "tlsdesc.c",
+    ]
+  }
+
+  deps = [
+    ":no_stack_protector",
+  ]
+}
+
+fusl_source_set("no_stack_protector") {
+  configs = [ "//fusl:fusl_no_stack_protector_config" ]
+
+  sources = [
+    "dlstart.c",
+    "dynlink.c",
+  ]
 }
