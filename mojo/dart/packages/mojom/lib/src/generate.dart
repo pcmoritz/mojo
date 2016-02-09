@@ -197,7 +197,6 @@ class MojomGenerator {
         final result = await _runBindingsGeneration(script, arguments);
         if (result.exitCode != 0) {
           log.info("bindings generation result = ${result.exitCode}");
-          await outputDir.delete(recursive: true);
           throw new GenerationError("$script failed:\n"
               "code: ${result.exitCode}\n"
               "stderr: ${result.stderr}\n"
@@ -221,7 +220,6 @@ class MojomGenerator {
           log.info("Found generated lib dir: $libDir");
 
           if (packageName != name) {
-            await outputDir.delete(recursive: true);
             throw new GenerationError(
                 "Tried to generate for package $name in package $packageName");
           }
@@ -232,7 +230,9 @@ class MojomGenerator {
         }
       }
     } finally {
-      await outputDir.delete(recursive: true);
+      if (await outputDir.exists()) {
+        await outputDir.delete(recursive: true);
+      }
     }
   }
 
