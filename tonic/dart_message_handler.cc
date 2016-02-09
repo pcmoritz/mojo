@@ -27,16 +27,16 @@ void DartMessageHandler::Initialize(
   // Only can be called once.
   CHECK(!task_runner_);
   task_runner_ = runner;
+  CHECK(task_runner_);
   Dart_SetMessageNotifyCallback(MessageNotifyCallback);
 }
 
 void DartMessageHandler::OnMessage(DartState* dart_state) {
-  CHECK(dart_state->message_handler().task_runner());
+  auto task_runner = dart_state->message_handler().task_runner();
 
   // Schedule a task to run on the message loop thread.
-  dart_state->message_handler().task_runner()->PostTask(
-      FROM_HERE,
-      base::Bind(&HandleMessage, dart_state->GetWeakPtr()));
+  task_runner->PostTask(FROM_HERE,
+                        base::Bind(&HandleMessage, dart_state->GetWeakPtr()));
 }
 
 void DartMessageHandler::OnHandleMessage(DartState* dart_state) {

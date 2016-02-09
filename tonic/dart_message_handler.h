@@ -15,16 +15,16 @@ class DartState;
 class DartMessageHandler {
  public:
   DartMessageHandler();
-  virtual ~DartMessageHandler();
+  ~DartMessageHandler();
 
   // Messages for the current isolate will be scheduled on |runner|.
   void Initialize(const scoped_refptr<base::SingleThreadTaskRunner>& runner);
 
  protected:
   // Called from an unknown thread for each message.
-  virtual void OnMessage(DartState* dart_state);
+  void OnMessage(DartState* dart_state);
   // By default, called on the task runner's thread for each message.
-  virtual void OnHandleMessage(DartState* dart_state);
+  void OnHandleMessage(DartState* dart_state);
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner() const {
     return task_runner_;
