@@ -67,7 +67,9 @@ _BANNED_CPP_FUNCTIONS = (
        'base/gtest_prod_util.h and use FRIEND_TEST_ALL_PREFIXES() instead.',
       ),
       False,
-      (),
+      (
+        r"^mojo/edk/util/gtest_prod_utils\.h$",
+      ),
     ),
     (
       'ScopedAllowIO',

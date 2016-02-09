@@ -14,6 +14,7 @@ mojo_edk_source_set("util") {
     "command_line.h",
     "cond_var.cc",
     "cond_var.h",
+    "gtest_prod_utils.h",
     "logging_internal.cc",
     "logging_internal.h",
     "make_unique.h",
