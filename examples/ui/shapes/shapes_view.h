@@ -13,9 +13,8 @@ namespace examples {
 
 class ShapesView : public mojo::ui::GaneshView {
  public:
-  ShapesView(
-      mojo::ApplicationImpl* app_impl,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+  ShapesView(mojo::ApplicationImpl* app_impl,
+             mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request);
 
   ~ShapesView() override;
 

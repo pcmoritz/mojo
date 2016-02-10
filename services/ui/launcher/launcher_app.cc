@@ -12,6 +12,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "services/ui/launcher/launcher_view_tree.h"
 
 namespace launcher {
@@ -97,7 +98,8 @@ void LauncherApp::OnViewportCreated(mojo::ViewportMetricsPtr metrics) {
       compositor_.get(), view_manager_.get(), context_provider.Pass(),
       metrics.Pass(),
       base::Bind(&LauncherApp::Shutdown, base::Unretained(this))));
-  UpdateClientView();
+  view_tree_->SetRoot(client_view_owner_.Pass());
+
   RequestUpdatedViewportMetrics();
 }
 
@@ -123,28 +125,11 @@ void LauncherApp::OnEvent(mojo::EventPtr event,
 void LauncherApp::LaunchClient(std::string app_url) {
   DVLOG(1) << "Launching " << app_url;
 
-  app_impl_->ConnectToService(app_url, &client_view_provider_);
-  client_view_provider_.set_connection_error_handler(base::Bind(
-      &LauncherApp::OnClientConnectionError, base::Unretained(this)));
+  mojo::ui::ViewProviderPtr client_view_provider;
+  app_impl_->ConnectToService(app_url, &client_view_provider);
 
-  client_view_provider_->CreateView(
-      nullptr, nullptr,
-      base::Bind(&LauncherApp::OnClientViewCreated, base::Unretained(this)));
-}
-
-void LauncherApp::OnClientConnectionError() {
-  LOG(ERROR) << "Exiting due to client application connection error.";
-  Shutdown();
-}
-
-void LauncherApp::OnClientViewCreated(mojo::ui::ViewTokenPtr view_token) {
-  client_view_token_ = view_token.Pass();
-  UpdateClientView();
-}
-
-void LauncherApp::UpdateClientView() {
-  if (view_tree_)
-    view_tree_->SetRoot(client_view_token_.Clone());
+  client_view_provider->CreateView(mojo::GetProxy(&client_view_owner_), nullptr,
+                                   nullptr);
 }
 
 void LauncherApp::Shutdown() {

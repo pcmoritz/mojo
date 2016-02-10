@@ -17,21 +17,18 @@ ViewManagerImpl::~ViewManagerImpl() {}
 void ViewManagerImpl::RegisterView(
     mojo::ui::ViewPtr view,
     mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
-    const mojo::String& label,
-    const RegisterViewCallback& callback) {
-  mojo::ui::ViewTokenPtr view_token =
-      registry_->RegisterView(view.Pass(), view_host_request.Pass(), label);
-  callback.Run(view_token.Pass());
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+    const mojo::String& label) {
+  registry_->RegisterView(view.Pass(), view_host_request.Pass(),
+                          view_owner_request.Pass(), label);
 }
 
 void ViewManagerImpl::RegisterViewTree(
     mojo::ui::ViewTreePtr view_tree,
     mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
-    const mojo::String& label,
-    const RegisterViewTreeCallback& callback) {
-  mojo::ui::ViewTreeTokenPtr view_tree_token = registry_->RegisterViewTree(
-      view_tree.Pass(), view_tree_host_request.Pass(), label);
-  callback.Run(view_tree_token.Pass());
+    const mojo::String& label) {
+  registry_->RegisterViewTree(view_tree.Pass(), view_tree_host_request.Pass(),
+                              label);
 }
 
 }  // namespace view_manager

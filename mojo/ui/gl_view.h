@@ -18,10 +18,9 @@ namespace ui {
 // content for the scene.
 class GLView : public BaseView {
  public:
-  GLView(
-      mojo::ApplicationImpl* app_impl,
-      const std::string& label,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+  GLView(mojo::ApplicationImpl* app_impl,
+         mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+         const std::string& label);
 
   ~GLView() override;
 

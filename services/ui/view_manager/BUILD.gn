@@ -24,6 +24,8 @@ mojo_native_application("view_manager") {
     "view_registry.h",
     "view_state.cc",
     "view_state.h",
+    "view_stub.cc",
+    "view_stub.h",
     "view_tree_host_impl.cc",
     "view_tree_host_impl.h",
     "view_tree_state.cc",

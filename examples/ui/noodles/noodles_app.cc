@@ -12,13 +12,12 @@ NoodlesApp::NoodlesApp() {}
 
 NoodlesApp::~NoodlesApp() {}
 
-bool NoodlesApp::CreateView(
+void NoodlesApp::CreateView(
     const std::string& connection_url,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services,
-    const mojo::ui::ViewProvider::CreateViewCallback& callback) {
-  new NoodlesView(app_impl(), callback);
-  return true;
+    mojo::ServiceProviderPtr exposed_services) {
+  new NoodlesView(app_impl(), view_owner_request.Pass());
 }
 
 }  // namespace examples

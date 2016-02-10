@@ -5,19 +5,20 @@
 #include "services/ui/view_manager/view_host_impl.h"
 
 #include "base/bind.h"
-#include "base/bind_helpers.h"
+#include "services/ui/view_manager/view_registry.h"
+#include "services/ui/view_manager/view_state.h"
 
 namespace view_manager {
 
-ViewHostImpl::ViewHostImpl(
-    ViewRegistry* registry,
-    ViewState* state,
-    mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request)
-    : registry_(registry),
-      state_(state),
-      binding_(this, view_host_request.Pass()) {}
+ViewHostImpl::ViewHostImpl(ViewRegistry* registry, ViewState* state)
+    : registry_(registry), state_(state) {}
 
 ViewHostImpl::~ViewHostImpl() {}
+
+void ViewHostImpl::GetToken(
+    const mojo::ui::ViewHost::GetTokenCallback& callback) {
+  callback.Run(state_->view_token()->Clone());
+}
 
 void ViewHostImpl::GetServiceProvider(
     mojo::InterfaceRequest<mojo::ServiceProvider> service_provider_request) {
@@ -34,12 +35,15 @@ void ViewHostImpl::RequestLayout() {
 }
 
 void ViewHostImpl::AddChild(uint32_t child_key,
-                            mojo::ui::ViewTokenPtr child_view_token) {
-  registry_->AddChild(state_, child_key, child_view_token.Pass());
+                            mojo::ui::ViewOwnerPtr child_view_owner) {
+  registry_->AddChild(state_, child_key, child_view_owner.Pass());
 }
 
-void ViewHostImpl::RemoveChild(uint32_t child_key) {
-  registry_->RemoveChild(state_, child_key);
+void ViewHostImpl::RemoveChild(uint32_t child_key,
+                               mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                                   transferred_view_owner_request) {
+  registry_->RemoveChild(state_, child_key,
+                         transferred_view_owner_request.Pass());
 }
 
 static void RunLayoutChildCallback(

@@ -19,8 +19,8 @@ constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
 
 ShapesView::ShapesView(
     mojo::ApplicationImpl* app_impl,
-    const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-    : GaneshView(app_impl, "Shapes", create_view_callback) {}
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
+    : GaneshView(app_impl, view_owner_request.Pass(), "Shapes") {}
 
 ShapesView::~ShapesView() {}
 

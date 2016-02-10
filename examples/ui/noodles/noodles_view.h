@@ -27,9 +27,8 @@ class Rasterizer;
 class NoodlesView : public mojo::ui::BaseView,
                     public mojo::ui::ChoreographerDelegate {
  public:
-  NoodlesView(
-      mojo::ApplicationImpl* app_impl,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+  NoodlesView(mojo::ApplicationImpl* app_impl,
+              mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request);
 
   ~NoodlesView() override;
 

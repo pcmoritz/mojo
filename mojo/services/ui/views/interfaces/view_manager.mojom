@@ -28,22 +28,26 @@ interface ViewManager {
   // local environment.  The view host is private to the view and should
   // not be shared with anyone else.
   //
-  // The |view_token| is used as a transferable reference which can
+  // The |view_owner| is used as a transferable reference which can
   // be passed to the view's intended container as part of a request to
   // add the view as a child.  The view manager itself does not describe
-  // how this interaction should take place, only that the token should
+  // how this interaction should take place, only that ownership should
   // eventually be passed back through the container's view host interface
-  // as an argument to AddChild().
+  // as an argument to |ViewHost.AddChild()|.
   //
   // The |label| is an optional name to associate with the view for
   // diagnostic purposes.  The label will be truncated if it is longer
   // than |kLabelMaxLength|.
   //
   // To unregister the view and cause it to be removed from the view tree,
-  // simply close the |view| and/or |view_host| message pipes.
+  // simply close the |view|, |view_host|, or |view_owner| message pipes.
+  //
+  // TODO(jeffbrown): Refactor this so View becomes a ViewListener,
+  // ViewHost becomes View, and there are only two pipes here.
   RegisterView(mojo.ui.View view,
                mojo.ui.ViewHost& view_host,
-               string? label) => (mojo.ui.ViewToken view_token);
+               mojo.ui.ViewOwner& view_owner,
+               string? label);
 
   // Registers a view tree with the view manager.
   //
@@ -62,5 +66,5 @@ interface ViewManager {
   // |view_tree_host| message pipes.
   RegisterViewTree(mojo.ui.ViewTree view_tree,
                    mojo.ui.ViewTreeHost& view_tree_host,
-                   string? label) => (mojo.ui.ViewTreeToken view_tree_token);
+                   string? label);
 };

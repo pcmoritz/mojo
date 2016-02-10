@@ -15,11 +15,11 @@ TileApp::TileApp() {}
 
 TileApp::~TileApp() {}
 
-bool TileApp::CreateView(
+void TileApp::CreateView(
     const std::string& connection_url,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services,
-    const mojo::ui::ViewProvider::CreateViewCallback& callback) {
+    mojo::ServiceProviderPtr exposed_services) {
   GURL url(connection_url);
   std::vector<std::string> view_urls;
   base::SplitString(url.query(), ',', &view_urls);
@@ -27,11 +27,10 @@ bool TileApp::CreateView(
   if (view_urls.empty()) {
     LOG(ERROR) << "Must supply comma-delimited URLs of mojo views to tile as a "
                   "query parameter.";
-    return false;
+    return;
   }
 
-  new TileView(app_impl(), view_urls, callback);
-  return true;
+  new TileView(app_impl(), view_owner_request.Pass(), view_urls);
 }
 
 }  // namespace examples

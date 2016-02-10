@@ -42,12 +42,19 @@ class ViewProviderApp : public mojo::ApplicationDelegate,
   //
   // The |view_provider_url| is the connection URL of the view provider request.
   //
-  // Returns true if successful, false if the view could not be created.
-  virtual bool CreateView(
+  // The |view_owner_request| should be attached to the newly created view
+  // and closed or left pending if the view could not be created.
+  //
+  // The |services| parameter is used to receive services from the view
+  // on behalf of the caller.
+  //
+  // The |exposed_services| parameters is used to provide services to
+  // the view from the caller.
+  virtual void CreateView(
       const std::string& view_provider_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback) = 0;
+      mojo::ServiceProviderPtr exposed_services) = 0;
 
  private:
   class DelegatingViewProvider;
@@ -56,11 +63,12 @@ class ViewProviderApp : public mojo::ApplicationDelegate,
   void Create(mojo::ApplicationConnection* connection,
               mojo::InterfaceRequest<mojo::ui::ViewProvider> request) override;
 
-  void CreateView(DelegatingViewProvider* provider,
-                  const std::string& view_provider_url,
-                  mojo::InterfaceRequest<mojo::ServiceProvider> services,
-                  mojo::ServiceProviderPtr exposed_services,
-                  const mojo::ui::ViewProvider::CreateViewCallback& callback);
+  void CreateView(
+      DelegatingViewProvider* provider,
+      const std::string& view_provider_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      mojo::InterfaceRequest<mojo::ServiceProvider> services,
+      mojo::ServiceProviderPtr exposed_services);
 
   mojo::ApplicationImpl* app_impl_ = nullptr;
   mojo::StrongBindingSet<mojo::ui::ViewProvider> bindings_;

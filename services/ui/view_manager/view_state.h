@@ -10,25 +10,29 @@
 #include <string>
 #include <unordered_map>
 
-#include "base/callback.h"
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
+#include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
 #include "services/ui/view_manager/view_layout_request.h"
 
 namespace view_manager {
 
-class ViewTreeState;
+class ViewRegistry;
+class ViewHostImpl;
+class ViewStub;
 
 // Describes the state of a particular view.
 // This object is owned by the ViewRegistry that created it.
 class ViewState {
  public:
-  using ChildrenMap = std::unordered_map<uint32_t, ViewState*>;
+  using ChildrenMap = std::unordered_map<uint32_t, std::unique_ptr<ViewStub>>;
 
-  ViewState(mojo::ui::ViewPtr view,
+  ViewState(ViewRegistry* registry,
+            mojo::ui::ViewPtr view,
             mojo::ui::ViewTokenPtr view_token,
+            mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
             const std::string& label);
   ~ViewState();
 
@@ -42,39 +46,24 @@ class ViewState {
   // Caller does not obtain ownership of the token.
   mojo::ui::ViewToken* view_token() const { return view_token_.get(); }
 
-  // Sets the associated host implementation and takes ownership of it.
-  void set_view_host(mojo::ui::ViewHost* host) { view_host_.reset(host); }
-
-  // Sets the connection error handler for the view.
-  void set_view_connection_error_handler(const base::Closure& handler) {
-    view_.set_connection_error_handler(handler);
-  }
-
-  // Gets the view tree to which this view belongs, or null if none.
-  ViewTreeState* tree() const { return tree_; }
-
-  // Gets the parent view state, or null if none.
-  ViewState* parent() const { return parent_; }
-
-  // Gets the key that this child has in its container, or 0 if none.
-  uint32_t key() const { return key_; }
-
-  // Recursively sets the view tree to which this view and all of its
-  // descendents belongs.  Must not be null.  This method must only be called
-  // on root views.
-  void SetTree(ViewTreeState* tree, uint32_t key);
-
-  // Sets the parent view state pointer, the child's key in its parent,
-  // and set its view tree to that of its parent.  Must not be null.
-  void SetParent(ViewState* parent, uint32_t key);
-
-  // Resets the parent view state and tree pointers to null.
-  void ResetContainer();
+  // Gets or sets the view stub which links this view into the
+  // view hierarchy, or null if the view isn't linked anywhere.
+  ViewStub* view_stub() const { return view_stub_; }
+  void set_view_stub(ViewStub* view_stub) { view_stub_ = view_stub; }
 
   // The map of children, indexed by child key.
-  // Child view state may be null if the child with the given key has
-  // become unavailable but not yet removed.
-  ChildrenMap& children() { return children_; }
+  // The view stub pointers are never null but some view stubs may
+  // have been marked unavailable.
+  const ChildrenMap& children() const { return children_; }
+
+  // Links a child into the view tree.
+  void LinkChild(uint32_t key, std::unique_ptr<ViewStub> child);
+
+  // Unlinks a child of the view tree.
+  std::unique_ptr<ViewStub> UnlinkChild(uint32_t key);
+
+  // Unlinks all children as a single operation.
+  std::vector<std::unique_ptr<ViewStub>> UnlinkAllChildren();
 
   // The set of children needing layout.
   // This set must never contain non-existent or unavailable children.
@@ -123,21 +112,30 @@ class ViewState {
   // Returns null if unavailable.
   mojo::ui::ViewLayoutInfoPtr CreateLayoutInfo();
 
-  const std::string& label() { return label_; }
-  const std::string& FormattedLabel();
+  // Binds the |ViewOwner| interface to the view which has the effect of
+  // tying the view's lifetime to that of the owner's pipe.
+  void BindOwner(
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request);
+
+  // Unbinds the view from its owner.
+  void ReleaseOwner();
+
+  const std::string& label() const { return label_; }
+  const std::string& FormattedLabel() const;
 
  private:
-  void SetTreeUnchecked(ViewTreeState* tree);
-
   mojo::ui::ViewPtr view_;
   mojo::ui::ViewTokenPtr view_token_;
-  const std::string label_;
-  std::string formatted_label_cache_;
 
-  std::unique_ptr<mojo::ui::ViewHost> view_host_;
-  ViewTreeState* tree_ = nullptr;
-  ViewState* parent_ = nullptr;
-  uint32_t key_ = 0u;
+  const std::string label_;
+  mutable std::string formatted_label_cache_;
+
+  std::unique_ptr<ViewHostImpl> impl_;
+  mojo::Binding<mojo::ui::ViewHost> host_binding_;
+  mojo::Binding<mojo::ui::ViewOwner> owner_binding_;
+
+  ViewStub* view_stub_ = nullptr;
+
   ChildrenMap children_;
   std::set<uint32_t> children_needing_layout_;
   std::vector<std::unique_ptr<ViewLayoutRequest>> pending_layout_requests_;

@@ -19,6 +19,7 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
+  Object viewOwner = null;
   Object services = null;
   Object exposedServices = null;
 
@@ -59,11 +60,15 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.services = decoder0.decodeInterfaceRequest(8, true, service_provider_mojom.ServiceProviderStub.newFromEndpoint);
+      result.viewOwner = decoder0.decodeInterfaceRequest(8, false, views_mojom.ViewOwnerStub.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.exposedServices = decoder0.decodeServiceInterface(12, true, service_provider_mojom.ServiceProviderProxy.newFromEndpoint);
+      result.services = decoder0.decodeInterfaceRequest(12, true, service_provider_mojom.ServiceProviderStub.newFromEndpoint);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.exposedServices = decoder0.decodeServiceInterface(16, true, service_provider_mojom.ServiceProviderProxy.newFromEndpoint);
     }
     return result;
   }
@@ -71,14 +76,21 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInterfaceRequest(services, 8, true);
+      encoder0.encodeInterfaceRequest(viewOwner, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "viewOwner of struct _ViewProviderCreateViewParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterfaceRequest(services, 12, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "services of struct _ViewProviderCreateViewParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInterface(exposedServices, 12, true);
+      encoder0.encodeInterface(exposedServices, 16, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "exposedServices of struct _ViewProviderCreateViewParams: $e";
@@ -88,6 +100,7 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
 
   String toString() {
     return "_ViewProviderCreateViewParams("
+           "viewOwner: $viewOwner" ", "
            "services: $services" ", "
            "exposedServices: $exposedServices" ")";
   }
@@ -95,81 +108,6 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
   Map toJson() {
     throw new bindings.MojoCodecError(
         'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-
-
-class ViewProviderCreateViewResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  views_mojom.ViewToken viewToken = null;
-
-  ViewProviderCreateViewResponseParams() : super(kVersions.last.size);
-
-  static ViewProviderCreateViewResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewProviderCreateViewResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewProviderCreateViewResponseParams result = new ViewProviderCreateViewResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.viewToken = views_mojom.ViewToken.decode(decoder1);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(viewToken, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "viewToken of struct ViewProviderCreateViewResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "ViewProviderCreateViewResponseParams("
-           "viewToken: $viewToken" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["viewToken"] = viewToken;
-    return map;
   }
 }
 
@@ -190,7 +128,7 @@ class _ViewProviderServiceDescription implements service_describer.ServiceDescri
 
 abstract class ViewProvider {
   static const String serviceName = "mojo::ui::ViewProvider";
-  dynamic createView(Object services,Object exposedServices,[Function responseFactory = null]);
+  void createView(Object viewOwner, Object services, Object exposedServices);
 }
 
 
@@ -214,26 +152,6 @@ class _ViewProviderProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewProvider_createViewName:
-        var r = ViewProviderCreateViewResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
       default:
         proxyError("Unexpected message type: ${message.header.type}");
         close(immediate: true);
@@ -252,15 +170,16 @@ class _ViewProviderProxyCalls implements ViewProvider {
   _ViewProviderProxyImpl _proxyImpl;
 
   _ViewProviderProxyCalls(this._proxyImpl);
-    dynamic createView(Object services,Object exposedServices,[Function responseFactory = null]) {
+    void createView(Object viewOwner, Object services, Object exposedServices) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
       var params = new _ViewProviderCreateViewParams();
+      params.viewOwner = viewOwner;
       params.services = services;
       params.exposedServices = exposedServices;
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _ViewProvider_createViewName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
+      _proxyImpl.sendMessage(params, _ViewProvider_createViewName);
     }
 }
 
@@ -343,11 +262,6 @@ class ViewProviderStub extends bindings.Stub {
   }
 
 
-  ViewProviderCreateViewResponseParams _ViewProviderCreateViewResponseParamsFactory(views_mojom.ViewToken viewToken) {
-    var mojo_factory_result = new ViewProviderCreateViewResponseParams();
-    mojo_factory_result.viewToken = viewToken;
-    return mojo_factory_result;
-  }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
     if (bindings.ControlMessageHandler.isControlMessage(message)) {
@@ -360,24 +274,7 @@ class ViewProviderStub extends bindings.Stub {
       case _ViewProvider_createViewName:
         var params = _ViewProviderCreateViewParams.deserialize(
             message.payload);
-        var response = _impl.createView(params.services,params.exposedServices,_ViewProviderCreateViewResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _ViewProvider_createViewName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _ViewProvider_createViewName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
+        _impl.createView(params.viewOwner, params.services, params.exposedServices);
         break;
       default:
         throw new bindings.MojoCodecError("Unexpected message name");

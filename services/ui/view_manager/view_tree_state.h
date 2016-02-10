@@ -10,24 +10,29 @@
 #include <string>
 #include <unordered_map>
 
-#include "base/callback.h"
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
-#include "mojo/common/binding_set.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "mojo/services/ui/views/interfaces/view_trees.mojom.h"
-#include "services/ui/view_manager/view_state.h"
 
 namespace view_manager {
+
+class ViewRegistry;
+class ViewState;
+class ViewStub;
+class ViewTreeHostImpl;
 
 // Describes the state of a particular view tree.
 // This object is owned by the ViewRegistry that created it.
 class ViewTreeState {
  public:
-  explicit ViewTreeState(mojo::ui::ViewTreePtr view_tree,
-                         mojo::ui::ViewTreeTokenPtr view_tree_token,
-                         const std::string& label);
+  ViewTreeState(
+      ViewRegistry* registry,
+      mojo::ui::ViewTreePtr view_tree,
+      mojo::ui::ViewTreeTokenPtr view_tree_token,
+      mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+      const std::string& label);
   ~ViewTreeState();
 
   base::WeakPtr<ViewTreeState> GetWeakPtr() {
@@ -35,7 +40,7 @@ class ViewTreeState {
   }
 
   // Gets the view tree interface, never null.
-  // Caller does not obtain ownership of the view.
+  // Caller does not obtain ownership of the view tree.
   mojo::ui::ViewTree* view_tree() const { return view_tree_.get(); }
 
   // Gets the token used to refer to this view tree globally.
@@ -44,30 +49,14 @@ class ViewTreeState {
     return view_tree_token_.get();
   }
 
-  // Sets the associated host implementation and takes ownership of it.
-  void set_view_tree_host(mojo::ui::ViewTreeHost* host) {
-    view_tree_host_.reset(host);
-  }
+  // Gets the root of the view tree, or null if there is no root.
+  ViewStub* root() const { return root_.get(); }
 
-  // Sets the connection error handler for the view.
-  void set_view_tree_connection_error_handler(const base::Closure& handler) {
-    view_tree_.set_connection_error_handler(handler);
-  }
+  // Links the root of the view tree.
+  void LinkRoot(uint32_t key, std::unique_ptr<ViewStub> root);
 
-  // Gets the root of the view tree, or null if it is unavailable.
-  ViewState* root() const { return root_; }
-
-  // Sets the root of the view tree.  Must not be null.
-  // The view specified as the new root must not have any parents.
-  void SetRoot(ViewState* root, uint32_t key);
-
-  // Resets the root view to null.
-  void ResetRoot();
-
-  // True if the client previously set but has not yet explicitly unset
-  // the root, independent of whether it is currently available.
-  bool explicit_root() const { return explicit_root_; }
-  void set_explicit_root(bool value) { explicit_root_ = value; }
+  // Unlinks the root of the view tree and returns it.
+  std::unique_ptr<ViewStub> UnlinkRoot();
 
   // True if there is a pending layout request.
   bool layout_request_pending() const { return layout_request_pending_; }
@@ -79,18 +68,21 @@ class ViewTreeState {
   bool layout_request_issued() const { return layout_request_issued_; }
   void set_layout_request_issued(bool value) { layout_request_issued_ = value; }
 
-  const std::string& label() { return label_; }
-  const std::string& FormattedLabel();
+  const std::string& label() const { return label_; }
+  const std::string& FormattedLabel() const;
 
  private:
   mojo::ui::ViewTreePtr view_tree_;
   mojo::ui::ViewTreeTokenPtr view_tree_token_;
+
   const std::string label_;
-  std::string formatted_label_cache_;
+  mutable std::string formatted_label_cache_;
+
+  std::unique_ptr<ViewTreeHostImpl> impl_;
+  mojo::Binding<mojo::ui::ViewTreeHost> host_binding_;
 
   std::unique_ptr<mojo::ui::ViewTreeHost> view_tree_host_;
-  ViewState* root_ = nullptr;
-  bool explicit_root_ = false;
+  std::unique_ptr<ViewStub> root_;
   bool layout_request_pending_ = false;
   bool layout_request_issued_ = false;
 

@@ -10,11 +10,10 @@ MotermApp::MotermApp() {}
 
 MotermApp::~MotermApp() {}
 
-bool MotermApp::CreateView(
+void MotermApp::CreateView(
     const std::string& connection_url,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services,
-    const mojo::ui::ViewProvider::CreateViewCallback& callback) {
-  new MotermView(app_impl(), services.Pass(), callback);
-  return true;
+    mojo::ServiceProviderPtr exposed_services) {
+  new MotermView(app_impl(), view_owner_request.Pass(), services.Pass());
 }

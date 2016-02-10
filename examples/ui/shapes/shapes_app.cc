@@ -12,13 +12,12 @@ ShapesApp::ShapesApp() {}
 
 ShapesApp::~ShapesApp() {}
 
-bool ShapesApp::CreateView(
+void ShapesApp::CreateView(
     const std::string& connection_url,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services,
-    const mojo::ui::ViewProvider::CreateViewCallback& callback) {
-  new ShapesView(app_impl(), callback);
-  return true;
+    mojo::ServiceProviderPtr exposed_services) {
+  new ShapesView(app_impl(), view_owner_request.Pass());
 }
 
 }  // namespace examples

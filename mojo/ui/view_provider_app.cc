@@ -21,11 +21,11 @@ class ViewProviderApp::DelegatingViewProvider : public mojo::ui::ViewProvider {
  private:
   // |ViewProvider|:
   void CreateView(
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback) override {
-    app_->CreateView(this, view_provider_url_, services.Pass(),
-                     exposed_services.Pass(), callback);
+      mojo::ServiceProviderPtr exposed_services) override {
+    app_->CreateView(this, view_provider_url_, view_owner_request.Pass(),
+                     services.Pass(), exposed_services.Pass());
   }
 
   ViewProviderApp* app_;
@@ -65,14 +65,11 @@ void ViewProviderApp::Create(
 void ViewProviderApp::CreateView(
     DelegatingViewProvider* provider,
     const std::string& view_provider_url,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services,
-    const mojo::ui::ViewProvider::CreateViewCallback& callback) {
-  if (!CreateView(view_provider_url, services.Pass(), exposed_services.Pass(),
-                  callback)) {
-    bindings_.RemoveBindings(provider);
-    delete provider;
-  }
+    mojo::ServiceProviderPtr exposed_services) {
+  CreateView(view_provider_url, view_owner_request.Pass(), services.Pass(),
+             exposed_services.Pass());
 }
 
 }  // namespace ui

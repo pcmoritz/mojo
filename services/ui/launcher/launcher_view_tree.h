@@ -26,7 +26,7 @@ class LauncherViewTree : public mojo::ui::ViewTree,
 
   ~LauncherViewTree() override;
 
-  void SetRoot(mojo::ui::ViewTokenPtr token);
+  void SetRoot(mojo::ui::ViewOwnerPtr owner);
   void SetViewportMetrics(mojo::ViewportMetricsPtr viewport_metrics);
   void DispatchEvent(mojo::EventPtr event);
 
@@ -47,7 +47,6 @@ class LauncherViewTree : public mojo::ui::ViewTree,
   void OnInputDispatcherConnectionError();
 
   void OnSceneRegistered(mojo::gfx::composition::SceneTokenPtr scene_token);
-  void OnViewTreeRegistered(mojo::ui::ViewTreeTokenPtr view_tree_token);
 
   void LayoutRoot();
   void OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info);
@@ -76,8 +75,8 @@ class LauncherViewTree : public mojo::ui::ViewTree,
   mojo::ui::ViewTreeHostPtr view_tree_host_;
   mojo::ui::InputDispatcherPtr input_dispatcher_;
 
-  mojo::ui::ViewTokenPtr root_;
   uint32_t root_key_ = 0u;
+  bool root_was_set_ = false;
   mojo::ui::ViewLayoutInfoPtr root_layout_info_;
 
   DISALLOW_COPY_AND_ASSIGN(LauncherViewTree);

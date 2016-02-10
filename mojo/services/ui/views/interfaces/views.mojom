@@ -25,6 +25,17 @@ struct ViewToken {
   uint32 value;
 };
 
+// A view owner provides access to the view's token and keeps the
+// view alive.  When the view owner is closed, the view will be
+// unregistered from the view manager.
+//
+// This interface is only intended to be implemented by the view manager
+// to obtain the desired ownership semantics.
+interface ViewOwner {
+  // Gets the |ViewToken| associated with the view.
+  GetToken() => (ViewToken token);
+};
+
 // A view is a graphical user interface component which is responsible
 // for drawing and supporting user interactions in the area of the screen
 // that it occupies.
@@ -100,6 +111,9 @@ interface View {
 // Each view obtains its own view host when registered with the ViewManager.
 // To unregister the view, close its view host message pipe.
 interface ViewHost {
+  // Gets the view's token.
+  GetToken() => (ViewToken token);
+
   // Gets a service provider to access services which are associated with
   // the view such as input, accessibility and editing capabilities.
   // The view service provider is private to the view and should not be
@@ -123,10 +137,12 @@ interface ViewHost {
   // new layout due to a change in the view's layout information.
   RequestLayout();
 
-  // Adds the view referenced by |child_view_token| as a child and assigns
+  // Adds the view referenced by |child_view_owner| as a child and assigns
   // it the provided |child_key| to identify it among its children.
   // The parent may remove the child later by passing the same |child_key|
   // to RemoveChild().
+  //
+  // This method takes ownership of the view.
   //
   // It is important for the parent to choose locally unique values for
   // |child_key| to ensure that each child can be distinguished even as
@@ -136,12 +152,12 @@ interface ViewHost {
   // If the child becomes unavailable at any time prior to being removed
   // then an OnChildUnavailable() message will be sent.
   //
-  // If |child_view_token| refers to a view which is already unavailable or
+  // If |child_view_owner| refers to a view which is already unavailable or
   // if adding the view would create a cycle in the view tree then the
   // call proceeds as if it succeeded but an OnChildUnavailable() message
   // will be sent.
   //
-  // If |child_view_token| refers to a view which already has a parent or is
+  // If |child_view_owner| refers to a view which already has a parent or is
   // the root of a view tree then an OnChildUnavailable() or OnRootUnavailable()
   // message will be sent to its old parent or root and the the view will be
   // (re-)added to its new parent as usual.  This special case also applies
@@ -155,14 +171,18 @@ interface ViewHost {
   //
   // It is an error to add a view whose |child_key| already appears
   // in the view's list of children; the connection will be closed.
-  AddChild(uint32 child_key, mojo.ui.ViewToken child_view_token);
+  AddChild(uint32 child_key, mojo.ui.ViewOwner child_view_owner);
 
   // Removes the view referenced by |child_key| from the view's
   // list of children.
   //
+  // If |transferred_view_owner| is not null, associates it with the
+  // previously added child to allow it to be transferred elsewhere or
+  // closes the |transferred_view_owner| message pipe if there was none.
+  //
   // It is an error to remove a view whose |child_key| does not appear
   // in the parent's list of children; the connection will be closed.
-  RemoveChild(uint32 child_key);
+  RemoveChild(uint32 child_key, mojo.ui.ViewOwner&? transferred_view_owner);
 
   // Sets the layout parameters of the child view referenced by |child_key|
   // and retrieves its layout information.

@@ -50,8 +50,8 @@ void Lissajous(SkPath* path, double ax, double ay, int wx, int wy, double p) {
 
 NoodlesView::NoodlesView(
     mojo::ApplicationImpl* app_impl,
-    const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-    : BaseView(app_impl, "Noodles", create_view_callback),
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
+    : BaseView(app_impl, view_owner_request.Pass(), "Noodles"),
       choreographer_(scene(), this),
       frame_queue_(std::make_shared<FrameQueue>()),
       rasterizer_delegate_(

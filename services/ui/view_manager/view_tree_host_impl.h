@@ -7,37 +7,31 @@
 
 #include "base/macros.h"
 #include "mojo/common/binding_set.h"
-#include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/ui/views/interfaces/view_trees.mojom.h"
-#include "services/ui/view_manager/view_registry.h"
-#include "services/ui/view_manager/view_tree_state.h"
 
 namespace view_manager {
+
+class ViewRegistry;
+class ViewTreeState;
 
 // ViewTreeHost interface implementation.
 // This object is owned by its associated ViewTreeState.
 class ViewTreeHostImpl : public mojo::ui::ViewTreeHost,
                          public mojo::ServiceProvider {
  public:
-  ViewTreeHostImpl(
-      ViewRegistry* registry,
-      ViewTreeState* state,
-      mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request);
+  ViewTreeHostImpl(ViewRegistry* registry, ViewTreeState* state);
   ~ViewTreeHostImpl() override;
-
-  void set_view_tree_host_connection_error_handler(
-      const base::Closure& handler) {
-    binding_.set_connection_error_handler(handler);
-  }
 
  private:
   // |ViewTreeHost|:
+  void GetToken(const GetTokenCallback& callback) override;
   void GetServiceProvider(
       mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) override;
   void RequestLayout() override;
   void SetRoot(uint32_t root_key,
-               mojo::ui::ViewTokenPtr root_view_token) override;
-  void ResetRoot() override;
+               mojo::ui::ViewOwnerPtr root_view_owner) override;
+  void ResetRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                     transferred_view_owner_request) override;
   void LayoutRoot(mojo::ui::ViewLayoutParamsPtr root_layout_params,
                   const LayoutRootCallback& callback) override;
 
@@ -47,7 +41,6 @@ class ViewTreeHostImpl : public mojo::ui::ViewTreeHost,
 
   ViewRegistry* const registry_;
   ViewTreeState* const state_;
-  mojo::Binding<mojo::ui::ViewTreeHost> binding_;
   mojo::BindingSet<mojo::ServiceProvider> service_provider_bindings_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewTreeHostImpl);

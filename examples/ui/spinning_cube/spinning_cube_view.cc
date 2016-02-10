@@ -54,8 +54,8 @@ int GetEventDirection(const mojo::PointF& current,
 
 SpinningCubeView::SpinningCubeView(
     mojo::ApplicationImpl* app_impl,
-    const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-    : GLView(app_impl, "SpinningCube", create_view_callback),
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
+    : GLView(app_impl, view_owner_request.Pass(), "SpinningCube"),
       choreographer_(scene(), this),
       input_handler_(view_service_provider(), this),
       weak_ptr_factory_(this) {

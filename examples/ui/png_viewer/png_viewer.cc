@@ -27,11 +27,11 @@ constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
 
 class PNGView : public mojo::ui::GaneshView {
  public:
-  PNGView(
-      mojo::ApplicationImpl* app_impl,
-      const skia::RefPtr<SkImage>& image,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-      : GaneshView(app_impl, "PNGViewer", create_view_callback), image_(image) {
+  PNGView(mojo::ApplicationImpl* app_impl,
+          mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+          const skia::RefPtr<SkImage>& image)
+      : GaneshView(app_impl, view_owner_request.Pass(), "PNGViewer"),
+        image_(image) {
     DCHECK(image_);
   }
 
@@ -106,13 +106,12 @@ class PNGContentViewProviderApp : public mojo::ui::ViewProviderApp {
 
   ~PNGContentViewProviderApp() override {}
 
-  bool CreateView(
+  void CreateView(
       const std::string& connection_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback) override {
-    new PNGView(app_impl(), image_, callback);
-    return true;
+      mojo::ServiceProviderPtr exposed_services) override {
+    new PNGView(app_impl(), view_owner_request.Pass(), image_);
   }
 
  private:

@@ -13,7 +13,6 @@
 #include "mojo/services/native_viewport/interfaces/native_viewport.mojom.h"
 #include "mojo/services/native_viewport/interfaces/native_viewport_event_dispatcher.mojom.h"
 #include "mojo/services/ui/views/interfaces/view_manager.mojom.h"
-#include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 
 namespace launcher {
 
@@ -43,8 +42,6 @@ class LauncherApp : public mojo::ApplicationDelegate,
   void RequestUpdatedViewportMetrics();
 
   void LaunchClient(std::string app_url);
-  void OnClientConnectionError();
-  void OnClientViewCreated(mojo::ui::ViewTokenPtr view_token);
 
   void UpdateClientView();
 
@@ -62,8 +59,7 @@ class LauncherApp : public mojo::ApplicationDelegate,
 
   std::unique_ptr<LauncherViewTree> view_tree_;
 
-  mojo::ui::ViewProviderPtr client_view_provider_;
-  mojo::ui::ViewTokenPtr client_view_token_;
+  mojo::ui::ViewOwnerPtr client_view_owner_;
 
   DISALLOW_COPY_AND_ASSIGN(LauncherApp);
 };

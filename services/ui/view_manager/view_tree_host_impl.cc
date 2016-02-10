@@ -5,19 +5,19 @@
 #include "services/ui/view_manager/view_tree_host_impl.h"
 
 #include "base/bind.h"
-#include "base/bind_helpers.h"
+#include "services/ui/view_manager/view_registry.h"
+#include "services/ui/view_manager/view_tree_state.h"
 
 namespace view_manager {
 
-ViewTreeHostImpl::ViewTreeHostImpl(
-    ViewRegistry* registry,
-    ViewTreeState* state,
-    mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request)
-    : registry_(registry),
-      state_(state),
-      binding_(this, view_tree_host_request.Pass()) {}
+ViewTreeHostImpl::ViewTreeHostImpl(ViewRegistry* registry, ViewTreeState* state)
+    : registry_(registry), state_(state) {}
 
 ViewTreeHostImpl::~ViewTreeHostImpl() {}
+
+void ViewTreeHostImpl::GetToken(const GetTokenCallback& callback) {
+  callback.Run(state_->view_tree_token()->Clone());
+}
 
 void ViewTreeHostImpl::GetServiceProvider(
     mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) {
@@ -29,12 +29,13 @@ void ViewTreeHostImpl::RequestLayout() {
 }
 
 void ViewTreeHostImpl::SetRoot(uint32_t root_key,
-                               mojo::ui::ViewTokenPtr root_view_token) {
-  registry_->SetRoot(state_, root_key, root_view_token.Pass());
+                               mojo::ui::ViewOwnerPtr root_view_owner) {
+  registry_->SetRoot(state_, root_key, root_view_owner.Pass());
 }
 
-void ViewTreeHostImpl::ResetRoot() {
-  registry_->ResetRoot(state_);
+void ViewTreeHostImpl::ResetRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                                     transferred_view_owner_request) {
+  registry_->ResetRoot(state_, transferred_view_owner_request.Pass());
 }
 
 static void RunLayoutRootCallback(

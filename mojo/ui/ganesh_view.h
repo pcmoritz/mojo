@@ -21,10 +21,9 @@ namespace ui {
 // content for the scene.
 class GaneshView : public BaseView {
  public:
-  GaneshView(
-      mojo::ApplicationImpl* app_impl,
-      const std::string& label,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+  GaneshView(mojo::ApplicationImpl* app_impl,
+             mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+             const std::string& label);
 
   ~GaneshView() override;
 

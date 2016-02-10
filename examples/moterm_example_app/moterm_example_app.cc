@@ -32,6 +32,7 @@
 #include "mojo/services/ui/views/interfaces/view_manager.mojom.h"
 #include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
+#include "mojo/ui/view_provider_app.h"
 
 // Kind of like |fputs()| (doesn't wait for result).
 void Fputs(mojo::files::File* file, const char* s) {
@@ -47,7 +48,7 @@ class MotermExampleAppView {
  public:
   MotermExampleAppView(
       mojo::Shell* shell,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback)
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
       : shell_(shell), weak_factory_(this) {
     // Connect to the moterm app.
     LOG(INFO) << "Connecting to moterm";
@@ -57,8 +58,8 @@ class MotermExampleAppView {
     // Create the moterm view and pass it back to the client directly.
     mojo::ConnectToService(moterm_app.get(), &moterm_view_provider_);
     mojo::ServiceProviderPtr moterm_service_provider;
-    moterm_view_provider_->CreateView(GetProxy(&moterm_service_provider),
-                                      nullptr, callback);
+    moterm_view_provider_->CreateView(
+        view_owner_request.Pass(), GetProxy(&moterm_service_provider), nullptr);
 
     // Connect to the moterm terminal service associated with the view
     // we just created.
@@ -154,42 +155,21 @@ class MotermExampleAppView {
   DISALLOW_COPY_AND_ASSIGN(MotermExampleAppView);
 };
 
-class MotermExampleApp : public mojo::ApplicationDelegate,
-                         public mojo::InterfaceFactory<mojo::ui::ViewProvider>,
-                         public mojo::ui::ViewProvider {
+class MotermExampleApp : public mojo::ui::ViewProviderApp {
  public:
-  MotermExampleApp() : application_impl_() {}
+  MotermExampleApp() {}
   ~MotermExampleApp() override {}
 
+  // |ViewProviderApp|:
+  void CreateView(
+      const std::string& connection_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      mojo::InterfaceRequest<mojo::ServiceProvider> services,
+      mojo::ServiceProviderPtr exposed_services) override {
+    new MotermExampleAppView(app_impl()->shell(), view_owner_request.Pass());
+  }
+
  private:
-  // |mojo::ApplicationDelegate|:
-  void Initialize(mojo::ApplicationImpl* application_impl) override {
-    DCHECK(!application_impl_);
-    application_impl_ = application_impl;
-  }
-
-  bool ConfigureIncomingConnection(
-      mojo::ApplicationConnection* connection) override {
-    connection->AddService<mojo::ui::ViewProvider>(this);
-    return true;
-  }
-
-  // |InterfaceFactory<mojo::ui::ViewProvider>|:
-  void Create(mojo::ApplicationConnection* connection,
-              mojo::InterfaceRequest<mojo::ui::ViewProvider> request) override {
-    bindings_.AddBinding(this, request.Pass());
-  }
-
-  // |ViewProvider|:
-  void CreateView(mojo::InterfaceRequest<mojo::ServiceProvider> services,
-                  mojo::ServiceProviderPtr exposed_services,
-                  const CreateViewCallback& callback) override {
-    new MotermExampleAppView(application_impl_->shell(), callback);
-  }
-
-  mojo::ApplicationImpl* application_impl_;
-  mojo::BindingSet<mojo::ui::ViewProvider> bindings_;
-
   DISALLOW_COPY_AND_ASSIGN(MotermExampleApp);
 };
 

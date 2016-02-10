@@ -20,5 +20,6 @@ mojo_native_application("moterm_example_app") {
     "//mojo/services/geometry/interfaces",
     "//mojo/services/terminal/interfaces",
     "//mojo/services/ui/views/interfaces",
+    "//mojo/ui",
   ]
 }

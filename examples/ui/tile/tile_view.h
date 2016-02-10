@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 
+#include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "mojo/ui/base_view.h"
 
 namespace examples {
@@ -15,8 +16,8 @@ namespace examples {
 class TileView : public mojo::ui::BaseView {
  public:
   TileView(mojo::ApplicationImpl* app_impl_,
-           const std::vector<std::string>& view_urls,
-           const mojo::ui::ViewProvider::CreateViewCallback& callback);
+           mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+           const std::vector<std::string>& view_urls);
 
   ~TileView() override;
 
@@ -42,11 +43,6 @@ class TileView : public mojo::ui::BaseView {
                           const OnChildUnavailableCallback& callback) override;
 
   void ConnectViews();
-  void OnChildConnectionError(uint32_t child_key, const std::string& url);
-  void OnChildCreated(uint32_t child_key,
-                      const std::string& url,
-                      mojo::ui::ViewProviderPtr provider,
-                      mojo::ui::ViewTokenPtr token);
   void OnChildLayoutFinished(uint32_t child_key,
                              mojo::ui::ViewLayoutInfoPtr child_layout_info);
   void FinishLayout();

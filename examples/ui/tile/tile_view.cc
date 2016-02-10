@@ -19,10 +19,12 @@ constexpr uint32_t kViewSceneNodeIdOffset = 1;
 constexpr uint32_t kViewFallbackNodeIdOffset = 2;
 }  // namespace
 
-TileView::TileView(mojo::ApplicationImpl* app_impl,
-                   const std::vector<std::string>& view_urls,
-                   const mojo::ui::ViewProvider::CreateViewCallback& callback)
-    : BaseView(app_impl, "Tile", callback), view_urls_(view_urls) {
+TileView::TileView(
+    mojo::ApplicationImpl* app_impl,
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+    const std::vector<std::string>& view_urls)
+    : BaseView(app_impl, view_owner_request.Pass(), "Tile"),
+      view_urls_(view_urls) {
   ConnectViews();
 }
 
@@ -34,42 +36,18 @@ void TileView::ConnectViews() {
     // Start connecting to the view provider.
     mojo::ui::ViewProviderPtr provider;
     app_impl()->ConnectToService(url, &provider);
-    provider.set_connection_error_handler(
-        base::Bind(&TileView::OnChildConnectionError, base::Unretained(this),
-                   child_key, url));
 
-    // Create the view.
-    // We include the provider reference in the callback so that the
-    // binding will be kept alive until the callback completes.
     LOG(INFO) << "Connecting to view: child_key=" << child_key
               << ", url=" << url;
-    provider->CreateView(
-        nullptr, nullptr,
-        base::Bind(&TileView::OnChildCreated, base::Unretained(this), child_key,
-                   url, base::Passed(provider.Pass())));
+    mojo::ui::ViewOwnerPtr child_view_owner;
+    provider->CreateView(mojo::GetProxy(&child_view_owner), nullptr, nullptr);
+
+    view_host()->AddChild(child_key, child_view_owner.Pass());
+    views_.emplace(std::make_pair(
+        child_key, std::unique_ptr<ViewData>(new ViewData(url, child_key))));
+
     child_key++;
   }
-}
-
-void TileView::OnChildConnectionError(uint32_t child_key,
-                                      const std::string& url) {
-  LOG(ERROR) << "Could not connect to view: child_key=" << child_key
-             << ", url=" << url;
-}
-
-void TileView::OnChildCreated(uint32_t child_key,
-                              const std::string& url,
-                              mojo::ui::ViewProviderPtr provider,
-                              mojo::ui::ViewTokenPtr token) {
-  DCHECK(views_.find(child_key) == views_.end());
-  LOG(INFO) << "View created: child_key=" << child_key << ", url=" << url;
-
-  view_host()->AddChild(child_key, token.Pass());
-  views_.emplace(std::make_pair(
-      child_key, std::unique_ptr<ViewData>(new ViewData(url, child_key))));
-
-  // Note that the view provider will be destroyed once this function
-  // returns which is fine now that we are done creating the view.
 }
 
 void TileView::OnChildUnavailable(uint32_t child_key,
@@ -82,7 +60,7 @@ void TileView::OnChildUnavailable(uint32_t child_key,
   std::unique_ptr<ViewData> view_data = std::move(it->second);
   views_.erase(it);
 
-  view_host()->RemoveChild(child_key);
+  view_host()->RemoveChild(child_key, nullptr);
 
   if (view_data->layout_pending) {
     DCHECK(pending_child_layout_count_);

@@ -90,6 +90,141 @@ class ViewToken extends bindings.Struct {
 
 
 
+class _ViewOwnerGetTokenParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _ViewOwnerGetTokenParams() : super(kVersions.last.size);
+
+  static _ViewOwnerGetTokenParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewOwnerGetTokenParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewOwnerGetTokenParams result = new _ViewOwnerGetTokenParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_ViewOwnerGetTokenParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class ViewOwnerGetTokenResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  ViewToken token = null;
+
+  ViewOwnerGetTokenResponseParams() : super(kVersions.last.size);
+
+  static ViewOwnerGetTokenResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewOwnerGetTokenResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewOwnerGetTokenResponseParams result = new ViewOwnerGetTokenResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      result.token = ViewToken.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(token, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "token of struct ViewOwnerGetTokenResponseParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "ViewOwnerGetTokenResponseParams("
+           "token: $token" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["token"] = token;
+    return map;
+  }
+}
+
+
+
+
 class _ViewOnLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -388,6 +523,141 @@ class ViewOnChildUnavailableResponseParams extends bindings.Struct {
 
 
 
+class _ViewHostGetTokenParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _ViewHostGetTokenParams() : super(kVersions.last.size);
+
+  static _ViewHostGetTokenParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewHostGetTokenParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewHostGetTokenParams result = new _ViewHostGetTokenParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_ViewHostGetTokenParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class ViewHostGetTokenResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  ViewToken token = null;
+
+  ViewHostGetTokenResponseParams() : super(kVersions.last.size);
+
+  static ViewHostGetTokenResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewHostGetTokenResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewHostGetTokenResponseParams result = new ViewHostGetTokenResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      result.token = ViewToken.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(token, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "token of struct ViewHostGetTokenResponseParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "ViewHostGetTokenResponseParams("
+           "token: $token" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["token"] = token;
+    return map;
+  }
+}
+
+
+
+
 class _ViewHostGetServiceProviderParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -599,7 +869,7 @@ class _ViewHostAddChildParams extends bindings.Struct {
     const bindings.StructDataHeader(24, 0)
   ];
   int childKey = 0;
-  ViewToken childViewToken = null;
+  Object childViewOwner = null;
 
   _ViewHostAddChildParams() : super(kVersions.last.size);
 
@@ -642,8 +912,7 @@ class _ViewHostAddChildParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(16, false);
-      result.childViewToken = ViewToken.decode(decoder1);
+      result.childViewOwner = decoder0.decodeServiceInterface(12, false, ViewOwnerProxy.newFromEndpoint);
     }
     return result;
   }
@@ -658,10 +927,10 @@ class _ViewHostAddChildParams extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeStruct(childViewToken, 16, false);
+      encoder0.encodeInterface(childViewOwner, 12, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "childViewToken of struct _ViewHostAddChildParams: $e";
+          "childViewOwner of struct _ViewHostAddChildParams: $e";
       rethrow;
     }
   }
@@ -669,14 +938,12 @@ class _ViewHostAddChildParams extends bindings.Struct {
   String toString() {
     return "_ViewHostAddChildParams("
            "childKey: $childKey" ", "
-           "childViewToken: $childViewToken" ")";
+           "childViewOwner: $childViewOwner" ")";
   }
 
   Map toJson() {
-    Map map = new Map();
-    map["childKey"] = childKey;
-    map["childViewToken"] = childViewToken;
-    return map;
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
   }
 }
 
@@ -688,6 +955,7 @@ class _ViewHostRemoveChildParams extends bindings.Struct {
     const bindings.StructDataHeader(16, 0)
   ];
   int childKey = 0;
+  Object transferredViewOwner = null;
 
   _ViewHostRemoveChildParams() : super(kVersions.last.size);
 
@@ -728,6 +996,10 @@ class _ViewHostRemoveChildParams extends bindings.Struct {
       
       result.childKey = decoder0.decodeUint32(8);
     }
+    if (mainDataHeader.version >= 0) {
+      
+      result.transferredViewOwner = decoder0.decodeInterfaceRequest(12, true, ViewOwnerStub.newFromEndpoint);
+    }
     return result;
   }
 
@@ -740,17 +1012,24 @@ class _ViewHostRemoveChildParams extends bindings.Struct {
           "childKey of struct _ViewHostRemoveChildParams: $e";
       rethrow;
     }
+    try {
+      encoder0.encodeInterfaceRequest(transferredViewOwner, 12, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "transferredViewOwner of struct _ViewHostRemoveChildParams: $e";
+      rethrow;
+    }
   }
 
   String toString() {
     return "_ViewHostRemoveChildParams("
-           "childKey: $childKey" ")";
+           "childKey: $childKey" ", "
+           "transferredViewOwner: $transferredViewOwner" ")";
   }
 
   Map toJson() {
-    Map map = new Map();
-    map["childKey"] = childKey;
-    return map;
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
   }
 }
 
@@ -920,6 +1199,231 @@ class ViewHostLayoutChildResponseParams extends bindings.Struct {
 
 
 
+
+const int _ViewOwner_getTokenName = 0;
+
+
+
+class _ViewOwnerServiceDescription implements service_describer.ServiceDescription {
+  dynamic getTopLevelInterface([Function responseFactory]) => null;
+
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) => null;
+
+  dynamic getAllTypeDefinitions([Function responseFactory]) => null;
+}
+
+abstract class ViewOwner {
+  static const String serviceName = null;
+  dynamic getToken([Function responseFactory = null]);
+}
+
+
+class _ViewOwnerProxyImpl extends bindings.Proxy {
+  _ViewOwnerProxyImpl.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) : super.fromEndpoint(endpoint);
+
+  _ViewOwnerProxyImpl.fromHandle(core.MojoHandle handle) :
+      super.fromHandle(handle);
+
+  _ViewOwnerProxyImpl.unbound() : super.unbound();
+
+  static _ViewOwnerProxyImpl newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For _ViewOwnerProxyImpl"));
+    return new _ViewOwnerProxyImpl.fromEndpoint(endpoint);
+  }
+
+  service_describer.ServiceDescription get serviceDescription =>
+    new _ViewOwnerServiceDescription();
+
+  void handleResponse(bindings.ServiceMessage message) {
+    switch (message.header.type) {
+      case _ViewOwner_getTokenName:
+        var r = ViewOwnerGetTokenResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      default:
+        proxyError("Unexpected message type: ${message.header.type}");
+        close(immediate: true);
+        break;
+    }
+  }
+
+  String toString() {
+    var superString = super.toString();
+    return "_ViewOwnerProxyImpl($superString)";
+  }
+}
+
+
+class _ViewOwnerProxyCalls implements ViewOwner {
+  _ViewOwnerProxyImpl _proxyImpl;
+
+  _ViewOwnerProxyCalls(this._proxyImpl);
+    dynamic getToken([Function responseFactory = null]) {
+      var params = new _ViewOwnerGetTokenParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _ViewOwner_getTokenName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+}
+
+
+class ViewOwnerProxy implements bindings.ProxyBase {
+  final bindings.Proxy impl;
+  ViewOwner ptr;
+
+  ViewOwnerProxy(_ViewOwnerProxyImpl proxyImpl) :
+      impl = proxyImpl,
+      ptr = new _ViewOwnerProxyCalls(proxyImpl);
+
+  ViewOwnerProxy.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) :
+      impl = new _ViewOwnerProxyImpl.fromEndpoint(endpoint) {
+    ptr = new _ViewOwnerProxyCalls(impl);
+  }
+
+  ViewOwnerProxy.fromHandle(core.MojoHandle handle) :
+      impl = new _ViewOwnerProxyImpl.fromHandle(handle) {
+    ptr = new _ViewOwnerProxyCalls(impl);
+  }
+
+  ViewOwnerProxy.unbound() :
+      impl = new _ViewOwnerProxyImpl.unbound() {
+    ptr = new _ViewOwnerProxyCalls(impl);
+  }
+
+  factory ViewOwnerProxy.connectToService(
+      bindings.ServiceConnector s, String url, [String serviceName]) {
+    ViewOwnerProxy p = new ViewOwnerProxy.unbound();
+    s.connectToService(url, p, serviceName);
+    return p;
+  }
+
+  static ViewOwnerProxy newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For ViewOwnerProxy"));
+    return new ViewOwnerProxy.fromEndpoint(endpoint);
+  }
+
+  String get serviceName => ViewOwner.serviceName;
+
+  Future close({bool immediate: false}) => impl.close(immediate: immediate);
+
+  Future responseOrError(Future f) => impl.responseOrError(f);
+
+  Future get errorFuture => impl.errorFuture;
+
+  int get version => impl.version;
+
+  Future<int> queryVersion() => impl.queryVersion();
+
+  void requireVersion(int requiredVersion) {
+    impl.requireVersion(requiredVersion);
+  }
+
+  String toString() {
+    return "ViewOwnerProxy($impl)";
+  }
+}
+
+
+class ViewOwnerStub extends bindings.Stub {
+  ViewOwner _impl = null;
+
+  ViewOwnerStub.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint, [this._impl])
+      : super.fromEndpoint(endpoint);
+
+  ViewOwnerStub.fromHandle(core.MojoHandle handle, [this._impl])
+      : super.fromHandle(handle);
+
+  ViewOwnerStub.unbound() : super.unbound();
+
+  static ViewOwnerStub newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For ViewOwnerStub"));
+    return new ViewOwnerStub.fromEndpoint(endpoint);
+  }
+
+
+  ViewOwnerGetTokenResponseParams _ViewOwnerGetTokenResponseParamsFactory(ViewToken token) {
+    var mojo_factory_result = new ViewOwnerGetTokenResponseParams();
+    mojo_factory_result.token = token;
+    return mojo_factory_result;
+  }
+
+  dynamic handleMessage(bindings.ServiceMessage message) {
+    if (bindings.ControlMessageHandler.isControlMessage(message)) {
+      return bindings.ControlMessageHandler.handleMessage(this,
+                                                          0,
+                                                          message);
+    }
+    assert(_impl != null);
+    switch (message.header.type) {
+      case _ViewOwner_getTokenName:
+        var params = _ViewOwnerGetTokenParams.deserialize(
+            message.payload);
+        var response = _impl.getToken(_ViewOwnerGetTokenResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _ViewOwner_getTokenName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _ViewOwner_getTokenName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      default:
+        throw new bindings.MojoCodecError("Unexpected message name");
+        break;
+    }
+    return null;
+  }
+
+  ViewOwner get impl => _impl;
+  set impl(ViewOwner d) {
+    assert(_impl == null);
+    _impl = d;
+  }
+
+  String toString() {
+    var superString = super.toString();
+    return "ViewOwnerStub($superString)";
+  }
+
+  int get version => 0;
+
+  service_describer.ServiceDescription get serviceDescription =>
+    new _ViewOwnerServiceDescription();
+}
 
 const int _View_onLayoutName = 0;
 const int _View_onChildUnavailableName = 1;
@@ -1205,12 +1709,13 @@ class ViewStub extends bindings.Stub {
     new _ViewServiceDescription();
 }
 
-const int _ViewHost_getServiceProviderName = 0;
-const int _ViewHost_createSceneName = 1;
-const int _ViewHost_requestLayoutName = 2;
-const int _ViewHost_addChildName = 3;
-const int _ViewHost_removeChildName = 4;
-const int _ViewHost_layoutChildName = 5;
+const int _ViewHost_getTokenName = 0;
+const int _ViewHost_getServiceProviderName = 1;
+const int _ViewHost_createSceneName = 2;
+const int _ViewHost_requestLayoutName = 3;
+const int _ViewHost_addChildName = 4;
+const int _ViewHost_removeChildName = 5;
+const int _ViewHost_layoutChildName = 6;
 
 
 
@@ -1224,11 +1729,12 @@ class _ViewHostServiceDescription implements service_describer.ServiceDescriptio
 
 abstract class ViewHost {
   static const String serviceName = null;
+  dynamic getToken([Function responseFactory = null]);
   void getServiceProvider(Object serviceProvider);
   void createScene(Object scene);
   void requestLayout();
-  void addChild(int childKey, ViewToken childViewToken);
-  void removeChild(int childKey);
+  void addChild(int childKey, Object childViewOwner);
+  void removeChild(int childKey, Object transferredViewOwner);
   dynamic layoutChild(int childKey,layouts_mojom.ViewLayoutParams childLayoutParams,[Function responseFactory = null]);
 }
 
@@ -1253,6 +1759,26 @@ class _ViewHostProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
+      case _ViewHost_getTokenName:
+        var r = ViewHostGetTokenResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
       case _ViewHost_layoutChildName:
         var r = ViewHostLayoutChildResponseParams.deserialize(
             message.payload);
@@ -1291,6 +1817,14 @@ class _ViewHostProxyCalls implements ViewHost {
   _ViewHostProxyImpl _proxyImpl;
 
   _ViewHostProxyCalls(this._proxyImpl);
+    dynamic getToken([Function responseFactory = null]) {
+      var params = new _ViewHostGetTokenParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _ViewHost_getTokenName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
     void getServiceProvider(Object serviceProvider) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
@@ -1317,23 +1851,24 @@ class _ViewHostProxyCalls implements ViewHost {
       var params = new _ViewHostRequestLayoutParams();
       _proxyImpl.sendMessage(params, _ViewHost_requestLayoutName);
     }
-    void addChild(int childKey, ViewToken childViewToken) {
+    void addChild(int childKey, Object childViewOwner) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
       var params = new _ViewHostAddChildParams();
       params.childKey = childKey;
-      params.childViewToken = childViewToken;
+      params.childViewOwner = childViewOwner;
       _proxyImpl.sendMessage(params, _ViewHost_addChildName);
     }
-    void removeChild(int childKey) {
+    void removeChild(int childKey, Object transferredViewOwner) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
       var params = new _ViewHostRemoveChildParams();
       params.childKey = childKey;
+      params.transferredViewOwner = transferredViewOwner;
       _proxyImpl.sendMessage(params, _ViewHost_removeChildName);
     }
     dynamic layoutChild(int childKey,layouts_mojom.ViewLayoutParams childLayoutParams,[Function responseFactory = null]) {
@@ -1427,6 +1962,11 @@ class ViewHostStub extends bindings.Stub {
   }
 
 
+  ViewHostGetTokenResponseParams _ViewHostGetTokenResponseParamsFactory(ViewToken token) {
+    var mojo_factory_result = new ViewHostGetTokenResponseParams();
+    mojo_factory_result.token = token;
+    return mojo_factory_result;
+  }
   ViewHostLayoutChildResponseParams _ViewHostLayoutChildResponseParamsFactory(layouts_mojom.ViewLayoutInfo info) {
     var mojo_factory_result = new ViewHostLayoutChildResponseParams();
     mojo_factory_result.info = info;
@@ -1441,6 +1981,28 @@ class ViewHostStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
+      case _ViewHost_getTokenName:
+        var params = _ViewHostGetTokenParams.deserialize(
+            message.payload);
+        var response = _impl.getToken(_ViewHostGetTokenResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _ViewHost_getTokenName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _ViewHost_getTokenName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
       case _ViewHost_getServiceProviderName:
         var params = _ViewHostGetServiceProviderParams.deserialize(
             message.payload);
@@ -1459,12 +2021,12 @@ class ViewHostStub extends bindings.Stub {
       case _ViewHost_addChildName:
         var params = _ViewHostAddChildParams.deserialize(
             message.payload);
-        _impl.addChild(params.childKey, params.childViewToken);
+        _impl.addChild(params.childKey, params.childViewOwner);
         break;
       case _ViewHost_removeChildName:
         var params = _ViewHostRemoveChildParams.deserialize(
             message.payload);
-        _impl.removeChild(params.childKey);
+        _impl.removeChild(params.childKey, params.transferredViewOwner);
         break;
       case _ViewHost_layoutChildName:
         var params = _ViewHostLayoutChildParams.deserialize(

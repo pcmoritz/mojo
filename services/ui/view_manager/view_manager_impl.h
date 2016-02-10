@@ -22,13 +22,12 @@ class ViewManagerImpl : public mojo::ui::ViewManager {
   void RegisterView(
       mojo::ui::ViewPtr view,
       mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
-      const mojo::String& label,
-      const RegisterViewCallback& callback) override;
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      const mojo::String& label) override;
   void RegisterViewTree(
       mojo::ui::ViewTreePtr view_tree,
       mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
-      const mojo::String& label,
-      const RegisterViewTreeCallback& callback) override;
+      const mojo::String& label) override;
 
   ViewRegistry* registry_;
 

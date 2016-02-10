@@ -13,7 +13,6 @@
 #include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "mojo/services/ui/views/interfaces/view_manager.mojom.h"
-#include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
 
 namespace mojo {
@@ -29,10 +28,9 @@ class BaseView : public mojo::ui::View {
  public:
   // TODO(jeffbrown): Consider switching this over to an ApplicationConnector
   // but having ApplicationImpl is handy for simple examples.
-  BaseView(
-      mojo::ApplicationImpl* app_impl,
-      const std::string& label,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+  BaseView(mojo::ApplicationImpl* app_impl,
+           mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+           const std::string& label);
 
   ~BaseView() override;
 

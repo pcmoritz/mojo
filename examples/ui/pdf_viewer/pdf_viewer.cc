@@ -117,9 +117,9 @@ class PDFDocumentView : public mojo::ui::GaneshView,
  public:
   PDFDocumentView(
       mojo::ApplicationImpl* app_impl,
-      const std::shared_ptr<PDFDocument>& pdf_document,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-      : GaneshView(app_impl, "PDFDocumentViewer", create_view_callback),
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      const std::shared_ptr<PDFDocument>& pdf_document)
+      : GaneshView(app_impl, view_owner_request.Pass(), "PDFDocumentViewer"),
         pdf_document_(pdf_document),
         choreographer_(scene(), this),
         input_handler_(view_service_provider(), this) {
@@ -256,13 +256,12 @@ class PDFContentViewProviderApp : public mojo::ui::ViewProviderApp {
 
   ~PDFContentViewProviderApp() override {}
 
-  bool CreateView(
+  void CreateView(
       const std::string& connection_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback) override {
-    new PDFDocumentView(app_impl(), pdf_document_, callback);
-    return true;
+      mojo::ServiceProviderPtr exposed_services) override {
+    new PDFDocumentView(app_impl(), view_owner_request.Pass(), pdf_document_);
   }
 
  private:

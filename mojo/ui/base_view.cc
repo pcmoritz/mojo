@@ -11,16 +11,16 @@ namespace ui {
 
 BaseView::BaseView(
     mojo::ApplicationImpl* app_impl,
-    const std::string& label,
-    const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
+    mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+    const std::string& label)
     : app_impl_(app_impl), view_binding_(this) {
   DCHECK(app_impl_);
   app_impl_->ConnectToService("mojo:view_manager_service", &view_manager_);
 
   mojo::ui::ViewPtr view;
   view_binding_.Bind(mojo::GetProxy(&view));
-  view_manager_->RegisterView(view.Pass(), mojo::GetProxy(&view_host_), label,
-                              create_view_callback);
+  view_manager_->RegisterView(view.Pass(), mojo::GetProxy(&view_host_),
+                              view_owner_request.Pass(), label);
   view_host_->CreateScene(mojo::GetProxy(&scene_));
   view_host_->GetServiceProvider(mojo::GetProxy(&view_service_provider_));
 }

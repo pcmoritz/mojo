@@ -14,11 +14,11 @@ class NoodlesApp : public mojo::ui::ViewProviderApp {
   NoodlesApp();
   ~NoodlesApp() override;
 
-  bool CreateView(
+  void CreateView(
       const std::string& connection_url,
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
-      const mojo::ui::ViewProvider::CreateViewCallback& callback) override;
+      mojo::ServiceProviderPtr exposed_services) override;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(NoodlesApp);

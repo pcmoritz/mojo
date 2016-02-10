@@ -35,8 +35,8 @@ class MotermView : public mojo::ui::GaneshView,
  public:
   MotermView(
       mojo::ApplicationImpl* app_impl,
-      mojo::InterfaceRequest<mojo::ServiceProvider> service_provider_request,
-      const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback);
+      mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      mojo::InterfaceRequest<mojo::ServiceProvider> service_provider_request);
   ~MotermView() override;
 
  private:

@@ -9,11 +9,10 @@
 namespace mojo {
 namespace ui {
 
-GLView::GLView(
-    mojo::ApplicationImpl* app_impl,
-    const std::string& label,
-    const mojo::ui::ViewProvider::CreateViewCallback& create_view_callback)
-    : BaseView(app_impl, label, create_view_callback),
+GLView::GLView(mojo::ApplicationImpl* app_impl,
+               mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+               const std::string& label)
+    : BaseView(app_impl, view_owner_request.Pass(), label),
       gl_context_owner_(ApplicationConnectorPtr::Create(
                             app_impl->CreateApplicationConnector())
                             .get()),
