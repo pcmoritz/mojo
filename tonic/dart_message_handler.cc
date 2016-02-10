@@ -15,6 +15,9 @@ namespace tonic {
 
 DartMessageHandler::DartMessageHandler()
     : handled_first_message_(false),
+      quit_message_loop_when_isolate_exits_(true),
+      isolate_exited_(false),
+      isolate_had_uncaught_exception_error_(false),
       task_runner_(nullptr) {
 }
 
@@ -43,6 +46,8 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   DartIsolateScope scope(dart_state->isolate());
   DartApiScope dart_api_scope;
 
+  bool error = false;
+
   // On the first message, check if we should pause on isolate start.
   if (!handled_first_message()) {
     set_handled_first_message(true);
@@ -62,7 +67,7 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       }
       Dart_SetPausedOnStart(false);
       // We've resumed, handle *all* normal messages that are in the queue.
-      LogIfError(Dart_HandleMessages());
+      error = LogIfError(Dart_HandleMessages());
     }
   } else if (Dart_IsPausedOnExit()) {
     // We are paused on isolate exit. Only handle service messages until we are
@@ -76,17 +81,25 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
     }
   } else {
     // We are processing messages normally.
-    LogIfError(Dart_HandleMessage());
+    error = LogIfError(Dart_HandleMessage());
   }
 
-  if (!Dart_HasLivePorts()) {
+  if (error) {
+    // Remember that we had an uncaught exception error.
+    isolate_had_uncaught_exception_error_ = true;
+  }
+
+  if (error || !Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
     if (Dart_ShouldPauseOnExit()) {
       // Mark that we are paused on exit.
       Dart_SetPausedOnExit(true);
     } else {
-      // Quit.
-      base::MessageLoop::current()->QuitWhenIdle();
+      isolate_exited_ = true;
+      if (quit_message_loop_when_isolate_exits()) {
+        // Quit.
+        base::MessageLoop::current()->QuitWhenIdle();
+      }
     }
   }
 }

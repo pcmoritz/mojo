@@ -140,7 +140,11 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
         default_strict_(false),
         run_on_message_loop_(false) {}
 
-  ~DartContentHandlerApp() override {}
+  ~DartContentHandlerApp() override {
+    // Shutdown the controller.
+    mojo::dart::DartController::Shutdown();
+    delete service_connector_;
+  }
 
   void ExtractApplication(base::FilePath* application_dir,
                           mojo::URLResponsePtr response,
@@ -240,13 +244,6 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
       connection->AddService(&content_handler_factory_);
     }
     return true;
-  }
-
-  // Overridden from ApplicationDelegate:
-  void Quit() override {
-    // Shutdown the controller.
-    mojo::dart::DartController::Shutdown();
-    delete service_connector_;
   }
 
   mojo::TracingImpl tracing_;
