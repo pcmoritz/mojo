@@ -14,7 +14,7 @@ gcc_toolchain("fusl_x64") {
   readelf = "readelf"
   nm = "nm"
   ar = "ar"
-  ld = cc
+  ld = cxx
 
   toolchain_cpu = "x64"
   toolchain_os = "linux"
