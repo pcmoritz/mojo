@@ -284,7 +284,8 @@ RawChannel::IOResult RawChannelPosix::WriteNoLock(
     return IO_FAILED_SHUTDOWN;
 
   if (errno != EAGAIN && errno != EWOULDBLOCK) {
-    PLOG(WARNING) << "sendmsg/write/writev";
+    int saved_errno = errno;  // Don't rely on logging preserving errno.
+    LOG(WARNING) << "sendmsg/write/writev: errno = " << saved_errno;
     return IO_FAILED_UNKNOWN;
   }
 
@@ -445,7 +446,8 @@ RawChannel::IOResult RawChannelPosix::ReadImpl(size_t* bytes_read) {
   if (errno == ECONNRESET)
     return IO_FAILED_BROKEN;
 
-  PLOG(WARNING) << "recvmsg";
+  int saved_errno = errno;  // Don't rely on logging preserving errno.
+  LOG(WARNING) << "recvmsg: errno = " << saved_errno;
   return IO_FAILED_UNKNOWN;
 }
 
