@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include <memory>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -20,7 +21,6 @@
 #include "mojo/edk/system/message_in_transit.h"
 #include "mojo/edk/system/test/random.h"
 #include "mojo/edk/system/test/scoped_test_dir.h"
-#include "mojo/edk/system/test/simple_test_thread.h"
 #include "mojo/edk/system/test/test_io_thread.h"
 #include "mojo/edk/system/test/timeouts.h"
 #include "mojo/edk/system/transport_data.h"
@@ -315,29 +315,6 @@ TEST_F(RawChannelTest, OnReadMessage) {
 
 // RawChannelTest.WriteMessageAndOnReadMessage ---------------------------------
 
-class RawChannelWriterThread : public test::SimpleTestThread {
- public:
-  RawChannelWriterThread(RawChannel* raw_channel, size_t write_count)
-      : raw_channel_(raw_channel), left_to_write_(write_count) {}
-
-  ~RawChannelWriterThread() override { Join(); }
-
- private:
-  void Run() override {
-    static const int kMaxRandomMessageSize = 25000;
-
-    while (left_to_write_-- > 0) {
-      EXPECT_TRUE(raw_channel_->WriteMessage(MakeTestMessage(
-          static_cast<uint32_t>(test::RandomInt(1, kMaxRandomMessageSize)))));
-    }
-  }
-
-  RawChannel* const raw_channel_;
-  size_t left_to_write_;
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(RawChannelWriterThread);
-};
-
 class ReadCountdownRawChannelDelegate : public RawChannel::Delegate {
  public:
   explicit ReadCountdownRawChannelDelegate(size_t expected_count)
@@ -375,6 +352,15 @@ class ReadCountdownRawChannelDelegate : public RawChannel::Delegate {
   MOJO_DISALLOW_COPY_AND_ASSIGN(ReadCountdownRawChannelDelegate);
 };
 
+void WriteMessageAndOnReadMessageHelper(RawChannel* raw_channel,
+                                        size_t write_count) {
+  static const int kMaxRandomMessageSize = 25000;
+  while (write_count-- > 0) {
+    EXPECT_TRUE(raw_channel->WriteMessage(MakeTestMessage(
+        static_cast<uint32_t>(test::RandomInt(1, kMaxRandomMessageSize)))));
+  }
+}
+
 TEST_F(RawChannelTest, WriteMessageAndOnReadMessage) {
   static const size_t kNumWriterThreads = 10;
   static const size_t kNumWriteMessagesPerThread = 4000;
@@ -394,15 +380,15 @@ TEST_F(RawChannelTest, WriteMessageAndOnReadMessage) {
                     io_thread()->platform_handle_watcher(), &reader_delegate);
   });
 
-  {
-    std::vector<std::unique_ptr<RawChannelWriterThread>> writer_threads;
-    for (size_t i = 0; i < kNumWriterThreads; i++) {
-      writer_threads.push_back(MakeUnique<RawChannelWriterThread>(
-          writer_rc.get(), kNumWriteMessagesPerThread));
-    }
-    for (size_t i = 0; i < writer_threads.size(); i++)
-      writer_threads[i]->Start();
-  }  // Joins all the writer threads.
+  std::vector<std::thread> writer_threads;
+  // Create/start the the writer threads.
+  for (size_t i = 0; i < kNumWriterThreads; i++) {
+    writer_threads.push_back(std::thread(&WriteMessageAndOnReadMessageHelper,
+                                         writer_rc.get(),
+                                         kNumWriteMessagesPerThread));
+  }
+  for (auto& writer_thread : writer_threads)
+    writer_thread.join();
 
   // Sleep a bit, to let any extraneous reads be processed. (There shouldn't be
   // any, but we want to know about them.)

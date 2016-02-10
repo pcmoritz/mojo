@@ -6,7 +6,7 @@
 
 #include <functional>
 #include <memory>
-#include <utility>
+#include <thread>
 
 #include "mojo/edk/embedder/simple_platform_support.h"
 #include "mojo/edk/platform/message_loop.h"
@@ -16,7 +16,6 @@
 #include "mojo/edk/system/channel.h"
 #include "mojo/edk/system/channel_endpoint.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"
-#include "mojo/edk/system/test/simple_test_thread.h"
 #include "mojo/edk/util/ref_ptr.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -121,53 +120,6 @@ TEST_F(ChannelManagerTest, TwoChannels) {
   EXPECT_EQ(MOJO_RESULT_OK, d2->Close());
 }
 
-class OtherThread : public test::SimpleTestThread {
- public:
-  // Note: There should be no other refs to the channel identified by
-  // |channel_id| outside the channel manager.
-  OtherThread(RefPtr<TaskRunner>&& task_runner,
-              ChannelManager* channel_manager,
-              ChannelId channel_id,
-              std::function<void()>&& quit_closure)
-      : task_runner_(std::move(task_runner)),
-        channel_manager_(channel_manager),
-        channel_id_(channel_id),
-        quit_closure_(std::move(quit_closure)) {}
-  ~OtherThread() override {}
-
- private:
-  void Run() override {
-    // TODO(vtl): Once we have a way of creating a channel from off the I/O
-    // thread, do that here instead.
-
-    // You can use any unique, nonzero value as the ID.
-    RefPtr<Channel> ch = channel_manager_->GetChannel(channel_id_);
-    // |ChannelManager| should have a ref.
-    EXPECT_FALSE(ch->HasOneRef());
-
-    channel_manager_->WillShutdownChannel(channel_id_);
-    // |ChannelManager| should still have a ref.
-    EXPECT_FALSE(ch->HasOneRef());
-
-    {
-      std::unique_ptr<MessageLoop> message_loop(CreateTestMessageLoop());
-      channel_manager_->ShutdownChannel(channel_id_, [&message_loop]() {
-        message_loop->QuitNow();
-      }, message_loop->GetTaskRunner().Clone());
-      message_loop->Run();
-    }
-
-    task_runner_->PostTask(std::move(quit_closure_));
-  }
-
-  const RefPtr<TaskRunner> task_runner_;
-  ChannelManager* const channel_manager_;
-  const ChannelId channel_id_;
-  std::function<void()> quit_closure_;
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(OtherThread);
-};
-
 TEST_F(ChannelManagerTest, CallsFromOtherThread) {
   PlatformPipe channel_pair;
 
@@ -175,11 +127,31 @@ TEST_F(ChannelManagerTest, CallsFromOtherThread) {
   RefPtr<MessagePipeDispatcher> d = channel_manager().CreateChannelOnIOThread(
       id, channel_pair.handle0.Pass());
 
-  OtherThread thread(task_runner().Clone(), &channel_manager(), id,
-                     [this]() { message_loop()->QuitNow(); });
-  thread.Start();
+  std::thread other_thread([this, id]() {
+    // TODO(vtl): Once we have a way of creating a channel from off the I/O
+    // thread, do that here instead.
+
+    // You can use any unique, nonzero value as the ID.
+    RefPtr<Channel> ch = channel_manager().GetChannel(id);
+    // |ChannelManager| should have a ref.
+    EXPECT_FALSE(ch->HasOneRef());
+
+    channel_manager().WillShutdownChannel(id);
+    // |ChannelManager| should still have a ref.
+    EXPECT_FALSE(ch->HasOneRef());
+
+    {
+      std::unique_ptr<MessageLoop> message_loop(CreateTestMessageLoop());
+      channel_manager().ShutdownChannel(
+          id, [&message_loop]() { message_loop->QuitNow(); },
+          message_loop->GetTaskRunner().Clone());
+      message_loop->Run();
+    }
+
+    task_runner()->PostTask([this]() { message_loop()->QuitNow(); });
+  });
   message_loop()->Run();
-  thread.Join();
+  other_thread.join();
 
   EXPECT_EQ(MOJO_RESULT_OK, d->Close());
 }
