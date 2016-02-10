@@ -962,7 +962,7 @@ mojom_types.MojomInterface _versioningTestClientHumanResourceDatabase() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'HumanResourceDatabase'
       ..fullIdentifier = 'mojo.test.versioning.HumanResourceDatabase')
-    ..interfaceName = 'HumanResourceDatabase'
+    ..serviceName_ = 'HumanResourceDatabase'
     ..methods = <int, mojom_types.MojomMethod>{
       _HumanResourceDatabase_addEmployeeName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

@@ -449,7 +449,7 @@ mojom_types.MojomInterface _sampleImportImportedInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'ImportedInterface'
       ..fullIdentifier = 'imported.ImportedInterface')
-    ..interfaceName = 'ImportedInterface'
+    ..serviceName_ = 'ImportedInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _ImportedInterface_doSomethingName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

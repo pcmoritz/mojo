@@ -2273,7 +2273,7 @@ mojom_types.MojomInterface _sampleServiceService() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Service'
       ..fullIdentifier = 'sample.Service')
-    ..interfaceName = 'Service'
+    ..serviceName_ = 'Service'
     ..methods = <int, mojom_types.MojomMethod>{
       _Service_frobinateName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -2539,7 +2539,7 @@ mojom_types.MojomInterface _sampleServicePort() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Port'
       ..fullIdentifier = 'sample.Port')
-    ..interfaceName = 'Port'
+    ..serviceName_ = 'Port'
     ..methods = <int, mojom_types.MojomMethod>{
       _Port_postMessageName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

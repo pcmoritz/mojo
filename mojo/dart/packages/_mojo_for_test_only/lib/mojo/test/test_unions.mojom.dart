@@ -3675,7 +3675,7 @@ mojom_types.MojomInterface _testUnionsSmallCache() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'SmallCache'
       ..fullIdentifier = 'mojo.test.SmallCache')
-    ..interfaceName = 'SmallCache'
+    ..serviceName_ = 'SmallCache'
     ..methods = <int, mojom_types.MojomMethod>{
       _SmallCache_setIntValueName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -3937,7 +3937,7 @@ mojom_types.MojomInterface _testUnionsUnionInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'UnionInterface'
       ..fullIdentifier = 'mojo.test.UnionInterface')
-    ..interfaceName = 'UnionInterface'
+    ..serviceName_ = 'UnionInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _UnionInterface_echoName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

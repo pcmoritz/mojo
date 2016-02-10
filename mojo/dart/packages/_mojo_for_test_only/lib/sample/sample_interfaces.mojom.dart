@@ -1627,7 +1627,7 @@ mojom_types.MojomInterface _sampleInterfacesProvider() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Provider'
       ..fullIdentifier = 'sample.Provider')
-    ..interfaceName = 'Provider'
+    ..serviceName_ = 'Provider'
     ..methods = <int, mojom_types.MojomMethod>{
       _Provider_echoStringName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -2125,7 +2125,7 @@ mojom_types.MojomInterface _sampleInterfacesIntegerAccessor() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'IntegerAccessor'
       ..fullIdentifier = 'sample.IntegerAccessor')
-    ..interfaceName = 'IntegerAccessor'
+    ..serviceName_ = 'IntegerAccessor'
     ..methods = <int, mojom_types.MojomMethod>{
       _IntegerAccessor_getIntegerName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -2391,7 +2391,7 @@ mojom_types.MojomInterface _sampleInterfacesSampleInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'SampleInterface'
       ..fullIdentifier = 'sample.SampleInterface')
-    ..interfaceName = 'SampleInterface'
+    ..serviceName_ = 'SampleInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _SampleInterface_sampleMethod0Name: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

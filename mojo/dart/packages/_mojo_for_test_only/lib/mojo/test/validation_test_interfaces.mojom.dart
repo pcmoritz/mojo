@@ -4152,7 +4152,7 @@ mojom_types.MojomInterface _validationTestInterfacesInterfaceA() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'InterfaceA'
       ..fullIdentifier = 'mojo.test.InterfaceA')
-    ..interfaceName = 'InterfaceA'
+    ..serviceName_ = 'InterfaceA'
     ..methods = <int, mojom_types.MojomMethod>{
     };
 }
@@ -4333,7 +4333,7 @@ mojom_types.MojomInterface _validationTestInterfacesBoundsCheckTestInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'BoundsCheckTestInterface'
       ..fullIdentifier = 'mojo.test.BoundsCheckTestInterface')
-    ..interfaceName = 'BoundsCheckTestInterface'
+    ..serviceName_ = 'BoundsCheckTestInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _BoundsCheckTestInterface_method0Name: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -4611,7 +4611,7 @@ mojom_types.MojomInterface _validationTestInterfacesConformanceTestInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'ConformanceTestInterface'
       ..fullIdentifier = 'mojo.test.ConformanceTestInterface')
-    ..interfaceName = 'ConformanceTestInterface'
+    ..serviceName_ = 'ConformanceTestInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _ConformanceTestInterface_method0Name: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -5160,7 +5160,7 @@ mojom_types.MojomInterface _validationTestInterfacesIntegrationTestInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'IntegrationTestInterface'
       ..fullIdentifier = 'mojo.test.IntegrationTestInterface')
-    ..interfaceName = 'IntegrationTestInterface'
+    ..serviceName_ = 'IntegrationTestInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _IntegrationTestInterface_method0Name: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

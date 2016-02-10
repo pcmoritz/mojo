@@ -1101,7 +1101,7 @@ mojom_types.MojomInterface _dartToCppCppSide() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'CppSide'
       ..fullIdentifier = 'dart_to_cpp.CppSide')
-    ..interfaceName = 'CppSide'
+    ..serviceName_ = 'CppSide'
     ..methods = <int, mojom_types.MojomMethod>{
       _CppSide_startTestName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -1360,7 +1360,7 @@ mojom_types.MojomInterface _dartToCppDartSide() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'DartSide'
       ..fullIdentifier = 'dart_to_cpp.DartSide')
-    ..interfaceName = 'DartSide'
+    ..serviceName_ = 'DartSide'
     ..methods = <int, mojom_types.MojomMethod>{
       _DartSide_setClientName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

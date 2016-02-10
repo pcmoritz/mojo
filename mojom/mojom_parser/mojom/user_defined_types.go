@@ -544,6 +544,11 @@ type MojomInterface struct {
 	methodsByName map[string]*MojomMethod
 
 	methodsByLexicalOrder []*MojomMethod
+
+	// If the declaration of this interface has been annotated with the
+	// "ServiceName=" attribute then this field contains the value of that
+	// attribute, otherwise this is null.
+	ServiceName *string
 }
 
 func NewMojomInterface(declData DeclarationData) *MojomInterface {
@@ -551,6 +556,18 @@ func NewMojomInterface(declData DeclarationData) *MojomInterface {
 	mojomInterface.MethodsByOrdinal = make(map[uint32]*MojomMethod)
 	mojomInterface.methodsByName = make(map[string]*MojomMethod)
 	mojomInterface.Init(declData, mojomInterface)
+	// Search for an attribute named "ServiceName" with a string value.
+	// If that is found take the value as |ServiceName|.
+	if declData.attributes != nil && declData.attributes.List != nil {
+		for _, attribute := range declData.attributes.List {
+			if attribute.Key == "ServiceName" {
+				if valueString, ok := attribute.Value.Value().(string); ok {
+					mojomInterface.ServiceName = &valueString
+					break
+				}
+			}
+		}
+	}
 	return mojomInterface
 }
 

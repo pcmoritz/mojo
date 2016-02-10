@@ -2386,7 +2386,7 @@ mojom_types.MojomInterface _regressionTestsCheckMethodWithEmptyResponse() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'CheckMethodWithEmptyResponse'
       ..fullIdentifier = 'regression_tests.CheckMethodWithEmptyResponse')
-    ..interfaceName = 'CheckMethodWithEmptyResponse'
+    ..serviceName_ = 'CheckMethodWithEmptyResponse'
     ..methods = <int, mojom_types.MojomMethod>{
       _CheckMethodWithEmptyResponse_withoutParameterAndEmptyResponseName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -2689,7 +2689,7 @@ mojom_types.MojomInterface _regressionTestsCheckNameCollision() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'CheckNameCollision'
       ..fullIdentifier = 'regression_tests.CheckNameCollision')
-    ..interfaceName = 'CheckNameCollision'
+    ..serviceName_ = 'CheckNameCollision'
     ..methods = <int, mojom_types.MojomMethod>{
       _CheckNameCollision_withNameCollisionName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -2934,7 +2934,7 @@ mojom_types.MojomInterface _regressionTestsCheckEnumCaps() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'CheckEnumCaps'
       ..fullIdentifier = 'regression_tests.CheckEnumCaps')
-    ..interfaceName = 'CheckEnumCaps'
+    ..serviceName_ = 'CheckEnumCaps'
     ..methods = <int, mojom_types.MojomMethod>{
       _CheckEnumCaps_setEnumWithInternalAllCapsName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -3134,7 +3134,7 @@ mojom_types.MojomInterface _regressionTestsTestInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'TestInterface'
       ..fullIdentifier = 'regression_tests.TestInterface')
-    ..interfaceName = 'TestInterface'
+    ..serviceName_ = 'TestInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _TestInterface_someMessageName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -3333,7 +3333,7 @@ mojom_types.MojomInterface _regressionTestsRegression551() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Regression551'
       ..fullIdentifier = 'regression_tests.Regression551')
-    ..interfaceName = 'Regression551'
+    ..serviceName_ = 'Regression551'
     ..methods = <int, mojom_types.MojomMethod>{
       _Regression551_getName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -3576,7 +3576,7 @@ mojom_types.MojomInterface _regressionTestsServiceName() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'ServiceName'
       ..fullIdentifier = 'regression_tests.ServiceName')
-    ..interfaceName = 'ServiceName'
+    ..serviceName_ = 'ServiceName'
     ..methods = <int, mojom_types.MojomMethod>{
       _ServiceName_serviceName_Name: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

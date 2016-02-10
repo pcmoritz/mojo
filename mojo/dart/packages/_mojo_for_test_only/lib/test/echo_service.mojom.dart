@@ -456,7 +456,7 @@ mojom_types.MojomInterface _echoServiceEchoService() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'EchoService'
       ..fullIdentifier = 'test.EchoService')
-    ..interfaceName = 'EchoService'
+    ..serviceName_ = 'EchoService'
     ..methods = <int, mojom_types.MojomMethod>{
       _EchoService_echoStringName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

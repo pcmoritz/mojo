@@ -1337,7 +1337,7 @@ mojom_types.MojomInterface _sampleFactoryNamedObject() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'NamedObject'
       ..fullIdentifier = 'sample.NamedObject')
-    ..interfaceName = 'NamedObject'
+    ..serviceName_ = 'NamedObject'
     ..methods = <int, mojom_types.MojomMethod>{
       _NamedObject_setNameName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -1603,7 +1603,7 @@ mojom_types.MojomInterface _sampleFactoryFactory() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Factory'
       ..fullIdentifier = 'sample.Factory')
-    ..interfaceName = 'Factory'
+    ..serviceName_ = 'Factory'
     ..methods = <int, mojom_types.MojomMethod>{
       _Factory_doStuffName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

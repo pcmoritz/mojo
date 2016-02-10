@@ -816,7 +816,7 @@ mojom_types.MojomInterface _pingpongServicePingPongService() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'PingPongService'
       ..fullIdentifier = 'test.PingPongService')
-    ..interfaceName = 'PingPongService'
+    ..serviceName_ = 'PingPongService'
     ..methods = <int, mojom_types.MojomMethod>{
       _PingPongService_setClientName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
@@ -1203,7 +1203,7 @@ mojom_types.MojomInterface _pingpongServicePingPongClient() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'PingPongClient'
       ..fullIdentifier = 'test.PingPongClient')
-    ..interfaceName = 'PingPongClient'
+    ..serviceName_ = 'PingPongClient'
     ..methods = <int, mojom_types.MojomMethod>{
       _PingPongClient_pongName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

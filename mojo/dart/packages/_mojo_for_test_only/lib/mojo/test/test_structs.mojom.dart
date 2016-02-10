@@ -7638,7 +7638,7 @@ mojom_types.MojomInterface _testStructsSomeInterface() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'SomeInterface'
       ..fullIdentifier = 'mojo.test.SomeInterface')
-    ..interfaceName = 'SomeInterface'
+    ..serviceName_ = 'SomeInterface'
     ..methods = <int, mojom_types.MojomMethod>{
       _SomeInterface_someMethodName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()

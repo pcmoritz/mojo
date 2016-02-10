@@ -445,8 +445,7 @@ func TestSingleFileSerialization(t *testing.T) {
 
 		// interface EchoService
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:test.EchoService"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
-			DeclData:      test.newDeclData("EchoService", "test.EchoService"),
-			InterfaceName: "EchoService",
+			DeclData: test.newDeclData("EchoService", "test.EchoService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
 					DeclData: test.newDeclData("EchoString", ""),
@@ -494,6 +493,58 @@ func TestSingleFileSerialization(t *testing.T) {
 						},
 					},
 					Ordinal: 1,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Use of the ServiceName attribute
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	module test;
+
+	[ServiceName = "my.test.EchoService"]
+	interface EchoService {
+      EchoString(string? value) => (string? value);
+    };`
+
+		test.addTestCase("test", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:test.EchoService"}
+
+		// ResolvedTypes
+
+		// interface EchoService
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:test.EchoService"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData:    test.newDeclDataA("EchoService", "test.EchoService", &[]mojom_types.Attribute{{"ServiceName", &mojom_types.LiteralValueStringValue{"my.test.EchoService"}}}),
+			ServiceName: stringPointer("my.test.EchoService"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: test.newDeclData("EchoString", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("EchoString-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: test.newDeclData("value", ""),
+								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: test.newDeclData("EchoString-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: test.newDeclData("value", ""),
+								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
+							},
+						},
+					},
 				},
 			},
 		}}

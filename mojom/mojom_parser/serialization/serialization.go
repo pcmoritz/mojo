@@ -208,8 +208,7 @@ func translateMojomInterface(intrfc *mojom.MojomInterface) *mojom_types.UserDefi
 	mojomInterface.Value.DeclData = translateDeclarationData(&intrfc.DeclarationData)
 	mojomInterface.Value.DeclData.ContainedDeclarations = translateContainedDeclarations(&intrfc.NestedDeclarations)
 
-	// TODO(rudominer) The Interface name field need not be the name from the .mojom file.
-	mojomInterface.Value.InterfaceName = intrfc.SimpleName()
+	mojomInterface.Value.ServiceName = intrfc.ServiceName
 
 	mojomInterface.Value.Methods = make(map[uint32]mojom_types.MojomMethod)
 	for ordinal, method := range intrfc.MethodsByOrdinal {

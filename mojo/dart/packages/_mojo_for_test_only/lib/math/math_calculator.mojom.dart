@@ -514,7 +514,7 @@ mojom_types.MojomInterface _mathCalculatorCalculator() {
     ..declData = (new mojom_types.DeclarationData()
       ..shortName = 'Calculator'
       ..fullIdentifier = 'math.Calculator')
-    ..interfaceName = 'Calculator'
+    ..serviceName_ = 'Calculator'
     ..methods = <int, mojom_types.MojomMethod>{
       _Calculator_clearName: new mojom_types.MojomMethod()
         ..declData = (new mojom_types.DeclarationData()
