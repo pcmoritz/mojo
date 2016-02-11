@@ -241,11 +241,14 @@ const int _InputConnection_setListenerName = 0;
 
 
 class _InputConnectionServiceDescription implements service_describer.ServiceDescription {
-  dynamic getTopLevelInterface([Function responseFactory]) => null;
+  dynamic getTopLevelInterface([Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) => null;
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getAllTypeDefinitions([Function responseFactory]) => null;
+  dynamic getAllTypeDefinitions([Function responseFactory]) =>
+      responseFactory(null);
 }
 
 abstract class InputConnection {
@@ -416,8 +419,13 @@ class InputConnectionStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _InputConnectionServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _InputConnectionServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _InputListener_onEventName = 0;
@@ -425,11 +433,14 @@ const int _InputListener_onEventName = 0;
 
 
 class _InputListenerServiceDescription implements service_describer.ServiceDescription {
-  dynamic getTopLevelInterface([Function responseFactory]) => null;
+  dynamic getTopLevelInterface([Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) => null;
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getAllTypeDefinitions([Function responseFactory]) => null;
+  dynamic getAllTypeDefinitions([Function responseFactory]) =>
+      responseFactory(null);
 }
 
 abstract class InputListener {
@@ -642,8 +653,13 @@ class InputListenerStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _InputListenerServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _InputListenerServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

@@ -2405,13 +2405,13 @@ mojom_types.MojomInterface _regressionTestsCheckMethodWithEmptyResponse() {
 
 class _CheckMethodWithEmptyResponseServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsCheckMethodWithEmptyResponse();
+    responseFactory(_regressionTestsCheckMethodWithEmptyResponse());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class CheckMethodWithEmptyResponse {
@@ -2678,8 +2678,13 @@ class CheckMethodWithEmptyResponseStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _CheckMethodWithEmptyResponseServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _CheckMethodWithEmptyResponseServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _CheckNameCollision_withNameCollisionName = 0;
@@ -2702,13 +2707,13 @@ mojom_types.MojomInterface _regressionTestsCheckNameCollision() {
 
 class _CheckNameCollisionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsCheckNameCollision();
+    responseFactory(_regressionTestsCheckNameCollision());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class CheckNameCollision {
@@ -2923,8 +2928,13 @@ class CheckNameCollisionStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _CheckNameCollisionServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _CheckNameCollisionServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _CheckEnumCaps_setEnumWithInternalAllCapsName = 0;
@@ -2946,13 +2956,13 @@ mojom_types.MojomInterface _regressionTestsCheckEnumCaps() {
 
 class _CheckEnumCapsServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsCheckEnumCaps();
+    responseFactory(_regressionTestsCheckEnumCaps());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class CheckEnumCaps {
@@ -3123,8 +3133,13 @@ class CheckEnumCapsStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _CheckEnumCapsServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _CheckEnumCapsServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _TestInterface_someMessageName = 0;
@@ -3146,13 +3161,13 @@ mojom_types.MojomInterface _regressionTestsTestInterface() {
 
 class _TestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsTestInterface();
+    responseFactory(_regressionTestsTestInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class TestInterface {
@@ -3322,8 +3337,13 @@ class TestInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _TestInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _TestInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _Regression551_getName = 0;
@@ -3346,13 +3366,13 @@ mojom_types.MojomInterface _regressionTestsRegression551() {
 
 class _Regression551ServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsRegression551();
+    responseFactory(_regressionTestsRegression551());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class Regression551 {
@@ -3565,8 +3585,13 @@ class Regression551Stub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _Regression551ServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _Regression551ServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _ServiceName_serviceName_Name = 0;
@@ -3589,13 +3614,13 @@ mojom_types.MojomInterface _regressionTestsServiceName() {
 
 class _ServiceNameServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _regressionTestsServiceName();
+    responseFactory(_regressionTestsServiceName());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class ServiceName {
@@ -3807,8 +3832,13 @@ class ServiceNameStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _ServiceNameServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _ServiceNameServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

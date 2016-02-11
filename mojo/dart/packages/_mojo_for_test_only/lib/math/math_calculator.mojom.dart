@@ -539,13 +539,13 @@ mojom_types.MojomInterface _mathCalculatorCalculator() {
 
 class _CalculatorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _mathCalculatorCalculator();
+    responseFactory(_mathCalculatorCalculator());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class Calculator {
@@ -871,8 +871,13 @@ class CalculatorStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _CalculatorServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _CalculatorServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

@@ -208,13 +208,13 @@ mojom_types.MojomInterface _echoEcho() {
 
 class _EchoServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _echoEcho();
+    responseFactory(_echoEcho());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class Echo {
@@ -427,8 +427,13 @@ class EchoStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _EchoServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _EchoServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

@@ -461,13 +461,13 @@ mojom_types.MojomInterface _sampleImportImportedInterface() {
 
 class _ImportedInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleImportImportedInterface();
+    responseFactory(_sampleImportImportedInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class ImportedInterface {
@@ -637,8 +637,13 @@ class ImportedInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _ImportedInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _ImportedInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

@@ -993,13 +993,13 @@ mojom_types.MojomInterface _versioningTestClientHumanResourceDatabase() {
 
 class _HumanResourceDatabaseServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _versioningTestClientHumanResourceDatabase();
+    responseFactory(_versioningTestClientHumanResourceDatabase());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class HumanResourceDatabase {
@@ -1385,8 +1385,13 @@ class HumanResourceDatabaseStub extends bindings.Stub {
 
   int get version => 1;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _HumanResourceDatabaseServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _HumanResourceDatabaseServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

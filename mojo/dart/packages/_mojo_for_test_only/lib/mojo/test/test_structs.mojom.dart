@@ -7651,13 +7651,13 @@ mojom_types.MojomInterface _testStructsSomeInterface() {
 
 class _SomeInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _testStructsSomeInterface();
+    responseFactory(_testStructsSomeInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class SomeInterface {
@@ -7870,8 +7870,13 @@ class SomeInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _SomeInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _SomeInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

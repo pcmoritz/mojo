@@ -1355,13 +1355,13 @@ mojom_types.MojomInterface _sampleFactoryNamedObject() {
 
 class _NamedObjectServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleFactoryNamedObject();
+    responseFactory(_sampleFactoryNamedObject());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class NamedObject {
@@ -1588,8 +1588,13 @@ class NamedObjectStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _NamedObjectServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _NamedObjectServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _Factory_doStuffName = 0;
@@ -1639,13 +1644,13 @@ mojom_types.MojomInterface _sampleFactoryFactory() {
 
 class _FactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleFactoryFactory();
+    responseFactory(_sampleFactoryFactory());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class Factory {
@@ -2046,8 +2051,13 @@ class FactoryStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _FactoryServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _FactoryServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

@@ -3693,13 +3693,13 @@ mojom_types.MojomInterface _testUnionsSmallCache() {
 
 class _SmallCacheServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _testUnionsSmallCache();
+    responseFactory(_testUnionsSmallCache());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class SmallCache {
@@ -3926,8 +3926,13 @@ class SmallCacheStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _SmallCacheServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _SmallCacheServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _UnionInterface_echoName = 0;
@@ -3950,13 +3955,13 @@ mojom_types.MojomInterface _testUnionsUnionInterface() {
 
 class _UnionInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _testUnionsUnionInterface();
+    responseFactory(_testUnionsUnionInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class UnionInterface {
@@ -4169,8 +4174,13 @@ class UnionInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _UnionInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _UnionInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

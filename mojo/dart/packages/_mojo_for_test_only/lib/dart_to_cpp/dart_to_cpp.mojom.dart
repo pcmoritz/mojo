@@ -1128,13 +1128,13 @@ mojom_types.MojomInterface _dartToCppCppSide() {
 
 class _CppSideServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _dartToCppCppSide();
+    responseFactory(_dartToCppCppSide());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class CppSide {
@@ -1347,8 +1347,13 @@ class CppSideStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _CppSideServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _CppSideServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _DartSide_setClientName = 0;
@@ -1382,13 +1387,13 @@ mojom_types.MojomInterface _dartToCppDartSide() {
 
 class _DartSideServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _dartToCppDartSide();
+    responseFactory(_dartToCppDartSide());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class DartSide {
@@ -1589,8 +1594,13 @@ class DartSideStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _DartSideServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _DartSideServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

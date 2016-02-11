@@ -4159,13 +4159,13 @@ mojom_types.MojomInterface _validationTestInterfacesInterfaceA() {
 
 class _InterfaceAServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _validationTestInterfacesInterfaceA();
+    responseFactory(_validationTestInterfacesInterfaceA());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class InterfaceA {
@@ -4321,8 +4321,13 @@ class InterfaceAStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _InterfaceAServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _InterfaceAServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _BoundsCheckTestInterface_method0Name = 0;
@@ -4351,13 +4356,13 @@ mojom_types.MojomInterface _validationTestInterfacesBoundsCheckTestInterface() {
 
 class _BoundsCheckTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _validationTestInterfacesBoundsCheckTestInterface();
+    responseFactory(_validationTestInterfacesBoundsCheckTestInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class BoundsCheckTestInterface {
@@ -4585,8 +4590,13 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _BoundsCheckTestInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _BoundsCheckTestInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _ConformanceTestInterface_method0Name = 0;
@@ -4699,13 +4709,13 @@ mojom_types.MojomInterface _validationTestInterfacesConformanceTestInterface() {
 
 class _ConformanceTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _validationTestInterfacesConformanceTestInterface();
+    responseFactory(_validationTestInterfacesConformanceTestInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class ConformanceTestInterface {
@@ -5149,8 +5159,13 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _ConformanceTestInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _ConformanceTestInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _IntegrationTestInterface_method0Name = 0;
@@ -5173,13 +5188,13 @@ mojom_types.MojomInterface _validationTestInterfacesIntegrationTestInterface() {
 
 class _IntegrationTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _validationTestInterfacesIntegrationTestInterface();
+    responseFactory(_validationTestInterfacesIntegrationTestInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class IntegrationTestInterface {
@@ -5392,8 +5407,13 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _IntegrationTestInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _IntegrationTestInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

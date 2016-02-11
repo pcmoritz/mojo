@@ -632,14 +632,16 @@ testValidateInterfaceType() {
   _checkMojomInterface(mi, shortName, fullIdentifier, methodMap);
 
   // The proxy and stub need to have a valid serviceDescription.
-  var bcti_p = new validation.BoundsCheckTestInterfaceProxy.unbound().impl;
-  var bcti_s = new validation.BoundsCheckTestInterfaceStub.unbound();
+  var boundsCheckProxyImpl =
+      new validation.BoundsCheckTestInterfaceProxy.unbound().impl;
+  var boundsCheckStubDescription =
+      validation.BoundsCheckTestInterfaceStub.serviceDescription;
 
   _checkServiceDescription(
-      bcti_p.serviceDescription, interfaceID, shortName, fullIdentifier,
-      methodMap);
+      boundsCheckProxyImpl.serviceDescription, interfaceID, shortName,
+      fullIdentifier, methodMap);
   _checkServiceDescription(
-      bcti_s.serviceDescription, interfaceID, shortName, fullIdentifier,
+      boundsCheckStubDescription, interfaceID, shortName, fullIdentifier,
       methodMap);
 }
 
@@ -647,17 +649,18 @@ _checkServiceDescription(service_describer.ServiceDescription sd,
     String interfaceID, String shortName, String fullIdentifier,
     Map<int, String> methodMap) {
   // Check the top level interface, which must pass _checkMojomInterface.
-  mojom_types.MojomInterface mi = sd.getTopLevelInterface();
+  Function identity = (v) => v;
+  mojom_types.MojomInterface mi = sd.getTopLevelInterface(identity);
   _checkMojomInterface(mi, shortName, fullIdentifier, methodMap);
 
   // Try out sd.GetTypeDefinition with the given interfaceID.
-  mojom_types.UserDefinedType udt = sd.getTypeDefinition(interfaceID);
+  mojom_types.UserDefinedType udt = sd.getTypeDefinition(interfaceID, identity);
   Expect.isNotNull(udt.interfaceType);
   _checkMojomInterface(udt.interfaceType, shortName, fullIdentifier, methodMap);
 
   // Check all type definitions. Reflect-wise, all data inside should match the
   // imported Descriptor.
-  var actualDescriptions = sd.getAllTypeDefinitions();
+  var actualDescriptions = sd.getAllTypeDefinitions(identity);
   var expectedDescriptions = validation.getAllMojomTypeDefinitions();
   Expect.mapEquals(actualDescriptions, expectedDescriptions);
 }

@@ -855,13 +855,13 @@ mojom_types.MojomInterface _pingpongServicePingPongService() {
 
 class _PingPongServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _pingpongServicePingPongService();
+    responseFactory(_pingpongServicePingPongService());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class PingPongService {
@@ -1192,8 +1192,13 @@ class PingPongServiceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _PingPongServiceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _PingPongServiceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _PingPongClient_pongName = 0;
@@ -1215,13 +1220,13 @@ mojom_types.MojomInterface _pingpongServicePingPongClient() {
 
 class _PingPongClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _pingpongServicePingPongClient();
+    responseFactory(_pingpongServicePingPongClient());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class PingPongClient {
@@ -1392,8 +1397,13 @@ class PingPongClientStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _PingPongClientServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _PingPongClientServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

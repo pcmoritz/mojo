@@ -1664,13 +1664,13 @@ mojom_types.MojomInterface _sampleInterfacesProvider() {
 
 class _ProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleInterfacesProvider();
+    responseFactory(_sampleInterfacesProvider());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class Provider {
@@ -2113,8 +2113,13 @@ class ProviderStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _ProviderServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _ProviderServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _IntegerAccessor_getIntegerName = 0;
@@ -2143,13 +2148,13 @@ mojom_types.MojomInterface _sampleInterfacesIntegerAccessor() {
 
 class _IntegerAccessorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleInterfacesIntegerAccessor();
+    responseFactory(_sampleInterfacesIntegerAccessor());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class IntegerAccessor {
@@ -2378,8 +2383,13 @@ class IntegerAccessorStub extends bindings.Stub {
 
   int get version => 3;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _IntegerAccessorServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _IntegerAccessorServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _SampleInterface_sampleMethod0Name = 0;
@@ -2414,13 +2424,13 @@ mojom_types.MojomInterface _sampleInterfacesSampleInterface() {
 
 class _SampleInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-      _sampleInterfacesSampleInterface();
+    responseFactory(_sampleInterfacesSampleInterface());
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-      getAllMojomTypeDefinitions()[typeKey];
+    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-      getAllMojomTypeDefinitions();
+    responseFactory(getAllMojomTypeDefinitions());
 }
 
 abstract class SampleInterface {
@@ -2663,8 +2673,13 @@ class SampleInterfaceStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _SampleInterfaceServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _SampleInterfaceServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 

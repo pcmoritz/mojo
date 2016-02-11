@@ -9,6 +9,7 @@ group("test_apps") {
     ":echo_service_interface",
     ":pingpong_service_interface",
     "//mojo/dart/apptests/test_apps/echo",
+    "//mojo/dart/apptests/test_apps/echo_with_service_describer",
     "//mojo/dart/apptests/test_apps/pingpong",
     "//mojo/dart/apptests/test_apps/pingpong_target",
   ]

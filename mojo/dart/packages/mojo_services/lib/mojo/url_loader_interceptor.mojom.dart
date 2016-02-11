@@ -611,11 +611,14 @@ const int _UrlLoaderInterceptorFactory_createName = 0;
 
 
 class _UrlLoaderInterceptorFactoryServiceDescription implements service_describer.ServiceDescription {
-  dynamic getTopLevelInterface([Function responseFactory]) => null;
+  dynamic getTopLevelInterface([Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) => null;
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getAllTypeDefinitions([Function responseFactory]) => null;
+  dynamic getAllTypeDefinitions([Function responseFactory]) =>
+      responseFactory(null);
 }
 
 abstract class UrlLoaderInterceptorFactory {
@@ -786,8 +789,13 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _UrlLoaderInterceptorFactoryServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _UrlLoaderInterceptorFactoryServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 const int _UrlLoaderInterceptor_interceptRequestName = 0;
@@ -797,11 +805,14 @@ const int _UrlLoaderInterceptor_interceptResponseName = 2;
 
 
 class _UrlLoaderInterceptorServiceDescription implements service_describer.ServiceDescription {
-  dynamic getTopLevelInterface([Function responseFactory]) => null;
+  dynamic getTopLevelInterface([Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) => null;
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
+      responseFactory(null);
 
-  dynamic getAllTypeDefinitions([Function responseFactory]) => null;
+  dynamic getAllTypeDefinitions([Function responseFactory]) =>
+      responseFactory(null);
 }
 
 abstract class UrlLoaderInterceptor {
@@ -1127,8 +1138,13 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
 
   int get version => 0;
 
-  service_describer.ServiceDescription get serviceDescription =>
-    new _UrlLoaderInterceptorServiceDescription();
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _UrlLoaderInterceptorServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
 }
 
 
