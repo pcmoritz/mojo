@@ -9,22 +9,18 @@
 #include <string>
 
 #include "base/macros.h"
-#include "services/media/framework/ptr.h"
+#include "services/media/framework/safe_clone.h"
 
 namespace mojo {
 namespace media {
 
 class Metadata;
 
-// TODO(dalesat): Get rid of typedefs like these.
-typedef UniquePtr<Metadata> MetadataPtr;
-
 // Container for content metadata.
 // TODO(dalesat): Probably needs to be extensible. Consider using map-like.
 class Metadata {
  public:
-  // TODO(dalesat): Rename methods like this 'Create'.
-  static MetadataPtr Create(
+  static std::unique_ptr<Metadata> Create(
       uint64_t duration_ns,
       const std::string& title,
       const std::string& artist,
@@ -49,7 +45,7 @@ class Metadata {
 
   const std::string& composer() const { return composer_; }
 
-  MetadataPtr Clone() const {
+  std::unique_ptr<Metadata> Clone() const {
     return Create(
         duration_ns_,
         title_,

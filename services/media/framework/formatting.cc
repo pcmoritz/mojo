@@ -65,7 +65,9 @@ std::ostream& operator<<(std::ostream& os, const PacketPtr& value) {
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value) {
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<StreamType>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -76,9 +78,10 @@ std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value) {
   os << begl << "Scheme scheme(): " << value->scheme() << std::endl;
   switch (value->scheme()) {
     case StreamType::Scheme::kMultiplexed:
-      os << begl << "StreamTypePtr multiplex_type: "
+      os << begl << "std::unique_ptr<StreamType> multiplex_type: "
           << value->multiplexed()->multiplex_type();
-      os << begl << "StreamTypesPtr substream_types: "
+      os << begl << "std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>"
+          << " substream_types: "
           << value->multiplexed()->substream_types();
       break;
     case StreamType::Scheme::kLpcm:
@@ -98,7 +101,7 @@ std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value) {
           << value->compressed_audio()->channels() << std::endl;
       os << begl << "uint32_t frames_per_second: "
           << value->compressed_audio()->frames_per_second() << std::endl;
-      os << begl << "BytesPtr encoding_details: "
+      os << begl << "std::unique_ptr<Bytes> encoding_details: "
           << value->compressed_audio()->encoding_details() << std::endl;
       break;
     case StreamType::Scheme::kVideo:
@@ -118,7 +121,7 @@ std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value) {
           << value->video()->coded_width() << std::endl;
       os << begl << "uint32_t coded_height: "
           << value->video()->coded_height() << std::endl;
-      os << begl << "BytesPtr encoding_details: "
+      os << begl << "std::unique_ptr<Bytes> encoding_details: "
           << value->video()->encoding_details() << std::endl;
       break;
     default:
@@ -128,7 +131,9 @@ std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value) {
   return os << outdent;
 }
 
-std::ostream& operator<<(std::ostream& os, const StreamTypeSetPtr& value) {
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<StreamTypeSet>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -139,9 +144,10 @@ std::ostream& operator<<(std::ostream& os, const StreamTypeSetPtr& value) {
   os << begl << "Scheme scheme(): " << value->scheme() << std::endl;
   switch (value->scheme()) {
     case StreamType::Scheme::kMultiplexed:
-      os << begl << "StreamTypeSetPtr multiplex_type_set: "
+      os << begl << "std::unique_ptr<StreamTypeSet> multiplex_type_set: "
           << value->multiplexed()->multiplex_type_set();
-      os << begl << "StreamTypeSetsPtr substream_type_sets: "
+      os << begl << "std::unique_ptr<std::vector<std::unique_ptr<"
+          << "StreamTypeSet>>> substream_type_sets: "
           << value->multiplexed()->substream_type_sets();
       break;
     case StreamType::Scheme::kLpcm:
@@ -177,7 +183,9 @@ std::ostream& operator<<(std::ostream& os, const StreamTypeSetPtr& value) {
   return os << outdent;
 }
 
-std::ostream& operator<<(std::ostream& os, const StreamTypesPtr& value) {
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else if (value->size() == 0) {
@@ -187,14 +195,16 @@ std::ostream& operator<<(std::ostream& os, const StreamTypesPtr& value) {
   }
 
   int index = 0;
-  for (const StreamTypePtr& element : *value) {
+  for (const std::unique_ptr<StreamType>& element : *value) {
     os << "[" << index++ << "]: " << element;
   }
 
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const StreamTypeSetsPtr& value) {
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else if (value->size() == 0) {
@@ -204,7 +214,7 @@ std::ostream& operator<<(std::ostream& os, const StreamTypeSetsPtr& value) {
   }
 
   int index = 0;
-  for (const StreamTypeSetPtr& element : *value) {
+  for (const std::unique_ptr<StreamTypeSet>& element : *value) {
     os << "[" << index++ << "]: " << element;
   }
 
@@ -379,7 +389,9 @@ std::ostream& operator<<(std::ostream& os, VideoStreamType::ColorSpace value) {
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const BytesPtr& value) {
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<Bytes>& value) {
   if (value == nullptr) {
     return os << "<nullptr>";
   } else {

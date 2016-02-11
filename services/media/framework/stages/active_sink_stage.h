@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_MEDIA_FRAMEWORK_ENGINE_ACTIVE_SINK_STAGE_H_
-#define SERVICES_MEDIA_FRAMEWORK_ENGINE_ACTIVE_SINK_STAGE_H_
+#ifndef SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SINK_STAGE_H_
+#define SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SINK_STAGE_H_
 
 #include <deque>
 
@@ -16,34 +16,44 @@ namespace media {
 // A stage that hosts an ActiveSink.
 class ActiveSinkStage : public Stage {
  public:
-  ActiveSinkStage(ActiveSinkPtr source);
+  ActiveSinkStage(std::shared_ptr<ActiveSink> sink);
 
   ~ActiveSinkStage() override;
 
   // Stage implementation.
-  uint32_t input_count() const override;
+  size_t input_count() const override;
 
-  StageInput& input(uint32_t index) override;
+  Input& input(size_t index) override;
 
-  uint32_t output_count() const override;
+  size_t output_count() const override;
 
-  StageOutput& output(uint32_t index) override;
+  Output& output(size_t index) override;
 
-  bool Prepare(UpdateCallback update_callback) override;
+  PayloadAllocator* PrepareInput(size_t index) override;
+
+  void PrepareOutput(
+      size_t index,
+      PayloadAllocator* allocator,
+      const UpstreamCallback& callback) override;
 
   void Prime() override;
 
   void Update(Engine* engine) override;
 
+  void FlushInput(
+      size_t index,
+      const DownstreamCallback& callback) override;
+
+  void FlushOutput(size_t index) override;
+
  private:
-  StageInput input_;
-  ActiveSinkPtr sink_;
+  Input input_;
+  std::shared_ptr<ActiveSink> sink_;
   ActiveSink::DemandCallback demand_function_;
-  Stage::UpdateCallback update_callback_;
   Demand sink_demand_;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif  // SERVICES_MEDIA_FRAMEWORK_ENGINE_ACTIVE_SINK_STAGE_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SINK_STAGE_H_

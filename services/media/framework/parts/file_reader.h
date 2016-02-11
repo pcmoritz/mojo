@@ -13,8 +13,8 @@ namespace media {
 // Reads raw data from a file.
 class FileReader : public Reader {
  public:
-  static ReaderPtr Create() {
-    return ReaderPtr(new FileReader());
+  static std::shared_ptr<Reader> Create() {
+    return std::shared_ptr<Reader>(new FileReader());
   }
 
   ~FileReader() override;

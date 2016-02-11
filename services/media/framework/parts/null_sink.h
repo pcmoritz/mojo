@@ -10,23 +10,19 @@
 namespace mojo {
 namespace media {
 
-class NullSink;
-
-typedef SharedPtr<NullSink, ActiveSink> NullSinkPtr;
-
 // Sink that throws packets away.
 class NullSink : public ActiveSink {
  public:
-  static NullSinkPtr Create() { return NullSinkPtr(new NullSink()); }
+  static std::shared_ptr<NullSink> Create() {
+      return std::shared_ptr<NullSink>(new NullSink());
+  }
 
   ~NullSink() override;
 
   // ActiveSink implementation.
-  bool must_allocate() const override;
+  PayloadAllocator* allocator() override;
 
-  Allocator* allocator() override;
-
-  void SetDemandCallback(DemandCallback demand_callback) override;
+  void SetDemandCallback(const DemandCallback& demand_callback) override;
 
   void Prime() override;
 

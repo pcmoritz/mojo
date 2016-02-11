@@ -15,17 +15,17 @@ class LpcmUtilImpl : public LpcmUtil {
  public:
   ~LpcmUtilImpl();
 
-  void Silence(void* buffer, uint64_t frame_count) const override;
+  void Silence(void* buffer, size_t frame_count) const override;
 
-  void Copy(const void* in, void* out, uint64_t frame_count) const override;
+  void Copy(const void* in, void* out, size_t frame_count) const override;
 
-  void Mix(const void* in, void* out, uint64_t frame_count) const override;
+  void Mix(const void* in, void* out, size_t frame_count) const override;
 
   void Interleave(
       const void* in,
-      uint64_t in_byte_count,
+      size_t in_byte_count,
       void* out,
-      uint64_t frame_count) const override;
+      size_t frame_count) const override;
 
  private:
   LpcmUtilImpl(const LpcmStreamType& stream_type);
@@ -69,10 +69,10 @@ template<typename T>
 LpcmUtilImpl<T>::~LpcmUtilImpl() {}
 
 template<typename T>
-void LpcmUtilImpl<T>::Silence(void* buffer, uint64_t frame_count) const {
+void LpcmUtilImpl<T>::Silence(void* buffer, size_t frame_count) const {
   T* sample = reinterpret_cast<T*>(buffer);
   for (
-      uint64_t sample_countdown = frame_count * stream_type_.channels();
+      size_t sample_countdown = frame_count * stream_type_.channels();
       sample_countdown != 0;
       --sample_countdown) {
     *sample = 0;
@@ -81,33 +81,33 @@ void LpcmUtilImpl<T>::Silence(void* buffer, uint64_t frame_count) const {
 }
 
 template<>
-void LpcmUtilImpl<uint8_t>::Silence(void* buffer, uint64_t frame_count) const {
+void LpcmUtilImpl<uint8_t>::Silence(void* buffer, size_t frame_count) const {
   std::memset(buffer, 0x80, frame_count * stream_type_.bytes_per_frame());
 }
 
 template<>
-void LpcmUtilImpl<int16_t>::Silence(void* buffer, uint64_t frame_count) const {
+void LpcmUtilImpl<int16_t>::Silence(void* buffer, size_t frame_count) const {
   std::memset(buffer, 0, frame_count * stream_type_.bytes_per_frame());
 }
 
 template<>
-void LpcmUtilImpl<int32_t>::Silence(void* buffer, uint64_t frame_count) const {
+void LpcmUtilImpl<int32_t>::Silence(void* buffer, size_t frame_count) const {
   std::memset(buffer, 0, frame_count * stream_type_.bytes_per_frame());
 }
 
 template<typename T>
-void LpcmUtilImpl<T>::Copy(const void* in, void* out, uint64_t frame_count)
+void LpcmUtilImpl<T>::Copy(const void* in, void* out, size_t frame_count)
     const {
   std::memcpy(out, in, stream_type_.min_buffer_size(frame_count));
 }
 
 template<typename T>
-void LpcmUtilImpl<T>::Mix(const void* in, void* out, uint64_t frame_count)
+void LpcmUtilImpl<T>::Mix(const void* in, void* out, size_t frame_count)
     const {
   const T* in_sample = reinterpret_cast<const T*>(in);
   T* out_sample = reinterpret_cast<T*>(out);
   for (
-      uint64_t sample_countdown = frame_count * stream_type_.channels();
+      size_t sample_countdown = frame_count * stream_type_.channels();
       sample_countdown != 0;
       --sample_countdown) {
     *out_sample += *in_sample; // TODO(dalesat): Limit.
@@ -117,12 +117,12 @@ void LpcmUtilImpl<T>::Mix(const void* in, void* out, uint64_t frame_count)
 }
 
 template<>
-void LpcmUtilImpl<uint8_t>::Mix(const void* in, void* out, uint64_t frame_count)
+void LpcmUtilImpl<uint8_t>::Mix(const void* in, void* out, size_t frame_count)
     const {
   const uint8_t* in_sample = reinterpret_cast<const uint8_t*>(in);
   uint8_t* out_sample = reinterpret_cast<uint8_t*>(out);
   for (
-      uint64_t sample_countdown = frame_count * stream_type_.channels();
+      size_t sample_countdown = frame_count * stream_type_.channels();
       sample_countdown != 0;
       --sample_countdown) {
     *out_sample = uint8_t(uint16_t(*out_sample) + uint16_t(*in_sample) - 0x80);
@@ -135,9 +135,9 @@ void LpcmUtilImpl<uint8_t>::Mix(const void* in, void* out, uint64_t frame_count)
 template<typename T>
 void LpcmUtilImpl<T>::Interleave(
     const void* in,
-    uint64_t in_byte_count,
+    size_t in_byte_count,
     void* out,
-    uint64_t frame_count) const {
+    size_t frame_count) const {
   DCHECK(in);
   DCHECK(in_byte_count);
   DCHECK(out);

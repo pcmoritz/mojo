@@ -7,7 +7,9 @@
 namespace mojo {
 namespace media {
 
-Result Demux::Create(ReaderPtr reader, DemuxPtr* demux_out) {
+Result Demux::Create(
+    std::shared_ptr<Reader> reader,
+    std::shared_ptr<Demux>* demux_out) {
   return Result::kUnsupportedOperation;
 }
 

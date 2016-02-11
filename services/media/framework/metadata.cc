@@ -8,7 +8,7 @@ namespace mojo {
 namespace media {
 
 // static
-MetadataPtr Metadata::Create(
+std::unique_ptr<Metadata> Metadata::Create(
     uint64_t duration_ns,
     const std::string& title,
     const std::string& artist,
@@ -16,7 +16,7 @@ MetadataPtr Metadata::Create(
     const std::string& publisher,
     const std::string& genre,
     const std::string& composer) {
-  return MetadataPtr(new Metadata(
+  return std::unique_ptr<Metadata>(new Metadata(
       duration_ns,
       title,
       artist,

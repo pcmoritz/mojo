@@ -61,7 +61,7 @@ std::ostream& operator<<(
 std::ostream& operator<<(std::ostream& os, VideoStreamType::VideoProfile value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::PixelFormat value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::ColorSpace value);
-std::ostream& operator<<(std::ostream& os, const BytesPtr& value);
+std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Bytes>& value);
 
 template<typename T>
 std::ostream& operator<<(std::ostream& os, Range<T> value) {
@@ -72,10 +72,18 @@ std::ostream& operator<<(std::ostream& os, Range<bool> value);
 
 // The following overloads add newlines.
 
-std::ostream& operator<<(std::ostream& os, const StreamTypePtr& value);
-std::ostream& operator<<(std::ostream& os, const StreamTypeSetPtr& value);
-std::ostream& operator<<(std::ostream& os, const StreamTypesPtr& value);
-std::ostream& operator<<(std::ostream& os, const StreamTypeSetsPtr& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<StreamType>& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<StreamTypeSet>& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>& value);
 
 } // namespace media
 } // namespace mojo

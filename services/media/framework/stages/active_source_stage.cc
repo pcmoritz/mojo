@@ -7,14 +7,16 @@
 namespace mojo {
 namespace media {
 
-ActiveSourceStage::ActiveSourceStage(ActiveSourcePtr source) : source_(source) {
+ActiveSourceStage::ActiveSourceStage(std::shared_ptr<ActiveSource> source) :
+    source_(source),
+    prepared_(false) {
   DCHECK(source_);
 
   supply_function_ = [this](PacketPtr packet) {
     bool packets_was_empty_ = packets_.empty();
     packets_.push_back(std::move(packet));
-    if (packets_was_empty_ && update_callback_) {
-      update_callback_(this);
+    if (packets_was_empty_ && prepared_) {
+      RequestUpdate();
     }
   };
 
@@ -23,33 +25,58 @@ ActiveSourceStage::ActiveSourceStage(ActiveSourcePtr source) : source_(source) {
 
 ActiveSourceStage::~ActiveSourceStage() {}
 
-uint32_t ActiveSourceStage::input_count() const {
+size_t ActiveSourceStage::input_count() const {
   return 0;
 };
 
-StageInput& ActiveSourceStage::input(uint32_t index) {
-  NOTREACHED();
-  static StageInput result;
-  return result;
+Input& ActiveSourceStage::input(size_t index) {
+  CHECK(false) << "input requested from source";
+  return *(static_cast<Input*>(nullptr));
 }
 
-uint32_t ActiveSourceStage::output_count() const {
+size_t ActiveSourceStage::output_count() const {
   return 1;
 }
 
-StageOutput& ActiveSourceStage::output(uint32_t index) {
+Output& ActiveSourceStage::output(size_t index) {
   DCHECK_EQ(index, 0u);
   return output_;
 }
 
-bool ActiveSourceStage::Prepare(UpdateCallback update_callback) {
-  update_callback_ = update_callback;
-  Allocator* allocator = output_.Prepare(source_->can_accept_allocator());
-  if (allocator) {
-    DCHECK(source_->can_accept_allocator());
-    source_->set_allocator(allocator);
+PayloadAllocator* ActiveSourceStage::PrepareInput(size_t index) {
+  CHECK(false) << "PrepareInput called on source";
+  return nullptr;
+}
+
+void ActiveSourceStage::PrepareOutput(
+    size_t index,
+    PayloadAllocator* allocator,
+    const UpstreamCallback& callback) {
+  DCHECK_EQ(index, 0u);
+  DCHECK(source_);
+
+  if (source_->can_accept_allocator()) {
+    // Give the source the provided allocator or the default if non was
+    // provided.
+    source_->set_allocator(
+        allocator == nullptr ? PayloadAllocator::GetDefault() : allocator);
+  } else if (allocator){
+    // The source can't use the provided allocator, so the output must copy
+    // packets.
+    output_.SetCopyAllocator(allocator);
   }
-  return true;
+
+  prepared_ = true;
+}
+
+void ActiveSourceStage::UnprepareOutput(
+    size_t index,
+    const UpstreamCallback& callback) {
+  DCHECK_EQ(index, 0u);
+  DCHECK(source_);
+
+  source_->set_allocator(nullptr);
+  output_.SetCopyAllocator(nullptr);
 }
 
 void ActiveSourceStage::Update(Engine* engine) {
@@ -63,6 +90,19 @@ void ActiveSourceStage::Update(Engine* engine) {
     output_.SupplyPacket(std::move(packets_.front()), engine);
     packets_.pop_front();
   }
+}
+
+void ActiveSourceStage::FlushInput(
+    size_t index,
+    const DownstreamCallback& callback) {
+  CHECK(false) << "FlushInput called on source";
+}
+
+void ActiveSourceStage::FlushOutput(size_t index) {
+  DCHECK(source_);
+  output_.Flush();
+  source_->Flush();
+  packets_.clear();
 }
 
 }  // namespace media

@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_MEDIA_MODELS_PACKET_TRANSFORM_H_
-#define MOJO_MEDIA_MODELS_PACKET_TRANSFORM_H_
+#ifndef MOJO_MEDIA_MODELS_TRANSFORM_H_
+#define MOJO_MEDIA_MODELS_TRANSFORM_H_
 
-#include <memory>
-
-#include "services/media/framework/allocator.h"
+#include "services/media/framework/models/part.h"
 #include "services/media/framework/packet.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
 
 // Synchronous packet transform.
-class PacketTransform {
+class Transform : public Part {
  public:
-  virtual ~PacketTransform() {}
+  ~Transform() override {}
 
   // Processes a packet. Returns true to indicate the transform is done
   // processing the input packet. Returns false to indicate the input
@@ -26,13 +25,11 @@ class PacketTransform {
   virtual bool TransformPacket(
       const PacketPtr& input,
       bool new_input,
-      Allocator* allocator,
+      PayloadAllocator* allocator,
       PacketPtr* output) = 0;
 };
-
-typedef std::shared_ptr<PacketTransform> PacketTransformPtr;
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_PACKET_TRANSFORM_H_
+#endif // MOJO_MEDIA_MODELS_TRANSFORM_H_

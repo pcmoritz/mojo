@@ -5,40 +5,34 @@
 #ifndef MOJO_MEDIA_MODELS_ACTIVE_SINK_H_
 #define MOJO_MEDIA_MODELS_ACTIVE_SINK_H_
 
-#include <memory>
-
-#include "services/media/framework/allocator.h"
 #include "services/media/framework/models/demand.h"
+#include "services/media/framework/models/part.h"
 #include "services/media/framework/packet.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
 
 // Sink that consumes packets asynchronously.
-class ActiveSink {
+class ActiveSink : public Part {
  public:
   using DemandCallback = std::function<void(Demand demand)>;
 
-  virtual ~ActiveSink() {}
+  ~ActiveSink() override {}
 
-  // Indicates whether the sink must allocate.
-  virtual bool must_allocate() const = 0;
-
-  // The consumer's allocator. Can return nullptr, in which case the default
-  // allocator should be used.
-  virtual Allocator* allocator() = 0;
+  // An allocator that must be used for supplied packets or nullptr if there's
+  // no such requirement.
+  virtual PayloadAllocator* allocator() = 0;
 
   // Sets the callback that signals demand asynchronously.
-  virtual void SetDemandCallback(DemandCallback demand_callback) = 0;
+  virtual void SetDemandCallback(const DemandCallback& demand_callback) = 0;
 
   // Initiates demand.
   virtual void Prime() = 0;
 
-  // Supplies a packet to the sink.
+  // Supplies a packet to the sink, returning the new demand for the input.
   virtual Demand SupplyPacket(PacketPtr packet) = 0;
 };
-
-typedef std::shared_ptr<ActiveSink> ActiveSinkPtr;
 
 }  // namespace media
 }  // namespace mojo

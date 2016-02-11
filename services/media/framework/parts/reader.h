@@ -13,16 +13,12 @@
 namespace mojo {
 namespace media {
 
-class Reader;
-
-typedef std::shared_ptr<Reader> ReaderPtr;
-
 // Abstract base class for objects that read raw data on behalf of demuxes.
 // This model is synchronous, because that's how ffmpeg works.
 class Reader {
  public:
   // Creates a Reader object for a given url.
-  static Result Create(const GURL& gurl, ReaderPtr* reader_out);
+  static Result Create(const GURL& gurl, std::shared_ptr<Reader>* reader_out);
 
   virtual ~Reader() {}
 

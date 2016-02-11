@@ -2,16 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_MEDIA_FRAMEWORK_ENGINE_STAGE_H_
-#define SERVICES_MEDIA_FRAMEWORK_ENGINE_STAGE_H_
+#ifndef SERVICES_MEDIA_FRAMEWORK_STAGES_STAGE_H_
+#define SERVICES_MEDIA_FRAMEWORK_STAGES_STAGE_H_
 
 #include <vector>
 
 #include "services/media/framework/packet.h"
-#include "services/media/framework/stages/lpcm_stage_input.h"
-#include "services/media/framework/stages/lpcm_stage_output.h"
-#include "services/media/framework/stages/stage_input.h"
-#include "services/media/framework/stages/stage_output.h"
+#include "services/media/framework/payload_allocator.h"
+#include "services/media/framework/stages/input.h"
+#include "services/media/framework/stages/output.h"
 
 namespace mojo {
 namespace media {
@@ -21,30 +20,53 @@ class Engine;
 // Host for a source, sink or transform.
 class Stage {
  public:
+  using UpstreamCallback = std::function<void(size_t input_index)>;
+  using DownstreamCallback = std::function<void(size_t output_index)>;
   using UpdateCallback = std::function<void(Stage* stage)>;
 
   Stage();
 
   virtual ~Stage();
 
+  void SetUpdateCallback(const UpdateCallback& update_callback) {
+    update_callback_ = update_callback;
+  }
+
   // Returns the number of input connections.
-  virtual uint32_t input_count() const = 0;
+  virtual size_t input_count() const = 0;
 
   // Returns the indicated input connection.
-  virtual StageInput& input(uint32_t index) = 0;
+  virtual Input& input(size_t index) = 0;
 
   // Returns the number of output connections.
-  virtual uint32_t output_count() const = 0;
+  virtual size_t output_count() const = 0;
 
   // Returns the indicated output connection.
-  virtual StageOutput& output(uint32_t index) = 0;
+  virtual Output& output(size_t index) = 0;
 
-  // Prepares the stage for operation, providing a callback used to signal the
-  // need to update this stage. Returns true if the stage will call the
-  // callback, false if not. The default implementation of this method returns
-  // false.
-  // TODO(dalesat): Should this be const UpdateCallback&?
-  virtual bool Prepare(UpdateCallback update_callback);
+  // Prepares the input for operation. Returns nullptr unless the connected
+  // output must use a specific allocator, in which case it returns that
+  // allocator.
+  virtual PayloadAllocator* PrepareInput(size_t index) = 0;
+
+  // Prepares the output for operation, passing an allocator that must be used
+  // by the output or nullptr if there is no such requirement. The callback is
+  // used to indicate what inputs are ready to be prepared as a consequence of
+  // preparing the output.
+  virtual void PrepareOutput(
+      size_t index,
+      PayloadAllocator* allocator,
+      const UpstreamCallback& callback) = 0;
+
+  // Unprepares the input. The default implementation does nothing.
+  virtual void UnprepareInput(size_t index);
+
+  // Unprepares the output. The default implementation does nothing. The
+  // the callback is used to indicate what inputs are ready to be unprepared as
+  // a consequence of unpreparing the output.
+  virtual void UnprepareOutput(
+    size_t index,
+    const UpstreamCallback& callback);
 
   // Initiates demand. Called on sink stages after the graph is prepared. The
   // default implementation does nothing.
@@ -53,13 +75,23 @@ class Stage {
   // Performs processing.
   virtual void Update(Engine* engine) = 0;
 
-  // Returns a bool indicating whether the stage is prepared.
-  bool prepared() {
-    return prepared_;
+  // Flushes an input. The callback is used to indicate what outputs are ready
+  // to be flushed as a consequence of flushing the input.
+  virtual void FlushInput(
+      size_t index,
+      const DownstreamCallback& callback) = 0;
+
+  // Flushes an output.
+  virtual void FlushOutput(size_t index) = 0;
+
+ protected:
+  void RequestUpdate() {
+    DCHECK(update_callback_);
+    update_callback_(this);
   }
 
  private:
-  bool prepared_;
+  UpdateCallback update_callback_;
   bool in_supply_backlog_;
   bool in_demand_backlog_;
 
@@ -69,4 +101,4 @@ class Stage {
 }  // namespace media
 }  // namespace mojo
 
-#endif  // SERVICES_MEDIA_FRAMEWORK_ENGINE_STAGE_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_STAGES_STAGE_H_

@@ -73,12 +73,13 @@ int Score(
 }
 
 // Finds the media type set that best matches in_type.
-const StreamTypeSetPtr* FindBestLpcm(
+const std::unique_ptr<StreamTypeSet>* FindBestLpcm(
     const LpcmStreamType& in_type,
-    const StreamTypeSetsPtr& out_type_sets) {
-  const StreamTypeSetPtr* best = nullptr;
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets) {
+  const std::unique_ptr<StreamTypeSet>* best = nullptr;
   int best_score = 0;
-  for (const StreamTypeSetPtr& out_type_set : *out_type_sets) {
+  for (const std::unique_ptr<StreamTypeSet>& out_type_set : *out_type_sets) {
     switch (out_type_set->scheme()) {
       case StreamType::Scheme::kAnyElementary:
       case StreamType::Scheme::kAnyAudio:
@@ -106,16 +107,17 @@ const StreamTypeSetPtr* FindBestLpcm(
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForCompressedAudio(
     const CompressedAudioStreamType& in_type,
-    const StreamTypePtr& in_type_ptr,
-    const StreamTypeSetsPtr& out_type_sets,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type) {
+    const std::unique_ptr<StreamType>& in_type_ptr,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets,
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type) {
   DCHECK(out_type);
-  DCHECK(engine);
+  DCHECK(graph);
 
   // See if we have a matching COMPRESSED_AUDIO type.
-  for (const StreamTypeSetPtr& out_type_set : *out_type_sets) {
+  for (const std::unique_ptr<StreamTypeSet>& out_type_set : *out_type_sets) {
     switch (out_type_set->scheme()) {
       case StreamType::Scheme::kAnyElementary:
       case StreamType::Scheme::kAnyAudio:
@@ -138,7 +140,8 @@ AddResult AddTransformsForCompressedAudio(
   }
 
   // Find the best LPCM output type.
-  const StreamTypeSetPtr* best = FindBestLpcm(in_type, out_type_sets);
+  const std::unique_ptr<StreamTypeSet>* best =
+      FindBestLpcm(in_type, out_type_sets);
   if (best == nullptr) {
     // No candidates found.
     *out_type = nullptr;
@@ -148,7 +151,7 @@ AddResult AddTransformsForCompressedAudio(
   DCHECK_EQ((*best)->scheme(), StreamType::Scheme::kLpcm);
 
   // Need to decode. Create a decoder and go from there.
-  DecoderPtr decoder;
+  std::shared_ptr<Decoder> decoder;
   Result result = Decoder::Create(in_type_ptr, &decoder);
   if (result !=  Result::kOk) {
     // No decoder found.
@@ -156,7 +159,7 @@ AddResult AddTransformsForCompressedAudio(
     return AddResult::kFailed;
   }
 
-  *output = engine->ConnectOutputToPart(*output, engine->Add(decoder)).output();
+  *output = graph->ConnectOutputToPart(*output, graph->Add(decoder)).output();
   *out_type = decoder->output_stream_type();
 
   return AddResult::kProgressed;
@@ -169,10 +172,10 @@ AddResult AddTransformsForCompressedAudio(
 AddResult AddTransformsForLpcm(
     const LpcmStreamType& in_type,
     const LpcmStreamTypeSet& out_type_set,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type) {
-  DCHECK(engine);
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type) {
+  DCHECK(graph);
   DCHECK(out_type);
 
   // TODO(dalesat): Room for more intelligence here wrt transform ordering and
@@ -180,9 +183,9 @@ AddResult AddTransformsForLpcm(
   if (in_type.sample_format() != out_type_set.sample_format() &&
       out_type_set.sample_format() != LpcmStreamType::SampleFormat::kAny) {
     // The reformatter will fix interleave conversion.
-    *output = engine->ConnectOutputToPart(
+    *output = graph->ConnectOutputToPart(
         *output,
-        engine->Add(LpcmReformatter::Create(in_type, out_type_set))).output();
+        graph->Add(LpcmReformatter::Create(in_type, out_type_set))).output();
   }
 
   if (!out_type_set.channels().contains(in_type.channels())) {
@@ -216,14 +219,16 @@ AddResult AddTransformsForLpcm(
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForLpcm(
     const LpcmStreamType& in_type,
-    const StreamTypeSetsPtr& out_type_sets,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type) {
-  DCHECK(engine);
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets,
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type) {
+  DCHECK(graph);
   DCHECK(out_type);
 
-  const StreamTypeSetPtr* best = FindBestLpcm(in_type, out_type_sets);
+  const std::unique_ptr<StreamTypeSet>* best =
+      FindBestLpcm(in_type, out_type_sets);
   if (best == nullptr) {
     // TODO(dalesat): Support a compressed output type by encoding.
     NOTREACHED() << "conversion using encoder not supported";
@@ -242,7 +247,7 @@ AddResult AddTransformsForLpcm(
       return AddTransformsForLpcm(
           in_type,
           *(*best)->lpcm(),
-          engine,
+          graph,
           output,
           out_type);
     default:
@@ -257,13 +262,14 @@ AddResult AddTransformsForLpcm(
 // (out_type_sets). If the call succeeds, *out_type is set to the new output
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransforms(
-    const StreamTypePtr& in_type,
-    const StreamTypeSetsPtr& out_type_sets,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type) {
+    const std::unique_ptr<StreamType>& in_type,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets,
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type) {
   DCHECK(in_type);
-  DCHECK(engine);
+  DCHECK(graph);
   DCHECK(out_type);
 
   switch (in_type->scheme()) {
@@ -271,7 +277,7 @@ AddResult AddTransforms(
       return AddTransformsForLpcm(
           *in_type->lpcm(),
           out_type_sets,
-          engine,
+          graph,
           output,
           out_type);
     case StreamType::Scheme::kCompressedAudio:
@@ -279,7 +285,7 @@ AddResult AddTransforms(
           *in_type->compressed_audio(),
           in_type,
           out_type_sets,
-          engine,
+          graph,
           output,
           out_type);
     default:
@@ -293,33 +299,34 @@ AddResult AddTransforms(
 }  // namespace
 
 bool BuildConversionPipeline(
-    const StreamTypePtr& in_type,
-    const StreamTypeSetsPtr& out_type_sets,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type) {
+    const std::unique_ptr<StreamType>& in_type,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets,
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type) {
   DCHECK(in_type);
   DCHECK(out_type_sets);
-  DCHECK(engine);
+  DCHECK(graph);
   DCHECK(output);
   DCHECK(out_type);
 
-  Engine::Output out = *output;
+  OutputRef out = *output;
 
-  const StreamTypePtr* type_to_convert = &in_type;
-  StreamTypePtr next_in_type;
+  const std::unique_ptr<StreamType>* type_to_convert = &in_type;
+  std::unique_ptr<StreamType> next_in_type;
   while (true) {
-    StreamTypePtr converted_type;
+    std::unique_ptr<StreamType> converted_type;
     switch (AddTransforms(
         *type_to_convert,
         out_type_sets,
-        engine,
+        graph,
         &out,
         &converted_type)) {
       case AddResult::kFailed:
         // Failed to find a suitable conversion. Return the pipeline to its
         // original state.
-        engine->RemovePartsConnectedToOutput(*output);
+        graph->RemovePartsConnectedToOutput(*output);
         *out_type = nullptr;
         return false;
       case AddResult::kProgressed:

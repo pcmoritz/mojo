@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "services/media/framework/metadata.h"
-#include "services/media/framework/models/multistream_packet_source.h"
+#include "services/media/framework/models/multistream_source.h"
 #include "services/media/framework/packet.h"
 #include "services/media/framework/parts/reader.h"
 #include "services/media/framework/result.h"
@@ -18,13 +18,9 @@
 namespace mojo {
 namespace media {
 
-class Demux;
-
-typedef SharedPtr<Demux, MultiStreamPacketSource> DemuxPtr;
-
 // Abstract base class for sources that parse input from a reader and
 // produce one or more output streams.
-class Demux : public MultiStreamPacketSource {
+class Demux : public MultistreamSource {
  public:
   // Represents a stream produced by the demux.
   class DemuxStream {
@@ -33,13 +29,15 @@ class Demux : public MultiStreamPacketSource {
    public:
     virtual ~DemuxStream() {}
 
-    virtual uint32_t index() const = 0;
+    virtual size_t index() const = 0;
 
-    virtual StreamTypePtr stream_type() const = 0;
+    virtual std::unique_ptr<StreamType> stream_type() const = 0;
   };
 
   // Creates a Demux object for a given reader.
-  static Result Create(ReaderPtr reader, DemuxPtr* demux_out);
+  static Result Create(
+      std::shared_ptr<Reader> reader,
+      std::shared_ptr<Demux>* demux_out);
 
   ~Demux() override {}
 
@@ -54,21 +52,13 @@ class Demux : public MultiStreamPacketSource {
   // support this.
 
   // Initializes the demux.
-  virtual Result Init(ReaderPtr reader) = 0;
+  virtual Result Init(std::shared_ptr<Reader> reader) = 0;
 
   // Gets the current metadata.
-  virtual MetadataPtr metadata() const = 0;
+  virtual std::unique_ptr<Metadata> metadata() const = 0;
 
   // Gets the stream collection.
   virtual const std::vector<DemuxStream*>& streams() const = 0;
-
-  // MultiStreamProducer implementation (deferred to subclasses).
-  // bool can_accept_allocator(uint32_t stream_index) const override;
-  // void set_allocator(uint32_t stream_index, Allocator* allocator) override;
-
-  // MultiStreamPacketSource implementation (deferred to subclasses).
-  // uint32_t stream_count() const override;
-  // PacketPtr PullPacket(uint32_t* stream_index_out) override;
 };
 
 }  // namespace media

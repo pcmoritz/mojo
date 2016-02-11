@@ -9,15 +9,16 @@ namespace mojo {
 namespace media {
 
 Stage::Stage() :
-    prepared_(false),
     in_supply_backlog_(false),
     in_demand_backlog_(false) {}
 
 Stage::~Stage() {}
 
-bool Stage::Prepare(UpdateCallback update_callback) {
-  return false;
-}
+void Stage::UnprepareInput(size_t index) {}
+
+void Stage::UnprepareOutput(
+    size_t index,
+    const UpstreamCallback& callback) {}
 
 void Stage::Prime() {}
 

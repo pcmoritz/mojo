@@ -10,12 +10,12 @@
 namespace mojo {
 namespace media {
 
-Result Reader::Create(const GURL& gurl, ReaderPtr* reader_out) {
+Result Reader::Create(const GURL& gurl, std::shared_ptr<Reader>* reader_out) {
   if (!gurl.is_valid()) {
     return Result::kInvalidArgument;
   }
 
-  ReaderPtr reader = nullptr;
+  std::shared_ptr<Reader> reader = nullptr;
   if (gurl.SchemeIsFile()) {
     reader = FileReader::Create();
   }

@@ -6,49 +6,29 @@
 #define SERVICES_MEDIA_FRAMEWORK_STREAM_TYPE_H_
 
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "base/logging.h"
-#include "services/media/framework/ptr.h"
 
 namespace mojo {
 namespace media {
 
 class StreamType;
-class StreamTypes;
 class MultiplexedStreamType;
 class LpcmStreamType;
 class CompressedAudioStreamType;
 class VideoStreamType;
 
-typedef UniquePtr<StreamType> StreamTypePtr;
-typedef UniquePtr<StreamTypes> StreamTypesPtr;
-
-// TODO(dalesat): Get rid of this class.
-class StreamTypes : public std::vector<StreamTypePtr> {
+class Bytes {
  public:
-  static StreamTypesPtr Create(size_t size) {
-    return StreamTypesPtr(new StreamTypes(size));
+  static std::unique_ptr<Bytes> Create(size_t size) {
+    return std::unique_ptr<Bytes>(new Bytes(size));
   }
 
-  explicit StreamTypes(size_t size) : std::vector<StreamTypePtr>(size) {}
-
-  StreamTypesPtr Clone() const;
-};
-
-class Bytes;
-typedef UniquePtr<Bytes> BytesPtr;
-
-// TODO(dalesat): Get rid of this class.
-class Bytes : public std::vector<uint8_t> {
- public:
-  static BytesPtr Create(size_t size) {
-    return BytesPtr(new Bytes(size));
-  }
-
-  static BytesPtr Create(uint8_t* data, size_t size) {
-    BytesPtr result = Create(size);
+  static std::unique_ptr<Bytes> Create(const uint8_t* data, size_t size) {
+    std::unique_ptr<Bytes> result = Create(size);
     if (size != 0) {
       DCHECK(result->data());
       DCHECK(data);
@@ -57,11 +37,20 @@ class Bytes : public std::vector<uint8_t> {
     return result;
   }
 
-  explicit Bytes(size_t size) : std::vector<uint8_t>(size) {}
+  ~Bytes();
 
-  explicit Bytes(const Bytes& copy_from) : std::vector<uint8_t>(copy_from) {}
+  std::unique_ptr<Bytes> Clone() const;
 
-  BytesPtr Clone() const;
+  uint8_t* data() { return storage_.data(); }
+
+  const uint8_t* data() const { return storage_.data(); }
+
+  size_t size() const { return storage_.size(); }
+
+ private:
+  explicit Bytes(size_t size);
+
+  std::vector<uint8_t> storage_;
 };
 
 // Describes the type of a stream.
@@ -84,8 +73,8 @@ class StreamType {
     kVideo
   };
 
-  static StreamTypePtr Create(Scheme scheme) {
-    return StreamTypePtr(new StreamType(scheme));
+  static std::unique_ptr<StreamType> Create(Scheme scheme) {
+    return std::unique_ptr<StreamType>(new StreamType(scheme));
   }
 
   explicit StreamType(Scheme scheme);
@@ -101,7 +90,7 @@ class StreamType {
   virtual const CompressedAudioStreamType* compressed_audio() const;
   virtual const VideoStreamType* video() const;
 
-  virtual StreamTypePtr Clone() const;
+  virtual std::unique_ptr<StreamType> Clone() const;
 
  private:
   Scheme scheme_;
@@ -122,32 +111,16 @@ struct Range {
 };
 
 class StreamTypeSet;
-class StreamTypeSets;
 class MultiplexedStreamTypeSet;
 class LpcmStreamTypeSet;
 class CompressedAudioStreamTypeSet;
 class VideoStreamTypeSet;
 
-typedef UniquePtr<StreamTypeSet> StreamTypeSetPtr;
-typedef UniquePtr<StreamTypeSets> StreamTypeSetsPtr;
-
-// TODO(dalesat): Get rid of this class.
-class StreamTypeSets : public std::vector<StreamTypeSetPtr> {
- public:
-  static StreamTypeSetsPtr Create(size_t size) {
-    return StreamTypeSetsPtr(new StreamTypeSets(size));
-  }
-
-  StreamTypeSets(size_t size) : std::vector<StreamTypeSetPtr>(size) {}
-
-  StreamTypeSetsPtr Clone() const;
-};
-
 // Describes a set of possible stream types.
 class StreamTypeSet {
  public:
-  static StreamTypeSetPtr Create(StreamType::Scheme scheme) {
-    return StreamTypeSetPtr(new StreamTypeSet(scheme));
+  static std::unique_ptr<StreamTypeSet> Create(StreamType::Scheme scheme) {
+    return std::unique_ptr<StreamTypeSet>(new StreamTypeSet(scheme));
   }
 
   StreamTypeSet(StreamType::Scheme scheme);
@@ -163,7 +136,7 @@ class StreamTypeSet {
   virtual const CompressedAudioStreamTypeSet* compressed_audio() const;
   virtual const VideoStreamTypeSet* video() const;
 
-  virtual StreamTypeSetPtr Clone() const;
+  virtual std::unique_ptr<StreamTypeSet> Clone() const;
 
  private:
   StreamType::Scheme scheme_;
@@ -172,71 +145,78 @@ class StreamTypeSet {
 // Describes the type of a multiplexed stream.
 class MultiplexedStreamType : public StreamType {
  public:
-  static StreamTypePtr Create(
-      StreamTypePtr multiplex_type,
-      StreamTypesPtr substream_types) {
-    return StreamTypePtr(
+  static std::unique_ptr<StreamType> Create(
+      std::unique_ptr<StreamType> multiplex_type,
+      std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>
+          substream_types) {
+    return std::unique_ptr<StreamType>(
         new MultiplexedStreamType(
             std::move(multiplex_type),
             std::move(substream_types)));
   }
 
   MultiplexedStreamType(
-      StreamTypePtr multiplex_type,
-      StreamTypesPtr substream_types);
+      std::unique_ptr<StreamType> multiplex_type,
+      std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>
+          substream_types);
 
   ~MultiplexedStreamType() override;
 
   const MultiplexedStreamType* multiplexed() const override;
 
-  const StreamTypePtr& multiplex_type() const {
+  const std::unique_ptr<StreamType>& multiplex_type() const {
     return multiplex_type_;
   }
 
-  const StreamTypesPtr& substream_types() const {
+  const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>&
+      substream_types() const {
     return substream_types_;
   }
 
-  StreamTypePtr Clone() const override;
+  std::unique_ptr<StreamType> Clone() const override;
 
 private:
-  StreamTypePtr multiplex_type_;
-  StreamTypesPtr substream_types_;
+  std::unique_ptr<StreamType> multiplex_type_;
+  std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> substream_types_;
 };
 
 // Describes the type of a multiplexed stream.
 class MultiplexedStreamTypeSet : public StreamTypeSet {
 public:
-  static StreamTypeSetPtr Create(
-      StreamTypeSetPtr multiplex_type_set,
-      StreamTypeSetsPtr substream_type_sets) {
-    return StreamTypeSetPtr(
+  static std::unique_ptr<StreamTypeSet> Create(
+      std::unique_ptr<StreamTypeSet> multiplex_type_set,
+      std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
+          substream_type_sets) {
+    return std::unique_ptr<StreamTypeSet>(
         new MultiplexedStreamTypeSet(
             std::move(multiplex_type_set),
             std::move(substream_type_sets)));
   }
 
   MultiplexedStreamTypeSet(
-      StreamTypeSetPtr multiplex_type_set,
-      StreamTypeSetsPtr substream_type_sets);
+      std::unique_ptr<StreamTypeSet> multiplex_type_set,
+      std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
+          substream_type_sets);
 
   ~MultiplexedStreamTypeSet() override;
 
   const MultiplexedStreamTypeSet* multiplexed() const override;
 
-  const StreamTypeSetPtr& multiplex_type_set() const {
+  const std::unique_ptr<StreamTypeSet>& multiplex_type_set() const {
     return multiplex_type_set_;
   }
 
-  const StreamTypeSetsPtr& substream_type_sets() const {
+  const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+      substream_type_sets() const {
     return substream_type_sets_;
   }
 
-  StreamTypeSetPtr Clone() const override;
+  std::unique_ptr<StreamTypeSet> Clone() const override;
 
 private:
-  StreamTypeSetPtr multiplex_type_set_;
-  StreamTypeSetsPtr substream_type_sets_;
+  std::unique_ptr<StreamTypeSet> multiplex_type_set_;
+  std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
+      substream_type_sets_;
 };
 
 // Describes the type of an LPCM stream.
@@ -251,11 +231,11 @@ class LpcmStreamType : public StreamType {
     kFloat
   };
 
-  static StreamTypePtr Create(
+  static std::unique_ptr<StreamType> Create(
       SampleFormat sample_format,
       uint32_t channels,
       uint32_t frames_per_second) {
-    return StreamTypePtr(new LpcmStreamType(
+    return std::unique_ptr<StreamType>(new LpcmStreamType(
         sample_format,
         channels,
         frames_per_second));
@@ -296,7 +276,7 @@ class LpcmStreamType : public StreamType {
 
   static uint32_t SampleSizeFromFormat(SampleFormat sample_format);
 
-  StreamTypePtr Clone() const override;
+  std::unique_ptr<StreamType> Clone() const override;
 
  protected:
   LpcmStreamType(
@@ -315,11 +295,11 @@ class LpcmStreamType : public StreamType {
 // Describes a set of LPCM stream types.
 class LpcmStreamTypeSet : public StreamTypeSet {
  public:
-  static StreamTypeSetPtr Create(
+  static std::unique_ptr<StreamTypeSet> Create(
       LpcmStreamType::SampleFormat sample_format,
       Range<uint32_t> channels,
       Range<uint32_t> frames_per_second) {
-    return StreamTypeSetPtr(new LpcmStreamTypeSet(
+    return std::unique_ptr<StreamTypeSet>(new LpcmStreamTypeSet(
         sample_format,
         channels,
         frames_per_second));
@@ -348,7 +328,7 @@ class LpcmStreamTypeSet : public StreamTypeSet {
 
   bool contains(const LpcmStreamType& type) const;
 
-  StreamTypeSetPtr Clone() const override;
+  std::unique_ptr<StreamTypeSet> Clone() const override;
 
  protected:
   LpcmStreamTypeSet(
@@ -372,13 +352,13 @@ class CompressedAudioStreamType : public LpcmStreamType {
     kVorbis
   };
 
-  static StreamTypePtr Create(
+  static std::unique_ptr<StreamType> Create(
       AudioEncoding encoding,
       SampleFormat sample_format,
       uint32_t channels,
       uint32_t frames_per_second,
-      BytesPtr encoding_details) {
-    return StreamTypePtr(new CompressedAudioStreamType(
+      std::unique_ptr<Bytes> encoding_details) {
+    return std::unique_ptr<StreamType>(new CompressedAudioStreamType(
         encoding,
         sample_format,
         channels,
@@ -391,7 +371,7 @@ class CompressedAudioStreamType : public LpcmStreamType {
     SampleFormat sample_format,
     uint32_t channels,
     uint32_t frames_per_second,
-    BytesPtr encoding_details);
+    std::unique_ptr<Bytes> encoding_details);
 
   ~CompressedAudioStreamType() override;
 
@@ -401,26 +381,26 @@ class CompressedAudioStreamType : public LpcmStreamType {
     return encoding_;
   }
 
-  const BytesPtr& encoding_details() const {
+  const std::unique_ptr<Bytes>& encoding_details() const {
     return encoding_details_;
   }
 
-  StreamTypePtr Clone() const override;
+  std::unique_ptr<StreamType> Clone() const override;
 
  private:
   AudioEncoding encoding_;
-  BytesPtr encoding_details_;
+  std::unique_ptr<Bytes> encoding_details_;
 };
 
 // Describes a set of compressed audio stream types.
 class CompressedAudioStreamTypeSet : public LpcmStreamTypeSet {
  public:
-  static StreamTypeSetPtr Create(
+  static std::unique_ptr<StreamTypeSet> Create(
       CompressedAudioStreamType::AudioEncoding encoding,
       CompressedAudioStreamType::SampleFormat sample_format,
       Range<uint32_t> channels,
       Range<uint32_t> frames_per_second) {
-    return StreamTypeSetPtr(new CompressedAudioStreamTypeSet(
+    return std::unique_ptr<StreamTypeSet>(new CompressedAudioStreamTypeSet(
         encoding,
         sample_format,
         channels,
@@ -443,7 +423,7 @@ class CompressedAudioStreamTypeSet : public LpcmStreamTypeSet {
 
   bool contains(const CompressedAudioStreamType& type) const;
 
-  StreamTypeSetPtr Clone() const override;
+  std::unique_ptr<StreamTypeSet> Clone() const override;
 
  private:
   CompressedAudioStreamType::AudioEncoding encoding_;
@@ -502,7 +482,7 @@ class VideoStreamType : public StreamType {
     kSdRec601
   };
 
-  static StreamTypePtr Create(
+  static std::unique_ptr<StreamType> Create(
       VideoEncoding encoding,
       VideoProfile profile,
       PixelFormat pixel_format,
@@ -511,8 +491,8 @@ class VideoStreamType : public StreamType {
       uint32_t height,
       uint32_t coded_width,
       uint32_t coded_height,
-      BytesPtr encoding_details) {
-    return StreamTypePtr(new VideoStreamType(
+      std::unique_ptr<Bytes> encoding_details) {
+    return std::unique_ptr<StreamType>(new VideoStreamType(
         encoding,
         profile,
         pixel_format,
@@ -533,7 +513,7 @@ class VideoStreamType : public StreamType {
     uint32_t height,
     uint32_t coded_width,
     uint32_t coded_height,
-    BytesPtr encoding_details);
+    std::unique_ptr<Bytes> encoding_details);
 
   ~VideoStreamType() override;
 
@@ -571,11 +551,11 @@ class VideoStreamType : public StreamType {
     return coded_height_;
   }
 
-  const BytesPtr& encoding_details() const {
+  const std::unique_ptr<Bytes>& encoding_details() const {
     return encoding_details_;
   }
 
-  StreamTypePtr Clone() const override;
+  std::unique_ptr<StreamType> Clone() const override;
 
  private:
   VideoEncoding encoding_;
@@ -586,17 +566,17 @@ class VideoStreamType : public StreamType {
   uint32_t height_;
   uint32_t coded_width_;
   uint32_t coded_height_;
-  BytesPtr encoding_details_;
+  std::unique_ptr<Bytes> encoding_details_;
 };
 
 // Describes a set of video stream types.
 class VideoStreamTypeSet : public StreamTypeSet {
  public:
-  static StreamTypeSetPtr Create(
+  static std::unique_ptr<StreamTypeSet> Create(
       VideoStreamType::VideoEncoding encoding,
       Range<uint32_t> width,
       Range<uint32_t> height) {
-    return StreamTypeSetPtr(new VideoStreamTypeSet(
+    return std::unique_ptr<StreamTypeSet>(new VideoStreamTypeSet(
         encoding,
         width,
         height));
@@ -623,7 +603,7 @@ class VideoStreamTypeSet : public StreamTypeSet {
     return height_;
   }
 
-  StreamTypeSetPtr Clone() const override;
+  std::unique_ptr<StreamTypeSet> Clone() const override;
 
  private:
   VideoStreamType::VideoEncoding encoding_;

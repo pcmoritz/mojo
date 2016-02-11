@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_MEDIA_MODELS_MULTISTREAM_PACKET_SOURCE_H_
-#define MOJO_MEDIA_MODELS_MULTISTREAM_PACKET_SOURCE_H_
+#ifndef MOJO_MEDIA_MODELS_MULTISTREAM_SOURCE_H_
+#define MOJO_MEDIA_MODELS_MULTISTREAM_SOURCE_H_
 
-#include <memory>
-
+#include "services/media/framework/models/part.h"
 #include "services/media/framework/packet.h"
 
 namespace mojo {
@@ -14,22 +13,20 @@ namespace media {
 
 // Synchronous source of packets for multiple streams. This is currently used
 // by Demux, though it would be better if Demux were asynchronous.
-class MultiStreamPacketSource {
+class MultistreamSource : public Part {
  public:
-  virtual ~MultiStreamPacketSource() {}
+  ~MultistreamSource() override {}
 
   // Returns the number of streams the source produces.
-  virtual uint32_t stream_count() const = 0;
+  virtual size_t stream_count() const = 0;
 
   // Gets a packet for the stream indicated via stream_index_out. This call
   // should always produce a packet until end-of-stream. The caller is
   // responsible for releasing the packet.
-  virtual PacketPtr PullPacket(uint32_t *stream_index_out) = 0;
+  virtual PacketPtr PullPacket(size_t *stream_index_out) = 0;
 };
-
-typedef std::shared_ptr<MultiStreamPacketSource> MultiStreamPacketSourcePtr;
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_MULTISTREAM_PACKET_SOURCE_H_
+#endif // MOJO_MEDIA_MODELS_MULTISTREAM_SOURCE_H_

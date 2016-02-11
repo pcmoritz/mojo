@@ -5,29 +5,29 @@
 #include <cstdlib>
 
 #include "base/logging.h"
-#include "services/media/framework/allocator.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
 
 namespace {
 
-class DefaultAllocator : public Allocator {
+class DefaultAllocator : public PayloadAllocator {
  public:
   constexpr DefaultAllocator() {}
 
-  // Allocator implementation.
-  void* AllocatePayloadBuffer(uint64_t size) override;
+  // PayloadAllocator implementation.
+  void* AllocatePayloadBuffer(size_t size) override;
 
-  void ReleasePayloadBuffer(uint64_t size, void* buffer) override;
+  void ReleasePayloadBuffer(size_t size, void* buffer) override;
 };
 
-void* DefaultAllocator::AllocatePayloadBuffer(uint64_t size) {
+void* DefaultAllocator::AllocatePayloadBuffer(size_t size) {
   DCHECK(size > 0);
   return std::malloc(static_cast<size_t>(size));
 }
 
-void DefaultAllocator::ReleasePayloadBuffer(uint64_t size, void* buffer) {
+void DefaultAllocator::ReleasePayloadBuffer(size_t size, void* buffer) {
   DCHECK(size > 0);
   DCHECK(buffer);
   std::free(buffer);
@@ -38,7 +38,7 @@ static constexpr DefaultAllocator default_allocator;
 } // namespace
 
 // static
-Allocator* Allocator::GetDefault() {
+PayloadAllocator* PayloadAllocator::GetDefault() {
   return const_cast<DefaultAllocator*>(&default_allocator);
 }
 

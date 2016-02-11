@@ -2,23 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SOURCE_STAGE_H_
-#define SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SOURCE_STAGE_H_
+#ifndef SERVICES_MEDIA_FRAMEWORK_STAGES_TRANSFORM_STAGE_H_
+#define SERVICES_MEDIA_FRAMEWORK_STAGES_TRANSFORM_STAGE_H_
 
-#include <deque>
-
-#include "services/media/framework/models/active_source.h"
+#include "services/media/framework/models/transform.h"
 #include "services/media/framework/stages/stage.h"
 
 namespace mojo {
 namespace media {
 
-// A stage that hosts an ActiveSource.
-class ActiveSourceStage : public Stage {
+// A stage that hosts a Transform.
+class TransformStage : public Stage {
  public:
-  ActiveSourceStage(std::shared_ptr<ActiveSource> source);
+  TransformStage(std::shared_ptr<Transform> transform);
 
-  ~ActiveSourceStage() override;
+  ~TransformStage() override;
 
   // Stage implementation.
   size_t input_count() const override;
@@ -49,14 +47,14 @@ class ActiveSourceStage : public Stage {
   void FlushOutput(size_t index) override;
 
  private:
+  Input input_;
   Output output_;
-  std::shared_ptr<ActiveSource> source_;
-  bool prepared_;
-  ActiveSource::SupplyCallback supply_function_;
-  std::deque<PacketPtr> packets_;
+  std::shared_ptr<Transform> transform_;
+  PayloadAllocator* allocator_;
+  bool input_packet_is_new_;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif  // SERVICES_MEDIA_FRAMEWORK_STAGES_ACTIVE_SOURCE_STAGE_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_STAGES_TRANSFORM_STAGE_H_

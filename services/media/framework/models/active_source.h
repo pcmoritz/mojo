@@ -5,36 +5,33 @@
 #ifndef MOJO_MEDIA_MODELS_ACTIVE_SOURCE_H_
 #define MOJO_MEDIA_MODELS_ACTIVE_SOURCE_H_
 
-#include <memory>
-
-#include "services/media/framework/allocator.h"
 #include "services/media/framework/models/demand.h"
+#include "services/media/framework/models/part.h"
 #include "services/media/framework/packet.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
 
 // Source that produces packets asynchronously.
-class ActiveSource {
+class ActiveSource : public Part {
  public:
   using SupplyCallback = std::function<void(PacketPtr packet)>;
 
-  virtual ~ActiveSource() {}
+  ~ActiveSource() override {}
 
   // Whether the source can accept an allocator.
   virtual bool can_accept_allocator() const = 0;
 
   // Sets the allocator for the source.
-  virtual void set_allocator(Allocator* allocator) = 0;
+  virtual void set_allocator(PayloadAllocator* allocator) = 0;
 
   // Sets the callback that supplies a packet asynchronously.
-  virtual void SetSupplyCallback(SupplyCallback supply_callback) = 0;
+  virtual void SetSupplyCallback(const SupplyCallback& supply_callback) = 0;
 
   // Sets the demand signalled from downstream.
   virtual void SetDownstreamDemand(Demand demand) = 0;
 };
-
-typedef std::shared_ptr<ActiveSource> ActiveSourcePtr;
 
 }  // namespace media
 }  // namespace mojo

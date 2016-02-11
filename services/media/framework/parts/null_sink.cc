@@ -11,15 +11,11 @@ NullSink::NullSink() {}
 
 NullSink::~NullSink() {}
 
-bool NullSink::must_allocate() const {
-  return false;
-}
-
-Allocator* NullSink::allocator() {
+PayloadAllocator* NullSink::allocator() {
   return nullptr;
 }
 
-void NullSink::SetDemandCallback(DemandCallback demand_callback) {
+void NullSink::SetDemandCallback(const DemandCallback& demand_callback) {
   demand_callback_ = demand_callback;
 }
 

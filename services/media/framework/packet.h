@@ -8,8 +8,7 @@
 #include <memory>
 
 #include "base/logging.h"
-#include "services/media/framework/allocator.h"
-#include "services/media/framework/ptr.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
@@ -22,7 +21,7 @@ struct PacketDeleter {
 };
 
 // Unique pointer for packets.
-typedef UniquePtr<Packet, PacketDeleter> PacketPtr;
+typedef std::unique_ptr<Packet, PacketDeleter> PacketPtr;
 
 // Media packet abstract base class. Subclasses may be defined as needed.
 // Packet::Create and Packet::CreateEndOfStream use an implementation with
@@ -38,9 +37,9 @@ class Packet {
       int64_t presentation_time,
       uint64_t duration,
       bool end_of_stream,
-      uint64_t size,
+      size_t size,
       void* payload,
-      Allocator* allocator);
+      PayloadAllocator* allocator);
 
   // Creates a packet. If size is 0, payload must be nullptr and vice-versa.
   // No allocator is provided, and the payload will not be released when the
@@ -49,7 +48,7 @@ class Packet {
       int64_t presentation_time,
       uint64_t duration,
       bool end_of_stream,
-      uint64_t size,
+      size_t size,
       void* payload);
 
   // Creates an end-of-stream packet with no payload.
@@ -61,7 +60,7 @@ class Packet {
 
   virtual bool end_of_stream() const = 0;
 
-  virtual uint64_t size() const = 0;
+  virtual size_t size() const = 0;
 
   virtual void* payload() const = 0;
 

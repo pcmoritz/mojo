@@ -5,7 +5,7 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
 #define SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
 
-#include "services/media/framework/engine.h"
+#include "services/media/framework/graph.h"
 #include "services/media/framework/packet.h"
 #include "services/media/framework/stream_type.h"
 
@@ -17,11 +17,12 @@ namespace media {
 // *output and delivers the resulting output type via *out_type. If it fails,
 // returns false, sets *out_type to nullptr and leaves *output unchanged.
 bool BuildConversionPipeline(
-    const StreamTypePtr& in_type,
-    const StreamTypeSetsPtr& out_type_sets,
-    Engine* engine,
-    Engine::Output* output,
-    StreamTypePtr* out_type);
+    const std::unique_ptr<StreamType>& in_type,
+    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+        out_type_sets,
+    Graph* graph,
+    OutputRef* output,
+    std::unique_ptr<StreamType>* out_type);
 
 }  // namespace media
 }  // namespace mojo

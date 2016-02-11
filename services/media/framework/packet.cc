@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
-#include "services/media/framework/allocator.h"
 #include "services/media/framework/packet.h"
+#include "services/media/framework/payload_allocator.h"
 
 namespace mojo {
 namespace media {
@@ -15,9 +15,9 @@ class PacketImpl : public Packet {
       int64_t presentation_time,
       uint64_t duration,
       bool end_of_stream,
-      uint64_t size,
+      size_t size,
       void* payload,
-      Allocator* allocator) :
+      PayloadAllocator* allocator) :
       presentation_time_(presentation_time),
       duration_(duration),
       end_of_stream_(end_of_stream),
@@ -35,7 +35,7 @@ class PacketImpl : public Packet {
 
   bool end_of_stream() const override { return end_of_stream_; }
 
-  uint64_t size() const override { return size_; }
+  size_t size() const override { return size_; }
 
   void* payload() const override { return payload_; }
 
@@ -52,9 +52,9 @@ class PacketImpl : public Packet {
   int64_t presentation_time_;
   uint64_t duration_;
   bool end_of_stream_;
-  uint64_t size_;
+  size_t size_;
   void* payload_;
-  Allocator* allocator_;
+  PayloadAllocator* allocator_;
 };
 
 // static
@@ -62,9 +62,9 @@ PacketPtr Packet::Create(
     int64_t presentation_time,
     uint64_t duration,
     bool end_of_stream,
-    uint64_t size,
+    size_t size,
     void* payload,
-    Allocator* allocator) {
+    PayloadAllocator* allocator) {
   DCHECK(payload == nullptr || allocator != nullptr);
   return PacketPtr(new PacketImpl(
       presentation_time,
@@ -80,7 +80,7 @@ PacketPtr Packet::CreateNoAllocator(
     int64_t presentation_time,
     uint64_t duration,
     bool end_of_stream,
-    uint64_t size,
+    size_t size,
     void* payload) {
   return PacketPtr(new PacketImpl(
       presentation_time,

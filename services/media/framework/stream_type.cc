@@ -3,13 +3,18 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
+#include "services/media/framework/safe_clone.h"
 #include "services/media/framework/stream_type.h"
 
 namespace mojo {
 namespace media {
 
-BytesPtr Bytes::Clone() const {
-  return BytesPtr(new Bytes(*this));
+Bytes::Bytes(size_t size) : storage_(size) {}
+
+Bytes::~Bytes() {}
+
+std::unique_ptr<Bytes> Bytes::Clone() const {
+  return std::unique_ptr<Bytes>(new Bytes(*this));
 }
 
 StreamType::StreamType(Scheme scheme) : scheme_(scheme) {}
@@ -36,29 +41,13 @@ const VideoStreamType* StreamType::video() const {
   return nullptr;
 }
 
-StreamTypePtr StreamType::Clone() const {
+std::unique_ptr<StreamType> StreamType::Clone() const {
   return Create(scheme());
-}
-
-StreamTypesPtr StreamTypes::Clone() const {
-  StreamTypes* result = new StreamTypes(size());
-  for (const StreamTypePtr& stream_type : *this) {
-    result->push_back(stream_type.Clone());
-  }
-  return StreamTypesPtr(result);
 }
 
 StreamTypeSet::StreamTypeSet(StreamType::Scheme scheme) : scheme_(scheme) {}
 
 StreamTypeSet::~StreamTypeSet() {}
-
-StreamTypeSetsPtr StreamTypeSets::Clone() const {
-  StreamTypeSets* result = new StreamTypeSets(size());
-  for (const StreamTypeSetPtr& stream_type_set : *this) {
-    result->push_back(stream_type_set.Clone());
-  }
-  return StreamTypeSetsPtr(result);
-}
 
 const MultiplexedStreamTypeSet* StreamTypeSet::multiplexed() const {
   NOTREACHED();
@@ -80,13 +69,13 @@ const VideoStreamTypeSet* StreamTypeSet::video() const {
   return nullptr;
 }
 
-StreamTypeSetPtr StreamTypeSet::Clone() const {
+std::unique_ptr<StreamTypeSet> StreamTypeSet::Clone() const {
   return Create(scheme());
 }
 
 MultiplexedStreamType::MultiplexedStreamType(
-    StreamTypePtr multiplex_type,
-    StreamTypesPtr substream_types) :
+    std::unique_ptr<StreamType> multiplex_type,
+    std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> substream_types) :
     StreamType(Scheme::kMultiplexed),
     multiplex_type_(std::move(multiplex_type)),
     substream_types_(std::move(substream_types)) {}
@@ -97,13 +86,14 @@ const MultiplexedStreamType* MultiplexedStreamType::multiplexed() const {
   return this;
 }
 
-StreamTypePtr MultiplexedStreamType::Clone() const {
-  return Create(multiplex_type().Clone(), substream_types().Clone());
+std::unique_ptr<StreamType> MultiplexedStreamType::Clone() const {
+  return Create(SafeClone(multiplex_type()), SafeClone(substream_types()));
 }
 
 MultiplexedStreamTypeSet::MultiplexedStreamTypeSet(
-    StreamTypeSetPtr multiplex_type_set,
-    StreamTypeSetsPtr substream_type_sets) :
+    std::unique_ptr<StreamTypeSet> multiplex_type_set,
+    std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
+        substream_type_sets) :
     StreamTypeSet(StreamType::Scheme::kMultiplexed),
     multiplex_type_set_(std::move(multiplex_type_set)),
     substream_type_sets_(std::move(substream_type_sets)) {}
@@ -114,8 +104,10 @@ const MultiplexedStreamTypeSet* MultiplexedStreamTypeSet::multiplexed() const {
   return this;
 }
 
-StreamTypeSetPtr MultiplexedStreamTypeSet::Clone() const {
-  return Create(multiplex_type_set().Clone(), substream_type_sets().Clone());
+std::unique_ptr<StreamTypeSet> MultiplexedStreamTypeSet::Clone() const {
+  return Create(
+      SafeClone(multiplex_type_set()),
+      SafeClone(substream_type_sets()));
 }
 
 LpcmStreamType::LpcmStreamType(
@@ -165,7 +157,7 @@ uint32_t LpcmStreamType::SampleSizeFromFormat(
   return 0;
 }
 
-StreamTypePtr LpcmStreamType::Clone() const {
+std::unique_ptr<StreamType> LpcmStreamType::Clone() const {
   return Create(sample_format(), channels(), frames_per_second());
 }
 
@@ -203,7 +195,7 @@ bool LpcmStreamTypeSet::contains(const LpcmStreamType& type) const {
       frames_per_second().contains(type.frames_per_second());
 }
 
-StreamTypeSetPtr LpcmStreamTypeSet::Clone() const {
+std::unique_ptr<StreamTypeSet> LpcmStreamTypeSet::Clone() const {
   return Create(sample_format(), channels(), frames_per_second());
 }
 
@@ -212,7 +204,7 @@ CompressedAudioStreamType::CompressedAudioStreamType(
   SampleFormat sample_format,
   uint32_t channels,
   uint32_t frames_per_second,
-  BytesPtr encoding_details) :
+  std::unique_ptr<Bytes> encoding_details) :
   LpcmStreamType(
       Scheme::kCompressedAudio,
       sample_format,
@@ -228,13 +220,13 @@ const CompressedAudioStreamType* CompressedAudioStreamType::compressed_audio()
   return this;
 }
 
-StreamTypePtr CompressedAudioStreamType::Clone() const {
+std::unique_ptr<StreamType> CompressedAudioStreamType::Clone() const {
   return Create(
       encoding(),
       sample_format(),
       channels(),
       frames_per_second(),
-      encoding_details().Clone());
+      SafeClone(encoding_details()));
 }
 
 CompressedAudioStreamTypeSet::CompressedAudioStreamTypeSet(
@@ -267,7 +259,7 @@ bool CompressedAudioStreamTypeSet::contains(
       frames_per_second().contains(type.frames_per_second());
 }
 
-StreamTypeSetPtr CompressedAudioStreamTypeSet::Clone() const {
+std::unique_ptr<StreamTypeSet> CompressedAudioStreamTypeSet::Clone() const {
   return Create(
       encoding(),
       sample_format(),
@@ -284,7 +276,7 @@ VideoStreamType::VideoStreamType(
   uint32_t height,
   uint32_t coded_width,
   uint32_t coded_height,
-  BytesPtr encoding_details) :
+  std::unique_ptr<Bytes> encoding_details) :
   StreamType(StreamType::Scheme::kVideo),
   encoding_(encoding),
   profile_(profile),
@@ -302,7 +294,7 @@ const VideoStreamType* VideoStreamType::video() const {
   return this;
 }
 
-StreamTypePtr VideoStreamType::Clone() const {
+std::unique_ptr<StreamType> VideoStreamType::Clone() const {
   return Create(
       encoding(),
       profile(),
@@ -312,7 +304,7 @@ StreamTypePtr VideoStreamType::Clone() const {
       height(),
       coded_width(),
       coded_height(),
-      encoding_details().Clone());
+      SafeClone(encoding_details()));
 }
 
 VideoStreamTypeSet::VideoStreamTypeSet(
@@ -330,7 +322,7 @@ const VideoStreamTypeSet* VideoStreamTypeSet::video() const {
   return this;
 }
 
-StreamTypeSetPtr VideoStreamTypeSet::Clone() const {
+std::unique_ptr<StreamTypeSet> VideoStreamTypeSet::Clone() const {
   return Create(
       encoding(),
       width(),

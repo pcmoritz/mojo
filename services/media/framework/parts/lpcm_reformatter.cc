@@ -19,22 +19,19 @@ class LpcmReformatterImpl : public LpcmReformatter {
 
   ~LpcmReformatterImpl() override;
 
-  // LpcmTransform implementation.
-  const LpcmStreamType& input_stream_type() const override;
-
-  const LpcmStreamType& output_stream_type() const override;
-
-  void TransformFrames(
-      LpcmFrameBuffer* source,
-      LpcmFrameBuffer* dest,
-      bool mix) override;
+  // Transform implementation.
+  bool TransformPacket(
+      const PacketPtr& input,
+      bool new_input,
+      PayloadAllocator* allocator,
+      PacketPtr* output) override;
 
  private:
   LpcmStreamType in_type_;
   LpcmStreamType out_type_;
 };
 
-LpcmReformatterPtr LpcmReformatter::Create(
+std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
     const LpcmStreamType& in_type,
     const LpcmStreamTypeSet& out_type) {
   LpcmReformatter* result = nullptr;
@@ -145,7 +142,7 @@ LpcmReformatterPtr LpcmReformatter::Create(
       break;
   }
 
-  return LpcmReformatterPtr(result);
+  return std::shared_ptr<LpcmReformatter>(result);
 }
 
 template<typename TIn, typename TOut>
@@ -184,164 +181,118 @@ inline constexpr int32_t Clamp(int32_t val) {
 }
 
 template<typename TIn, typename TOut>
-inline void CopySample(TOut* dest, TIn* source) {
+inline void CopySample(TOut* dest, const TIn* source) {
   *dest = static_cast<TOut>(*source);
 }
 
-inline void CopySample(uint8_t* dest, int16_t* source) {
+inline void CopySample(uint8_t* dest, const int16_t* source) {
   *dest = static_cast<uint8_t>((*source >> 8) ^ 0x80);
 }
 
-inline void CopySample(uint8_t* dest, int32_t* source) {
+inline void CopySample(uint8_t* dest, const int32_t* source) {
   *dest = static_cast<uint8_t>((Clamp(*source) >> 16) ^ 0x80);
 }
 
-inline void CopySample(uint8_t* dest, float* source) {
+inline void CopySample(uint8_t* dest, const float* source) {
   *dest = static_cast<uint8_t>((Clamp(*source) * 0x7f) + 128);
 }
 
-inline void CopySample(int16_t* dest, uint8_t* source) {
+inline void CopySample(int16_t* dest, const uint8_t* source) {
   *dest = static_cast<int16_t>(*source ^ 0x80) << 8;
 }
 
-inline void CopySample(int16_t* dest, int32_t* source) {
+inline void CopySample(int16_t* dest, const int32_t* source) {
   *dest = static_cast<int16_t>(Clamp(*source) >> 8);
 }
 
-inline void CopySample(int16_t* dest, float* source) {
+inline void CopySample(int16_t* dest, const float* source) {
   *dest = static_cast<int16_t>(Clamp(*source) * 0x7fff);
 }
 
-inline void CopySample(int32_t* dest, uint8_t* source) {
+inline void CopySample(int32_t* dest, const uint8_t* source) {
   *dest = static_cast<int32_t>(*source ^ 0x80) << 16;
 }
 
-inline void CopySample(int32_t* dest, int16_t* source) {
+inline void CopySample(int32_t* dest, const int16_t* source) {
   *dest = static_cast<int32_t>(*source << 8);
 }
 
-inline void CopySample(int32_t* dest, float* source) {
+inline void CopySample(int32_t* dest, const float* source) {
   *dest = static_cast<int32_t>(Clamp(*source) * 0x7fffff);
 }
 
-inline void CopySample(float* dest, uint8_t* source) {
+inline void CopySample(float* dest, const uint8_t* source) {
   *dest = static_cast<float>(*source ^ 0x80) / 0x80;
 }
 
-inline void CopySample(float* dest, int16_t* source) {
+inline void CopySample(float* dest, const int16_t* source) {
   *dest = static_cast<float>(*source) / 0x8000;
 }
 
-inline void CopySample(float* dest, int32_t* source) {
+inline void CopySample(float* dest, const int32_t* source) {
   *dest = static_cast<float>(Clamp(*source)) / 0x800000;
-}
-
-template<typename TIn, typename TOut>
-inline void MixSample(TOut* dest, TIn* source) {
-  *dest += static_cast<TOut>(*source);
-}
-
-inline void MixSample(uint8_t* dest, int16_t* source) {
-  *dest += static_cast<uint8_t>((*source >> 8) ^ 0x80);
-}
-
-inline void MixSample(uint8_t* dest, int32_t* source) {
-  *dest += static_cast<uint8_t>((Clamp(*source) >> 16) ^ 0x80);
-}
-
-inline void MixSample(uint8_t* dest, float* source) {
-  *dest += static_cast<uint8_t>((Clamp(*source) * 0x7f) + 128);
-}
-
-inline void MixSample(int16_t* dest, uint8_t* source) {
-  *dest += static_cast<int16_t>(*source ^ 0x80) << 8;
-}
-
-inline void MixSample(int16_t* dest, int32_t* source) {
-  *dest += static_cast<int16_t>(Clamp(*source) >> 8);
-}
-
-inline void MixSample(int16_t* dest, float* source) {
-  *dest += static_cast<int16_t>(Clamp(*source) * 0x7fff);
-}
-
-inline void MixSample(int32_t* dest, uint8_t* source) {
-  *dest += static_cast<int32_t>(*source ^ 0x80) << 16;
-}
-
-inline void MixSample(int32_t* dest, int16_t* source) {
-  *dest += static_cast<int32_t>(*source << 8);
-}
-
-inline void MixSample(int32_t* dest, float* source) {
-  *dest += static_cast<int32_t>(Clamp(*source) * 0x7fffff);
-}
-
-inline void MixSample(float* dest, uint8_t* source) {
-  *dest += static_cast<float>(*source ^ 0x80) / 0x80;
-}
-
-inline void MixSample(float* dest, int16_t* source) {
-  *dest += static_cast<float>(*source) / 0x8000;
-}
-
-inline void MixSample(float* dest, int32_t* source) {
-  *dest += static_cast<float>(Clamp(*source)) / 0x800000;
 }
 
 } // namespace
 
 template<typename TIn, typename TOut>
-const LpcmStreamType& LpcmReformatterImpl<TIn, TOut>::input_stream_type()
-    const {
-  return in_type_;
-}
+bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
+    const PacketPtr& input,
+    bool new_input,
+    PayloadAllocator* allocator,
+    PacketPtr* output) {
+  DCHECK(input);
+  DCHECK(allocator);
+  DCHECK(output);
 
-template<typename TIn, typename TOut>
-const LpcmStreamType& LpcmReformatterImpl<TIn, TOut>::output_stream_type()
-    const {
-  return out_type_;
-}
-
-template<typename TIn, typename TOut>
-void LpcmReformatterImpl<TIn, TOut>::TransformFrames(
-    LpcmFrameBuffer* source,
-    LpcmFrameBuffer* dest,
-    bool mix) {
-  DCHECK(source);
-  DCHECK(dest);
-  DCHECK(source->buffer());
-  DCHECK(source->frame_count());
-  DCHECK(dest->buffer());
-  DCHECK(dest->frame_count());
-
-  uint64_t frame_count = std::min(source->frame_count(), dest->frame_count());
-
-  uint8_t* in_channel = static_cast<uint8_t*>(source->buffer());
-  uint8_t* out_channel = static_cast<uint8_t*>(dest->buffer());
-
-  for (uint32_t channel = 0; channel < in_type_.channels(); channel++) {
-    TIn* in_sample = reinterpret_cast<TIn*>(in_channel);
-    TOut* out_sample = reinterpret_cast<TOut*>(out_channel);
-    if (mix) {
-      for (uint64_t sample = 0; sample < frame_count; sample++) {
-        MixSample(out_sample, in_sample);
-        in_sample += in_type_.channels();
-        out_sample += out_type_.channels();
-      }
-    } else {
-      for (uint64_t sample = 0; sample < frame_count; sample++) {
-        CopySample(out_sample, in_sample);
-        in_sample += in_type_.channels();
-        out_sample += out_type_.channels();
-      }
-    }
-    in_channel += in_type_.sample_size();
-    out_channel += out_type_.sample_size();
+  uint64_t in_size = input->size();
+  if (in_size == 0) {
+    // Zero-sized input packet. Make a copy.
+    *output = Packet::Create(
+        input->presentation_time(),
+        input->duration(),
+        input->end_of_stream(),
+        0,
+        nullptr,
+        nullptr);
+    return true;
   }
 
-  source->Advance(frame_count);
-  dest->Advance(frame_count);
+  size_t frame_count = input->duration();
+  uint64_t out_size = out_type_.min_buffer_size(frame_count);
+
+  void* buffer = allocator->AllocatePayloadBuffer(out_size);
+  if (buffer == nullptr) {
+    LOG(WARNING) << "lpcm reformatter starved for buffers";
+    // Starved for buffer space. Can't process now.
+    *output = nullptr;
+    return false;
+  }
+
+  const TIn* in_channel = static_cast<const TIn*>(input->payload());
+  TOut* out_channel = static_cast<TOut*>(buffer);
+
+  for (uint32_t channel = 0; channel < in_type_.channels(); channel++) {
+    const TIn* in_sample = in_channel;
+    TOut* out_sample = out_channel;
+    for (size_t sample = 0; sample < frame_count; sample++) {
+      CopySample(out_sample, in_sample);
+      in_sample += in_type_.channels();
+      out_sample += out_type_.channels();
+    }
+    ++in_channel;
+    ++out_channel;
+  }
+
+  *output = Packet::Create(
+      input->presentation_time(),
+      frame_count,
+      input->end_of_stream(),
+      out_size,
+      buffer,
+      allocator);
+
+  return true;
 }
 
 }  // namespace media

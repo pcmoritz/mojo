@@ -20,13 +20,13 @@ class LpcmUtil {
   virtual ~LpcmUtil() {}
 
   // Fills the buffer with silence.
-  virtual void Silence(void* buffer, uint64_t frame_count) const = 0;
+  virtual void Silence(void* buffer, size_t frame_count) const = 0;
 
   // Copies samples.
-  virtual void Copy(const void* in, void* out, uint64_t frame_count) const = 0;
+  virtual void Copy(const void* in, void* out, size_t frame_count) const = 0;
 
   // Mixes samples.
-  virtual void Mix(const void* in, void* out, uint64_t frame_count) const = 0;
+  virtual void Mix(const void* in, void* out, size_t frame_count) const = 0;
 
   // Interleaves non-interleaved samples. This assumes ffmpeg non-interleaved
   // ("planar") layout, in which the buffer (in) is divided evenly into a
@@ -35,9 +35,9 @@ class LpcmUtil {
   // (hence the in_type_count and the frame_count).
   virtual void Interleave(
       const void* in,
-      uint64_t in_byte_count,
+      size_t in_byte_count,
       void* out,
-      uint64_t frame_count) const = 0;
+      size_t frame_count) const = 0;
 };
 
 }  // namespace media
