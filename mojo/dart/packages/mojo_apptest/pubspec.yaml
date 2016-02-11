@@ -1,6 +1,5 @@
 author: Chromium Authors <mojo-dev@googlegroups.com>
 dependencies:
-  mojo: any
   test: ^0.12.6+1
 description: Test harness for mojo applications
 environment:
