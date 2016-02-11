@@ -34,7 +34,8 @@ class ViewStub {
   // Begins the process of resolving a view.
   // Invokes |ViewRegistry.OnViewResolved| when the token is obtained
   // from the owner or passes nullptr if an error occurs.
-  ViewStub(ViewRegistry* registry, mojo::ui::ViewOwnerPtr owner);
+  ViewStub(ViewRegistry* registry,
+           mojo::InterfaceHandle<mojo::ui::ViewOwner> owner);
   ~ViewStub();
 
   // Gets the view state referenced by the stub, or null if the view

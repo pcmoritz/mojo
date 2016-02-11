@@ -78,11 +78,13 @@ class MockNetworkService : public mojo::NetworkService {
       const CreateTCPConnectedSocketCallback& callback) override {}
   void CreateUDPSocket(
       mojo::InterfaceRequest<mojo::UDPSocket> socket) override {}
-  void CreateHttpServer(mojo::NetAddressPtr local_address,
-                        mojo::HttpServerDelegatePtr delegate,
-                        const CreateHttpServerCallback& callback) override {}
+  void CreateHttpServer(
+      mojo::NetAddressPtr local_address,
+      mojo::InterfaceHandle<mojo::HttpServerDelegate> delegate,
+      const CreateHttpServerCallback& callback) override {}
   void RegisterURLLoaderInterceptor(
-      mojo::URLLoaderInterceptorFactoryPtr factory) override {}
+      mojo::InterfaceHandle<mojo::URLLoaderInterceptorFactory> factory)
+      override {}
   void CreateHostResolver(
       mojo::InterfaceRequest<mojo::HostResolver> host_resolver) override {}
 

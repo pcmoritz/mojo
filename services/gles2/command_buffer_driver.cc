@@ -4,6 +4,8 @@
 
 #include "services/gles2/command_buffer_driver.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/macros.h"
 #include "base/memory/shared_memory.h"
@@ -85,11 +87,13 @@ CommandBufferDriver::~CommandBufferDriver() {
 }
 
 void CommandBufferDriver::Initialize(
-    mojo::CommandBufferSyncClientPtr sync_client,
-    mojo::CommandBufferLostContextObserverPtr loss_observer,
+    mojo::InterfaceHandle<mojo::CommandBufferSyncClient> sync_client,
+    mojo::InterfaceHandle<mojo::CommandBufferLostContextObserver> loss_observer,
     mojo::ScopedSharedBufferHandle shared_state) {
-  sync_client_ = sync_client.Pass();
-  loss_observer_ = loss_observer.Pass();
+  sync_client_ =
+      mojo::CommandBufferSyncClientPtr::Create(std::move(sync_client));
+  loss_observer_ = mojo::CommandBufferLostContextObserverPtr::Create(
+      std::move(loss_observer));
   bool success = DoInitialize(shared_state.Pass());
   mojo::GpuCapabilitiesPtr capabilities =
       success ? mojo::GpuCapabilities::From(decoder_->GetCapabilities())

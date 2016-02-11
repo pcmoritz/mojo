@@ -12,6 +12,7 @@
 #include <GLES2/gl2extmojo.h>
 #include <MGL/mgl.h>
 #include <MGL/mgl_onscreen.h>
+#include <utility>
 
 #include "base/bind.h"
 #include "base/location.h"
@@ -50,7 +51,8 @@ void GpuRasterizer::CreateContext() {
       base::Bind(&GpuRasterizer::InitContext, base::Unretained(this)));
 }
 
-void GpuRasterizer::InitContext(mojo::CommandBufferPtr command_buffer) {
+void GpuRasterizer::InitContext(
+    mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer) {
   DCHECK(!gl_context_);
   DCHECK(!ganesh_context_);
   DCHECK(!ganesh_surface_);
@@ -61,7 +63,8 @@ void GpuRasterizer::InitContext(mojo::CommandBufferPtr command_buffer) {
     return;
   }
 
-  gl_context_ = mojo::GLContext::CreateFromCommandBuffer(command_buffer.Pass());
+  gl_context_ = mojo::GLContext::CreateFromCommandBuffer(
+      mojo::CommandBufferPtr::Create(std::move(command_buffer)));
   gl_context_->AddObserver(this);
   ganesh_context_.reset(new mojo::skia::GaneshContext(gl_context_));
 

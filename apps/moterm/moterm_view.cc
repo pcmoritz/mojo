@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <string>
+#include <utility>
 
 #include "apps/moterm/key_util.h"
 #include "base/bind.h"
@@ -162,7 +163,7 @@ void MotermView::Connect(
 }
 
 void MotermView::ConnectToClient(
-    mojo::terminal::TerminalClientPtr terminal_client,
+    mojo::InterfaceHandle<mojo::terminal::TerminalClient> terminal_client,
     bool force,
     const ConnectToClientCallback& callback) {
   if (driver_) {
@@ -176,9 +177,10 @@ void MotermView::ConnectToClient(
     }
   }
 
-  mojo::files::FilePtr file;
+  mojo::InterfaceHandle<mojo::files::File> file;
   driver_ = MotermDriver::Create(this, GetProxy(&file));
-  terminal_client->ConnectToTerminal(file.Pass());
+  mojo::terminal::TerminalClientPtr::Create(std::move(terminal_client))
+      ->ConnectToTerminal(std::move(file));
   DCHECK(on_closed_callback_.is_null());
   on_closed_callback_ = [callback] { callback.Run(mojo::files::Error::OK); };
 }

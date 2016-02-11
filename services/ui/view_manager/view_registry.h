@@ -73,7 +73,7 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   // Destroys |parent_state| if an error occurs.
   void AddChild(ViewState* parent_state,
                 uint32_t child_key,
-                mojo::ui::ViewOwnerPtr child_view_owner);
+                mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner);
 
   // Removes a child.
   // Destroys |parent_state| if an error occurs.
@@ -108,7 +108,7 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   // Destroys |tree_state| if an error occurs.
   void SetRoot(ViewTreeState* tree_state,
                uint32_t root_key,
-               mojo::ui::ViewOwnerPtr root_view_owner);
+               mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner);
 
   // Resets the root of the view tree.
   // Destroys |tree_state| if an error occurs.

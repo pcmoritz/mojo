@@ -81,7 +81,7 @@ class ApplicationManager {
       const GURL& application_url,
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
       const base::Closure& on_application_end);
 
   template <typename Interface>
@@ -156,7 +156,7 @@ class ApplicationManager {
       const GURL& application_url,
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
       const base::Closure& on_application_end,
       const std::vector<std::string>& pre_redirect_parameters);
 
@@ -164,13 +164,13 @@ class ApplicationManager {
       const GURL& resolved_url,
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider>* services,
-      mojo::ServiceProviderPtr* exposed_services);
+      mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services);
 
   bool ConnectToApplicationWithLoader(
       const GURL& resolved_url,
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider>* services,
-      mojo::ServiceProviderPtr* exposed_services,
+      mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services,
       const base::Closure& on_application_end,
       const std::vector<std::string>& parameters,
       ApplicationLoader* loader);
@@ -188,22 +188,23 @@ class ApplicationManager {
       const GURL& resolved_url,
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
       const base::Closure& on_application_end,
       const std::vector<std::string>& parameters);
 
   ShellImpl* GetShellImpl(const GURL& url);
 
-  void ConnectToClient(ShellImpl* shell_impl,
-                       const GURL& resolved_url,
-                       const GURL& requestor_url,
-                       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-                       mojo::ServiceProviderPtr exposed_services);
+  void ConnectToClient(
+      ShellImpl* shell_impl,
+      const GURL& resolved_url,
+      const GURL& requestor_url,
+      mojo::InterfaceRequest<mojo::ServiceProvider> services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services);
 
   void HandleFetchCallback(
       const GURL& requestor_url,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
       const base::Closure& on_application_end,
       const std::vector<std::string>& parameters,
       scoped_ptr<Fetcher> fetcher);

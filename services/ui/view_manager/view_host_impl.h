@@ -31,8 +31,9 @@ class ViewHostImpl : public mojo::ui::ViewHost,
   void CreateScene(
       mojo::InterfaceRequest<mojo::gfx::composition::Scene> scene) override;
   void RequestLayout() override;
-  void AddChild(uint32_t child_key,
-                mojo::ui::ViewOwnerPtr child_view_owner) override;
+  void AddChild(
+      uint32_t child_key,
+      mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) override;
   void RemoveChild(uint32_t child_key,
                    mojo::InterfaceRequest<mojo::ui::ViewOwner>
                        transferred_view_owner_request) override;

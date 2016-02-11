@@ -35,7 +35,7 @@ class HttpServerImpl : public HttpServer {
 
   // HttpServer:
   void SetHandler(const mojo::String& path,
-                  HttpHandlerPtr http_handler,
+                  mojo::InterfaceHandle<HttpHandler> http_handler,
                   const mojo::Callback<void(bool)>& callback) override;
 
   void GetPort(const GetPortCallback& callback) override;

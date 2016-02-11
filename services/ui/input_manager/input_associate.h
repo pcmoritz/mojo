@@ -29,7 +29,8 @@ class InputAssociate : public mojo::ui::ViewAssociate {
     ~InputConnectionImpl() override;
 
    private:
-    void SetListener(mojo::ui::InputListenerPtr listener) override;
+    void SetListener(
+        mojo::InterfaceHandle<mojo::ui::InputListener> listener) override;
 
     InputAssociate* const associate_;
     mojo::ui::ViewTokenPtr view_token_;
@@ -55,7 +56,7 @@ class InputAssociate : public mojo::ui::ViewAssociate {
   };
 
   // |ViewAssociate|:
-  void Connect(mojo::ui::ViewInspectorPtr inspector,
+  void Connect(mojo::InterfaceHandle<mojo::ui::ViewInspector> inspector,
                const ConnectCallback& callback) override;
   void ConnectToViewService(
       mojo::ui::ViewTokenPtr view_token,
@@ -68,7 +69,7 @@ class InputAssociate : public mojo::ui::ViewAssociate {
 
   // Incoming service calls.
   void SetListener(mojo::ui::ViewToken* view_token,
-                   mojo::ui::InputListenerPtr listener);
+                   mojo::InterfaceHandle<mojo::ui::InputListener> listener);
   void DispatchEvent(mojo::ui::ViewTreeToken* view_tree_token,
                      mojo::EventPtr event);
 

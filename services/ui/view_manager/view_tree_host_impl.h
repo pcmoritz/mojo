@@ -28,8 +28,9 @@ class ViewTreeHostImpl : public mojo::ui::ViewTreeHost,
   void GetServiceProvider(
       mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) override;
   void RequestLayout() override;
-  void SetRoot(uint32_t root_key,
-               mojo::ui::ViewOwnerPtr root_view_owner) override;
+  void SetRoot(
+      uint32_t root_key,
+      mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) override;
   void ResetRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
                      transferred_view_owner_request) override;
   void LayoutRoot(mojo::ui::ViewLayoutParamsPtr root_layout_params,

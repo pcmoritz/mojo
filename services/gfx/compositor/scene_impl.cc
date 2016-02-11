@@ -4,6 +4,8 @@
 
 #include "services/gfx/compositor/scene_impl.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/bind_helpers.h"
 
@@ -25,8 +27,10 @@ SceneImpl::SceneImpl(
 
 SceneImpl::~SceneImpl() {}
 
-void SceneImpl::SetListener(mojo::gfx::composition::SceneListenerPtr listener) {
-  engine_->SetListener(state_, listener.Pass());
+void SceneImpl::SetListener(
+    mojo::InterfaceHandle<mojo::gfx::composition::SceneListener> listener) {
+  engine_->SetListener(state_, mojo::gfx::composition::SceneListenerPtr::Create(
+                                   std::move(listener)));
 }
 
 void SceneImpl::Update(mojo::gfx::composition::SceneUpdatePtr update) {

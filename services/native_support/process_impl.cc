@@ -26,6 +26,8 @@
 #include "services/native_support/process_controller_impl.h"
 #include "services/native_support/process_io_redirection.h"
 
+using mojo::files::FilePtr;
+
 namespace native_support {
 
 namespace {
@@ -60,9 +62,9 @@ void ProcessImpl::Spawn(
     mojo::Array<uint8_t> path,
     mojo::Array<mojo::Array<uint8_t>> argv,
     mojo::Array<mojo::Array<uint8_t>> envp,
-    mojo::files::FilePtr stdin_file,
-    mojo::files::FilePtr stdout_file,
-    mojo::files::FilePtr stderr_file,
+    mojo::InterfaceHandle<mojo::files::File> stdin_file,
+    mojo::InterfaceHandle<mojo::files::File> stdout_file,
+    mojo::InterfaceHandle<mojo::files::File> stderr_file,
     mojo::InterfaceRequest<ProcessController> process_controller,
     const SpawnCallback& callback) {
   std::vector<int> fds_to_inherit(3, -1);
@@ -108,9 +110,10 @@ void ProcessImpl::Spawn(
 
   std::unique_ptr<ProcessIORedirection> process_io_redirection(
       new ProcessIORedirectionForStdIO(
-          stdin_file.Pass(), stdout_file.Pass(), stderr_file.Pass(),
-          stdin_parent_fd.Pass(), stdout_parent_fd.Pass(),
-          stderr_parent_fd.Pass()));
+          FilePtr::Create(std::move(stdin_file)),
+          FilePtr::Create(std::move(stdout_file)),
+          FilePtr::Create(std::move(stderr_file)), stdin_parent_fd.Pass(),
+          stdout_parent_fd.Pass(), stderr_parent_fd.Pass()));
 
   SpawnImpl(path.Pass(), argv.Pass(), envp.Pass(),
             std::move(process_io_redirection), fds_to_inherit,
@@ -121,7 +124,7 @@ void ProcessImpl::SpawnWithTerminal(
     mojo::Array<uint8_t> path,
     mojo::Array<mojo::Array<uint8_t>> argv,
     mojo::Array<mojo::Array<uint8_t>> envp,
-    mojo::files::FilePtr terminal_file,
+    mojo::InterfaceHandle<mojo::files::File> terminal_file,
     mojo::InterfaceRequest<ProcessController> process_controller,
     const SpawnWithTerminalCallback& callback) {
   DCHECK(terminal_file);
@@ -150,8 +153,8 @@ void ProcessImpl::SpawnWithTerminal(
   fds_to_inherit[STDERR_FILENO] = stderr_fd.get();
 
   std::unique_ptr<ProcessIORedirection> process_io_redirection(
-      new ProcessIORedirectionForTerminal(terminal_file.Pass(),
-                                          master_fd.Pass()));
+      new ProcessIORedirectionForTerminal(
+          FilePtr::Create(std::move(terminal_file)), master_fd.Pass()));
 
   SpawnImpl(path.Pass(), argv.Pass(), envp.Pass(),
             std::move(process_io_redirection), fds_to_inherit,

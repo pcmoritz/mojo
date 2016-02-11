@@ -24,9 +24,9 @@ LinuxKeyboardServiceImpl::~LinuxKeyboardServiceImpl() {
 }
 
 void LinuxKeyboardServiceImpl::Show(
-    keyboard::KeyboardClientPtr client,
+    mojo::InterfaceHandle<keyboard::KeyboardClient> client,
     keyboard::KeyboardType type) {
-  client_ = client.Pass();
+  client_ = keyboard::KeyboardClientPtr::Create(std::move(client));
 }
 
 void LinuxKeyboardServiceImpl::ShowByRequest() {

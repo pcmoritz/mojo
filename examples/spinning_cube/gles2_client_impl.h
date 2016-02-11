@@ -22,7 +22,8 @@ class GLES2ClientImpl {
   void Draw();
 
  private:
-  void ContextCreated(mojo::CommandBufferPtr command_buffer);
+  void ContextCreated(
+      mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer);
   void ContextLost();
   static void ContextLostThunk(void* closure);
   void WantToDraw();

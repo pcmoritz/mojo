@@ -29,8 +29,8 @@ class IndirectIntegerServiceImpl : public IndirectIntegerService,
 
   // IndirectIntegerService
 
-  void Set(IntegerServicePtr service) override {
-    integer_service_ = service.Pass();
+  void Set(InterfaceHandle<IntegerService> service) override {
+    integer_service_ = IntegerServicePtr::Create(std::move(service));
   }
 
   void Get(InterfaceRequest<IntegerService> service) override {

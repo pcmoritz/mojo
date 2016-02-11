@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include <memory>
+#include <utility>
 
 #include "base/bind.h"
 #include "base/memory/scoped_ptr.h"
@@ -75,9 +76,9 @@ class SpinningCubeApp : public mojo::ApplicationDelegate,
 
  private:
   void SetEventDispatcher() {
-    mojo::NativeViewportEventDispatcherPtr ptr;
+    mojo::InterfaceHandle<mojo::NativeViewportEventDispatcher> ptr;
     dispatcher_binding_.Bind(GetProxy(&ptr));
-    viewport_->SetEventDispatcher(ptr.Pass());
+    viewport_->SetEventDispatcher(std::move(ptr));
   }
 
   void OnViewportConnectionError() { mojo::RunLoop::current()->Quit(); }

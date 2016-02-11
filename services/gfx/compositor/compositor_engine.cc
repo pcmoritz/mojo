@@ -99,7 +99,7 @@ void CompositorEngine::DestroyScene(SceneState* scene_state) {
 }
 
 void CompositorEngine::CreateRenderer(
-    mojo::ContextProviderPtr context_provider,
+    mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
     mojo::InterfaceRequest<mojo::gfx::composition::Renderer> renderer_request,
     const mojo::String& label) {
   DCHECK(context_provider);

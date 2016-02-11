@@ -32,7 +32,8 @@ class SceneImpl : public mojo::gfx::composition::Scene,
 
  private:
   // |Scene|:
-  void SetListener(mojo::gfx::composition::SceneListenerPtr listener) override;
+  void SetListener(mojo::InterfaceHandle<mojo::gfx::composition::SceneListener>
+                       listener) override;
   void Update(mojo::gfx::composition::SceneUpdatePtr update) override;
   void Publish(mojo::gfx::composition::SceneMetadataPtr metadata) override;
   void GetScheduler(

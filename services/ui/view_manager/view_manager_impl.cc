@@ -4,6 +4,8 @@
 
 #include "services/ui/view_manager/view_manager_impl.h"
 
+#include <utility>
+
 #include "services/ui/view_manager/view_host_impl.h"
 #include "services/ui/view_manager/view_tree_host_impl.h"
 
@@ -15,20 +17,22 @@ ViewManagerImpl::ViewManagerImpl(ViewRegistry* registry)
 ViewManagerImpl::~ViewManagerImpl() {}
 
 void ViewManagerImpl::RegisterView(
-    mojo::ui::ViewPtr view,
+    mojo::InterfaceHandle<mojo::ui::View> view,
     mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     const mojo::String& label) {
-  registry_->RegisterView(view.Pass(), view_host_request.Pass(),
-                          view_owner_request.Pass(), label);
+  registry_->RegisterView(mojo::ui::ViewPtr::Create(std::move(view)),
+                          view_host_request.Pass(), view_owner_request.Pass(),
+                          label);
 }
 
 void ViewManagerImpl::RegisterViewTree(
-    mojo::ui::ViewTreePtr view_tree,
+    mojo::InterfaceHandle<mojo::ui::ViewTree> view_tree,
     mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
     const mojo::String& label) {
-  registry_->RegisterViewTree(view_tree.Pass(), view_tree_host_request.Pass(),
-                              label);
+  registry_->RegisterViewTree(
+      mojo::ui::ViewTreePtr::Create(std::move(view_tree)),
+      view_tree_host_request.Pass(), label);
 }
 
 }  // namespace view_manager

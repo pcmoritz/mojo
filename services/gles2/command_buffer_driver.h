@@ -58,9 +58,11 @@ class CommandBufferDriver {
 
   void set_client(scoped_ptr<Client> client) { client_ = client.Pass(); }
 
-  void Initialize(mojo::CommandBufferSyncClientPtr sync_client,
-                  mojo::CommandBufferLostContextObserverPtr loss_observer,
-                  mojo::ScopedSharedBufferHandle shared_state);
+  void Initialize(
+      mojo::InterfaceHandle<mojo::CommandBufferSyncClient> sync_client,
+      mojo::InterfaceHandle<mojo::CommandBufferLostContextObserver>
+          loss_observer,
+      mojo::ScopedSharedBufferHandle shared_state);
   void SetGetBuffer(int32_t buffer);
   void Flush(int32_t put_offset);
   void MakeProgress(int32_t last_get_offset);

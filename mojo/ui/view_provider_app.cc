@@ -4,6 +4,8 @@
 
 #include "mojo/ui/view_provider_app.h"
 
+#include <utility>
+
 #include "base/command_line.h"
 #include "base/logging.h"
 
@@ -23,9 +25,9 @@ class ViewProviderApp::DelegatingViewProvider : public mojo::ui::ViewProvider {
   void CreateView(
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) override {
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override {
     app_->CreateView(this, view_provider_url_, view_owner_request.Pass(),
-                     services.Pass(), exposed_services.Pass());
+                     services.Pass(), std::move(exposed_services));
   }
 
   ViewProviderApp* app_;
@@ -67,7 +69,7 @@ void ViewProviderApp::CreateView(
     const std::string& view_provider_url,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services) {
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   CreateView(view_provider_url, view_owner_request.Pass(), services.Pass(),
              exposed_services.Pass());
 }

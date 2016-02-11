@@ -55,7 +55,8 @@ class NativeViewportImpl : public mojo::NativeViewport,
   void GetContextProvider(
       mojo::InterfaceRequest<mojo::ContextProvider> request) override;
   void SetEventDispatcher(
-      mojo::NativeViewportEventDispatcherPtr dispatcher) override;
+      mojo::InterfaceHandle<mojo::NativeViewportEventDispatcher> dispatcher)
+      override;
 
   // PlatformViewport::Delegate implementation.
   void OnMetricsChanged(mojo::ViewportMetricsPtr metrics) override;

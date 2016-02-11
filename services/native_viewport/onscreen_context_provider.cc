@@ -46,14 +46,16 @@ void OnscreenContextProvider::SetAcceleratedWidget(
 }
 
 void OnscreenContextProvider::Create(
-    mojo::ViewportParameterListenerPtr viewport_parameter_listener,
+    mojo::InterfaceHandle<mojo::ViewportParameterListener>
+        viewport_parameter_listener,
     const CreateCallback& callback) {
   if (!pending_create_callback_.is_null()) {
     DCHECK(!command_buffer_impl_);
     pending_create_callback_.Run(nullptr);
   }
 
-  pending_listener_ = viewport_parameter_listener.Pass();
+  pending_listener_ = mojo::ViewportParameterListenerPtr::Create(
+      std::move(viewport_parameter_listener));
   pending_create_callback_ = callback;
 
   if (widget_ != gfx::kNullAcceleratedWidget)

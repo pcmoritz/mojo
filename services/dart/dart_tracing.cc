@@ -4,6 +4,8 @@
 
 #include "services/dart/dart_tracing.h"
 
+#include <utility>
+
 #include "dart/runtime/include/dart_tools_api.h"
 #include "mojo/public/cpp/application/application_impl.h"
 
@@ -44,10 +46,11 @@ void DartTraceProvider::Bind(
 }
 
 // tracing::TraceProvider implementation:
-void DartTraceProvider::StartTracing(const mojo::String& categories,
-                                     tracing::TraceRecorderPtr recorder) {
+void DartTraceProvider::StartTracing(
+    const mojo::String& categories,
+    mojo::InterfaceHandle<tracing::TraceRecorder> recorder) {
   DCHECK(!recorder_.get());
-  recorder_ = recorder.Pass();
+  recorder_ = tracing::TraceRecorderPtr::Create(std::move(recorder));
   DartTimelineController::Enable(categories);
 }
 

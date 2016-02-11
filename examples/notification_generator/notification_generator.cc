@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/macros.h"
 #include "mojo/application/application_runner_chromium.h"
@@ -59,11 +61,12 @@ class NotificationGeneratorDelegate : public mojo::ApplicationDelegate,
   void PostNotification(const char* title,
                         const char* text,
                         notifications::NotificationPtr* notification) {
-    notifications::NotificationClientPtr notification_client;
+    mojo::InterfaceHandle<notifications::NotificationClient>
+        notification_client;
     auto request = mojo::GetProxy(&notification_client);
     client_bindings_.AddBinding(this, request.Pass());
     notification_service_->Post(CreateNotificationData(title, text).Pass(),
-                                notification_client.Pass(),
+                                std::move(notification_client),
                                 GetProxy(notification));
   }
 

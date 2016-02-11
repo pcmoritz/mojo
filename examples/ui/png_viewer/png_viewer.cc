@@ -110,7 +110,7 @@ class PNGContentViewProviderApp : public mojo::ui::ViewProviderApp {
       const std::string& connection_url,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) override {
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override {
     new PNGView(app_impl(), view_owner_request.Pass(), image_);
   }
 

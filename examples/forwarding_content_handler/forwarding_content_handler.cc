@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <utility>
+
 #include "base/macros.h"
 #include "base/memory/scoped_ptr.h"
 #include "mojo/application/application_runner_chromium.h"
@@ -29,14 +31,14 @@ class ForwardingApplicationImpl : public Application {
 
  private:
   // Application:
-  void Initialize(ShellPtr shell,
+  void Initialize(InterfaceHandle<Shell> shell,
                   Array<String> args,
                   const mojo::String& url) override {
-    shell_ = shell.Pass();
+    shell_ = ShellPtr::Create(std::move(shell));
   }
   void AcceptConnection(const String& requestor_url,
                         InterfaceRequest<ServiceProvider> services,
-                        ServiceProviderPtr exposed_services,
+                        InterfaceHandle<ServiceProvider> exposed_services,
                         const String& requested_url) override {
     shell_->ConnectToApplication(target_url_, services.Pass(),
                                   exposed_services.Pass());
@@ -69,7 +71,7 @@ class ForwardingContentHandler : public ApplicationDelegate,
     CHECK(!response.is_null());
     const std::string requestor_url(response->url);
     std::string target_url;
-    if(!common::BlockingCopyToString(response->body.Pass(), &target_url)) {
+    if (!common::BlockingCopyToString(response->body.Pass(), &target_url)) {
       LOG(WARNING) << "unable to read target URL from " << requestor_url;
       return nullptr;
     }

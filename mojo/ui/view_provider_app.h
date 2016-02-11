@@ -54,7 +54,7 @@ class ViewProviderApp : public mojo::ApplicationDelegate,
       const std::string& view_provider_url,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) = 0;
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) = 0;
 
  private:
   class DelegatingViewProvider;
@@ -68,7 +68,7 @@ class ViewProviderApp : public mojo::ApplicationDelegate,
       const std::string& view_provider_url,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services);
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services);
 
   mojo::ApplicationImpl* app_impl_ = nullptr;
   mojo::StrongBindingSet<mojo::ui::ViewProvider> bindings_;

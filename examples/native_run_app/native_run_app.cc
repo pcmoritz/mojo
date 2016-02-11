@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "base/logging.h"
@@ -46,9 +47,9 @@ mojo::Array<uint8_t> ToByteArray(const std::string& s) {
 
 class TerminalConnection {
  public:
-  explicit TerminalConnection(mojo::files::FilePtr terminal,
+  explicit TerminalConnection(mojo::InterfaceHandle<mojo::files::File> terminal,
                               native_support::Process* native_support_process)
-      : terminal_(terminal.Pass()),
+      : terminal_(mojo::files::FilePtr::Create(std::move(terminal))),
         native_support_process_(native_support_process) {
     terminal_.set_connection_error_handler([this]() { delete this; });
     Start();
@@ -156,8 +157,9 @@ class TerminalConnection {
     // TODO(vtl): If the |InterfacePtr| underlying |native_support_process_|
     // encounters an error, then we're sort of dead in the water.
     native_support_process_->SpawnWithTerminal(
-        ToByteArray(command_line_[0]), argv.Pass(), nullptr, terminal_.Pass(),
-        GetProxy(&process_controller_), [this](mojo::files::Error error) {
+        ToByteArray(command_line_[0]), argv.Pass(), nullptr,
+        terminal_.PassInterfaceHandle(), GetProxy(&process_controller_),
+        [this](mojo::files::Error error) {
           this->DidSpawnWithTerminal(error);
         });
     process_controller_.set_connection_error_handler([this]() { delete this; });
@@ -201,10 +203,11 @@ class TerminalClientImpl : public TerminalClient {
   ~TerminalClientImpl() override {}
 
   // |TerminalClient| implementation:
-  void ConnectToTerminal(mojo::files::FilePtr terminal) override {
+  void ConnectToTerminal(
+      mojo::InterfaceHandle<mojo::files::File> terminal) override {
     if (terminal) {
       // Owns itself.
-      new TerminalConnection(terminal.Pass(), native_support_process_);
+      new TerminalConnection(std::move(terminal), native_support_process_);
     } else {
       LOG(ERROR) << "No terminal";
     }

@@ -32,7 +32,8 @@ class AuthenticatingURLLoaderInterceptorMetaFactoryImpl
   // AuthenticatingURLLoaderInterceptorMetaFactory:
   void CreateURLLoaderInterceptorFactory(
       mojo::InterfaceRequest<URLLoaderInterceptorFactory> factory_request,
-      authentication::AuthenticationServicePtr authentication_service) override;
+      InterfaceHandle<authentication::AuthenticationService>
+          authentication_service) override;
 
   StrongBinding<AuthenticatingURLLoaderInterceptorMetaFactory> binding_;
   ApplicationImpl* app_;

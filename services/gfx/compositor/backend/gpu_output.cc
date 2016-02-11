@@ -22,13 +22,14 @@ static scoped_ptr<base::MessagePump> CreateMessagePumpMojo() {
       base::MessageLoop::TYPE_DEFAULT);
 }
 
-GpuOutput::GpuOutput(mojo::ContextProviderPtr context_provider,
-                     const SchedulerCallbacks& scheduler_callbacks,
-                     const base::Closure& error_callback)
+GpuOutput::GpuOutput(
+    mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
+    const SchedulerCallbacks& scheduler_callbacks,
+    const base::Closure& error_callback)
     : frame_queue_(std::make_shared<FrameQueue>()),
-      scheduler_(std::make_shared<VsyncScheduler>(base::MessageLoop::current()
-                                                      ->task_runner(),
-                                                  scheduler_callbacks)),
+      scheduler_(std::make_shared<VsyncScheduler>(
+          base::MessageLoop::current()->task_runner(),
+          scheduler_callbacks)),
       rasterizer_delegate_(
           make_scoped_ptr(new RasterizerDelegate(frame_queue_))) {
   DCHECK(context_provider);
@@ -44,9 +45,8 @@ GpuOutput::GpuOutput(mojo::ContextProviderPtr context_provider,
       FROM_HERE,
       base::Bind(&RasterizerDelegate::CreateRasterizer,
                  base::Unretained(rasterizer_delegate_.get()),
-                 base::Passed(context_provider.PassInterfaceHandle()),
-                 scheduler_, base::MessageLoop::current()->task_runner(),
-                 error_callback));
+                 base::Passed(std::move(context_provider)), scheduler_,
+                 base::MessageLoop::current()->task_runner(), error_callback));
 }
 
 GpuOutput::~GpuOutput() {

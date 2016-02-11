@@ -4,6 +4,8 @@
 
 #include "services/authenticating_url_loader_interceptor/authenticating_url_loader_interceptor_factory.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "base/stl_util.h"
@@ -15,11 +17,13 @@ namespace mojo {
 AuthenticatingURLLoaderInterceptorFactory::
     AuthenticatingURLLoaderInterceptorFactory(
         mojo::InterfaceRequest<URLLoaderInterceptorFactory> request,
-        authentication::AuthenticationServicePtr authentication_service,
+        mojo::InterfaceHandle<authentication::AuthenticationService>
+            authentication_service,
         mojo::ApplicationImpl* app,
         std::map<GURL, std::string>* cached_tokens)
     : binding_(this, request.Pass()),
-      authentication_service_(authentication_service.Pass()),
+      authentication_service_(authentication::AuthenticationServicePtr::Create(
+          std::move(authentication_service))),
       app_(app),
       cached_tokens_(cached_tokens) {
   app_->ConnectToService("mojo:network_service", &network_service_);

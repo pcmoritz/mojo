@@ -14,6 +14,6 @@ void MotermApp::CreateView(
     const std::string& connection_url,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services) {
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   new MotermView(app_impl(), view_owner_request.Pass(), services.Pass());
 }

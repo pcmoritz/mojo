@@ -4,6 +4,8 @@
 
 #include "services/gles2/command_buffer_impl.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/message_loop/message_loop.h"
 #include "gpu/command_buffer/service/sync_point_manager.h"
@@ -42,7 +44,7 @@ class CommandBufferDriverClientImpl : public CommandBufferDriver::Client {
   base::WeakPtr<CommandBufferImpl> command_buffer_;
   scoped_refptr<base::SingleThreadTaskRunner> control_task_runner_;
 };
-}
+}  // namespace
 
 CommandBufferImpl::CommandBufferImpl(
     mojo::InterfaceRequest<mojo::CommandBuffer> request,
@@ -72,11 +74,12 @@ CommandBufferImpl::~CommandBufferImpl() {
 }
 
 void CommandBufferImpl::Initialize(
-    mojo::CommandBufferSyncClientPtr sync_client,
-    mojo::CommandBufferSyncPointClientPtr sync_point_client,
-    mojo::CommandBufferLostContextObserverPtr loss_observer,
+    mojo::InterfaceHandle<mojo::CommandBufferSyncClient> sync_client,
+    mojo::InterfaceHandle<mojo::CommandBufferSyncPointClient> sync_point_client,
+    mojo::InterfaceHandle<mojo::CommandBufferLostContextObserver> loss_observer,
     mojo::ScopedSharedBufferHandle shared_state) {
-  sync_point_client_ = sync_point_client.Pass();
+  sync_point_client_ = mojo::CommandBufferSyncPointClientPtr::Create(
+      std::move(sync_point_client));
   driver_task_runner_->PostTask(
       FROM_HERE,
       base::Bind(&CommandBufferDriver::Initialize,

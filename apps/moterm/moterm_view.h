@@ -70,9 +70,10 @@ class MotermView : public mojo::ui::GaneshView,
   void Connect(mojo::InterfaceRequest<mojo::files::File> terminal_file,
                bool force,
                const ConnectCallback& callback) override;
-  void ConnectToClient(mojo::terminal::TerminalClientPtr terminal_client,
-                       bool force,
-                       const ConnectToClientCallback& callback) override;
+  void ConnectToClient(
+      mojo::InterfaceHandle<mojo::terminal::TerminalClient> terminal_client,
+      bool force,
+      const ConnectToClientCallback& callback) override;
   void GetSize(const GetSizeCallback& callback) override;
   void SetSize(uint32_t rows,
                uint32_t columns,

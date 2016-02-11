@@ -25,7 +25,7 @@ class GpuRasterizer;
 // Renderer backed by a ContextProvider.
 class GpuOutput : public Output {
  public:
-  GpuOutput(mojo::ContextProviderPtr context_provider,
+  GpuOutput(mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
             const SchedulerCallbacks& scheduler_callbacks,
             const base::Closure& error_callback);
   ~GpuOutput() override;

@@ -28,8 +28,9 @@ class DartTraceProvider : public tracing::TraceProvider {
 
  private:
   // tracing::TraceProvider implementation:
-  void StartTracing(const mojo::String& categories,
-                    tracing::TraceRecorderPtr recorder) override;
+  void StartTracing(
+      const mojo::String& categories,
+      mojo::InterfaceHandle<tracing::TraceRecorder> recorder) override;
   void StopTracing() override;
 
   void SplitAndRecord(char* data, size_t length);

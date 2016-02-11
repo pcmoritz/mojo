@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/bind_helpers.h"
 #include "base/logging.h"
@@ -118,10 +120,12 @@ class EchoTerminalApp
   }
 
   // |mojo::terminal::TerminalClient| implementation:
-  void ConnectToTerminal(mojo::files::FilePtr terminal) override {
+  void ConnectToTerminal(
+      mojo::InterfaceHandle<mojo::files::File> terminal) override {
     DCHECK(terminal);
     // The |TerminalEchoer| will own itself.
-    (new TerminalEchoer(terminal.Pass()))->StartReading();
+    (new TerminalEchoer(mojo::files::FilePtr::Create(std::move(terminal))))
+        ->StartReading();
   }
 
   mojo::BindingSet<mojo::terminal::TerminalClient> terminal_clients_;

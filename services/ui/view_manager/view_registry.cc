@@ -177,9 +177,10 @@ void ViewRegistry::RequestLayout(ViewState* view_state) {
   InvalidateLayout(view_state);
 }
 
-void ViewRegistry::AddChild(ViewState* parent_state,
-                            uint32_t child_key,
-                            mojo::ui::ViewOwnerPtr child_view_owner) {
+void ViewRegistry::AddChild(
+    ViewState* parent_state,
+    uint32_t child_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) {
   DCHECK(IsViewStateRegisteredDebug(parent_state));
   DCHECK(child_view_owner);
   DVLOG(1) << "AddChild: parent=" << parent_state
@@ -284,9 +285,10 @@ void ViewRegistry::RequestLayout(ViewTreeState* tree_state) {
   InvalidateLayoutForRoot(tree_state);
 }
 
-void ViewRegistry::SetRoot(ViewTreeState* tree_state,
-                           uint32_t root_key,
-                           mojo::ui::ViewOwnerPtr root_view_owner) {
+void ViewRegistry::SetRoot(
+    ViewTreeState* tree_state,
+    uint32_t root_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
   DCHECK(root_view_owner);
   DVLOG(1) << "SetRoot: tree=" << tree_state << ", root_key=" << root_key;

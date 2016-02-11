@@ -38,10 +38,13 @@ class CommandBufferImpl : public mojo::CommandBuffer {
       scoped_ptr<CommandBufferDriver> driver);
   ~CommandBufferImpl() override;
 
-  void Initialize(mojo::CommandBufferSyncClientPtr sync_client,
-                  mojo::CommandBufferSyncPointClientPtr sync_point_client,
-                  mojo::CommandBufferLostContextObserverPtr loss_observer,
-                  mojo::ScopedSharedBufferHandle shared_state) override;
+  void Initialize(
+      mojo::InterfaceHandle<mojo::CommandBufferSyncClient> sync_client,
+      mojo::InterfaceHandle<mojo::CommandBufferSyncPointClient>
+          sync_point_client,
+      mojo::InterfaceHandle<mojo::CommandBufferLostContextObserver>
+          loss_observer,
+      mojo::ScopedSharedBufferHandle shared_state) override;
   void SetGetBuffer(int32_t buffer) override;
   void Flush(int32_t put_offset) override;
   void MakeProgress(int32_t last_get_offset) override;

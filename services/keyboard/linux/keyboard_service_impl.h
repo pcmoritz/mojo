@@ -23,7 +23,7 @@ class LinuxKeyboardServiceImpl : public keyboard::KeyboardService,
   ~LinuxKeyboardServiceImpl() override;
 
   // |KeyboardService| overrides:
-  void Show(keyboard::KeyboardClientPtr client,
+  void Show(mojo::InterfaceHandle<keyboard::KeyboardClient> client,
             keyboard::KeyboardType type) override;
   void ShowByRequest() override;
   void Hide() override;

@@ -46,7 +46,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   void OnContextLost() override;
 
   void CreateContext();
-  void InitContext(mojo::CommandBufferPtr command_buffer);
+  void InitContext(mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer);
   void DestroyContext();
   void OnContextProviderConnectionError();
 

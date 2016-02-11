@@ -97,7 +97,8 @@ class IndirectServiceDemoAppDelegate : public ApplicationDelegate {
     app->ConnectToService("mojo:indirect_integer_service",
         &indirect_integer_service_);
     app->ConnectToService("mojo:integer_service", &indirect_service_delegate);
-    indirect_integer_service_->Set(indirect_service_delegate.Pass());
+    indirect_integer_service_->Set(
+        indirect_service_delegate.PassInterfaceHandle());
 
     for (unsigned i = 0; i < kTaskCount; i++) {
       IntegerServicePtr integer_service;

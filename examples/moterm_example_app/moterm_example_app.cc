@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <utility>
 
 #include "base/bind.h"
 #include "base/macros.h"
@@ -132,7 +133,7 @@ class MotermExampleAppView {
     mojo::terminal::TerminalClientPtr dest_terminal_client;
     mojo::ConnectToService(dest_sp.get(), &dest_terminal_client);
     moterm_terminal_->ConnectToClient(
-        dest_terminal_client.Pass(), true,
+        std::move(dest_terminal_client), true,
         base::Bind(&MotermExampleAppView::OnDestinationDone,
                    weak_factory_.GetWeakPtr()));
   }
@@ -165,7 +166,7 @@ class MotermExampleApp : public mojo::ui::ViewProviderApp {
       const std::string& connection_url,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) override {
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override {
     new MotermExampleAppView(app_impl()->shell(), view_owner_request.Pass());
   }
 

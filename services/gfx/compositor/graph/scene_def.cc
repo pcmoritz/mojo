@@ -5,6 +5,7 @@
 #include "services/gfx/compositor/graph/scene_def.h"
 
 #include <ostream>
+#include <utility>
 
 #include "base/bind.h"
 #include "base/logging.h"
@@ -292,7 +293,9 @@ ResourceDef* SceneDef::CreateResource(
         base::MessageLoop::current()->task_runner(),
         base::Bind(
             &ReleaseMailboxTexture,
-            base::Passed(mailbox_texture_resource_decl->callback.Pass())));
+            base::Passed(
+                mojo::gfx::composition::MailboxTextureCallbackPtr::Create(
+                    std::move(mailbox_texture_resource_decl->callback)))));
     if (!image) {
       err << "Could not create MailboxTexture";
       return nullptr;

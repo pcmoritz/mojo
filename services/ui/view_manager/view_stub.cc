@@ -4,6 +4,8 @@
 
 #include "services/ui/view_manager/view_stub.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "services/ui/view_manager/view_registry.h"
@@ -12,8 +14,10 @@
 
 namespace view_manager {
 
-ViewStub::ViewStub(ViewRegistry* registry, mojo::ui::ViewOwnerPtr owner)
-    : registry_(registry), owner_(owner.Pass()) {
+ViewStub::ViewStub(ViewRegistry* registry,
+                   mojo::InterfaceHandle<mojo::ui::ViewOwner> owner)
+    : registry_(registry),
+      owner_(mojo::ui::ViewOwnerPtr::Create(std::move(owner))) {
   DCHECK(registry_);
   DCHECK(owner_);
 

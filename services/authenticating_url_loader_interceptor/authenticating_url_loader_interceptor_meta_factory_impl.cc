@@ -4,6 +4,8 @@
 
 #include "services/authenticating_url_loader_interceptor/authenticating_url_loader_interceptor_meta_factory_impl.h"
 
+#include <utility>
+
 #include "mojo/public/cpp/application/application_impl.h"
 #include "services/authenticating_url_loader_interceptor/authenticating_url_loader_interceptor_factory.h"
 
@@ -25,10 +27,11 @@ AuthenticatingURLLoaderInterceptorMetaFactoryImpl::
 void AuthenticatingURLLoaderInterceptorMetaFactoryImpl::
     CreateURLLoaderInterceptorFactory(
         mojo::InterfaceRequest<URLLoaderInterceptorFactory> factory_request,
-        authentication::AuthenticationServicePtr authentication_service) {
-  new AuthenticatingURLLoaderInterceptorFactory(factory_request.Pass(),
-                                                authentication_service.Pass(),
-                                                app_, cached_tokens_);
+        InterfaceHandle<authentication::AuthenticationService>
+            authentication_service) {
+  new AuthenticatingURLLoaderInterceptorFactory(
+      factory_request.Pass(), std::move(authentication_service), app_,
+      cached_tokens_);
 }
 
 }  // namespace mojo

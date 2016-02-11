@@ -14,6 +14,7 @@ using mojo::ApplicationConnector;
 using mojo::ApplicationPtr;
 using mojo::Array;
 using mojo::InterfaceRequest;
+using mojo::InterfaceHandle;
 using mojo::ServiceProvider;
 using mojo::ServiceProviderPtr;
 using mojo::Shell;
@@ -32,7 +33,7 @@ ShellImpl::ApplicationConnectorImpl::~ApplicationConnectorImpl() {}
 void ShellImpl::ApplicationConnectorImpl::ConnectToApplication(
     const String& app_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services) {
+    InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   shell_->ConnectToApplication(app_url, std::move(services),
                                std::move(exposed_services));
 }
@@ -68,18 +69,20 @@ void ShellImpl::InitializeApplication(Array<String> args) {
                            identity_.url.spec());
 }
 
-void ShellImpl::ConnectToClient(const GURL& requested_url,
-                                const GURL& requestor_url,
-                                InterfaceRequest<ServiceProvider> services,
-                                ServiceProviderPtr exposed_services) {
+void ShellImpl::ConnectToClient(
+    const GURL& requested_url,
+    const GURL& requestor_url,
+    InterfaceRequest<ServiceProvider> services,
+    InterfaceHandle<ServiceProvider> exposed_services) {
   application_->AcceptConnection(
       String::From(requestor_url), std::move(services),
       std::move(exposed_services), requested_url.spec());
 }
 
-void ShellImpl::ConnectToApplication(const String& app_url,
-                                     InterfaceRequest<ServiceProvider> services,
-                                     ServiceProviderPtr exposed_services) {
+void ShellImpl::ConnectToApplication(
+    const String& app_url,
+    InterfaceRequest<ServiceProvider> services,
+    InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   GURL app_gurl(app_url);
   if (!app_gurl.is_valid()) {
     LOG(ERROR) << "Error: invalid URL: " << app_url;

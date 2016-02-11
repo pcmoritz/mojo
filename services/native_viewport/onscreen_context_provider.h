@@ -33,7 +33,8 @@ class OnscreenContextProvider : public mojo::ContextProvider,
   };
  private:
   // mojo::ContextProvider implementation:
-  void Create(mojo::ViewportParameterListenerPtr viewport_parameter_listener,
+  void Create(mojo::InterfaceHandle<mojo::ViewportParameterListener>
+                  viewport_parameter_listener,
               const CreateCallback& callback) override;
 
   // gles2::CommandBufferImpl::Observer implementation:

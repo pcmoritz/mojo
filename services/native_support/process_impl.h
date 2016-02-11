@@ -34,16 +34,16 @@ class ProcessImpl : public Process {
   void Spawn(mojo::Array<uint8_t> path,
              mojo::Array<mojo::Array<uint8_t>> argv,
              mojo::Array<mojo::Array<uint8_t>> envp,
-             mojo::files::FilePtr stdin_file,
-             mojo::files::FilePtr stdout_file,
-             mojo::files::FilePtr stderr_file,
+             mojo::InterfaceHandle<mojo::files::File> stdin_file,
+             mojo::InterfaceHandle<mojo::files::File> stdout_file,
+             mojo::InterfaceHandle<mojo::files::File> stderr_file,
              mojo::InterfaceRequest<ProcessController> process_controller,
              const SpawnCallback& callback) override;
   void SpawnWithTerminal(
       mojo::Array<uint8_t> path,
       mojo::Array<mojo::Array<uint8_t>> argv,
       mojo::Array<mojo::Array<uint8_t>> envp,
-      mojo::files::FilePtr terminal_file,
+      mojo::InterfaceHandle<mojo::files::File> terminal_file,
       mojo::InterfaceRequest<ProcessController> process_controller,
       const SpawnWithTerminalCallback& callback) override;
 

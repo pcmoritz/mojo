@@ -28,8 +28,9 @@ void ViewTreeHostImpl::RequestLayout() {
   registry_->RequestLayout(state_);
 }
 
-void ViewTreeHostImpl::SetRoot(uint32_t root_key,
-                               mojo::ui::ViewOwnerPtr root_view_owner) {
+void ViewTreeHostImpl::SetRoot(
+    uint32_t root_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) {
   registry_->SetRoot(state_, root_key, root_view_owner.Pass());
 }
 

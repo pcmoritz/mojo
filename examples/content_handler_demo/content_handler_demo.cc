@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include <memory>
+#include <utility>
 
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
@@ -23,16 +24,16 @@ class PrintBodyApplication : public Application {
                        ScopedDataPipeConsumerHandle body)
       : binding_(this, request.Pass()), body_(body.Pass()) {}
 
-  void Initialize(ShellPtr shell,
+  void Initialize(InterfaceHandle<Shell> shell,
                   Array<String> args,
                   const mojo::String& url) override {
-    shell_ = shell.Pass();
+    shell_ = ShellPtr::Create(std::move(shell));
   }
   void RequestQuit() override {}
 
   void AcceptConnection(const String& requestor_url,
                         InterfaceRequest<ServiceProvider> services,
-                        ServiceProviderPtr exported_services,
+                        InterfaceHandle<ServiceProvider> exported_services,
                         const String& url) override {
     printf(
         "ContentHandler::OnConnect - url:%s - requestor_url:%s - body "
@@ -110,7 +111,6 @@ class ContentHandlerApp : public ApplicationDelegate,
   }
 
  private:
-
   MOJO_DISALLOW_COPY_AND_ASSIGN(ContentHandlerApp);
 };
 

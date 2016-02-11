@@ -4,6 +4,8 @@
 
 #include "services/ui/input_manager/input_associate.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
@@ -14,8 +16,9 @@ InputAssociate::InputAssociate() {}
 
 InputAssociate::~InputAssociate() {}
 
-void InputAssociate::Connect(mojo::ui::ViewInspectorPtr inspector,
-                             const ConnectCallback& callback) {
+void InputAssociate::Connect(
+    mojo::InterfaceHandle<mojo::ui::ViewInspector> inspector,
+    const ConnectCallback& callback) {
   DCHECK(inspector);  // checked by mojom
 
   auto info = mojo::ui::ViewAssociateInfo::New();
@@ -50,12 +53,13 @@ void InputAssociate::ConnectToViewTreeService(
   }
 }
 
-void InputAssociate::SetListener(mojo::ui::ViewToken* view_token,
-                                 mojo::ui::InputListenerPtr listener) {
+void InputAssociate::SetListener(
+    mojo::ui::ViewToken* view_token,
+    mojo::InterfaceHandle<mojo::ui::InputListener> listener) {
   // TODO(jeffbrown): This simple hack just hooks up the first listener
   // ever seen.
   if (!listener_)
-    listener_ = listener.Pass();
+    listener_ = mojo::ui::InputListenerPtr::Create(std::move(listener));
 }
 
 void InputAssociate::DispatchEvent(mojo::ui::ViewTreeToken* view_tree_token,
@@ -81,8 +85,8 @@ InputAssociate::InputConnectionImpl::InputConnectionImpl(
 InputAssociate::InputConnectionImpl::~InputConnectionImpl() {}
 
 void InputAssociate::InputConnectionImpl::SetListener(
-    mojo::ui::InputListenerPtr listener) {
-  associate_->SetListener(view_token_.get(), listener.Pass());
+    mojo::InterfaceHandle<mojo::ui::InputListener> listener) {
+  associate_->SetListener(view_token_.get(), std::move(listener));
 }
 
 InputAssociate::InputDispatcherImpl::InputDispatcherImpl(

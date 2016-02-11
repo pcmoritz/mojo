@@ -25,7 +25,8 @@ class AuthenticatingURLLoaderInterceptorFactory
  public:
   AuthenticatingURLLoaderInterceptorFactory(
       mojo::InterfaceRequest<URLLoaderInterceptorFactory> request,
-      authentication::AuthenticationServicePtr authentication_service,
+      mojo::InterfaceHandle<authentication::AuthenticationService>
+          authentication_service,
       mojo::ApplicationImpl* app,
       std::map<GURL, std::string>* cached_tokens);
   ~AuthenticatingURLLoaderInterceptorFactory() override;

@@ -19,7 +19,7 @@ void TileApp::CreateView(
     const std::string& connection_url,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     mojo::InterfaceRequest<mojo::ServiceProvider> services,
-    mojo::ServiceProviderPtr exposed_services) {
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   GURL url(connection_url);
   std::vector<std::string> view_urls;
   base::SplitString(url.query(), ',', &view_urls);

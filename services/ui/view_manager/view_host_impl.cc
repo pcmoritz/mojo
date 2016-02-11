@@ -34,8 +34,9 @@ void ViewHostImpl::RequestLayout() {
   registry_->RequestLayout(state_);
 }
 
-void ViewHostImpl::AddChild(uint32_t child_key,
-                            mojo::ui::ViewOwnerPtr child_view_owner) {
+void ViewHostImpl::AddChild(
+    uint32_t child_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) {
   registry_->AddChild(state_, child_key, child_view_owner.Pass());
 }
 

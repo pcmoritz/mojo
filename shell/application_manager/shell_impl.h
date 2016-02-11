@@ -35,10 +35,11 @@ class ShellImpl : public mojo::Shell {
 
   void InitializeApplication(mojo::Array<mojo::String> args);
 
-  void ConnectToClient(const GURL& requested_url,
-                       const GURL& requestor_url,
-                       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-                       mojo::ServiceProviderPtr exposed_services);
+  void ConnectToClient(
+      const GURL& requested_url,
+      const GURL& requestor_url,
+      mojo::InterfaceRequest<mojo::ServiceProvider> services,
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services);
 
   mojo::Application* application() { return application_.get(); }
   const Identity& identity() const { return identity_; }
@@ -54,7 +55,7 @@ class ShellImpl : public mojo::Shell {
     void ConnectToApplication(
         const mojo::String& app_url,
         mojo::InterfaceRequest<mojo::ServiceProvider> services,
-        mojo::ServiceProviderPtr exposed_services) override;
+        mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override;
     void Duplicate(mojo::InterfaceRequest<mojo::ApplicationConnector>
                        application_connector_request) override;
 
@@ -69,7 +70,7 @@ class ShellImpl : public mojo::Shell {
   void ConnectToApplication(
       const mojo::String& app_url,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) override;
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override;
   void CreateApplicationConnector(
       mojo::InterfaceRequest<mojo::ApplicationConnector>
           application_connector_request) override;

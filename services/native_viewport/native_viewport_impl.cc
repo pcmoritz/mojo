@@ -90,8 +90,9 @@ void NativeViewportImpl::GetContextProvider(
 }
 
 void NativeViewportImpl::SetEventDispatcher(
-    mojo::NativeViewportEventDispatcherPtr dispatcher) {
-  event_dispatcher_ = dispatcher.Pass();
+    mojo::InterfaceHandle<mojo::NativeViewportEventDispatcher> dispatcher) {
+  event_dispatcher_ =
+      mojo::NativeViewportEventDispatcherPtr::Create(std::move(dispatcher));
 }
 
 void NativeViewportImpl::OnMetricsChanged(mojo::ViewportMetricsPtr metrics) {

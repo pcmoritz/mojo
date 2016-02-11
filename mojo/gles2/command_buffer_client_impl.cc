@@ -5,6 +5,7 @@
 #include "mojo/gles2/command_buffer_client_impl.h"
 
 #include <limits>
+#include <utility>
 
 #include "base/logging.h"
 #include "base/process/process_handle.h"
@@ -47,7 +48,7 @@ void CommandBufferDelegate::ContextLost() {}
 class CommandBufferClientImpl::SyncClientImpl
     : public mojo::CommandBufferSyncClient {
  public:
-  SyncClientImpl(mojo::CommandBufferSyncClientPtr* ptr,
+  SyncClientImpl(mojo::InterfaceHandle<mojo::CommandBufferSyncClient>* ptr,
                  const MojoAsyncWaiter* async_waiter)
       : initialized_successfully_(false), binding_(this, ptr, async_waiter) {}
 
@@ -89,8 +90,9 @@ class CommandBufferClientImpl::SyncClientImpl
 class CommandBufferClientImpl::SyncPointClientImpl
     : public mojo::CommandBufferSyncPointClient {
  public:
-  SyncPointClientImpl(mojo::CommandBufferSyncPointClientPtr* ptr,
-                      const MojoAsyncWaiter* async_waiter)
+  SyncPointClientImpl(
+      mojo::InterfaceHandle<mojo::CommandBufferSyncPointClient>* ptr,
+      const MojoAsyncWaiter* async_waiter)
       : sync_point_(0u), binding_(this, ptr, async_waiter) {}
 
   uint32_t WaitForInsertSyncPoint() {
@@ -143,19 +145,18 @@ bool CommandBufferClientImpl::Initialize() {
 
   shared_state()->Initialize();
 
-  mojo::CommandBufferSyncClientPtr sync_client;
+  mojo::InterfaceHandle<mojo::CommandBufferSyncClient> sync_client;
   sync_client_impl_.reset(new SyncClientImpl(&sync_client, async_waiter_));
 
-  mojo::CommandBufferSyncPointClientPtr sync_point_client;
+  mojo::InterfaceHandle<mojo::CommandBufferSyncPointClient> sync_point_client;
   sync_point_client_impl_.reset(
       new SyncPointClientImpl(&sync_point_client, async_waiter_));
 
-  mojo::CommandBufferLostContextObserverPtr observer_ptr;
+  mojo::InterfaceHandle<mojo::CommandBufferLostContextObserver> observer_ptr;
   observer_binding_.Bind(GetProxy(&observer_ptr), async_waiter_);
-  command_buffer_->Initialize(sync_client.Pass(),
-                              sync_point_client.Pass(),
-                              observer_ptr.Pass(),
-                              duped.Pass());
+  command_buffer_->Initialize(std::move(sync_client),
+                              std::move(sync_point_client),
+                              std::move(observer_ptr), duped.Pass());
 
   // Wait for DidInitialize to come on the sync client pipe.
   if (!sync_client_impl_->WaitForInitialization()) {

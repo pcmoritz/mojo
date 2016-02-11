@@ -13,6 +13,8 @@
 #include "mojo/ui/gl_renderer.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
+using mojo::gfx::composition::MailboxTextureCallbackPtr;
+
 namespace {
 
 static const base::TimeDelta kDefaultMessageDelay =
@@ -66,7 +68,7 @@ TEST_F(GLRendererTest, GetTextureOnce) {
   EXPECT_FALSE(resource->get_mailbox_texture()->mailbox_name.is_null());
   EXPECT_TRUE(resource->get_mailbox_texture()->size->Equals(size));
   EXPECT_NE(resource->get_mailbox_texture()->sync_point, 0u);
-  EXPECT_NE(resource->get_mailbox_texture()->callback.get(), nullptr);
+  EXPECT_TRUE(resource->get_mailbox_texture()->callback.is_valid());
 }
 
 TEST_F(GLRendererTest, GetTextureTwiceSameSize) {
@@ -91,7 +93,7 @@ TEST_F(GLRendererTest, GetTextureTwiceSameSize) {
   EXPECT_FALSE(resource1->get_mailbox_texture()->mailbox_name.is_null());
   EXPECT_TRUE(resource1->get_mailbox_texture()->size->Equals(size));
   EXPECT_NE(resource1->get_mailbox_texture()->sync_point, 0u);
-  EXPECT_NE(resource1->get_mailbox_texture()->callback.get(), nullptr);
+  EXPECT_TRUE(resource1->get_mailbox_texture()->callback.is_valid());
 
   mojo::gfx::composition::ResourcePtr resource2 =
       renderer.BindTextureResource(std::move(texture2));
@@ -100,7 +102,7 @@ TEST_F(GLRendererTest, GetTextureTwiceSameSize) {
   EXPECT_FALSE(resource2->get_mailbox_texture()->mailbox_name.is_null());
   EXPECT_TRUE(resource2->get_mailbox_texture()->size->Equals(size));
   EXPECT_NE(resource2->get_mailbox_texture()->sync_point, 0u);
-  EXPECT_NE(resource2->get_mailbox_texture()->callback.get(), nullptr);
+  EXPECT_TRUE(resource2->get_mailbox_texture()->callback.is_valid());
 
   EXPECT_NE(resource2->get_mailbox_texture()->sync_point,
             resource1->get_mailbox_texture()->sync_point);
@@ -120,7 +122,9 @@ TEST_F(GLRendererTest, GetTextureAfterRecycleSameSize) {
   mojo::gfx::composition::ResourcePtr resource1 =
       renderer.BindTextureResource(std::move(texture1));
   EXPECT_NE(resource1.get(), nullptr);
-  resource1->get_mailbox_texture()->callback->OnMailboxTextureReleased();
+  MailboxTextureCallbackPtr::Create(
+      std::move(resource1->get_mailbox_texture()->callback))
+      ->OnMailboxTextureReleased();
 
   KickMessageLoop();
 
@@ -142,7 +146,9 @@ TEST_F(GLRendererTest, GetTextureAfterRecycleDifferentSize) {
   mojo::gfx::composition::ResourcePtr resource1 =
       renderer.BindTextureResource(std::move(texture1));
   EXPECT_NE(resource1.get(), nullptr);
-  resource1->get_mailbox_texture()->callback->OnMailboxTextureReleased();
+  MailboxTextureCallbackPtr::Create(
+      std::move(resource1->get_mailbox_texture()->callback))
+      ->OnMailboxTextureReleased();
 
   KickMessageLoop();
 
@@ -198,7 +204,9 @@ TEST_F(GLRendererTest, RecycledAfterReleasedGlContext) {
   EXPECT_NE(resource1.get(), nullptr);
 
   gl_context_->Destroy();
-  resource1->get_mailbox_texture()->callback->OnMailboxTextureReleased();
+  MailboxTextureCallbackPtr::Create(
+      std::move(resource1->get_mailbox_texture()->callback))
+      ->OnMailboxTextureReleased();
 
   KickMessageLoop();
 

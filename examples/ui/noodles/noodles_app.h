@@ -18,7 +18,7 @@ class NoodlesApp : public mojo::ui::ViewProviderApp {
       const std::string& connection_url,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
       mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::ServiceProviderPtr exposed_services) override;
+      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(NoodlesApp);

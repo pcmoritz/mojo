@@ -4,6 +4,8 @@
 
 #include "services/http_server/http_server_impl.h"
 
+#include <utility>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "mojo/public/cpp/application/application_impl.h"
@@ -33,14 +35,15 @@ void HttpServerImpl::AddBinding(mojo::InterfaceRequest<HttpServer> request) {
 }
 
 void HttpServerImpl::SetHandler(const mojo::String& path,
-                                HttpHandlerPtr http_handler,
+                                mojo::InterfaceHandle<HttpHandler> http_handler,
                                 const mojo::Callback<void(bool)>& callback) {
   for (const auto& handler : handlers_) {
     if (handler->pattern->pattern() == path)
       callback.Run(false);
   }
 
-  Handler* handler = new Handler(path, http_handler.Pass());
+  Handler* handler =
+      new Handler(path, HttpHandlerPtr::Create(std::move(http_handler)));
   handler->http_handler.set_connection_error_handler(
       [this, handler]() { OnHandlerConnectionError(handler); });
   handlers_.push_back(handler);

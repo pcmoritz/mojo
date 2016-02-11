@@ -4,6 +4,8 @@
 
 #include "services/gfx/compositor/compositor_impl.h"
 
+#include <utility>
+
 #include "services/gfx/compositor/scene_impl.h"
 
 namespace compositor {
@@ -22,10 +24,10 @@ void CompositorImpl::CreateScene(
 }
 
 void CompositorImpl::CreateRenderer(
-    mojo::ContextProviderPtr context_provider,
+    mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
     mojo::InterfaceRequest<mojo::gfx::composition::Renderer> renderer_request,
     const mojo::String& label) {
-  engine_->CreateRenderer(context_provider.Pass(), renderer_request.Pass(),
+  engine_->CreateRenderer(std::move(context_provider), renderer_request.Pass(),
                           label);
 }
 

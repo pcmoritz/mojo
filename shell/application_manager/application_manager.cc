@@ -128,7 +128,7 @@ void ApplicationManager::ConnectToApplication(
     const GURL& requested_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services,
+    mojo::InterfaceHandle<ServiceProvider> exposed_services,
     const base::Closure& on_application_end) {
   ConnectToApplicationWithParameters(
       requested_url, requestor_url, services.Pass(), exposed_services.Pass(),
@@ -139,7 +139,7 @@ void ApplicationManager::ConnectToApplicationWithParameters(
     const GURL& requested_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services,
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& pre_redirect_parameters) {
   TRACE_EVENT_INSTANT2(
@@ -243,7 +243,7 @@ bool ApplicationManager::ConnectToRunningApplication(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider>* services,
-    ServiceProviderPtr* exposed_services) {
+    mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services) {
   GURL application_url = GetBaseURLAndQuery(resolved_url, nullptr);
   ShellImpl* shell_impl = GetShellImpl(application_url);
   if (!shell_impl)
@@ -261,7 +261,7 @@ bool ApplicationManager::ConnectToApplicationWithLoader(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider>* services,
-    ServiceProviderPtr* exposed_services,
+    mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters,
     ApplicationLoader* loader) {
@@ -292,7 +292,7 @@ InterfaceRequest<Application> ApplicationManager::RegisterShell(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services,
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters) {
   Identity app_identity = MakeApplicationIdentity(resolved_url);
@@ -325,7 +325,7 @@ void ApplicationManager::ConnectToClient(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services) {
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) {
   shell_impl->ConnectToClient(resolved_url, requestor_url, services.Pass(),
                               exposed_services.Pass());
 }
@@ -333,7 +333,7 @@ void ApplicationManager::ConnectToClient(
 void ApplicationManager::HandleFetchCallback(
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    ServiceProviderPtr exposed_services,
+    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters,
     scoped_ptr<Fetcher> fetcher) {

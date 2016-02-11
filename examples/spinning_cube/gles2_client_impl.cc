@@ -11,6 +11,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <cmath>
+#include <utility>
 
 #include "mojo/public/c/gpu/MGL/mgl.h"
 #include "mojo/public/c/gpu/MGL/mgl_onscreen.h"
@@ -56,10 +57,11 @@ GLES2ClientImpl::GLES2ClientImpl(mojo::ContextProviderPtr context_provider)
       waiting_to_draw_(false),
       context_provider_(context_provider.Pass()),
       context_(nullptr) {
-  context_provider_->Create(nullptr,
-                            [this](mojo::CommandBufferPtr command_buffer) {
-                              ContextCreated(command_buffer.Pass());
-                            });
+  context_provider_->Create(
+      nullptr,
+      [this](mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer) {
+        ContextCreated(std::move(command_buffer));
+      });
 }
 
 GLES2ClientImpl::~GLES2ClientImpl() {
@@ -132,12 +134,12 @@ void GLES2ClientImpl::HandleInputEvent(const mojo::Event& event) {
   }
 }
 
-void GLES2ClientImpl::ContextCreated(mojo::CommandBufferPtr command_buffer) {
-  context_ = MGLCreateContext(
-      MGL_API_VERSION_GLES2,
-      command_buffer.PassInterfaceHandle().PassHandle().release().value(),
-      MGL_NO_CONTEXT, &ContextLostThunk, this,
-      mojo::Environment::GetDefaultAsyncWaiter());
+void GLES2ClientImpl::ContextCreated(
+    mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer) {
+  context_ = MGLCreateContext(MGL_API_VERSION_GLES2,
+                              command_buffer.PassHandle().release().value(),
+                              MGL_NO_CONTEXT, &ContextLostThunk, this,
+                              mojo::Environment::GetDefaultAsyncWaiter());
   MGLMakeCurrent(context_);
   cube_.Init();
   WantToDraw();
@@ -147,10 +149,11 @@ void GLES2ClientImpl::ContextLost() {
   cube_.OnGLContextLost();
   MGLDestroyContext(context_);
   context_ = nullptr;
-  context_provider_->Create(nullptr,
-                            [this](mojo::CommandBufferPtr command_buffer) {
-                              ContextCreated(command_buffer.Pass());
-                            });
+  context_provider_->Create(
+      nullptr,
+      [this](mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer) {
+        ContextCreated(std::move(command_buffer));
+      });
 }
 
 void GLES2ClientImpl::ContextLostThunk(void* closure) {
