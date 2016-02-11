@@ -136,7 +136,7 @@ action("copy_crt_objects") {
 
   outputs = [
     "$target/crtbegin.o",
-    "$target/crtbeginSo.o",
+    "$target/crtbeginS.o",
     "$target/crtbeginT.o",
     "$target/crtend.o",
     "$target/crtendS.o",
