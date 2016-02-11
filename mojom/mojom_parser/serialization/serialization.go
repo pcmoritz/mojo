@@ -19,14 +19,34 @@ import (
 
 // This variable may be set to false in order to omit emitting line and
 // column numbers.
-var EmitLineAndColumnNumbers bool = true
+var emitLineAndColumnNumbers bool = true
+
+// This variable may be set to false in order to omit emitting serialized
+// runtime type info.
+var emitSerializedRuntimeTypeInfo bool = true
 
 // Serialize serializes the MojomDescriptor into a binary form that is passed to the
 // backend of the compiler in order to invoke the code generators.
 // To do this we use Mojo serialization.
 // If |debug| is true we also return a human-readable representation
 // of the serialized mojom_types.FileGraph.
+// This function is not thread safe.
 func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString string, err error) {
+	return serialize(d, debug, true, true)
+}
+
+// serialize() is a package-private version of the public method Serialize().
+// It is intended for use in tests because it allows setting of the variables
+// emitLineAndColumnNumbers and emitSerializedRuntimeTypeInfo.
+// This function is not thread safe because it accesses the global variables
+// emitLineAndColumnNumbers and emitSerializedRuntimeTypeInfo.
+func serialize(d *mojom.MojomDescriptor, debug,
+	emitLineAndColumnNumbersParam, emitSerializedRuntimeTypeInfoParam bool) (bytes []byte, debugString string, err error) {
+	saveEmitLineAndColumnNumbers := emitLineAndColumnNumbers
+	emitLineAndColumnNumbers = emitLineAndColumnNumbersParam
+	saveEmitSerializedRuntimeTypeInfo := emitSerializedRuntimeTypeInfo
+	emitSerializedRuntimeTypeInfo = emitSerializedRuntimeTypeInfoParam
+
 	fileGraph := translateDescriptor(d)
 	if debug {
 		debugString = myfmt.Sprintf("%#v", fileGraph)
@@ -34,6 +54,9 @@ func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString 
 	encoder := bindings.NewEncoder()
 	fileGraph.Encode(encoder)
 	bytes, _, err = encoder.Data()
+
+	emitLineAndColumnNumbers = saveEmitLineAndColumnNumbers
+	emitSerializedRuntimeTypeInfo = saveEmitSerializedRuntimeTypeInfo
 	return
 }
 
@@ -42,12 +65,6 @@ func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString 
 // Mojo Go representation used for serialization.)
 func translateDescriptor(d *mojom.MojomDescriptor) *mojom_files.MojomFileGraph {
 	fileGraph := mojom_files.MojomFileGraph{}
-
-	// Add |files| field.
-	fileGraph.Files = make(map[string]mojom_files.MojomFile)
-	for name, file := range d.MojomFilesByName {
-		fileGraph.Files[name] = translateMojomFile(file)
-	}
 
 	// Add |resolved_types| field.
 	fileGraph.ResolvedTypes = make(map[string]mojom_types.UserDefinedType)
@@ -61,13 +78,19 @@ func translateDescriptor(d *mojom.MojomDescriptor) *mojom_files.MojomFileGraph {
 		fileGraph.ResolvedValues[key] = translateUserDefinedValue(userDefinedValue)
 	}
 
+	// Add |files| field.
+	fileGraph.Files = make(map[string]mojom_files.MojomFile)
+	for name, file := range d.MojomFilesByName {
+		fileGraph.Files[name] = translateMojomFile(file, &fileGraph)
+	}
+
 	return &fileGraph
 }
 
 // translateMojomFile translates from a mojom.MojomFile (the pure Go
 // representation used by the parser) to a mojom_files.MojomFile (the
 // Mojo Go representation used for serialization.)
-func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
+func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGraph) (file mojom_files.MojomFile) {
 	// file_name field
 	file.FileName = f.CanonicalFileName
 
@@ -93,13 +116,32 @@ func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
 		}
 	}
 
-	// declared_mojom_objects field...
+	// We will populate a RuntimeTypeInfo structure and then serialize it and
+	// the serialized bytes will form the |serialized_runtime_type_info| field
+	// of the MojomFile.
+	typeInfo := mojom_files.RuntimeTypeInfo{}
+	typeInfo.ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	typeInfo.TypeMap = make(map[string]mojom_types.UserDefinedType)
+
+	// We populate the declared_mojom_objects field
+	// and simultaneously we populate typeInfo.TypeMap.
 
 	// Interfaces
 	if f.Interfaces != nil && len(f.Interfaces) > 0 {
 		file.DeclaredMojomObjects.Interfaces = new([]string)
 		for _, intrfc := range f.Interfaces {
-			*(file.DeclaredMojomObjects.Interfaces) = append(*(file.DeclaredMojomObjects.Interfaces), intrfc.TypeKey())
+			typeKey := intrfc.TypeKey()
+			*(file.DeclaredMojomObjects.Interfaces) = append(*(file.DeclaredMojomObjects.Interfaces), typeKey)
+
+			addServiceTypeInfo(intrfc, &typeInfo)
+			typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
+			if intrfc.Enums != nil {
+				// Add embedded enums to typeInfo.TypeMap.
+				for _, enum := range intrfc.Enums {
+					typeKey := enum.TypeKey()
+					typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
+				}
+			}
 		}
 	}
 
@@ -107,7 +149,16 @@ func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
 	if f.Structs != nil && len(f.Structs) > 0 {
 		file.DeclaredMojomObjects.Structs = new([]string)
 		for _, strct := range f.Structs {
-			*(file.DeclaredMojomObjects.Structs) = append(*(file.DeclaredMojomObjects.Structs), strct.TypeKey())
+			typeKey := strct.TypeKey()
+			*(file.DeclaredMojomObjects.Structs) = append(*(file.DeclaredMojomObjects.Structs), typeKey)
+			typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
+			if strct.Enums != nil {
+				// Add embedded enums to typeInfo.TypeMap.
+				for _, enum := range strct.Enums {
+					typeKey := enum.TypeKey()
+					typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
+				}
+			}
 		}
 	}
 
@@ -115,7 +166,9 @@ func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
 	if f.Unions != nil && len(f.Unions) > 0 {
 		file.DeclaredMojomObjects.Unions = new([]string)
 		for _, union := range f.Unions {
-			*(file.DeclaredMojomObjects.Unions) = append(*(file.DeclaredMojomObjects.Unions), union.TypeKey())
+			typeKey := union.TypeKey()
+			*(file.DeclaredMojomObjects.Unions) = append(*(file.DeclaredMojomObjects.Unions), typeKey)
+			typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
 		}
 	}
 
@@ -123,7 +176,9 @@ func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
 	if f.Enums != nil && len(f.Enums) > 0 {
 		file.DeclaredMojomObjects.TopLevelEnums = new([]string)
 		for _, enum := range f.Enums {
-			*(file.DeclaredMojomObjects.TopLevelEnums) = append(*(file.DeclaredMojomObjects.TopLevelEnums), enum.TypeKey())
+			typeKey := enum.TypeKey()
+			*(file.DeclaredMojomObjects.TopLevelEnums) = append(*(file.DeclaredMojomObjects.TopLevelEnums), typeKey)
+			typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
 		}
 	}
 
@@ -139,6 +194,31 @@ func translateMojomFile(f *mojom.MojomFile) (file mojom_files.MojomFile) {
 	// fields in KeysByType. It seems these fields are not currently being
 	// used in mojom_translator.py.
 
+	// SerializedRuntimeTypeInfo
+	if emitSerializedRuntimeTypeInfo {
+		encoder := bindings.NewEncoder()
+		typeInfo.Encode(encoder)
+		bytes, _, err := encoder.Data()
+		if err != nil {
+			panic(fmt.Sprintf("Error while serializing runtimeTypeInfo: %s", err.Error()))
+		}
+		file.SerializedRuntimeTypeInfo = &bytes
+	}
+
+	return
+}
+
+// addServiceTypeInfo will add a ServiceTypeInfo to the ServicesByName field of |typeInfo| corresponding
+// to |intrfc| if |intrfc| is a top-level interface, meaning that it has a non-nil service name. In that
+// case this method returns true. Otherwise this method will do nothing and return fals.
+func addServiceTypeInfo(intrfc *mojom.MojomInterface, typeInfo *mojom_files.RuntimeTypeInfo) (isTopLevel bool) {
+	isTopLevel = intrfc.ServiceName != nil
+	if isTopLevel {
+		serviceTypeInfo := mojom_files.ServiceTypeInfo{}
+		serviceTypeInfo.TopLevelInterface = intrfc.TypeKey()
+		serviceTypeInfo.CompleteTypeSet = intrfc.FindReachableTypes()
+		typeInfo.ServicesByName[*intrfc.ServiceName] = serviceTypeInfo
+	}
 	return
 }
 
@@ -544,7 +624,7 @@ func translateDeclarationData(d *mojom.DeclarationData) *mojom_types.Declaration
 	// source_file_info
 	declData.SourceFileInfo = new(mojom_types.SourceFileInfo)
 	declData.SourceFileInfo.FileName = d.OwningFile().CanonicalFileName
-	if EmitLineAndColumnNumbers {
+	if emitLineAndColumnNumbers {
 		declData.SourceFileInfo.LineNumber = d.LineNumber()
 		declData.SourceFileInfo.ColumnNumber = d.ColumnNumber()
 	}

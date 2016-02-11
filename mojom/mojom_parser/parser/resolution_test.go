@@ -1245,6 +1245,7 @@ func TestFindReachableTypes(t *testing.T) {
 
 		interface Interface2 {
 			Foo(int32 x) => (Struct1 y);
+			Bar(string x);
 		};
 		`
 

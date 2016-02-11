@@ -506,12 +506,12 @@ func TestSingleFileSerialization(t *testing.T) {
 	{
 
 		contents := `
-	module test;
+       module test;
 
-	[ServiceName = "my.test.EchoService"]
-	interface EchoService {
-      EchoString(string? value) => (string? value);
-    };`
+       [ServiceName = "my.test.EchoService"]
+       interface EchoService {
+         EchoString(string? value) => (string? value);
+       };`
 
 		test.addTestCase("test", contents)
 
@@ -872,8 +872,7 @@ func TestSingleFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		EmitLineAndColumnNumbers = c.lineAndcolumnNumbers
-		bytes, _, err := Serialize(descriptor, false)
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -885,7 +884,7 @@ func TestSingleFileSerialization(t *testing.T) {
 		fileGraph.Decode(decoder)
 
 		// Compare
-		if err := compareFileGraphs(c.expectedGraph, &fileGraph); err != nil {
+		if err := compareTwoGoObjects(c.expectedGraph, &fileGraph); err != nil {
 			t.Errorf("%s:\n%s", c.fileName, err.Error())
 			continue
 		}
@@ -1152,8 +1151,7 @@ func TestTwoFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		EmitLineAndColumnNumbers = c.lineAndcolumnNumbers
-		bytes, _, err := Serialize(descriptor, false)
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -1165,18 +1163,656 @@ func TestTwoFileSerialization(t *testing.T) {
 		fileGraph.Decode(decoder)
 
 		// Compare
-		if err := compareFileGraphs(c.expectedGraph, &fileGraph); err != nil {
+		if err := compareTwoGoObjects(c.expectedGraph, &fileGraph); err != nil {
 			t.Errorf("case %d:\n%s", i, err.Error())
 			continue
 		}
 	}
 }
 
-// compareFileGraphs compares |expected| and |actual| and returns a non-nil
+////////////////////////////////////////////
+/// Serialized Runtime Type Info Tests
+///////////////////////////////////////////
+
+type runtimeTypeInfoTestCase struct {
+	// The contents of the two files
+	mojomContentsA           string
+	mojomContentsB           string
+	expectedRuntimeTypeInfoA *mojom_files.RuntimeTypeInfo
+	expectedRuntimeTypeInfoB *mojom_files.RuntimeTypeInfo
+}
+
+type runtimeTypeInfoTest struct {
+	cases       []runtimeTypeInfoTestCase
+	testCaseNum int
+}
+
+func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoA() *mojom_files.RuntimeTypeInfo {
+	return t.cases[t.testCaseNum].expectedRuntimeTypeInfoA
+}
+
+func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoB() *mojom_files.RuntimeTypeInfo {
+	return t.cases[t.testCaseNum].expectedRuntimeTypeInfoB
+}
+
+func (test *runtimeTypeInfoTest) addTestCase(contentsA, contentsB string) {
+	test.cases = append(test.cases, runtimeTypeInfoTestCase{contentsA, contentsB, new(mojom_files.RuntimeTypeInfo), new(mojom_files.RuntimeTypeInfo)})
+	test.expectedRuntimeTypeInfoA().ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	test.expectedRuntimeTypeInfoA().TypeMap = make(map[string]mojom_types.UserDefinedType)
+	test.expectedRuntimeTypeInfoB().ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	test.expectedRuntimeTypeInfoB().TypeMap = make(map[string]mojom_types.UserDefinedType)
+}
+
+func (test *runtimeTypeInfoTest) fileNameA() string {
+	return fmt.Sprintf("file%dA", test.testCaseNum)
+}
+
+func (test *runtimeTypeInfoTest) fileNameB() string {
+	return fmt.Sprintf("file%dB", test.testCaseNum)
+}
+
+func (test *runtimeTypeInfoTest) endTestCase() {
+	test.testCaseNum += 1
+}
+
+// TestRuntimeTypeInfo uses a series of test cases in which the text of two .mojom
+// files is specified and the expected RuntimeTypeInfos are specified using Go struct literals.
+func TestRuntimeTypeInfo(t *testing.T) {
+	test := runtimeTypeInfoTest{}
+
+	/////////////////////////////////////////////////////////////
+	// Test Case: No nterfaces.
+	/////////////////////////////////////////////////////////////
+	{
+
+		contentsA := `
+	module a.b.c;
+	struct FooA{
+	};`
+
+		contentsB := `
+	module b.c.d;
+	struct FooB{
+	};`
+
+		test.addTestCase(contentsA, contentsB)
+
+		// TypeMap for file A
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameA(), "FooA", "a.b.c.FooA"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// TypeMap for file B
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.FooB"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
+			Fields:   []mojom_types.StructField{}}}
+
+		test.endTestCase()
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Test Case:  Two interfaces: Not top-level.
+	/////////////////////////////////////////////////////////////
+	{
+
+		contentsA := `
+	module a.b.c;
+	struct FooA{
+	};
+
+    interface InterfaceA {
+    	DoIt(FooA x) => (b.c.d.FooB? y);
+    };
+	`
+
+		contentsB := `
+	module b.c.d;
+	struct FooB{
+	};
+
+	interface InterfaceB {
+    	DoIt(a.b.c.FooA x) => (FooB? y);
+    };
+
+	`
+		test.addTestCase(contentsA, contentsB)
+
+		// TypeMap for file A
+
+		// FooA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameA(), "FooA", "a.b.c.FooA"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.InterfaceA"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclData(test.fileNameA(), "InterfaceA", "a.b.c.InterfaceA"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		////////////////////////////////////////////////////////////////////////
+
+		// TypeMap for file B
+
+		// FooA
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.FooB"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceB
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.InterfaceB"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Test Case:  Two interfaces: One of them top-level.
+	/////////////////////////////////////////////////////////////
+	{
+
+		contentsA := `
+	module a.b.c;
+	struct FooA{
+	};
+
+	[ServiceName = "AwesomeService"]
+    interface InterfaceA {
+    	DoIt(FooA x) => (b.c.d.FooB? y);
+    };
+	`
+
+		contentsB := `
+	module b.c.d;
+	struct FooB{
+	};
+
+	interface InterfaceB {
+    	DoIt(a.b.c.FooA x) => (FooB? y);
+    };
+
+	`
+		test.addTestCase(contentsA, contentsB)
+
+		// ServicesByName for file A
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
+			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
+		}
+
+		// TypeMap for file A
+
+		// FooA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameA(), "FooA", "a.b.c.FooA"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.InterfaceA"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclDataA(test.fileNameA(), "InterfaceA", "a.b.c.InterfaceA",
+				&[]mojom_types.Attribute{{"ServiceName", &mojom_types.LiteralValueStringValue{"AwesomeService"}}}),
+			ServiceName: stringPointer("AwesomeService"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		////////////////////////////////////////////////////////////////////////
+
+		// TypeMap for file B
+
+		// FooA
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.FooB"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceB
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.InterfaceB"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Test Case:  Same as above with extra attributes.
+	/////////////////////////////////////////////////////////////
+	{
+
+		contentsA := `
+	module a.b.c;
+	struct FooA{
+	};
+
+	[Color="RED", ServiceName = 7, ServiceName = "AwesomeService", Height=10.1]
+    interface InterfaceA {
+    	DoIt(FooA x) => (b.c.d.FooB? y);
+    };
+	`
+
+		contentsB := `
+	module b.c.d;
+	struct FooB{
+	};
+
+	[ServiceName = 42]
+	interface InterfaceB {
+    	DoIt(a.b.c.FooA x) => (FooB? y);
+    };
+
+	`
+		test.addTestCase(contentsA, contentsB)
+
+		// ServicesByName for file A
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
+			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
+		}
+
+		// TypeMap for file A
+
+		// FooA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameA(), "FooA", "a.b.c.FooA"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.InterfaceA"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclDataA(test.fileNameA(), "InterfaceA", "a.b.c.InterfaceA",
+				&[]mojom_types.Attribute{
+					{"Color", &mojom_types.LiteralValueStringValue{"RED"}},
+					{"ServiceName", &mojom_types.LiteralValueInt8Value{7}},
+					{"ServiceName", &mojom_types.LiteralValueStringValue{"AwesomeService"}},
+					{"Height", &mojom_types.LiteralValueDoubleValue{10.1}}}),
+			ServiceName: stringPointer("AwesomeService"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		////////////////////////////////////////////////////////////////////////
+
+		// TypeMap for file B
+
+		// FooA
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.FooB"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceB
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.InterfaceB"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclDataA(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB",
+				&[]mojom_types.Attribute{{"ServiceName", &mojom_types.LiteralValueInt8Value{42}}}),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Test Case:  Additional reachable types.
+	/////////////////////////////////////////////////////////////
+	{
+
+		contentsA := `
+	module a.b.c;
+	struct FooA{
+	};
+
+	[ServiceName = "AwesomeService"]
+    interface InterfaceA {
+    	DoIt(FooA x) => (b.c.d.FooB? y);
+    };
+	`
+
+		contentsB := `
+	module b.c.d;
+
+	enum Enum1{}; // This is in the CompleteTypeSet of InterfaceA
+	enum Enum2{}; // This is not.
+
+	struct FooB{
+		Enum1 x;
+	};
+
+	interface InterfaceB {
+    	DoIt(a.b.c.FooA x) => (FooB? y, Enum2 z);
+    };
+
+	`
+		test.addTestCase(contentsA, contentsB)
+
+		// ServicesByName for file A
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
+			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.Enum1", "TYPE_KEY:b.c.d.FooB"},
+		}
+
+		// TypeMap for file A
+
+		// FooA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameA(), "FooA", "a.b.c.FooA"),
+			Fields:   []mojom_types.StructField{}}}
+
+		// InterfaceA
+		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.InterfaceA"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclDataA(test.fileNameA(), "InterfaceA", "a.b.c.InterfaceA",
+				&[]mojom_types.Attribute{{"ServiceName", &mojom_types.LiteralValueStringValue{"AwesomeService"}}}),
+			ServiceName: stringPointer("AwesomeService"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		////////////////////////////////////////////////////////////////////////
+
+		// TypeMap for file B
+
+		// Enum1
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.Enum1"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
+			DeclData: newDeclData(test.fileNameB(), "Enum1", "b.c.d.Enum1"),
+			Values:   []mojom_types.EnumValue{},
+		}}
+
+		// Enum2
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.Enum2"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
+			DeclData: newDeclData(test.fileNameB(), "Enum2", "b.c.d.Enum2"),
+			Values:   []mojom_types.EnumValue{},
+		}}
+
+		// FooA
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.FooB"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
+			Fields: []mojom_types.StructField{
+				mojom_types.StructField{
+					DeclData: newDeclData(test.fileNameB(), "x", ""),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("Enum1"), stringPointer("TYPE_KEY:b.c.d.Enum1")}},
+				},
+			},
+		}}
+
+		// InterfaceB
+		test.expectedRuntimeTypeInfoB().TypeMap["TYPE_KEY:b.c.d.InterfaceB"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
+							},
+							mojom_types.StructField{
+								DeclData: newDeclData(test.fileNameB(), "z", ""),
+								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+									false, false, stringPointer("Enum2"), stringPointer("TYPE_KEY:b.c.d.Enum2")}},
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for i, c := range test.cases {
+		descriptor := mojom.NewMojomDescriptor()
+		fileNameA := fmt.Sprintf("file%dA", i)
+		fileNameB := fmt.Sprintf("file%dB", i)
+
+		// Parse file A.
+		parserA := parser.MakeParser(fileNameA, fileNameA, c.mojomContentsA, descriptor, nil)
+		parserA.Parse()
+		if !parserA.OK() {
+			t.Errorf("Parsing error for %s: %s", fileNameA, parserA.GetError().Error())
+			continue
+		}
+
+		// Parse file B.
+		parserB := parser.MakeParser(fileNameB, fileNameB, c.mojomContentsB, descriptor, nil)
+		parserB.Parse()
+		if !parserB.OK() {
+			t.Errorf("Parsing error for %s: %s", fileNameB, parserB.GetError().Error())
+			continue
+		}
+
+		// Resolve
+		if err := descriptor.Resolve(); err != nil {
+			t.Errorf("Resolve error for case %d: %s", i, err.Error())
+			continue
+		}
+		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
+			t.Errorf("ComputeEnumValueIntegers error for case %d: %s", i, err.Error())
+			continue
+		}
+		if err := descriptor.ComputeDataForGenerators(); err != nil {
+			t.Errorf("ComputeDataForGenerators error for case %d: %s", i, err.Error())
+			continue
+		}
+
+		// Serialize
+		bytes, _, err := serialize(descriptor, false, false, true)
+		if err != nil {
+			t.Errorf("Serialization error for case %d: %s", i, err.Error())
+			continue
+		}
+
+		// Deserialize
+		decoder := bindings.NewDecoder(bytes, nil)
+		fileGraph := mojom_files.MojomFileGraph{}
+		fileGraph.Decode(decoder)
+
+		// Deserialize  RuntimeTypeInfo A
+		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo, nil)
+		runtimeTypeInfoA := mojom_files.RuntimeTypeInfo{}
+		runtimeTypeInfoA.Decode(decoder)
+
+		// Deserialize  RuntimeTypeInfo B
+		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameB].SerializedRuntimeTypeInfo, nil)
+		runtimeTypeInfoB := mojom_files.RuntimeTypeInfo{}
+		runtimeTypeInfoB.Decode(decoder)
+
+		// Compare A
+		if err := compareTwoGoObjects(c.expectedRuntimeTypeInfoA, &runtimeTypeInfoA); err != nil {
+			t.Errorf("case %d A:\n%s", i, err.Error())
+		}
+
+		// Compare B
+		if err := compareTwoGoObjects(c.expectedRuntimeTypeInfoB, &runtimeTypeInfoB); err != nil {
+			t.Errorf("case %d B:\n%s", i, err.Error())
+		}
+	}
+}
+
+// compareTwoGoObjects compares |expected| and |actual| and returns a non-nil
 // error if they are not deeply equal. The error message contains a human-readable
 // string containing a deep-print of expected and actual along with the substrings
 // starting from the first character where they differ.
-func compareFileGraphs(expected *mojom_files.MojomFileGraph, actual *mojom_files.MojomFileGraph) error {
+func compareTwoGoObjects(expected interface{}, actual interface{}) error {
 	if !reflect.DeepEqual(expected, actual) {
 		// Note(rudominer) The myfmt package is a local modification of the fmt package
 		// that does a deep printing that follows pointers for up to 50 levels.

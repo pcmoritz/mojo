@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"mojom/mojom_parser/lexer"
+	"sort"
 	"strings"
 )
 
@@ -145,6 +146,7 @@ func (b *UserDefinedTypeBase) FindReachableTypes() []string {
 		}
 		i++
 	}
+	sort.Strings(typeKeys)
 	return typeKeys
 }
 
@@ -152,6 +154,9 @@ func (b *UserDefinedTypeBase) FindReachableTypes() []string {
 // It performs a depth-first search through the type graph while populating
 // |reachableSet| with the UserDefinedTypes encountered during the search.
 func findReachableTypes(udt UserDefinedType, reachableSet UserDefinedTypeSet) {
+	if udt == nil {
+		panic("udt is nil")
+	}
 	if reachableSet.Contains(udt) {
 		return
 	}
@@ -186,7 +191,9 @@ func findReachableTypes(udt UserDefinedType, reachableSet UserDefinedTypeSet) {
 			// There is an edge in the type graph from this interface type to
 			// the type of a request or response parameter.
 			findReachableTypes(object.Parameters, reachableSet)
-			findReachableTypes(object.ResponseParameters, reachableSet)
+			if object.ResponseParameters != nil {
+				findReachableTypes(object.ResponseParameters, reachableSet)
+			}
 		}
 	}
 }
