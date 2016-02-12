@@ -31,6 +31,7 @@
 #include "tonic/dart_library_provider_network.h"
 #include "tonic/dart_message_handler.h"
 #include "tonic/dart_script_loader_sync.h"
+#include "tonic/dart_vm.h"
 
 namespace mojo {
 namespace dart {
@@ -597,46 +598,25 @@ void DartController::InitVmIfNeeded(Dart_EntropySource entropy,
   // Start a handle watcher.
   handle_watcher_producer_handle_ = HandleWatcher::Start();
 
-  const char* kControllerFlags[] = {
-    // Disable access dart:mirrors library.
-    "--enable_mirrors=false",
-    // Force await and async to be keywords even outside of an async function.
-    "--await_is_keyword",
-    // Until background compilation is stable, disable.
-    "--background_compilation=false",
-  };
-
-  // Number of flags the controller sets.
-  const int kNumControllerFlags = arraysize(kControllerFlags);
-  const int kNumFlags = vm_flags_count + kNumControllerFlags;
-  const char* flags[kNumFlags];
-
-  for (int i = 0; i < kNumControllerFlags; i++) {
-    flags[i] = kControllerFlags[i];
-  }
-
+  std::vector<const char*> flags;
+  // Disable access dart:mirrors library.
+  flags.push_back("--enable_mirrors=false");
+  // Force await and async to be keywords even outside of an async function.
+  flags.push_back("--await_is_keyword");
+  // Add remaining flags.
   for (int i = 0; i < vm_flags_count; ++i) {
-    flags[i + kNumControllerFlags] = vm_flags[i];
+    flags.push_back(vm_flags[i]);
   }
 
-  bool result = Dart_SetVMFlags(kNumFlags, flags);
-  CHECK(result);
+  tonic::DartVM::Config config;
+  config.vm_isolate_snapshot = vm_isolate_snapshot_buffer;
+  config.create = IsolateCreateCallback;
+  config.shutdown = IsolateShutdownCallback;
+  config.entropy_source = entropy;
+  config.get_service_assets = GetVMServiceAssetsArchiveCallback;
 
-  // This should be called before calling Dart_Initialize.
-  tonic::DartDebugger::InitDebugger();
+  CHECK(tonic::DartVM::Initialize(config, flags));
 
-  const char* error = Dart_Initialize(
-      vm_isolate_snapshot_buffer,
-      nullptr, // Precompiled instructions
-      IsolateCreateCallback,
-      nullptr,  // Deprecated isolate interrupt callback. Must pass nullptr.
-      nullptr,  // Deprecated unhandled exception callback. Must pass nullptr.
-      IsolateShutdownCallback,
-      // File IO callbacks.
-      nullptr, nullptr, nullptr, nullptr,
-      entropy,
-      GetVMServiceAssetsArchiveCallback);
-  CHECK(error == nullptr);
   initialized_ = true;
   if (enable_dart_timeline) {
     Dart_GlobalTimelineSetRecordedStreams(DART_TIMELINE_STREAM_DART);
@@ -725,7 +705,7 @@ void DartController::Shutdown() {
   }
   BlockForServiceIsolateLocked();
   HandleWatcher::StopAll();
-  Dart_Cleanup();
+  CHECK(tonic::DartVM::Cleanup());
   service_isolate_running_ = false;
   initialized_ = false;
 }
