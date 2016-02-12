@@ -74,16 +74,18 @@ func main() {
 	outFile := flag.String("out", "", "The path to the output file. If not present the output will "+
 		"be written to standard out.")
 	debug := flag.Bool("debug", false, "Generate debug data including the parse tree and print it to standard out.")
+	metaDataOnly := flag.Bool("meta-data-only", false, "Only parse file attributes and 'module' statement, "+
+		"not mojom declarations or import statements.")
 	flag.Parse()
 
 	fileNames := flag.Args()
 	if len(fileNames) == 0 {
 		ErrorExit(fmt.Sprintf("No .mojom files given.\n"+
-			"Usage: %s [-I <include_dirs>] [-out <out_file>] [-debug] <mojom_file>...",
+			"Usage: %s [-I <include_dirs>] [-out <out_file>] [-debug] [-meta-data-only] <mojom_file>...",
 			filepath.Base(os.Args[0])))
 	}
 
-	parseDriver := parser.NewDriver(directoryListFlag, *debug)
+	parseDriver := parser.NewDriver(directoryListFlag, *debug, *metaDataOnly)
 
 	// Do the parsing
 	descriptor, err := parseDriver.ParseFiles(fileNames)

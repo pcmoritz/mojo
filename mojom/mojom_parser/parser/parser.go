@@ -63,6 +63,16 @@ type Parser struct {
 
 	debugMode bool
 	used      bool
+
+	// In meta-data-only mode the parser will parse the module statement,
+	// the import statements and the file attributes and then return without
+	// parsing any of the mojom declarations. The result is as if the
+	// .mojom file did not have any declarations.
+	metaDataOnlyMode bool
+
+	// Set this variable to true to discard all remaining tokens in the
+	// |inputStream|.
+	discardRemaining bool
 }
 
 // Make a new Parser in preparation for calling Parse().
@@ -82,6 +92,10 @@ func MakeParser(canonicalFileName, specifiedName, fileContents string,
 
 func (p *Parser) SetDebugMode(debug bool) {
 	p.debugMode = debug
+}
+
+func (p *Parser) SetMetaDataOnlyMode(metaDataOnly bool) {
+	p.metaDataOnlyMode = metaDataOnly
 }
 
 // Perform the parsing on the |fileContents| passed to MakeParser().
@@ -221,7 +235,11 @@ const (
 // any other type of error the returned token is unspecified and the
 // global error state will be set with more details.
 func (p *Parser) peekNextToken(eofMessage string) (nextToken lexer.Token) {
-	nextToken = p.inputStream.PeekNext()
+	if p.discardRemaining {
+		nextToken = lexer.EofToken()
+	} else {
+		nextToken = p.inputStream.PeekNext()
+	}
 	if nextToken.EOF() {
 		errorMessage := "Unexpected end-of-file. " + eofMessage
 		p.parseError(ParserErrorCodeEOF, errorMessage)
@@ -235,7 +253,11 @@ func (p *Parser) peekNextToken(eofMessage string) (nextToken lexer.Token) {
 // This method is useful when EOF is an allowed state and you want
 // to know what the extraneous token is in case it is not EOF.
 func (p *Parser) checkEOF() (eof bool) {
-	p.lastSeen = p.inputStream.PeekNext()
+	if p.discardRemaining {
+		p.lastSeen = lexer.EofToken()
+	} else {
+		p.lastSeen = p.inputStream.PeekNext()
+	}
 	eof = p.lastSeen.EOF()
 	return
 }
@@ -245,6 +267,11 @@ func (p *Parser) checkEOF() (eof bool) {
 // past the end of the stream then it sets p.lastConsumed to the EOF
 // token.
 func (p *Parser) consumeNextToken() {
+	if p.discardRemaining {
+		p.lastSeen = lexer.EofToken()
+		p.lastConsumed = p.lastSeen
+		return
+	}
 	p.lastConsumed = p.inputStream.PeekNext()
 	p.inputStream.ConsumeNext()
 }

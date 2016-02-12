@@ -112,7 +112,17 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 	if len(f.Imports) > 0 {
 		file.Imports = new([]string)
 		for _, importName := range f.Imports {
-			*(file.Imports) = append(*(file.Imports), importName.CanonicalFileName)
+			// We support serializing a MojomFileGraph that has not had import names
+			// resolved to canonical file names. (For example this is the case in
+			// meta-data-only mode.)
+			if importName.CanonicalFileName != "" {
+				*(file.Imports) = append(*(file.Imports), importName.CanonicalFileName)
+			}
+		}
+		if len(*file.Imports) == 0 {
+			// If we are in a mode where canonical file names are not being resolved
+			// then emit a null value for |imports| rather than an empty array.
+			file.Imports = nil
 		}
 	}
 

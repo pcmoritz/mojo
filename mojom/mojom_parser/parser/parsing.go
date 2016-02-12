@@ -219,6 +219,12 @@ func (p *Parser) parseMojomFile() bool {
 		}
 	}
 
+	if p.metaDataOnlyMode {
+		// In meta-data-only mode we do not parse any of the mojom declarations.
+		p.discardRemaining = true
+		return true
+	}
+
 	// ATTR_MOJOM_DECL  -> [ATTRIBUTES] MOJOM_DECL
 	// MOJOM_DECL       -> INTRFC_DECL | STRUCT_DECL | UNION_DECL | ENUM_DECL | CONSTANT_DECL
 	for ; ; attributes = p.parseAttributes() {

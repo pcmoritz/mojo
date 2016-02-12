@@ -42,11 +42,12 @@ import (
 //
 // A ParseDriver may only be used once.
 type ParseDriver struct {
-	fileProvider  FileProvider
-	fileExtractor FileExtractor
-	parseInvoker  ParseInvoker
-	importDirs    []string
-	debugMode     bool
+	fileProvider     FileProvider
+	fileExtractor    FileExtractor
+	parseInvoker     ParseInvoker
+	importDirs       []string
+	debugMode        bool
+	metaDataOnlyMode bool
 }
 
 // NewDriver consructs a new ParseDriver.
@@ -58,18 +59,29 @@ type ParseDriver struct {
 // If debugMode is true we print to standard out the parse tree resulting
 // from each file parsing. In non-debug mode the parsers do not explicitly
 // construct a parse tree.
-func NewDriver(importDirectories []string, debugMode bool) *ParseDriver {
+//
+// If metaDataOnlyMode is true then:
+// (1) The parsers will only parse the mojom file metadata (module statement,
+// import statements, file-level attributes). The mojom declarations will not
+// be parsed. The result will be as if the .mojom file did not have any mojom
+// declarations. The resolution and validation phases will not be executed.
+// (2) References to imported files will not be followed and imported files
+// will not be parsed. Only explicitly specified files will be parsed.
+// This implies that the |MojomFile|s will contain partial information about
+// their imports. Each |ImportedFile| will contain its |SpecifiedName| but not
+// its |CanonicalFileName|.
+func NewDriver(importDirectories []string, debugMode, metaDataOnlyMode bool) *ParseDriver {
 	fileProvider := new(OSFileProvider)
 	fileProvider.importDirs = importDirectories
-	return newDriver(importDirectories, debugMode, fileProvider,
+	return newDriver(importDirectories, debugMode, metaDataOnlyMode, fileProvider,
 		DefaultFileExtractor(0), DefaultParseInvoker(0))
 }
 
 // This version of the factory is used in tests.
-func newDriver(importDirectories []string, debugMode bool, fileProvider FileProvider,
+func newDriver(importDirectories []string, debugMode, metaDataOnlyMode bool, fileProvider FileProvider,
 	fileExtractor FileExtractor, parseInvoker ParseInvoker) *ParseDriver {
 	p := ParseDriver{fileProvider: fileProvider, fileExtractor: fileExtractor, parseInvoker: parseInvoker,
-		importDirs: importDirectories, debugMode: debugMode}
+		importDirs: importDirectories, debugMode: debugMode, metaDataOnlyMode: metaDataOnlyMode}
 	return &p
 
 }
@@ -123,6 +135,7 @@ func (d *ParseDriver) ParseFiles(fileNames []string) (descriptor *mojom.MojomDes
 			parser := MakeParser(currentFile.absolutePath, topLevelFileName,
 				contents, descriptor, importedFrom)
 			parser.SetDebugMode(d.debugMode)
+			parser.SetMetaDataOnlyMode(d.metaDataOnlyMode)
 			// Invoke parser.Parse() (but skip doing so in tests sometimes.)
 			d.parseInvoker.invokeParse(&parser)
 
@@ -136,14 +149,17 @@ func (d *ParseDriver) ParseFiles(fileNames []string) (descriptor *mojom.MojomDes
 				return
 			}
 			currentFile.mojomFile = d.fileExtractor.extractMojomFile(&parser)
-			for _, importedFile := range currentFile.mojomFile.Imports {
-				// Note that it is important that we append all of the imported files here even
-				// if some of them have already been processed. That is because when the imported
-				// file is pulled from the queue it will be pre-processed during which time the
-				// absolute path to the file will be discovered and this absolute path will be
-				// set in |mojomFile| which is necessary for serializing mojomFile.
-				filesToProcess = append(filesToProcess,
-					&FileReference{importedFrom: currentFile, specifiedPath: importedFile.SpecifiedName})
+			if !d.metaDataOnlyMode {
+				// In meta-data-only mode we do not follow import statements.
+				for _, importedFile := range currentFile.mojomFile.Imports {
+					// Note that it is important that we append all of the imported files here even
+					// if some of them have already been processed. That is because when the imported
+					// file is pulled from the queue it will be pre-processed during which time the
+					// absolute path to the file will be discovered and this absolute path will be
+					// set in |mojomFile| which is necessary for serializing mojomFile.
+					filesToProcess = append(filesToProcess,
+						&FileReference{importedFrom: currentFile, specifiedPath: importedFile.SpecifiedName})
+				}
 			}
 		}
 	}

@@ -891,6 +891,97 @@ func TestSingleFileSerialization(t *testing.T) {
 	}
 }
 
+// TestMetaDataOnlyMode tests parsing and serialization in meta-data-only
+// mode. Only file-level attributes and the 'module' statement should be
+// parsed.
+func TestMetaDataOnlyMode(t *testing.T) {
+	test := singleFileTest{}
+	////////////////////////////////////////////////////////////
+	// Test Case:
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	[go_namespace="go.test",
+	lucky=true,
+	planet=EARTH]
+	module mojom.test;
+
+	import "another.file";
+	import "and.another.file";
+
+	const uint16 NUM_MAGI = 3;
+
+	struct Foo{
+		int32 x;
+		[min_version=2]
+		string y = "hello";
+		string? z;
+
+		enum Hats {
+			TOP,
+			COWBOY = NUM_MAGI,
+			HARD,
+		};
+	};`
+
+		test.addTestCase("mojom.test", contents)
+
+		// Attributes
+		test.expectedFile().Attributes = &[]mojom_types.Attribute{
+			{"go_namespace", &mojom_types.LiteralValueStringValue{"go.test"}},
+			{"lucky", &mojom_types.LiteralValueBoolValue{true}},
+			{"planet", &mojom_types.LiteralValueStringValue{"EARTH"}},
+		}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for _, c := range test.cases {
+		// Parse and resolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		parser := parser.MakeParser(c.fileName, c.fileName, c.mojomContents, descriptor, nil)
+		parser.SetMetaDataOnlyMode(true)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
+			continue
+		}
+		if err := descriptor.Resolve(); err != nil {
+			t.Errorf("Resolve error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
+			t.Errorf("ComputeEnumValueIntegers error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+		if err := descriptor.ComputeDataForGenerators(); err != nil {
+			t.Errorf("ComputeDataForGenerators error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		// Serialize
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		if err != nil {
+			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		// Deserialize
+		decoder := bindings.NewDecoder(bytes, nil)
+		fileGraph := mojom_files.MojomFileGraph{}
+		fileGraph.Decode(decoder)
+
+		// Compare
+		if err := compareTwoGoObjects(c.expectedGraph, &fileGraph); err != nil {
+			t.Errorf("%s:\n%s", c.fileName, err.Error())
+			continue
+		}
+	}
+}
+
 ////////////////////////////////////////////
 /// Two-File Tests
 ///////////////////////////////////////////

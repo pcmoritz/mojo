@@ -20,6 +20,11 @@ type TokenStream interface {
 // The EOF token is returned by TokenStream to signal the end of the stream.
 var eofToken = Token{Kind: EOF}
 
+// EofToken() returns an EOF token.
+func EofToken() Token {
+	return eofToken
+}
+
 // *TokenChan implements TokenStream.
 // This implementation uses a non-buffered channel to pass the tokens from the
 // lexer to the parser. One end of the channel is held by the lexer and the

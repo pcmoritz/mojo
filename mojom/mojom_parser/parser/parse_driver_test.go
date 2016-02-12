@@ -83,7 +83,7 @@ func TestExpectedFilesParsed(t *testing.T) {
 	fakeFileExtractor.appendImportsToFile("/a/b/c/file5", "file1", "file6")
 
 	// Construct the driver under test
-	driver := newDriver([]string{}, false, &fakeFileProvider, &fakeFileExtractor, NoOpParseInvoker(0))
+	driver := newDriver([]string{}, false, false, &fakeFileProvider, &fakeFileExtractor, NoOpParseInvoker(0))
 
 	// Invoke ParseFiles with file1, file2 and file3 as top-level files.
 	descriptor, err := driver.ParseFiles([]string{"file1", "file2", "file3"})
@@ -152,6 +152,78 @@ func TestExpectedFilesParsed(t *testing.T) {
 		t.Errorf("file4.SpecifiedFileName = %v", file4.SpecifiedFileName)
 	}
 
+}
+
+// TestMetaDataOnlyMode tests the logic in function ParseDriver.ParseFiles()
+// when metaDataOnlyMode is true. Imported files should not be parsed
+// and CanonicalFileNames should not be set.
+func TestMetaDataOnlyMode(t *testing.T) {
+	// Construct our fake objects.
+	fakeFileProvider := FakeFileProvider{}
+	fakeFileExtractor := makeFakeFileExtractor()
+	// Our fake file1 will import file3, file4, file5
+	fakeFileExtractor.appendImportsToFile("/a/b/c/file1", "file3", "file4", "file5")
+	// Our fake file5 will import file1 and file6
+	fakeFileExtractor.appendImportsToFile("/a/b/c/file5", "file1", "file6")
+
+	// Construct the driver under test
+	driver := newDriver([]string{}, false, true, &fakeFileProvider, &fakeFileExtractor, NoOpParseInvoker(0))
+
+	// Invoke ParseFiles with file1, file2 and file3 as top-level files.
+	descriptor, err := driver.ParseFiles([]string{"file1", "file2", "file3"})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// Check that the correct files had their contents requested in the expected order.
+	expectedFileRefs := []string{"file1", "file2", "file3"}
+	if !reflect.DeepEqual(expectedFileRefs, fakeFileProvider.requestedFileNames) {
+		t.Errorf("%v != %v", expectedFileRefs, fakeFileProvider.requestedFileNames)
+	}
+
+	// Retrieve the MojomFile for file1.
+	file1, ok := descriptor.MojomFilesByName["/a/b/c/file1"]
+	if !ok {
+		t.Fatalf("file1 not found.")
+	}
+
+	// Check that it has 3 imports: file3, file4, file5
+	if file1.Imports == nil {
+		t.Fatalf("file1 has no imports.")
+	}
+	if len(file1.Imports) != 3 {
+		t.Fatalf("len(file1.Imports)=%d", len(file1.Imports))
+	}
+	if file1.Imports[0].CanonicalFileName != "" {
+		t.Errorf("file1.Imports[0].CanonicalFileName=%q", file1.Imports[0].CanonicalFileName)
+	}
+	if file1.Imports[1].CanonicalFileName != "" {
+		t.Errorf("file1.Imports[1].CanonicalFileName=%q", file1.Imports[1].CanonicalFileName)
+	}
+	if file1.Imports[2].CanonicalFileName != "" {
+		t.Errorf("file1.Imports[1].CanonicalFileName=%q", file1.Imports[2].CanonicalFileName)
+	}
+
+	// Retrieve the MojomFile for file3
+	file3, ok := descriptor.MojomFilesByName["/a/b/c/file3"]
+	if !ok {
+		t.Fatalf("file3 not found.")
+	}
+
+	// We expect the |ImportedFrom| field to be nil and the |SpecifiedFileName|
+	// to be non-empty because, even though file3
+	// was imported from file1, it was also a top-level file.
+	if file3.ImportedFrom != nil {
+		t.Errorf("file3.ImportedFrom == %v", file3.ImportedFrom)
+	}
+	if file3.SpecifiedFileName != "file3" {
+		t.Errorf("file3.SpecifiedFileName == %v", file3.SpecifiedFileName)
+	}
+
+	// Try to retrieve the MojomFile for file4. It should not be there.
+	if _, ok = descriptor.MojomFilesByName["/a/b/c/file4"]; ok {
+		t.Fatalf("file4 was unexpectedly found.")
+	}
 }
 
 // TestOSFileProvider tests the function OSFileProvider.findFiles() and OSFileProvider.provideContents()
