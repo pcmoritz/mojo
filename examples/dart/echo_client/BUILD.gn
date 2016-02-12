@@ -20,6 +20,6 @@ dart_pkg("dart_echo_client") {
   ]
   deps = [
     "//mojo/dart/packages",
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

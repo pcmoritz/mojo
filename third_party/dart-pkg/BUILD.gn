@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("../rules.gni")
+import("//mojo/public/dart/rules.gni")
 
-dart_packages("third_party") {
+dart_packages("dart-pkg") {
   base_dir = "."
 }

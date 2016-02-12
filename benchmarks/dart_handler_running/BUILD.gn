@@ -13,7 +13,7 @@ dart_pkg("dart_handler_running") {
     "pubspec.yaml",
   ]
   deps = [
-    "//mojo/dart/packages",
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
+    "//third_party/dart-pkg",
   ]
 }

@@ -13,6 +13,6 @@ dart_pkg("observatory_test") {
     "pubspec.yaml",
   ]
   deps = [
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

@@ -14,6 +14,6 @@ dart_pkg("echo_with_service_describer") {
   ]
   deps = [
     "//mojo/dart/packages",
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

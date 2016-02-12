@@ -43,7 +43,7 @@ dart_pkg("_mojo_for_test_only") {
             ] + bindings_sources
 
   deps = [
-    "//mojo/public/dart",
     "//mojo/services",
+    "//third_party/dart-pkg",
   ]
 }

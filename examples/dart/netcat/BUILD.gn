@@ -14,6 +14,6 @@ dart_pkg("netcat") {
   ]
   deps = [
     "//mojo/dart/packages",
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

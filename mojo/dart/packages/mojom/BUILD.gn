@@ -23,6 +23,6 @@ dart_pkg("mojom") {
     "pubspec.yaml",
   ]
   deps = [
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

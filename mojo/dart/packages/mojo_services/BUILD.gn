@@ -94,7 +94,7 @@ dart_pkg("mojo_services") {
             ] + bindings_sources
 
   deps = [
-    "//mojo/public/dart",
     "//mojo/services",
+    "//third_party/dart-pkg",
   ]
 }

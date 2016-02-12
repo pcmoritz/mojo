@@ -24,6 +24,6 @@ dart_pkg("dart_apptests") {
   deps = [
     "//mojo/dart/apptests/test_apps",
     "//mojo/dart/packages",
-    "//mojo/public/dart",
+    "//third_party/dart-pkg",
   ]
 }

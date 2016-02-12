@@ -31,15 +31,15 @@ group("dart_test_deps") {
   public_deps = [
     ":dart_controller_for_test",
     "//base",
-    "//mojo/dart/packages",
     "//mojo/dart/embedder:dart_controller_no_snapshot",
+    "//mojo/dart/packages",
     "//mojo/edk/test:run_all_unittests",
+    "//mojo/environment:chromium",
     "//mojo/public/cpp/environment",
     "//mojo/public/cpp/system",
     "//mojo/public/cpp/utility",
-    "//mojo/public/dart",
-    "//mojo/environment:chromium",
     "//testing/gtest",
+    "//third_party/dart-pkg",
   ]
 }
 
@@ -66,8 +66,8 @@ test("dart_to_cpp_unittests") {
   ]
   deps = [
     ":dart_test",
-    ":dart_to_cpp_bindings",
     ":dart_test_deps",
+    ":dart_to_cpp_bindings",
   ]
 }
 
