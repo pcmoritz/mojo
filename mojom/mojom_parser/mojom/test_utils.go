@@ -73,17 +73,17 @@ func NewTestConstant(name string, value int64) *UserDefinedConstant {
 }
 
 func DeclTestData(name string) DeclarationData {
-	return DeclData(name, nil, lexer.Token{}, nil)
+	return DeclData(name, nil, lexer.Token{Text: name}, nil)
 }
 
 func DeclTestDataA(name string, attributes *Attributes) DeclarationData {
-	return DeclData(name, nil, lexer.Token{}, attributes)
+	return DeclData(name, nil, lexer.Token{Text: name}, attributes)
 }
 
 func DeclTestDataWithOrdinal(name string, declaredOrdinal int64) DeclarationData {
-	return DeclDataWithOrdinal(name, nil, lexer.Token{}, nil, declaredOrdinal)
+	return DeclDataWithOrdinal(name, nil, lexer.Token{Text: name}, nil, declaredOrdinal)
 }
 
 func DeclTestDataAWithOrdinal(name string, attributes *Attributes, declaredOrdinal int64) DeclarationData {
-	return DeclDataWithOrdinal(name, nil, lexer.Token{}, attributes, declaredOrdinal)
+	return DeclDataWithOrdinal(name, nil, lexer.Token{Text: name}, attributes, declaredOrdinal)
 }

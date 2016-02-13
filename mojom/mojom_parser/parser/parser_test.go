@@ -778,7 +778,7 @@ func TestInvalidAssignmentDuringParsing(t *testing.T) {
 	};
 	`
 	expectError("Illegal assignment")
-	expectError("Field x of type array<Foo? ,8>? may not be assigned the value 7 of type int8.")
+	expectError("Field x of type array<Foo?, 8>? may not be assigned the value 7 of type int8.")
 	endTestCase()
 
 	////////////////////////////////////////////////////////////

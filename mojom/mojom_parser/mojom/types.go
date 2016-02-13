@@ -633,7 +633,7 @@ func (a ArrayTypeRef) ReferencedUserDefinedTypes() UserDefinedTypeSet {
 func (a ArrayTypeRef) ToString(debug bool) string {
 	fixedLengthSpecifier := ""
 	if a.fixedLength > 0 {
-		fixedLengthSpecifier = fmt.Sprintf(" ,%d", a.fixedLength)
+		fixedLengthSpecifier = fmt.Sprintf(", %d", a.fixedLength)
 	}
 	nullableSpecifier := ""
 	if a.nullable {
