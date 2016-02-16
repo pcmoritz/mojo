@@ -15,25 +15,10 @@ MediaPipeBase::MediaPipeBase()
 MediaPipeBase::~MediaPipeBase() {
 }
 
-MojoResult MediaPipeBase::Init(InterfaceRequest<MediaPipe> request,
-                               uint64_t shared_buffer_size) {
+MojoResult MediaPipeBase::Init(InterfaceRequest<MediaPipe> request) {
   // Double init?
   if (IsInitialized()) {
     return MOJO_RESULT_ALREADY_EXISTS;
-  }
-
-  // Valid size?
-  DCHECK_GT(shared_buffer_size, 0u);
-  DCHECK_LE(shared_buffer_size, MediaPipeState::kMaxPayloadLen);
-  if (!shared_buffer_size ||
-      (shared_buffer_size > MediaPipeState::kMaxPayloadLen)) {
-    return MOJO_RESULT_INVALID_ARGUMENT;
-  }
-
-  DCHECK(!buffer_);
-  buffer_ = MappedSharedBuffer::Create(shared_buffer_size);
-  if (buffer_ == nullptr) {
-    return MOJO_RESULT_UNKNOWN;
   }
 
   binding_.Bind(request.Pass());
@@ -44,9 +29,7 @@ MojoResult MediaPipeBase::Init(InterfaceRequest<MediaPipe> request,
 }
 
 bool MediaPipeBase::IsInitialized() const {
-  DCHECK((!binding_.is_bound() && (buffer_ == nullptr)) ||
-          (binding_.is_bound() && (buffer_ != nullptr)));
-  return !!buffer_;
+  return binding_.is_bound();
 }
 
 void MediaPipeBase::Reset() {
@@ -56,27 +39,33 @@ void MediaPipeBase::Reset() {
   buffer_ = nullptr;
 }
 
-void MediaPipeBase::GetState(const GetStateCallback& cbk) {
-  static const MojoDuplicateBufferHandleOptions options = {
-    .struct_size = sizeof(*this),
-    .flags = MOJO_DUPLICATE_BUFFER_HANDLE_OPTIONS_FLAG_NONE,
-  };
-
-  MediaPipeStatePtr state_ptr(MediaPipeState::New());
-
-  // If we have not been successfully initialized, send back an invalid handle
-  // and a zero length.
-  if (!buffer_) {
-    state_ptr->payload_buffer_len = 0;
-  } else {
-    MojoResult res = DuplicateBuffer(buffer_->handle().get(),
-                                     &options,
-                                     &state_ptr->payload_buffer);
-    state_ptr->payload_buffer_len = buffer_->size();
-    DCHECK(MOJO_RESULT_OK == res);
+void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) {
+  // Double init?  Close the connection.
+  if (buffer_) {
+    LOG(ERROR) << "Attempting to set a new buffer (size = "
+               << size
+               << ") on a MediaPipe which already has a buffer (size = "
+               << buffer_->size()
+               << ")";
+    Reset();
+    return;
   }
 
-  cbk.Run(state_ptr.Pass());
+  // Invalid size?  Close the connection.
+  if (!size || (size > MediaPipe::kMaxBufferLen)) {
+    LOG(ERROR) << "Invalid shared buffer size (size = " << size << ")";
+    Reset();
+    return;
+  }
+
+
+  // Failed to map the buffer?  Close the connection.
+  buffer_ = MappedSharedBuffer::Create(handle.Pass(), size);
+  if (!buffer_) {
+    LOG(ERROR) << "Failed to map shared memory buffer (size = " << size << ")";
+    Reset();
+    return;
+  }
 }
 
 void MediaPipeBase::SendPacket(MediaPacketPtr packet,
@@ -167,8 +156,9 @@ void MediaPipeBase::MediaPacketState::SetResult(MediaPipe::SendResult result) {
 }
 
 MediaPipeBase::MappedSharedBufferPtr MediaPipeBase::MappedSharedBuffer::Create(
-    size_t size) {
-  MappedSharedBufferPtr ret(new MappedSharedBuffer(size));
+    ScopedSharedBufferHandle handle,
+    uint64_t size) {
+  MappedSharedBufferPtr ret(new MappedSharedBuffer(handle.Pass(), size));
   return ret->base() ? ret : nullptr;
 }
 
@@ -179,35 +169,22 @@ MediaPipeBase::MappedSharedBuffer::~MappedSharedBuffer() {
   }
 }
 
-MediaPipeBase::MappedSharedBuffer::MappedSharedBuffer(size_t size)
-  : size_(size) {
-  static const MojoCreateSharedBufferOptions opt {
-    .struct_size = sizeof(MojoDuplicateBufferHandleOptions),
-    .flags = MOJO_CREATE_SHARED_BUFFER_OPTIONS_FLAG_NONE,
-  };
-  MojoResult res;
+MediaPipeBase::MappedSharedBuffer::MappedSharedBuffer(
+    ScopedSharedBufferHandle handle,
+    size_t size)
+  : handle_(handle.Pass()),
+    size_(size) {
+  MojoResult res = MapBuffer(handle_.get(),
+                             0u,
+                             size_,
+                             &base_,
+                             MOJO_MAP_BUFFER_FLAG_NONE);
 
-  res = CreateSharedBuffer(&opt, size_, &handle_);
-  if (MOJO_RESULT_OK == res) {
-    // TODO(johngro) : We really only need read access to this buffer.  Ideally,
-    // we could request that using flags, but there does not seem to be a way to
-    // do this right now.
-    res = MapBuffer(handle_.get(),
-                    0u,
-                    size_,
-                    &base_,
-                    MOJO_MAP_BUFFER_FLAG_NONE);
-
-    if (MOJO_RESULT_OK != res) {
-      LOG(ERROR) << "Failed to map shared buffer of size " << size_
-                 << " (res " << res << ")";
-      DCHECK(base_ == nullptr);
-      handle_.reset();
-    }
-  } else {
-    LOG(ERROR) << "Failed to create shared buffer of size " << size_
+  if (MOJO_RESULT_OK != res) {
+    LOG(ERROR) << "Failed to map shared buffer of size " << size_
                << " (res " << res << ")";
-    DCHECK(!handle_.is_valid());
+    DCHECK(base_ == nullptr);
+    handle_.reset();
   }
 }
 

@@ -267,7 +267,6 @@ void PlayWAVApp::ProcessHTTPResponse(URLResponsePtr resp) {
 
   AudioTrackConfigurationPtr cfg;
   cfg = AudioTrackConfiguration::New();
-  cfg->max_frames = USecToFrames(BUF_DEPTH_USEC);
   cfg->audio_frame_ratio = tmp.numerator;
   cfg->media_time_ratio  = tmp.denominator;
 
@@ -296,6 +295,7 @@ void PlayWAVApp::ProcessHTTPResponse(URLResponsePtr resp) {
   // Set up our media pipe helper, configure its callback and water marks to
   // kick off the playback process.
   audio_pipe_.reset(new CircularBufferMediaPipeAdapter(media_pipe.Pass()));
+  audio_pipe_->Init(USecToBytes(BUF_DEPTH_USEC));
   audio_pipe_->SetWatermarks(USecToBytes(BUF_HI_WATER_USEC),
                              USecToBytes(BUF_LO_WATER_USEC));
   audio_pipe_->SetSignalCallback(

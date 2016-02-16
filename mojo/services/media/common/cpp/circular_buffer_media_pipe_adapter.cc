@@ -39,11 +39,6 @@ CircularBufferMediaPipeAdapter::CircularBufferMediaPipeAdapter(
   MOJO_DCHECK(pipe_);
   MOJO_DCHECK(RunLoop::current());
 
-  pipe_get_state_cbk_ = MediaPipe::GetStateCallback(
-  [this] (MediaPipeStatePtr state) {
-    HandleGetState(state.Pass());
-  });
-
   pipe_flush_cbk_ = MediaPipe::FlushCallback(
   [this] () {
     HandleFlush();
@@ -61,17 +56,68 @@ CircularBufferMediaPipeAdapter::CircularBufferMediaPipeAdapter(
       (*thiz)->HandleSignalCallback();
     }
   });
-
-
-  // Begin by getting a hold of the shared buffer from our pipe over which we
-  // will push data.
-  MOJO_DCHECK(get_state_in_progress_);
-  pipe_->GetState(pipe_get_state_cbk_);
 }
 
 CircularBufferMediaPipeAdapter::~CircularBufferMediaPipeAdapter() {
   *thiz_ = nullptr;
   Cleanup();
+}
+
+void CircularBufferMediaPipeAdapter::Init(uint64_t size) {
+  // Double Init?  Fault unless the user is asking us to set up a buffer of the
+  // same size.
+  if (buffer_handle_.is_valid()) {
+    if (buffer_size_ != size) {
+      Fault(MediaResult::BAD_STATE);
+    }
+    return;
+  }
+
+  // Make the buffer
+  MojoResult res = CreateSharedBuffer(nullptr, size, &buffer_handle_);
+  if (res != MOJO_RESULT_OK) {
+    MOJO_LOG(ERROR) << "Failed to allocate buffer of size " << size
+                    << " in " << __PRETTY_FUNCTION__
+                    << " (error " << res << ")";
+    Fault(MediaResult::INSUFFICIENT_RESOURCES);
+    return;
+  }
+
+  buffer_size_ = size;
+
+  // Map the buffer
+  //
+  // TODO(johngro) : We really only need write access to this buffer.
+  // Ideally, we could request that using flags, but there does not seem to be
+  // a way to do this right now.
+  res = MapBuffer(buffer_handle_.get(),
+                  0,
+                  buffer_size_,
+                  &buffer_,
+                  MOJO_MAP_BUFFER_FLAG_NONE);
+  if (res != MOJO_RESULT_OK) {
+    MOJO_LOG(ERROR) << "Failed to map buffer in " << __PRETTY_FUNCTION__
+                    << " (error " << res << ")";
+    Fault(MediaResult::UNKNOWN_ERROR);
+    return;
+  }
+
+  // Duplicate the buffer and send it to the other side of the pipe.
+  //
+  // TODO(johngro) : It would be nice if we could restrict this handle to be
+  // read-only.
+  ScopedSharedBufferHandle duplicated_handle;
+  res = DuplicateBuffer(buffer_handle_.get(), nullptr, &duplicated_handle);
+  if (res != MOJO_RESULT_OK) {
+    MOJO_LOG(ERROR) << "Failed to duplicate handle in " << __PRETTY_FUNCTION__
+                    << " (error " << res << ")";
+    Fault(MediaResult::UNKNOWN_ERROR);
+    return;
+  }
+
+  // TODO(johngro) : We should not have to send the buffer size, it should be an
+  // intrinsic property of the buffer itself and be query-able via the handle.
+  pipe_->SetBuffer(duplicated_handle.Pass(), buffer_size_);
 }
 
 void CircularBufferMediaPipeAdapter::SetSignalCallback(SignalCbk cbk) {
@@ -298,78 +344,12 @@ MediaResult CircularBufferMediaPipeAdapter::Flush() {
   return MediaResult::OK;
 }
 
-void CircularBufferMediaPipeAdapter::HandleGetState(MediaPipeStatePtr state) {
-  MOJO_DCHECK(state);     // We must have a state structure.
-  MOJO_DCHECK(!buffer_);  // We must not have already mapped a buffer.
-  MOJO_DCHECK(get_state_in_progress_);  // We should be waiting for our cbk.
-
-  // Success or failure, we are no longer waiting for our get state callback.
-  get_state_in_progress_ = false;
-  rd_ = wr_ = 0;
-
-  // Double init?  How did that happen?
-  if (buffer_handle_.is_valid() || (nullptr != buffer_)) {
-    MOJO_LOG(ERROR) << "Double init during " << __PRETTY_FUNCTION__;
-    Fault(MediaResult::UNKNOWN_ERROR);
-    return;
-  }
-
-  // No shared buffer?  That's a fatal error.
-  if (!state->payload_buffer.is_valid()) {
-    MOJO_LOG(ERROR) << "Null payload buffer in " << __PRETTY_FUNCTION__;
-    Fault(MediaResult::UNKNOWN_ERROR);
-    return;
-  }
-
-  // stash our state
-  buffer_handle_ = state->payload_buffer.Pass();
-  buffer_size_   = state->payload_buffer_len;
-
-  // Sanity checks the buffer size.
-  if (!buffer_size_ || (buffer_size_ > MediaPipeState::kMaxPayloadLen)) {
-    MOJO_LOG(ERROR) << "Bad buffer size in " << __PRETTY_FUNCTION__
-               << " (" << buffer_size_ << ")";
-    Fault(MediaResult::BAD_STATE);
-    return;
-  }
-
-  // Map our buffer
-  //
-  // TODO(johngro) : We really only need write access to this buffer.
-  // Ideally, we could request that using flags, but there does not seem to be
-  // a way to do this right now.
-  MojoResult res;
-  res = MapBuffer(buffer_handle_.get(),
-                  0,
-                  buffer_size_,
-                  &buffer_,
-                  MOJO_MAP_BUFFER_FLAG_NONE);
-  if (res != MOJO_RESULT_OK) {
-    MOJO_LOG(ERROR) << "Failed to map buffer in " << __PRETTY_FUNCTION__
-               << " (error " << res << ")";
-    Fault(MediaResult::UNKNOWN_ERROR);
-    return;
-  }
-
-  // Init is complete, we may be signalled now.
-  UpdateSignalled();
-}
-
 void CircularBufferMediaPipeAdapter::HandleSendPacket(
     uint32_t seq_num,
     MediaPipe::SendResult result) {
   MediaPipe::SendPacketCallback cbk;
 
   do {
-    if (get_state_in_progress_) {
-      // If we are in the process of getting the initial state of the system,
-      // then something is seriously wrong.  The other end of this interface is
-      // sending us Send callbacks while we are in the process of initializing
-      // (something which should be impossible)
-      Fault(MediaResult::PROTOCOL_ERROR);
-      break;
-    }
-
     // There should be at least one element in the in-flight queue, and the
     // front of the queue's sequence number should match the sequence number of
     // the payload being returned to us.

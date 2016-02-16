@@ -109,10 +109,9 @@ class AudioTrackDescriptor extends bindings.Struct {
 
 class AudioTrackConfiguration extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
+    const bindings.StructDataHeader(24, 0)
   ];
   media_types_mojom.MediaType mediaType = null;
-  int maxFrames = 0;
   int audioFrameRatio = 1;
   int mediaTimeRatio = 1;
 
@@ -158,15 +157,11 @@ class AudioTrackConfiguration extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.maxFrames = decoder0.decodeUint64(16);
+      result.audioFrameRatio = decoder0.decodeUint32(16);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.audioFrameRatio = decoder0.decodeUint32(24);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.mediaTimeRatio = decoder0.decodeUint32(28);
+      result.mediaTimeRatio = decoder0.decodeUint32(20);
     }
     return result;
   }
@@ -181,21 +176,14 @@ class AudioTrackConfiguration extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeUint64(maxFrames, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "maxFrames of struct AudioTrackConfiguration: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(audioFrameRatio, 24);
+      encoder0.encodeUint32(audioFrameRatio, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "audioFrameRatio of struct AudioTrackConfiguration: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(mediaTimeRatio, 28);
+      encoder0.encodeUint32(mediaTimeRatio, 20);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "mediaTimeRatio of struct AudioTrackConfiguration: $e";
@@ -206,7 +194,6 @@ class AudioTrackConfiguration extends bindings.Struct {
   String toString() {
     return "AudioTrackConfiguration("
            "mediaType: $mediaType" ", "
-           "maxFrames: $maxFrames" ", "
            "audioFrameRatio: $audioFrameRatio" ", "
            "mediaTimeRatio: $mediaTimeRatio" ")";
   }
@@ -214,7 +201,6 @@ class AudioTrackConfiguration extends bindings.Struct {
   Map toJson() {
     Map map = new Map();
     map["mediaType"] = mediaType;
-    map["maxFrames"] = maxFrames;
     map["audioFrameRatio"] = audioFrameRatio;
     map["mediaTimeRatio"] = mediaTimeRatio;
     return map;

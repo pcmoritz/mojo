@@ -70,8 +70,32 @@ class CircularBufferMediaPipeAdapter {
    */
   using SignalCbk = std::function<void(MediaResult state)>;
 
+  /**
+   * Constructor
+   *
+   * Create an adapter which will take ownership of the provided MediaPipe
+   * interface and assist in the process of generating MediaPackets and
+   * marshalling them to the other side of the MediaPipe.
+   *
+   * @param pipe A pointer to the MediaPipe interface which will be used as the
+   * target for MediaPackets.
+   */
   explicit CircularBufferMediaPipeAdapter(MediaPipePtr pipe);
+
+  /**
+   * Destructor
+   */
   ~CircularBufferMediaPipeAdapter();
+
+  /**
+   * Init
+   *
+   * Allocate a shared memory buffer of the specified size and begin the process
+   * of marshalling it to the other side of the MediaPipe.
+   *
+   * @param size The size in bytes of the shared memory buffer to allocate.
+   */
+  void Init(uint64_t size);
 
   /**
    * Set the signal callback for this media pipe adapter.  This callback will be
@@ -205,7 +229,6 @@ class CircularBufferMediaPipeAdapter {
   };
   using PacketStateQueue = std::deque<PacketState>;
 
-  void HandleGetState(MediaPipeStatePtr state);
   void HandleSendPacket(uint32_t seq_num, MediaPipe::SendResult result);
   void HandleFlush();
   void HandleSignalCallback();
@@ -219,12 +242,11 @@ class CircularBufferMediaPipeAdapter {
   }
 
   bool Busy() const {
-    return (get_state_in_progress_ || flush_in_progress_);
+    return flush_in_progress_;
   }
 
   // Pipe interface callbacks
   MediaPipePtr pipe_;
-  MediaPipe::GetStateCallback pipe_get_state_cbk_;
   MediaPipe::FlushCallback    pipe_flush_cbk_;
   Closure                     signalled_callback_;
 
@@ -234,7 +256,6 @@ class CircularBufferMediaPipeAdapter {
 
   // State for managing signalled/un-signalled status and signal callbacks.
   SignalCbk signal_cbk_;
-  bool      get_state_in_progress_ = true;
   bool      flush_in_progress_ = false;
   bool      fault_cbk_made_ = false;
   bool      cbk_scheduled_ = false;
@@ -246,7 +267,7 @@ class CircularBufferMediaPipeAdapter {
 
   ScopedSharedBufferHandle buffer_handle_;
   void*    buffer_ = nullptr;
-  uint64_t buffer_size_;
+  uint64_t buffer_size_ = 0;
   uint64_t rd_, wr_;
 
   // Packet queue state

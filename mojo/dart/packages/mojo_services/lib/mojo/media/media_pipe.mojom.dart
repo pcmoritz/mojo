@@ -252,17 +252,16 @@ class MediaPacket extends bindings.Struct {
 
 
 
-class MediaPipeState extends bindings.Struct {
+class _MediaPipeSetBufferParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  static const int kMaxPayloadLen = 4611686018427387903;
-  core.MojoSharedBuffer payloadBuffer = null;
-  int payloadBufferLen = 0;
+  core.MojoSharedBuffer buffer = null;
+  int size = 0;
 
-  MediaPipeState() : super(kVersions.last.size);
+  _MediaPipeSetBufferParams() : super(kVersions.last.size);
 
-  static MediaPipeState deserialize(bindings.Message message) {
+  static _MediaPipeSetBufferParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -271,11 +270,11 @@ class MediaPipeState extends bindings.Struct {
     return result;
   }
 
-  static MediaPipeState decode(bindings.Decoder decoder0) {
+  static _MediaPipeSetBufferParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    MediaPipeState result = new MediaPipeState();
+    _MediaPipeSetBufferParams result = new _MediaPipeSetBufferParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -297,11 +296,11 @@ class MediaPipeState extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.payloadBuffer = decoder0.decodeSharedBufferHandle(8, false);
+      result.buffer = decoder0.decodeSharedBufferHandle(8, false);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.payloadBufferLen = decoder0.decodeUint64(16);
+      result.size = decoder0.decodeUint64(16);
     }
     return result;
   }
@@ -309,159 +308,25 @@ class MediaPipeState extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeSharedBufferHandle(payloadBuffer, 8, false);
+      encoder0.encodeSharedBufferHandle(buffer, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "payloadBuffer of struct MediaPipeState: $e";
+          "buffer of struct _MediaPipeSetBufferParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint64(payloadBufferLen, 16);
+      encoder0.encodeUint64(size, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "payloadBufferLen of struct MediaPipeState: $e";
+          "size of struct _MediaPipeSetBufferParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "MediaPipeState("
-           "payloadBuffer: $payloadBuffer" ", "
-           "payloadBufferLen: $payloadBufferLen" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-
-
-class _MediaPipeGetStateParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _MediaPipeGetStateParams() : super(kVersions.last.size);
-
-  static _MediaPipeGetStateParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaPipeGetStateParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaPipeGetStateParams result = new _MediaPipeGetStateParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_MediaPipeGetStateParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-
-
-class MediaPipeGetStateResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  MediaPipeState state = null;
-
-  MediaPipeGetStateResponseParams() : super(kVersions.last.size);
-
-  static MediaPipeGetStateResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static MediaPipeGetStateResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    MediaPipeGetStateResponseParams result = new MediaPipeGetStateResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.state = MediaPipeState.decode(decoder1);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(state, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "state of struct MediaPipeGetStateResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "MediaPipeGetStateResponseParams("
-           "state: $state" ")";
+    return "_MediaPipeSetBufferParams("
+           "buffer: $buffer" ", "
+           "size: $size" ")";
   }
 
   Map toJson() {
@@ -746,7 +611,7 @@ class MediaPipeFlushResponseParams extends bindings.Struct {
 
 
 
-const int _MediaPipe_getStateName = 0;
+const int _MediaPipe_setBufferName = 0;
 const int _MediaPipe_sendPacketName = 1;
 const int _MediaPipe_flushName = 2;
   
@@ -819,9 +684,10 @@ class _MediaPipeServiceDescription implements service_describer.ServiceDescripti
 
 abstract class MediaPipe {
   static const String serviceName = null;
-  dynamic getState([Function responseFactory = null]);
+  void setBuffer(core.MojoSharedBuffer buffer, int size);
   dynamic sendPacket(MediaPacket packet,[Function responseFactory = null]);
   dynamic flush([Function responseFactory = null]);
+  static const int kMaxBufferLen = 4611686018427387903;
 }
 
 
@@ -845,26 +711,6 @@ class _MediaPipeProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _MediaPipe_getStateName:
-        var r = MediaPipeGetStateResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
       case _MediaPipe_sendPacketName:
         var r = MediaPipeSendPacketResponseParams.deserialize(
             message.payload);
@@ -923,13 +769,15 @@ class _MediaPipeProxyCalls implements MediaPipe {
   _MediaPipeProxyImpl _proxyImpl;
 
   _MediaPipeProxyCalls(this._proxyImpl);
-    dynamic getState([Function responseFactory = null]) {
-      var params = new _MediaPipeGetStateParams();
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _MediaPipe_getStateName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
+    void setBuffer(core.MojoSharedBuffer buffer, int size) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _MediaPipeSetBufferParams();
+      params.buffer = buffer;
+      params.size = size;
+      _proxyImpl.sendMessage(params, _MediaPipe_setBufferName);
     }
     dynamic sendPacket(MediaPacket packet,[Function responseFactory = null]) {
       var params = new _MediaPipeSendPacketParams();
@@ -1029,11 +877,6 @@ class MediaPipeStub extends bindings.Stub {
   }
 
 
-  MediaPipeGetStateResponseParams _MediaPipeGetStateResponseParamsFactory(MediaPipeState state) {
-    var mojo_factory_result = new MediaPipeGetStateResponseParams();
-    mojo_factory_result.state = state;
-    return mojo_factory_result;
-  }
   MediaPipeSendPacketResponseParams _MediaPipeSendPacketResponseParamsFactory(MediaPipeSendResult result) {
     var mojo_factory_result = new MediaPipeSendPacketResponseParams();
     mojo_factory_result.result = result;
@@ -1052,27 +895,10 @@ class MediaPipeStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaPipe_getStateName:
-        var params = _MediaPipeGetStateParams.deserialize(
+      case _MediaPipe_setBufferName:
+        var params = _MediaPipeSetBufferParams.deserialize(
             message.payload);
-        var response = _impl.getState(_MediaPipeGetStateResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _MediaPipe_getStateName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _MediaPipe_getStateName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
+        _impl.setBuffer(params.buffer, params.size);
         break;
       case _MediaPipe_sendPacketName:
         var params = _MediaPipeSendPacketParams.deserialize(

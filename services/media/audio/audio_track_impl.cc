@@ -225,23 +225,9 @@ void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
   }
   bytes_per_frame_ *= cfg->channels;
 
-  // Overflow trying to convert from frames to bytes?
-  uint64_t requested_frames = configuration->max_frames;
-  if (requested_frames >
-     (std::numeric_limits<size_t>::max() / bytes_per_frame_)) {
-    LOG(ERROR) << "Insufficient resources to create "
-               << requested_frames << " frame audio buffer.";
-    Shutdown();
-    return;
-  }
-
-  size_t requested_bytes = (requested_frames * bytes_per_frame_);
-
-  // Attempt to initialize our shared buffer and bind it to our interface
-  // request.
-  if (pipe_.Init(req.Pass(), requested_bytes) != MOJO_RESULT_OK) {
-    LOG(ERROR) << "Insufficient resources to create "
-               << requested_frames << " frame audio buffer.";
+  // Bind our pipe to the interface request.
+  if (pipe_.Init(req.Pass()) != MOJO_RESULT_OK) {
+    LOG(ERROR) << "Failed to media pipe to interface request.";
     Shutdown();
     return;
   }

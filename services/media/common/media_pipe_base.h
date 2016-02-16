@@ -50,8 +50,7 @@ class MediaPipeBase : public MediaPipe {
   ~MediaPipeBase() override;
 
   // Initialize the internal state of the pipe (allocate resources, etc..)
-  MojoResult Init(InterfaceRequest<MediaPipe> request,
-                  uint64_t shared_buffer_size);
+  MojoResult Init(InterfaceRequest<MediaPipe> request);
 
   bool IsInitialized() const;
   void Reset();
@@ -59,15 +58,16 @@ class MediaPipeBase : public MediaPipe {
  protected:
   class MappedSharedBuffer {
    public:
-    static MappedSharedBufferPtr Create(size_t size);
+    static MappedSharedBufferPtr Create(ScopedSharedBufferHandle handle,
+                                        uint64_t size);
     ~MappedSharedBuffer();
 
     const ScopedSharedBufferHandle& handle() const { return handle_; }
-    size_t size() const { return size_; }
-    void*  base() const { return base_; }
+    uint64_t size() const { return size_; }
+    void*    base() const { return base_; }
 
    private:
-    explicit MappedSharedBuffer(size_t size);
+    MappedSharedBuffer(ScopedSharedBufferHandle handle, size_t size);
 
     ScopedSharedBufferHandle handle_;
     size_t size_;
@@ -84,7 +84,7 @@ class MediaPipeBase : public MediaPipe {
   Binding<MediaPipe> binding_;
 
   // MediaPipe.mojom implementation.
-  void GetState(const GetStateCallback& cbk) final;
+  void SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) final;
   void SendPacket(MediaPacketPtr packet,
                   const SendPacketCallback& cbk) final;
   void Flush(const FlushCallback& cbk) final;

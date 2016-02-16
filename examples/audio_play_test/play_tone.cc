@@ -121,7 +121,6 @@ void PlayToneApp::Initialize(ApplicationImpl* app) {
 
   // Configure our sink for 16-bit 48KHz mono.
   AudioTrackConfigurationPtr cfg = AudioTrackConfiguration::New();
-  cfg->max_frames = USecToBytes(BUF_DEPTH_USEC) / FRAME_BYTES;
 
   LpcmMediaTypeDetailsPtr pcm_cfg = LpcmMediaTypeDetails::New();
   pcm_cfg->sample_format     = LpcmSampleFormat::SIGNED_16;
@@ -140,6 +139,7 @@ void PlayToneApp::Initialize(ApplicationImpl* app) {
   // proxy, pass its interface to our circular buffer helper, set up our
   // high/low water marks, register our callback, and start to buffer our audio.
   audio_pipe_.reset(new CircularBufferMediaPipeAdapter(pipe.Pass()));
+  audio_pipe_->Init(USecToBytes(BUF_DEPTH_USEC));
   audio_pipe_->SetSignalCallback(
   [this](MediaResult res) -> void {
     GenerateToneCbk(res);

@@ -19,9 +19,6 @@ struct AudioTrackConfiguration {
   // The media type to use.
   MediaType media_type;
 
-  // Desired maximum buffer size, in frames of audio.
-  uint64 max_frames;
-
   // Ratio of audio frames to media time ticks.
   //
   // Presentation time stamps on audio packets are expressed in units of media
