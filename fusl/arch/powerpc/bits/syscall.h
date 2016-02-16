@@ -364,6 +364,10 @@
 #define __NR_memfd_create          360
 #define __NR_bpf                   361
 #define __NR_execveat              362
+#define __NR_switch_endian         363
+#define __NR_userfaultfd           364
+#define __NR_membarrier            365
+#define __NR_mlock2                378
 
 /*
  * repeated with SYS prefix
@@ -734,3 +738,7 @@
 #define SYS_memfd_create          360
 #define SYS_bpf                   361
 #define SYS_execveat              362
+#define SYS_switch_endian         363
+#define SYS_userfaultfd           364
+#define SYS_membarrier            365
+#define SYS_mlock2                378

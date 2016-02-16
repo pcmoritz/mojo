@@ -6,9 +6,13 @@ import("//fusl/fusl.gni")
 
 fusl_source_set("ldso") {
   sources = [
+    "__dlsym.c",
     "dl_iterate_phdr.c",
     "dladdr.c",
+    "dlclose.c",
+    "dlerror.c",
     "dlinfo.c",
+    "dlopen.c",
   ]
 
   if (current_cpu == "x64") {
@@ -22,17 +26,4 @@ fusl_source_set("ldso") {
       "tlsdesc.c",
     ]
   }
-
-  deps = [
-    ":no_stack_protector",
-  ]
-}
-
-fusl_source_set("no_stack_protector") {
-  configs = [ "//fusl:fusl_no_stack_protector_config" ]
-
-  sources = [
-    "dlstart.c",
-    "dynlink.c",
-  ]
 }

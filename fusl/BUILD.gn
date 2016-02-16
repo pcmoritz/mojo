@@ -6,6 +6,7 @@
 sysroot = "$root_out_dir/sysroot"
 sysroot_lib_dir = "${sysroot}/usr/lib"
 sysroot_include_dir = "${sysroot}/usr/include"
+sysroot_include_bits_dir = "${sysroot}/usr/include/bits"
 
 config("fusl_config") {
   cflags = [
@@ -39,6 +40,7 @@ config("fusl_config") {
   # General includes, these need to come after the arch specific includes.
   # src/internal must come before include.
   include_dirs += [
+    "arch/generic",
     "src/internal",
     "include",
   ]
@@ -55,6 +57,7 @@ static_library("libc") {
   complete_static_lib = true
 
   deps = [
+    "ldso",
     "src/aio",
     "src/complex",
     "src/conf",
@@ -116,17 +119,44 @@ copy("copy_include") {
   ]
 }
 
-copy("copy_include_bits") {
+copy("copy_arch_include_bits") {
   deps = [
     ":copy_include",
   ]
   if (current_cpu == "x64") {
     sources = [
-      "arch/x86_64/bits",
+      "arch/generic/bits/errno.h",
+      "arch/generic/bits/poll.h",
+      "arch/generic/bits/resource.h",
+      "arch/generic/bits/sem.h",
+      "arch/generic/bits/statfs.h",
+      "arch/generic/bits/stdarg.h",
+      "arch/generic/bits/termios.h",
+      "arch/x86_64/bits/alltypes.h",
+      "arch/x86_64/bits/endian.h",
+      "arch/x86_64/bits/fcntl.h",
+      "arch/x86_64/bits/fenv.h",
+      "arch/x86_64/bits/float.h",
+      "arch/x86_64/bits/io.h",
+      "arch/x86_64/bits/ioctl.h",
+      "arch/x86_64/bits/ipc.h",
+      "arch/x86_64/bits/limits.h",
+      "arch/x86_64/bits/mman.h",
+      "arch/x86_64/bits/msg.h",
+      "arch/x86_64/bits/posix.h",
+      "arch/x86_64/bits/reg.h",
+      "arch/x86_64/bits/setjmp.h",
+      "arch/x86_64/bits/shm.h",
+      "arch/x86_64/bits/signal.h",
+      "arch/x86_64/bits/socket.h",
+      "arch/x86_64/bits/stat.h",
+      "arch/x86_64/bits/stdint.h",
+      "arch/x86_64/bits/syscall.h",
+      "arch/x86_64/bits/user.h",
     ]
   }
   outputs = [
-    "${sysroot_include_dir}/{{source_name_part}}",
+    "${sysroot_include_bits_dir}/{{source_name_part}}.h",
   ]
 }
 
@@ -146,8 +176,8 @@ copy("copy_libs") {
 
 group("copy_sysroot") {
   deps = [
+    ":copy_arch_include_bits",
     ":copy_include",
-    ":copy_include_bits",
     ":copy_libs",
     "crt:copy_crt_objects",
   ]

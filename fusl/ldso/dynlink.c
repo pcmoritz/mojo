@@ -23,8 +23,6 @@
 
 static void error(const char *, ...);
 
-#ifdef SHARED
-
 #define MAXP2(a,b) (-(-(a)&-(b)))
 #define ALIGN(x,y) ((x)+(y)-1 & -(y))
 
@@ -1136,7 +1134,7 @@ static void do_mips_relocs(struct dso *p, size_t *got)
 	Sym *sym = p->syms + j;
 	rel[0] = (unsigned char *)got - base;
 	for (i-=j; i; i--, sym++, rel[0]+=sizeof(size_t)) {
-		rel[1] = sym-p->syms << 8 | R_MIPS_JUMP_SLOT;
+		rel[1] = (sym-p->syms) << 8 | R_MIPS_JUMP_SLOT;
 		do_relocs(p, rel, sizeof rel, 2);
 	}
 }
@@ -1334,7 +1332,9 @@ void __dls2(unsigned char *base, size_t *sp)
 		void *p2 = (void *)sp[-1];
 		if (!p1) {
 			size_t *auxv, aux[AUX_CNT];
-			for (auxv=sp+1+*sp+1; *auxv; auxv++); auxv++;
+			for (auxv=sp+1+*sp+1; *auxv; auxv++)
+				; // Pass
+			auxv++;
 			decode_vec(auxv, aux, AUX_CNT);
 			if (aux[AT_BASE]) ldso.base = (void *)aux[AT_BASE];
 			else ldso.base = (void *)(aux[AT_PHDR] & -4096);
@@ -1521,7 +1521,7 @@ _Noreturn void __dls3(size_t *sp)
 		}
 	}
 	if (app.tls.size) {
-		libc.tls_head = &app.tls;
+		libc.tls_head = tls_tail = &app.tls;
 		app.tls_id = tls_cnt = 1;
 #ifdef TLS_ABOVE_TP
 		app.tls.offset = 0;
@@ -1584,11 +1584,14 @@ _Noreturn void __dls3(size_t *sp)
 	load_deps(&app);
 	make_global(&app);
 
-#ifndef DYNAMIC_IS_RO
-	for (i=0; app.dynv[i]; i+=2)
-		if (app.dynv[i]==DT_DEBUG)
+	for (i=0; app.dynv[i]; i+=2) {
+		if (!DT_DEBUG_INDIRECT && app.dynv[i]==DT_DEBUG)
 			app.dynv[i+1] = (size_t)&debug;
-#endif
+		if (DT_DEBUG_INDIRECT && app.dynv[i]==DT_DEBUG_INDIRECT) {
+			size_t *ptr = (size_t *) app.dynv[i+1];
+			*ptr = (size_t)&debug;
+		}
+	}
 
 	/* The main program must be relocated LAST since it may contin
 	 * copy relocations which depend on libraries' relocations. */
@@ -1733,7 +1736,8 @@ end:
 	return p;
 }
 
-static int invalid_dso_handle(void *h)
+__attribute__((__visibility__("hidden")))
+int __dl_invalid_handle(void *h)
 {
 	struct dso *p;
 	for (p=head; p; p=p->next) if (h==p) return 0;
@@ -1788,7 +1792,7 @@ static void *do_dlsym(struct dso *p, const char *s, void *ra)
 			return def.dso->funcdescs + (def.sym - def.dso->syms);
 		return laddr(def.dso, def.sym->st_value);
 	}
-	if (invalid_dso_handle(p))
+	if (__dl_invalid_handle(p))
 		return 0;
 	if ((ght = p->ghashtab)) {
 		gh = gnu_hash(s);
@@ -1823,7 +1827,7 @@ failed:
 	return 0;
 }
 
-int __dladdr(const void *addr, Dl_info *info)
+int dladdr(const void *addr, Dl_info *info)
 {
 	struct dso *p;
 	Sym *sym, *bestsym;
@@ -1912,68 +1916,14 @@ int dl_iterate_phdr(int(*callback)(struct dl_phdr_info *info, size_t size, void 
 	}
 	return ret;
 }
-#else
-static int invalid_dso_handle(void *h)
-{
-	error("Invalid library handle %p", (void *)h);
-	return 1;
-}
-void *dlopen(const char *file, int mode)
-{
-	error("Dynamic loading not supported");
-	return 0;
-}
-void *__dlsym(void *restrict p, const char *restrict s, void *restrict ra)
-{
-	error("Symbol not found: %s", s);
-	return 0;
-}
-int __dladdr (const void *addr, Dl_info *info)
-{
-	return 0;
-}
-#endif
 
-int __dlinfo(void *dso, int req, void *res)
-{
-	if (invalid_dso_handle(dso)) return -1;
-	if (req != RTLD_DI_LINKMAP) {
-		error("Unsupported request %d", req);
-		return -1;
-	}
-	*(struct link_map **)res = dso;
-	return 0;
-}
-
-char *dlerror()
-{
-	pthread_t self = __pthread_self();
-	if (!self->dlerror_flag) return 0;
-	self->dlerror_flag = 0;
-	char *s = self->dlerror_buf;
-	if (s == (void *)-1)
-		return "Dynamic linker failed to allocate memory for error message";
-	else
-		return s;
-}
-
-int dlclose(void *p)
-{
-	return invalid_dso_handle(p);
-}
-
-void __dl_thread_cleanup(void)
-{
-	pthread_t self = __pthread_self();
-	if (self->dlerror_buf != (void *)-1)
-		free(self->dlerror_buf);
-}
+__attribute__((__visibility__("hidden")))
+void __dl_vseterr(const char *, va_list);
 
 static void error(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-#ifdef SHARED
 	if (!runtime) {
 		vdprintf(2, fmt, ap);
 		dprintf(2, "\n");
@@ -1981,20 +1931,6 @@ static void error(const char *fmt, ...)
 		va_end(ap);
 		return;
 	}
-#endif
-	pthread_t self = __pthread_self();
-	if (self->dlerror_buf != (void *)-1)
-		free(self->dlerror_buf);
-	size_t len = vsnprintf(0, 0, fmt, ap);
+	__dl_vseterr(fmt, ap);
 	va_end(ap);
-	char *buf = malloc(len+1);
-	if (buf) {
-		va_start(ap, fmt);
-		vsnprintf(buf, len+1, fmt, ap);
-		va_end(ap);
-	} else {
-		buf = (void *)-1;	
-	}
-	self->dlerror_buf = buf;
-	self->dlerror_flag = 1;
 }
