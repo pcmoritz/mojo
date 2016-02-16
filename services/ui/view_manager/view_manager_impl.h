@@ -19,14 +19,14 @@ class ViewManagerImpl : public mojo::ui::ViewManager {
 
  private:
   // |ViewManager|:
-  void RegisterView(
-      mojo::InterfaceHandle<mojo::ui::View> view,
-      mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
+  void CreateView(
+      mojo::InterfaceRequest<mojo::ui::View> view_request,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      mojo::InterfaceHandle<mojo::ui::ViewListener> view_listener,
       const mojo::String& label) override;
-  void RegisterViewTree(
-      mojo::InterfaceHandle<mojo::ui::ViewTree> view_tree,
-      mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+  void CreateViewTree(
+      mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+      mojo::InterfaceHandle<mojo::ui::ViewTreeListener> view_tree_listener,
       const mojo::String& label) override;
 
   ViewRegistry* registry_;

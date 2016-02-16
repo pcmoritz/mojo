@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_UI_VIEW_MANAGER_VIEW_HOST_IMPL_H_
-#define SERVICES_UI_VIEW_MANAGER_VIEW_HOST_IMPL_H_
+#ifndef SERVICES_UI_VIEW_MANAGER_VIEW_IMPL_H_
+#define SERVICES_UI_VIEW_MANAGER_VIEW_IMPL_H_
 
 #include "base/macros.h"
 #include "mojo/common/binding_set.h"
@@ -14,18 +14,18 @@ namespace view_manager {
 class ViewRegistry;
 class ViewState;
 
-// ViewHost interface implementation.
+// View interface implementation.
 // This object is owned by its associated ViewState.
-class ViewHostImpl : public mojo::ui::ViewHost,
-                     public mojo::ui::ViewOwner,
-                     public mojo::ServiceProvider {
+class ViewImpl : public mojo::ui::View,
+                 public mojo::ui::ViewOwner,
+                 public mojo::ServiceProvider {
  public:
-  ViewHostImpl(ViewRegistry* registry, ViewState* state);
-  ~ViewHostImpl() override;
+  ViewImpl(ViewRegistry* registry, ViewState* state);
+  ~ViewImpl() override;
 
  private:
-  // |ViewHost|:
-  void GetToken(const mojo::ui::ViewHost::GetTokenCallback& callback) override;
+  // |View|:
+  void GetToken(const mojo::ui::View::GetTokenCallback& callback) override;
   void GetServiceProvider(mojo::InterfaceRequest<mojo::ServiceProvider>
                               service_provider_request) override;
   void CreateScene(
@@ -49,9 +49,9 @@ class ViewHostImpl : public mojo::ui::ViewHost,
   ViewState* const state_;
   mojo::BindingSet<mojo::ServiceProvider> service_provider_bindings_;
 
-  DISALLOW_COPY_AND_ASSIGN(ViewHostImpl);
+  DISALLOW_COPY_AND_ASSIGN(ViewImpl);
 };
 
 }  // namespace view_manager
 
-#endif  // SERVICES_UI_VIEW_MANAGER_VIEW_HOST_IMPL_H_
+#endif  // SERVICES_UI_VIEW_MANAGER_VIEW_IMPL_H_

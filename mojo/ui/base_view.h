@@ -18,13 +18,13 @@
 namespace mojo {
 namespace ui {
 
-// Abstract base implementation of the View interface for simple applications.
+// Abstract base implementation of a view for simple applications.
 // Subclasses must handle layout and provide content for the scene by
-// implementing the methods of the |View| mojom interface.
+// implementing the methods of the |ViewListener| mojom interface.
 //
 // It is not necessary to use this class to implement all Views.
 // This class is merely intended to make the simple apps easier to write.
-class BaseView : public mojo::ui::View {
+class BaseView : public mojo::ui::ViewListener {
  public:
   // TODO(jeffbrown): Consider switching this over to an ApplicationConnector
   // but having ApplicationImpl is handy for simple examples.
@@ -40,8 +40,8 @@ class BaseView : public mojo::ui::View {
   // Gets the view manager.
   mojo::ui::ViewManager* view_manager() { return view_manager_.get(); }
 
-  // Gets the view host for the view.
-  mojo::ui::ViewHost* view_host() { return view_host_.get(); }
+  // Gets the underlying view interface.
+  mojo::ui::View* view() { return view_.get(); }
 
   // Gets the service provider for the view.
   mojo::ServiceProvider* view_service_provider() {
@@ -56,16 +56,16 @@ class BaseView : public mojo::ui::View {
   // This is useful if the scene will be rendered by a separate component.
   mojo::gfx::composition::ScenePtr TakeScene() { return scene_.Pass(); }
 
-  // |View|:
+  // |ViewListener|:
   void OnChildUnavailable(uint32_t child_key,
                           const OnChildUnavailableCallback& callback) override;
 
  private:
   mojo::ApplicationImpl* app_impl_;
 
-  mojo::StrongBinding<mojo::ui::View> view_binding_;
+  mojo::StrongBinding<mojo::ui::ViewListener> view_listener_binding_;
   mojo::ui::ViewManagerPtr view_manager_;
-  mojo::ui::ViewHostPtr view_host_;
+  mojo::ui::ViewPtr view_;
   mojo::ServiceProviderPtr view_service_provider_;
   mojo::gfx::composition::ScenePtr scene_;
 

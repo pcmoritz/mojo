@@ -7,37 +7,36 @@
 #include "base/bind.h"
 #include "base/logging.h"
 #include "base/strings/stringprintf.h"
-#include "services/ui/view_manager/view_host_impl.h"
+#include "services/ui/view_manager/view_impl.h"
 #include "services/ui/view_manager/view_registry.h"
 #include "services/ui/view_manager/view_stub.h"
 
 namespace view_manager {
 
-ViewState::ViewState(
-    ViewRegistry* registry,
-    mojo::ui::ViewPtr view,
-    mojo::ui::ViewTokenPtr view_token,
-    mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
-    const std::string& label)
-    : view_(view.Pass()),
-      view_token_(view_token.Pass()),
+ViewState::ViewState(ViewRegistry* registry,
+                     mojo::ui::ViewTokenPtr view_token,
+                     mojo::InterfaceRequest<mojo::ui::View> view_request,
+                     mojo::ui::ViewListenerPtr view_listener,
+                     const std::string& label)
+    : view_token_(view_token.Pass()),
+      view_listener_(view_listener.Pass()),
       label_(label),
-      impl_(new ViewHostImpl(registry, this)),
-      host_binding_(impl_.get(), view_host_request.Pass()),
+      impl_(new ViewImpl(registry, this)),
+      view_binding_(impl_.get(), view_request.Pass()),
       owner_binding_(impl_.get()),
       weak_factory_(this) {
-  DCHECK(view_);
   DCHECK(view_token_);
+  DCHECK(view_listener_);
 
-  view_.set_connection_error_handler(
+  view_binding_.set_connection_error_handler(
       base::Bind(&ViewRegistry::OnViewDied, base::Unretained(registry),
                  base::Unretained(this), "View connection closed"));
-  host_binding_.set_connection_error_handler(
-      base::Bind(&ViewRegistry::OnViewDied, base::Unretained(registry),
-                 base::Unretained(this), "ViewHost connection closed"));
   owner_binding_.set_connection_error_handler(
       base::Bind(&ViewRegistry::OnViewDied, base::Unretained(registry),
                  base::Unretained(this), "ViewOwner connection closed"));
+  view_listener_.set_connection_error_handler(
+      base::Bind(&ViewRegistry::OnViewDied, base::Unretained(registry),
+                 base::Unretained(this), "ViewListener connection closed"));
 }
 
 ViewState::~ViewState() {}

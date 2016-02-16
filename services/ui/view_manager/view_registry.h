@@ -41,24 +41,24 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   // VIEW MANAGER REQUESTS
 
-  // Registers a view and returns its ViewToken.
-  void RegisterView(
-      mojo::ui::ViewPtr view,
-      mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
+  // Creates a view and returns its ViewToken.
+  void CreateView(
+      mojo::InterfaceRequest<mojo::ui::View> view_request,
       mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+      mojo::ui::ViewListenerPtr view_listener,
       const mojo::String& label);
 
-  // Registers a view tree.
-  void RegisterViewTree(
-      mojo::ui::ViewTreePtr view_tree,
-      mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+  // Creates a view tree.
+  void CreateViewTree(
+      mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+      mojo::ui::ViewTreeListenerPtr view_tree_listener,
       const mojo::String& label);
 
   // VIEW STUB REQUESTS
 
   void OnViewResolved(ViewStub* view_stub, mojo::ui::ViewTokenPtr view_token);
 
-  // VIEW HOST REQUESTS
+  // VIEW REQUESTS
 
   // Creates a scene for the view, replacing its current scene.
   // Destroys |view_state| if an error occurs.
@@ -98,7 +98,7 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   // Called when one of the view pipes is closed remotely.
   void OnViewDied(ViewState* view_state, const std::string& reason);
 
-  // VIEW TREE HOST REQUESTS
+  // VIEW TREE REQUESTS
 
   // Requests layout.
   // Destroys |tree_state| if an error occurs.

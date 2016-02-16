@@ -42,7 +42,7 @@ void TileView::ConnectViews() {
     mojo::ui::ViewOwnerPtr child_view_owner;
     provider->CreateView(mojo::GetProxy(&child_view_owner), nullptr, nullptr);
 
-    view_host()->AddChild(child_key, child_view_owner.Pass());
+    view()->AddChild(child_key, child_view_owner.Pass());
     views_.emplace(std::make_pair(
         child_key, std::unique_ptr<ViewData>(new ViewData(url, child_key))));
 
@@ -60,7 +60,7 @@ void TileView::OnChildUnavailable(uint32_t child_key,
   std::unique_ptr<ViewData> view_data = std::move(it->second);
   views_.erase(it);
 
-  view_host()->RemoveChild(child_key, nullptr);
+  view()->RemoveChild(child_key, nullptr);
 
   if (view_data->layout_pending) {
     DCHECK(pending_child_layout_count_);
@@ -125,9 +125,9 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
       view_data->layout_params = params.Clone();
       view_data->layout_info.reset();
 
-      view_host()->LayoutChild(it->first, params.Pass(),
-                               base::Bind(&TileView::OnChildLayoutFinished,
-                                          base::Unretained(this), it->first));
+      view()->LayoutChild(it->first, params.Pass(),
+                          base::Bind(&TileView::OnChildLayoutFinished,
+                                     base::Unretained(this), it->first));
     }
   }
 

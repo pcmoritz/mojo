@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_UI_VIEW_MANAGER_VIEW_TREE_HOST_IMPL_H_
-#define SERVICES_UI_VIEW_MANAGER_VIEW_TREE_HOST_IMPL_H_
+#ifndef SERVICES_UI_VIEW_MANAGER_VIEW_TREE_IMPL_H_
+#define SERVICES_UI_VIEW_MANAGER_VIEW_TREE_IMPL_H_
 
 #include "base/macros.h"
 #include "mojo/common/binding_set.h"
@@ -14,16 +14,15 @@ namespace view_manager {
 class ViewRegistry;
 class ViewTreeState;
 
-// ViewTreeHost interface implementation.
+// ViewTree interface implementation.
 // This object is owned by its associated ViewTreeState.
-class ViewTreeHostImpl : public mojo::ui::ViewTreeHost,
-                         public mojo::ServiceProvider {
+class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
  public:
-  ViewTreeHostImpl(ViewRegistry* registry, ViewTreeState* state);
-  ~ViewTreeHostImpl() override;
+  ViewTreeImpl(ViewRegistry* registry, ViewTreeState* state);
+  ~ViewTreeImpl() override;
 
  private:
-  // |ViewTreeHost|:
+  // |ViewTree|:
   void GetToken(const GetTokenCallback& callback) override;
   void GetServiceProvider(
       mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) override;
@@ -44,9 +43,9 @@ class ViewTreeHostImpl : public mojo::ui::ViewTreeHost,
   ViewTreeState* const state_;
   mojo::BindingSet<mojo::ServiceProvider> service_provider_bindings_;
 
-  DISALLOW_COPY_AND_ASSIGN(ViewTreeHostImpl);
+  DISALLOW_COPY_AND_ASSIGN(ViewTreeImpl);
 };
 
 }  // namespace view_manager
 
-#endif  // SERVICES_UI_VIEW_MANAGER_VIEW_TREE_HOST_IMPL_H_
+#endif  // SERVICES_UI_VIEW_MANAGER_VIEW_TREE_IMPL_H_

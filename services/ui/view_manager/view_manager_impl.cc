@@ -6,8 +6,8 @@
 
 #include <utility>
 
-#include "services/ui/view_manager/view_host_impl.h"
-#include "services/ui/view_manager/view_tree_host_impl.h"
+#include "services/ui/view_manager/view_impl.h"
+#include "services/ui/view_manager/view_tree_impl.h"
 
 namespace view_manager {
 
@@ -16,23 +16,24 @@ ViewManagerImpl::ViewManagerImpl(ViewRegistry* registry)
 
 ViewManagerImpl::~ViewManagerImpl() {}
 
-void ViewManagerImpl::RegisterView(
-    mojo::InterfaceHandle<mojo::ui::View> view,
-    mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
+void ViewManagerImpl::CreateView(
+    mojo::InterfaceRequest<mojo::ui::View> view_request,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+    mojo::InterfaceHandle<mojo::ui::ViewListener> view_listener,
     const mojo::String& label) {
-  registry_->RegisterView(mojo::ui::ViewPtr::Create(std::move(view)),
-                          view_host_request.Pass(), view_owner_request.Pass(),
-                          label);
+  registry_->CreateView(
+      view_request.Pass(), view_owner_request.Pass(),
+      mojo::ui::ViewListenerPtr::Create(std::move(view_listener)), label);
 }
 
-void ViewManagerImpl::RegisterViewTree(
-    mojo::InterfaceHandle<mojo::ui::ViewTree> view_tree,
-    mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+void ViewManagerImpl::CreateViewTree(
+    mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+    mojo::InterfaceHandle<mojo::ui::ViewTreeListener> view_tree_listener,
     const mojo::String& label) {
-  registry_->RegisterViewTree(
-      mojo::ui::ViewTreePtr::Create(std::move(view_tree)),
-      view_tree_host_request.Pass(), label);
+  registry_->CreateViewTree(
+      view_tree_request.Pass(),
+      mojo::ui::ViewTreeListenerPtr::Create(std::move(view_tree_listener)),
+      label);
 }
 
 }  // namespace view_manager

@@ -45,72 +45,70 @@ interface ViewOwner {
 // within its bounds to form a composite user interface.  The hierarchy
 // of views thus formed is called a view tree.
 //
-// A view must registered with the view manager before it can be shown.
-interface View {
-  // Called when the view needs to update its layout and provide its size.
-  //
-  // This method may be called for one or more of the following reasons:
-  //
-  //   1. The view called RequestLayout() to mark itself as needing layout.
-  //   2. The view's parent called LayoutChild() for the first time to
-  //      provide layout parameters to this view.
-  //   3. The view's parent called LayoutChild() and provided a
-  //      set of layout parameters which differ from its prior call to
-  //      OnLayout().
-  //   4. One or more of the view's children were just added to the view
-  //      tree using AddChild() or removed from the tree using RemoveChild().
-  //   5. One or more of the view's children produced different layout
-  //      information during their last layout pass causing a recursive
-  //      layout to occur.
-  //
-  // The |children_needing_layout| array includes the keys of all children
-  // which require a layout.  The view is responsible for calling LayoutChild()
-  // at least once for each child in the array in addition to any other
-  // children which might also need to be updated.
-  //
-  // Layout requests are coalesced for efficiency.  Certain intermediate
-  // updates may be dropped if the view is unable to keep up with them
-  // in a timely manner.  Do nothing updates are always dropped.
-  //
-  // The implementation should invoke the callback once the event has
-  // been handled and the view is ready to be shown in its new aspect.
-  //
-  // The result of the layout may cause the parent's layout to be invalidated.
-  // When this happens, the parent's own OnLayout() method will be called
-  // and will be informed that this child needs layout.
-  //
-  // Recursive layout happens in any of the following circumstances:
-  //
-  //   1. If the resulting scene has changed since the last layout.
-  //   2. If the resulting size has changed since the last layout.
-  //
-  // It is an error to return a malformed |result| which does not satisfy
-  // the requested |layout_params|, such as by returning a size which
-  // exceeds the requested constraints; the view's connection will be closed.
-  OnLayout(mojo.ui.ViewLayoutParams layout_params,
-    array<uint32> children_needing_layout) => (mojo.ui.ViewLayoutResult result);
-
-  // Called when a child view has become unavailable.
-  //
-  // A child may become unavailable for many reasons such being unregistered
-  // by its application, abnormal termination of its application, or
-  // cycles being introduced in the view tree.
-  //
-  // To complete removal of an unavailable child, this view component must
-  // call RemoveChild() on its view host with |child_key|.
-  //
-  // The implementation should invoke the callback once the event has
-  // been handled.
-  OnChildUnavailable(uint32 child_key) => ();
-};
-
-// The view host provides an interface for a view to configure itself and
-// interact with its local environment, such as adding and removing
-// children and specifying layout constraints.
+// LIFECYCLE
 //
-// Each view obtains its own view host when registered with the ViewManager.
-// To unregister the view, close its view host message pipe.
-interface ViewHost {
+// Use |ViewManager.CreateView()| to create a view.  The application
+// uses the |View| interface to manage the view's content and implements
+// the |ViewListener| interface to handle events.
+//
+// To destroy a view, simply close the |View| message pipe.
+//
+// SCENES
+//
+// Each view must provide content for its main scene, created using the
+// |View.CreateScene()| interface.  To perform graphical composition of
+// other components, the view's main scene may contain references to
+// scenes belonging to child views or scenes created by other application
+// components which interact with the compositor.
+//
+// See |mojo.gfx.compositor.Scene| for more information.
+//
+// EMBEDDING
+//
+// The following steps are required to embed another view into your own:
+//
+// 1. Obtain the |ViewOwner| belonging to the view you would like to embed.
+//    The means for doing this is not specified by the view system.
+//    You might create another view of your own to embed or connect to
+//    another application using a mechanism such as |ViewProvider| (or
+//    any suitable agreed-upon protocol) to create the view to embed.
+//
+// 2. Call |AddChild()| to add the view you would like to embed and assign
+//    it a unique key.
+//
+// 3. Call |LayoutChild()| to provide layout parameters for the new child
+//    using the key that was provided.
+//
+// 4. After obtaining the layout result from the child, publish an
+//    update to your |Scene| which includes a reference to the child's own
+//    scene using the |SceneToken| included in the layout result.
+//
+// 5. Watch for the child becoming unavailable, as reported by
+//    |OnChildUnavailable()|, which indicates that the child is no longer
+//    in a usable state (perhaps the application which provided it has
+//    stopped).  When this happens, you are still responsible for calling
+//    |RemoveChild()| to remove the child and discard any state that your
+//    view has associated with it.
+//
+// LAYOUT
+//
+// TODO(jeffbrown): Elaborate this once the layout protocol has been
+// redesigned.
+//
+// GETTING SERVICES
+//
+// The view's |ServiceProvider| offers access to many services which
+// are not directly expressed by the |View| interface itself, such
+// as input, accessiblity, and editing capabilities.
+//
+// For example, perform the following actions to receive input events:
+//
+// 1. Call |GetServiceProvider()| to obtain the view's service provider.
+//
+// 2. Ask the service provider for its |mojo.ui.InputConnection|.
+//
+// 3. Set listeners on the input connection to receive events.
+interface View {
   // Gets the view's token.
   GetToken() => (ViewToken token);
 
@@ -198,4 +196,63 @@ interface ViewHost {
   // as invalid size constraints; the connection will be closed.
   LayoutChild(uint32 child_key, mojo.ui.ViewLayoutParams child_layout_params)
       => (mojo.ui.ViewLayoutInfo? info);
+};
+
+// An interface clients may implement to receive events from a view.
+interface ViewListener {
+  // Called when the view needs to update its layout and provide its size.
+  //
+  // This method may be called for one or more of the following reasons:
+  //
+  //   1. The view called RequestLayout() to mark itself as needing layout.
+  //   2. The view's parent called LayoutChild() for the first time to
+  //      provide layout parameters to this view.
+  //   3. The view's parent called LayoutChild() and provided a
+  //      set of layout parameters which differ from its prior call to
+  //      OnLayout().
+  //   4. One or more of the view's children were just added to the view
+  //      tree using AddChild() or removed from the tree using RemoveChild().
+  //   5. One or more of the view's children produced different layout
+  //      information during their last layout pass causing a recursive
+  //      layout to occur.
+  //
+  // The |children_needing_layout| array includes the keys of all children
+  // which require a layout.  The view is responsible for calling LayoutChild()
+  // at least once for each child in the array in addition to any other
+  // children which might also need to be updated.
+  //
+  // Layout requests are coalesced for efficiency.  Certain intermediate
+  // updates may be dropped if the view is unable to keep up with them
+  // in a timely manner.  Do nothing updates are always dropped.
+  //
+  // The implementation should invoke the callback once the event has
+  // been handled and the view is ready to be shown in its new aspect.
+  //
+  // The result of the layout may cause the parent's layout to be invalidated.
+  // When this happens, the parent's own OnLayout() method will be called
+  // and will be informed that this child needs layout.
+  //
+  // Recursive layout happens in any of the following circumstances:
+  //
+  //   1. If the resulting scene has changed since the last layout.
+  //   2. If the resulting size has changed since the last layout.
+  //
+  // It is an error to return a malformed |result| which does not satisfy
+  // the requested |layout_params|, such as by returning a size which
+  // exceeds the requested constraints; the view's connection will be closed.
+  OnLayout(mojo.ui.ViewLayoutParams layout_params,
+    array<uint32> children_needing_layout) => (mojo.ui.ViewLayoutResult result);
+
+  // Called when a child view has become unavailable.
+  //
+  // A child may become unavailable for many reasons such being unregistered
+  // by its application, abnormal termination of its application, or
+  // cycles being introduced in the view tree.
+  //
+  // To complete removal of an unavailable child, this view component must
+  // call RemoveChild() on its view with |child_key|.
+  //
+  // The implementation should invoke the callback once the event has
+  // been handled.
+  OnChildUnavailable(uint32 child_key) => ();
 };

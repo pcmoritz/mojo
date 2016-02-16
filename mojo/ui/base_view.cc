@@ -13,16 +13,16 @@ BaseView::BaseView(
     mojo::ApplicationImpl* app_impl,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     const std::string& label)
-    : app_impl_(app_impl), view_binding_(this) {
+    : app_impl_(app_impl), view_listener_binding_(this) {
   DCHECK(app_impl_);
   app_impl_->ConnectToService("mojo:view_manager_service", &view_manager_);
 
-  mojo::ui::ViewPtr view;
-  view_binding_.Bind(mojo::GetProxy(&view));
-  view_manager_->RegisterView(view.Pass(), mojo::GetProxy(&view_host_),
-                              view_owner_request.Pass(), label);
-  view_host_->CreateScene(mojo::GetProxy(&scene_));
-  view_host_->GetServiceProvider(mojo::GetProxy(&view_service_provider_));
+  mojo::ui::ViewListenerPtr view_listener;
+  view_listener_binding_.Bind(mojo::GetProxy(&view_listener));
+  view_manager_->CreateView(mojo::GetProxy(&view_), view_owner_request.Pass(),
+                            view_listener.Pass(), label);
+  view_->CreateScene(mojo::GetProxy(&scene_));
+  view_->GetServiceProvider(mojo::GetProxy(&view_service_provider_));
 }
 
 BaseView::~BaseView() {}

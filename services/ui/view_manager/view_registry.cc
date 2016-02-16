@@ -10,8 +10,8 @@
 #include "base/bind.h"
 #include "base/bind_helpers.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
-#include "services/ui/view_manager/view_host_impl.h"
-#include "services/ui/view_manager/view_tree_host_impl.h"
+#include "services/ui/view_manager/view_impl.h"
+#include "services/ui/view_manager/view_tree_impl.h"
 
 namespace view_manager {
 namespace {
@@ -44,31 +44,31 @@ void ViewRegistry::ConnectAssociates(
                                      connection_error_callback);
 }
 
-void ViewRegistry::RegisterView(
-    mojo::ui::ViewPtr view,
-    mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
+void ViewRegistry::CreateView(
+    mojo::InterfaceRequest<mojo::ui::View> view_request,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
+    mojo::ui::ViewListenerPtr view_listener,
     const mojo::String& label) {
-  DCHECK(view);
-  DCHECK(view_host_request.is_pending());
+  DCHECK(view_request.is_pending());
   DCHECK(view_owner_request.is_pending());
+  DCHECK(view_listener);
 
   auto view_token = mojo::ui::ViewToken::New();
   view_token->value = next_view_token_value_++;
   CHECK(view_token->value);
   CHECK(!FindView(view_token->value));
 
-  // Create the state and bind host to it.
+  // Create the state and bind the interfaces to it.
   std::string sanitized_label =
       label.get().substr(0, mojo::ui::kLabelMaxLength);
   ViewState* view_state =
-      new ViewState(this, view.Pass(), view_token.Pass(),
-                    view_host_request.Pass(), sanitized_label);
+      new ViewState(this, view_token.Pass(), view_request.Pass(),
+                    view_listener.Pass(), sanitized_label);
   view_state->BindOwner(view_owner_request.Pass());
 
   // Add to registry and return token.
   views_by_token_.insert({view_state->view_token()->value, view_state});
-  DVLOG(1) << "RegisterView: view=" << view_state;
+  DVLOG(1) << "CreateView: view=" << view_state;
 }
 
 void ViewRegistry::OnViewDied(ViewState* view_state,
@@ -97,29 +97,29 @@ void ViewRegistry::UnregisterView(ViewState* view_state) {
   delete view_state;
 }
 
-void ViewRegistry::RegisterViewTree(
-    mojo::ui::ViewTreePtr view_tree,
-    mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+void ViewRegistry::CreateViewTree(
+    mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+    mojo::ui::ViewTreeListenerPtr view_tree_listener,
     const mojo::String& label) {
-  DCHECK(view_tree);
-  DCHECK(view_tree_host_request.is_pending());
+  DCHECK(view_tree_request.is_pending());
+  DCHECK(view_tree_listener);
 
   auto view_tree_token = mojo::ui::ViewTreeToken::New();
   view_tree_token->value = next_view_tree_token_value_++;
   CHECK(view_tree_token->value);
   CHECK(!FindViewTree(view_tree_token->value));
 
-  // Create the state and bind host to it.
+  // Create the state and bind the interfaces to it.
   std::string sanitized_label =
       label.get().substr(0, mojo::ui::kLabelMaxLength);
   ViewTreeState* tree_state =
-      new ViewTreeState(this, view_tree.Pass(), view_tree_token.Pass(),
-                        view_tree_host_request.Pass(), sanitized_label);
+      new ViewTreeState(this, view_tree_token.Pass(), view_tree_request.Pass(),
+                        view_tree_listener.Pass(), sanitized_label);
 
   // Add to registry.
   view_trees_by_token_.insert(
       {tree_state->view_tree_token()->value, tree_state});
-  DVLOG(1) << "RegisterViewTree: tree=" << tree_state;
+  DVLOG(1) << "CreateViewTree: tree=" << tree_state;
 }
 
 void ViewRegistry::OnViewTreeDied(ViewTreeState* tree_state,
@@ -585,7 +585,7 @@ void ViewRegistry::IssueNextViewLayoutRequest(ViewState* view_state) {
 
   // TODO: Detect ANRs
   DVLOG(1) << "IssueNextViewLayoutRequest: view_state=" << view_state;
-  view_state->view()->OnLayout(
+  view_state->view_listener()->OnLayout(
       request->layout_params()->Clone(),
       mojo::Array<uint32_t>::From(view_state->children_needing_layout()),
       base::Bind(&ViewRegistry::OnViewLayoutResult, base::Unretained(this),
@@ -603,7 +603,7 @@ void ViewRegistry::IssueNextViewTreeLayoutRequest(ViewTreeState* tree_state) {
 
   // TODO: Detect ANRs
   DVLOG(1) << "SendViewTreeLayoutRequest";
-  tree_state->view_tree()->OnLayout(
+  tree_state->view_tree_listener()->OnLayout(
       base::Bind(&ViewRegistry::OnViewTreeLayoutResult, base::Unretained(this),
                  tree_state->GetWeakPtr()));
   tree_state->set_layout_request_pending(false);
@@ -690,8 +690,8 @@ void ViewRegistry::SendChildUnavailable(ViewState* parent_state,
   // TODO: Detect ANRs
   DVLOG(1) << "SendChildUnavailable: parent_state=" << parent_state
            << ", child_key=" << child_key;
-  parent_state->view()->OnChildUnavailable(child_key,
-                                           base::Bind(&base::DoNothing));
+  parent_state->view_listener()->OnChildUnavailable(
+      child_key, base::Bind(&base::DoNothing));
 }
 
 void ViewRegistry::SendRootUnavailable(ViewTreeState* tree_state,
@@ -701,8 +701,8 @@ void ViewRegistry::SendRootUnavailable(ViewTreeState* tree_state,
   // TODO: Detect ANRs
   DVLOG(1) << "SendRootUnavailable: tree_state=" << tree_state
            << ", root_key=" << root_key;
-  tree_state->view_tree()->OnRootUnavailable(root_key,
-                                             base::Bind(&base::DoNothing));
+  tree_state->view_tree_listener()->OnRootUnavailable(
+      root_key, base::Bind(&base::DoNothing));
 }
 
 }  // namespace view_manager

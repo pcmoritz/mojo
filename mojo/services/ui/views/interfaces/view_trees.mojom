@@ -25,43 +25,43 @@ struct ViewTreeToken {
 };
 
 // A view tree is a top-level container for a hierarchy of views.
+// Each view is intended to operate independently from others and will
+// generally correspond to discrete interactive spaces such as separate
+// displays or isolated environments in a multi-user system.
 //
-// A view tree must registered with the view manager before it can be shown.
+// Within a view tree, certain global invariants may be enforced such as
+// ensuring that only one view has focus at a time.
+//
+// View trees will typically be created by system components responsible
+// for managing the overall user interface rather than end-user applications.
+//
+// LIFECYCLE
+//
+// Use |ViewManager.CreateViewTree()| to create a view tree.  The client
+// uses the |ViewTree| interface to manage the view tree's content
+// and implements the |ViewTreeListener| interface to handle events.
+//
+// To destroy a view tree, simply close the |ViewTree| message pipe.
+//
+// LAYOUT
+//
+// TODO(jeffbrown): Elaborate this once the layout protocol has been
+// redesigned.
+//
+// GETTING SERVICES
+//
+// The view tree's |ServiceProvider| offers access to many services which
+// are not directly expressed by the |ViewTree| interface itself, such
+// as input, accessiblity, and editing capabilities.
+//
+// For example, perform the following actions to dispatch input events:
+//
+// 1. Call |GetServiceProvider()| to obtain the view's service provider.
+//
+// 2. Ask the service provider for its |mojo.ui.InputDispatcher|.
+//
+// 3. Send input events to the dispatcher for delivery to views.
 interface ViewTree {
-  // Called when the tree needs to update its layout.
-  //
-  // This method may be called for one or more of the following reasons:
-  //
-  //   1. The root was just set.
-  //   2. The root produced different layout information during its last
-  //      layout pass causing a recursive layout to occur.
-  //
-  // Layout requests are coalesced for efficiency.  Certain intermediate
-  // updates may be dropped if the view tree is unable to keep up with them
-  // in a timely manner.  Do nothing updates are always dropped.
-  //
-  // The implementation should invoke the callback once the event has
-  // been handled and the view tree is ready to be shown in its new aspect.
-  OnLayout() => ();
-
-  // Called when the root view has become unavailable.
-  //
-  // The root may become unavailable for many reasons such being unregistered
-  // by its application, abnormal termination of its application, or
-  // being reparented into a different view tree.
-  //
-  // The implementation should invoke the callback once the event has
-  // been handled.
-  OnRootUnavailable(uint32 root_key) => ();
-};
-
-// The view tree host provides an interface for a view tree to configure itself
-// and interact with its views.
-//
-// Each view tree obtains its own view tree host when registered with the
-// ViewManager.  To unregister the view tree, close its view tree
-// and/or view tree host message pipes.
-interface ViewTreeHost {
   // Gets the view tree's token.
   GetToken() => (ViewTreeToken token);
 
@@ -124,4 +124,33 @@ interface ViewTreeHost {
   // as invalid size constraints; the connection will be closed.
   LayoutRoot(mojo.ui.ViewLayoutParams root_layout_params) =>
       (mojo.ui.ViewLayoutInfo? info);
+};
+
+// An interface clients may implement to receive events from a view tree.
+interface ViewTreeListener {
+  // Called when the tree needs to update its layout.
+  //
+  // This method may be called for one or more of the following reasons:
+  //
+  //   1. The root was just set.
+  //   2. The root produced different layout information during its last
+  //      layout pass causing a recursive layout to occur.
+  //
+  // Layout requests are coalesced for efficiency.  Certain intermediate
+  // updates may be dropped if the view tree is unable to keep up with them
+  // in a timely manner.  Do nothing updates are always dropped.
+  //
+  // The implementation should invoke the callback once the event has
+  // been handled and the view tree is ready to be shown in its new aspect.
+  OnLayout() => ();
+
+  // Called when the root view has become unavailable.
+  //
+  // The root may become unavailable for many reasons such being unregistered
+  // by its application, abnormal termination of its application, or
+  // being reparented into a different view tree.
+  //
+  // The implementation should invoke the callback once the event has
+  // been handled.
+  OnRootUnavailable(uint32 root_key) => ();
 };

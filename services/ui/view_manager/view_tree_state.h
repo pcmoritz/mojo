@@ -21,32 +21,33 @@ namespace view_manager {
 class ViewRegistry;
 class ViewState;
 class ViewStub;
-class ViewTreeHostImpl;
+class ViewTreeImpl;
 
 // Describes the state of a particular view tree.
 // This object is owned by the ViewRegistry that created it.
 class ViewTreeState {
  public:
-  ViewTreeState(
-      ViewRegistry* registry,
-      mojo::ui::ViewTreePtr view_tree,
-      mojo::ui::ViewTreeTokenPtr view_tree_token,
-      mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
-      const std::string& label);
+  ViewTreeState(ViewRegistry* registry,
+                mojo::ui::ViewTreeTokenPtr view_tree_token,
+                mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+                mojo::ui::ViewTreeListenerPtr view_tree_listener,
+                const std::string& label);
   ~ViewTreeState();
 
   base::WeakPtr<ViewTreeState> GetWeakPtr() {
     return weak_factory_.GetWeakPtr();
   }
 
-  // Gets the view tree interface, never null.
-  // Caller does not obtain ownership of the view tree.
-  mojo::ui::ViewTree* view_tree() const { return view_tree_.get(); }
-
   // Gets the token used to refer to this view tree globally.
   // Caller does not obtain ownership of the token.
   mojo::ui::ViewTreeToken* view_tree_token() const {
     return view_tree_token_.get();
+  }
+
+  // Gets the view tree listener interface, never null.
+  // Caller does not obtain ownership of the view tree listener.
+  mojo::ui::ViewTreeListener* view_tree_listener() const {
+    return view_tree_listener_.get();
   }
 
   // Gets the root of the view tree, or null if there is no root.
@@ -72,16 +73,15 @@ class ViewTreeState {
   const std::string& FormattedLabel() const;
 
  private:
-  mojo::ui::ViewTreePtr view_tree_;
   mojo::ui::ViewTreeTokenPtr view_tree_token_;
+  mojo::ui::ViewTreeListenerPtr view_tree_listener_;
 
   const std::string label_;
   mutable std::string formatted_label_cache_;
 
-  std::unique_ptr<ViewTreeHostImpl> impl_;
-  mojo::Binding<mojo::ui::ViewTreeHost> host_binding_;
+  std::unique_ptr<ViewTreeImpl> impl_;
+  mojo::Binding<mojo::ui::ViewTree> view_tree_binding_;
 
-  std::unique_ptr<mojo::ui::ViewTreeHost> view_tree_host_;
   std::unique_ptr<ViewStub> root_;
   bool layout_request_pending_ = false;
   bool layout_request_issued_ = false;

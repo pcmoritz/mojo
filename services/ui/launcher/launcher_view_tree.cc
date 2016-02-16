@@ -28,7 +28,7 @@ LauncherViewTree::LauncherViewTree(
       viewport_metrics_(viewport_metrics.Pass()),
       shutdown_callback_(shutdown_callback),
       scene_listener_binding_(this),
-      view_tree_binding_(this) {
+      view_tree_listener_binding_(this) {
   // Create the renderer.
   compositor_->CreateRenderer(context_provider_.Pass(), GetProxy(&renderer_),
                               "Launcher");
@@ -46,17 +46,16 @@ LauncherViewTree::LauncherViewTree(
       &LauncherViewTree::OnSceneConnectionError, base::Unretained(this)));
 
   // Register the view tree.
-  mojo::ui::ViewTreePtr view_tree;
-  view_tree_binding_.Bind(mojo::GetProxy(&view_tree));
-  view_manager_->RegisterViewTree(view_tree.Pass(),
-                                  mojo::GetProxy(&view_tree_host_), "Launcher");
-  view_tree_host_.set_connection_error_handler(base::Bind(
+  mojo::ui::ViewTreeListenerPtr view_tree_listener;
+  view_tree_listener_binding_.Bind(mojo::GetProxy(&view_tree_listener));
+  view_manager_->CreateViewTree(mojo::GetProxy(&view_tree_),
+                                view_tree_listener.Pass(), "Launcher");
+  view_tree_.set_connection_error_handler(base::Bind(
       &LauncherViewTree::OnViewTreeConnectionError, base::Unretained(this)));
 
   // Get view tree services.
   mojo::ServiceProviderPtr view_tree_service_provider;
-  view_tree_host_->GetServiceProvider(
-      mojo::GetProxy(&view_tree_service_provider));
+  view_tree_->GetServiceProvider(mojo::GetProxy(&view_tree_service_provider));
   mojo::ConnectToService<mojo::ui::InputDispatcher>(
       view_tree_service_provider.get(), &input_dispatcher_);
   input_dispatcher_.set_connection_error_handler(
@@ -68,10 +67,10 @@ LauncherViewTree::~LauncherViewTree() {}
 
 void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
   if (owner) {
-    view_tree_host_->SetRoot(++root_key_, owner.Pass());
+    view_tree_->SetRoot(++root_key_, owner.Pass());
     root_was_set_ = true;
   } else {
-    view_tree_host_->ResetRoot(nullptr);
+    view_tree_->ResetRoot(nullptr);
     root_was_set_ = false;
   }
   root_layout_info_.reset();
@@ -80,7 +79,7 @@ void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
 void LauncherViewTree::SetViewportMetrics(
     mojo::ViewportMetricsPtr viewport_metrics) {
   viewport_metrics_ = viewport_metrics.Pass();
-  view_tree_host_->RequestLayout();
+  view_tree_->RequestLayout();
   SetRootScene();
 }
 
@@ -150,7 +149,7 @@ void LauncherViewTree::LayoutRoot() {
   params->constraints->min_height = viewport_metrics_->size->height;
   params->constraints->max_height = viewport_metrics_->size->height;
   params->device_pixel_ratio = viewport_metrics_->device_pixel_ratio;
-  view_tree_host_->LayoutRoot(
+  view_tree_->LayoutRoot(
       params.Pass(),
       base::Bind(&LauncherViewTree::OnLayoutResult, base::Unretained(this)));
 }

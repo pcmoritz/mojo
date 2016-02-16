@@ -15,7 +15,7 @@
 
 namespace launcher {
 
-class LauncherViewTree : public mojo::ui::ViewTree,
+class LauncherViewTree : public mojo::ui::ViewTreeListener,
                          public mojo::gfx::composition::SceneListener {
  public:
   LauncherViewTree(mojo::gfx::composition::Compositor* compositor,
@@ -65,14 +65,14 @@ class LauncherViewTree : public mojo::ui::ViewTree,
   base::Closure shutdown_callback_;
 
   mojo::Binding<mojo::gfx::composition::SceneListener> scene_listener_binding_;
-  mojo::Binding<mojo::ui::ViewTree> view_tree_binding_;
+  mojo::Binding<mojo::ui::ViewTreeListener> view_tree_listener_binding_;
 
   mojo::gfx::composition::ScenePtr scene_;
   mojo::gfx::composition::SceneTokenPtr scene_token_;
   uint32_t scene_version_ = 1u;
 
   mojo::gfx::composition::RendererPtr renderer_;
-  mojo::ui::ViewTreeHostPtr view_tree_host_;
+  mojo::ui::ViewTreePtr view_tree_;
   mojo::ui::InputDispatcherPtr input_dispatcher_;
 
   uint32_t root_key_ = 0u;

@@ -10,31 +10,31 @@
 #include "services/ui/view_manager/view_registry.h"
 #include "services/ui/view_manager/view_state.h"
 #include "services/ui/view_manager/view_stub.h"
-#include "services/ui/view_manager/view_tree_host_impl.h"
+#include "services/ui/view_manager/view_tree_impl.h"
 
 namespace view_manager {
 
 ViewTreeState::ViewTreeState(
     ViewRegistry* registry,
-    mojo::ui::ViewTreePtr view_tree,
     mojo::ui::ViewTreeTokenPtr view_tree_token,
-    mojo::InterfaceRequest<mojo::ui::ViewTreeHost> view_tree_host_request,
+    mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
+    mojo::ui::ViewTreeListenerPtr view_tree_listener,
     const std::string& label)
-    : view_tree_(view_tree.Pass()),
-      view_tree_token_(view_tree_token.Pass()),
+    : view_tree_token_(view_tree_token.Pass()),
+      view_tree_listener_(view_tree_listener.Pass()),
       label_(label),
-      impl_(new ViewTreeHostImpl(registry, this)),
-      host_binding_(impl_.get(), view_tree_host_request.Pass()),
+      impl_(new ViewTreeImpl(registry, this)),
+      view_tree_binding_(impl_.get(), view_tree_request.Pass()),
       weak_factory_(this) {
-  DCHECK(view_tree_);
   DCHECK(view_tree_token_);
+  DCHECK(view_tree_listener_);
 
-  view_tree_.set_connection_error_handler(
+  view_tree_binding_.set_connection_error_handler(
       base::Bind(&ViewRegistry::OnViewTreeDied, base::Unretained(registry),
                  base::Unretained(this), "ViewTree connection closed"));
-  host_binding_.set_connection_error_handler(
+  view_tree_listener_.set_connection_error_handler(
       base::Bind(&ViewRegistry::OnViewTreeDied, base::Unretained(registry),
-                 base::Unretained(this), "ViewTreeHost connection closed"));
+                 base::Unretained(this), "ViewTreeListener connection closed"));
 }
 
 ViewTreeState::~ViewTreeState() {}

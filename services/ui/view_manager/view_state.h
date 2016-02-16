@@ -20,7 +20,7 @@
 namespace view_manager {
 
 class ViewRegistry;
-class ViewHostImpl;
+class ViewImpl;
 class ViewStub;
 
 // Describes the state of a particular view.
@@ -30,21 +30,21 @@ class ViewState {
   using ChildrenMap = std::unordered_map<uint32_t, std::unique_ptr<ViewStub>>;
 
   ViewState(ViewRegistry* registry,
-            mojo::ui::ViewPtr view,
             mojo::ui::ViewTokenPtr view_token,
-            mojo::InterfaceRequest<mojo::ui::ViewHost> view_host_request,
+            mojo::InterfaceRequest<mojo::ui::View> view_request,
+            mojo::ui::ViewListenerPtr view_listener,
             const std::string& label);
   ~ViewState();
 
   base::WeakPtr<ViewState> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
-  // Gets the view interface, never null.
-  // Caller does not obtain ownership of the view.
-  mojo::ui::View* view() const { return view_.get(); }
-
   // Gets the token used to refer to this view globally.
   // Caller does not obtain ownership of the token.
   mojo::ui::ViewToken* view_token() const { return view_token_.get(); }
+
+  // Gets the view listener interface, never null.
+  // Caller does not obtain ownership of the view listener.
+  mojo::ui::ViewListener* view_listener() const { return view_listener_.get(); }
 
   // Gets or sets the view stub which links this view into the
   // view hierarchy, or null if the view isn't linked anywhere.
@@ -124,14 +124,14 @@ class ViewState {
   const std::string& FormattedLabel() const;
 
  private:
-  mojo::ui::ViewPtr view_;
   mojo::ui::ViewTokenPtr view_token_;
+  mojo::ui::ViewListenerPtr view_listener_;
 
   const std::string label_;
   mutable std::string formatted_label_cache_;
 
-  std::unique_ptr<ViewHostImpl> impl_;
-  mojo::Binding<mojo::ui::ViewHost> host_binding_;
+  std::unique_ptr<ViewImpl> impl_;
+  mojo::Binding<mojo::ui::View> view_binding_;
   mojo::Binding<mojo::ui::ViewOwner> owner_binding_;
 
   ViewStub* view_stub_ = nullptr;

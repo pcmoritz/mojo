@@ -90,14 +90,14 @@ class ViewTreeToken extends bindings.Struct {
 
 
 
-class _ViewTreeOnLayoutParams extends bindings.Struct {
+class _ViewTreeGetTokenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
   ];
 
-  _ViewTreeOnLayoutParams() : super(kVersions.last.size);
+  _ViewTreeGetTokenParams() : super(kVersions.last.size);
 
-  static _ViewTreeOnLayoutParams deserialize(bindings.Message message) {
+  static _ViewTreeGetTokenParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -106,11 +106,11 @@ class _ViewTreeOnLayoutParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeOnLayoutParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeGetTokenParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeOnLayoutParams result = new _ViewTreeOnLayoutParams();
+    _ViewTreeGetTokenParams result = new _ViewTreeGetTokenParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -138,7 +138,7 @@ class _ViewTreeOnLayoutParams extends bindings.Struct {
   }
 
   String toString() {
-    return "_ViewTreeOnLayoutParams("")";
+    return "_ViewTreeGetTokenParams("")";
   }
 
   Map toJson() {
@@ -150,269 +150,15 @@ class _ViewTreeOnLayoutParams extends bindings.Struct {
 
 
 
-class ViewTreeOnLayoutResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  ViewTreeOnLayoutResponseParams() : super(kVersions.last.size);
-
-  static ViewTreeOnLayoutResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewTreeOnLayoutResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewTreeOnLayoutResponseParams result = new ViewTreeOnLayoutResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "ViewTreeOnLayoutResponseParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-
-
-class _ViewTreeOnRootUnavailableParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  int rootKey = 0;
-
-  _ViewTreeOnRootUnavailableParams() : super(kVersions.last.size);
-
-  static _ViewTreeOnRootUnavailableParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewTreeOnRootUnavailableParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewTreeOnRootUnavailableParams result = new _ViewTreeOnRootUnavailableParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.rootKey = decoder0.decodeUint32(8);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeUint32(rootKey, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "rootKey of struct _ViewTreeOnRootUnavailableParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_ViewTreeOnRootUnavailableParams("
-           "rootKey: $rootKey" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["rootKey"] = rootKey;
-    return map;
-  }
-}
-
-
-
-
-class ViewTreeOnRootUnavailableResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  ViewTreeOnRootUnavailableResponseParams() : super(kVersions.last.size);
-
-  static ViewTreeOnRootUnavailableResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewTreeOnRootUnavailableResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewTreeOnRootUnavailableResponseParams result = new ViewTreeOnRootUnavailableResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "ViewTreeOnRootUnavailableResponseParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-
-
-class _ViewTreeHostGetTokenParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _ViewTreeHostGetTokenParams() : super(kVersions.last.size);
-
-  static _ViewTreeHostGetTokenParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewTreeHostGetTokenParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewTreeHostGetTokenParams result = new _ViewTreeHostGetTokenParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_ViewTreeHostGetTokenParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-
-
-class ViewTreeHostGetTokenResponseParams extends bindings.Struct {
+class ViewTreeGetTokenResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   ViewTreeToken token = null;
 
-  ViewTreeHostGetTokenResponseParams() : super(kVersions.last.size);
+  ViewTreeGetTokenResponseParams() : super(kVersions.last.size);
 
-  static ViewTreeHostGetTokenResponseParams deserialize(bindings.Message message) {
+  static ViewTreeGetTokenResponseParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -421,11 +167,11 @@ class ViewTreeHostGetTokenResponseParams extends bindings.Struct {
     return result;
   }
 
-  static ViewTreeHostGetTokenResponseParams decode(bindings.Decoder decoder0) {
+  static ViewTreeGetTokenResponseParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewTreeHostGetTokenResponseParams result = new ViewTreeHostGetTokenResponseParams();
+    ViewTreeGetTokenResponseParams result = new ViewTreeGetTokenResponseParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -459,13 +205,13 @@ class ViewTreeHostGetTokenResponseParams extends bindings.Struct {
       encoder0.encodeStruct(token, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "token of struct ViewTreeHostGetTokenResponseParams: $e";
+          "token of struct ViewTreeGetTokenResponseParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "ViewTreeHostGetTokenResponseParams("
+    return "ViewTreeGetTokenResponseParams("
            "token: $token" ")";
   }
 
@@ -479,15 +225,15 @@ class ViewTreeHostGetTokenResponseParams extends bindings.Struct {
 
 
 
-class _ViewTreeHostGetServiceProviderParams extends bindings.Struct {
+class _ViewTreeGetServiceProviderParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   Object serviceProvider = null;
 
-  _ViewTreeHostGetServiceProviderParams() : super(kVersions.last.size);
+  _ViewTreeGetServiceProviderParams() : super(kVersions.last.size);
 
-  static _ViewTreeHostGetServiceProviderParams deserialize(bindings.Message message) {
+  static _ViewTreeGetServiceProviderParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -496,11 +242,11 @@ class _ViewTreeHostGetServiceProviderParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeHostGetServiceProviderParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeGetServiceProviderParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeHostGetServiceProviderParams result = new _ViewTreeHostGetServiceProviderParams();
+    _ViewTreeGetServiceProviderParams result = new _ViewTreeGetServiceProviderParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -533,13 +279,13 @@ class _ViewTreeHostGetServiceProviderParams extends bindings.Struct {
       encoder0.encodeInterfaceRequest(serviceProvider, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "serviceProvider of struct _ViewTreeHostGetServiceProviderParams: $e";
+          "serviceProvider of struct _ViewTreeGetServiceProviderParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewTreeHostGetServiceProviderParams("
+    return "_ViewTreeGetServiceProviderParams("
            "serviceProvider: $serviceProvider" ")";
   }
 
@@ -552,14 +298,14 @@ class _ViewTreeHostGetServiceProviderParams extends bindings.Struct {
 
 
 
-class _ViewTreeHostRequestLayoutParams extends bindings.Struct {
+class _ViewTreeRequestLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
   ];
 
-  _ViewTreeHostRequestLayoutParams() : super(kVersions.last.size);
+  _ViewTreeRequestLayoutParams() : super(kVersions.last.size);
 
-  static _ViewTreeHostRequestLayoutParams deserialize(bindings.Message message) {
+  static _ViewTreeRequestLayoutParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -568,11 +314,11 @@ class _ViewTreeHostRequestLayoutParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeHostRequestLayoutParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeRequestLayoutParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeHostRequestLayoutParams result = new _ViewTreeHostRequestLayoutParams();
+    _ViewTreeRequestLayoutParams result = new _ViewTreeRequestLayoutParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -600,7 +346,7 @@ class _ViewTreeHostRequestLayoutParams extends bindings.Struct {
   }
 
   String toString() {
-    return "_ViewTreeHostRequestLayoutParams("")";
+    return "_ViewTreeRequestLayoutParams("")";
   }
 
   Map toJson() {
@@ -612,16 +358,16 @@ class _ViewTreeHostRequestLayoutParams extends bindings.Struct {
 
 
 
-class _ViewTreeHostSetRootParams extends bindings.Struct {
+class _ViewTreeSetRootParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
   int rootKey = 0;
   Object rootViewOwner = null;
 
-  _ViewTreeHostSetRootParams() : super(kVersions.last.size);
+  _ViewTreeSetRootParams() : super(kVersions.last.size);
 
-  static _ViewTreeHostSetRootParams deserialize(bindings.Message message) {
+  static _ViewTreeSetRootParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -630,11 +376,11 @@ class _ViewTreeHostSetRootParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeHostSetRootParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeSetRootParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeHostSetRootParams result = new _ViewTreeHostSetRootParams();
+    _ViewTreeSetRootParams result = new _ViewTreeSetRootParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -671,20 +417,20 @@ class _ViewTreeHostSetRootParams extends bindings.Struct {
       encoder0.encodeUint32(rootKey, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "rootKey of struct _ViewTreeHostSetRootParams: $e";
+          "rootKey of struct _ViewTreeSetRootParams: $e";
       rethrow;
     }
     try {
       encoder0.encodeInterface(rootViewOwner, 12, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "rootViewOwner of struct _ViewTreeHostSetRootParams: $e";
+          "rootViewOwner of struct _ViewTreeSetRootParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewTreeHostSetRootParams("
+    return "_ViewTreeSetRootParams("
            "rootKey: $rootKey" ", "
            "rootViewOwner: $rootViewOwner" ")";
   }
@@ -698,15 +444,15 @@ class _ViewTreeHostSetRootParams extends bindings.Struct {
 
 
 
-class _ViewTreeHostResetRootParams extends bindings.Struct {
+class _ViewTreeResetRootParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   Object transferredViewOwner = null;
 
-  _ViewTreeHostResetRootParams() : super(kVersions.last.size);
+  _ViewTreeResetRootParams() : super(kVersions.last.size);
 
-  static _ViewTreeHostResetRootParams deserialize(bindings.Message message) {
+  static _ViewTreeResetRootParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -715,11 +461,11 @@ class _ViewTreeHostResetRootParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeHostResetRootParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeResetRootParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeHostResetRootParams result = new _ViewTreeHostResetRootParams();
+    _ViewTreeResetRootParams result = new _ViewTreeResetRootParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -752,13 +498,13 @@ class _ViewTreeHostResetRootParams extends bindings.Struct {
       encoder0.encodeInterfaceRequest(transferredViewOwner, 8, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "transferredViewOwner of struct _ViewTreeHostResetRootParams: $e";
+          "transferredViewOwner of struct _ViewTreeResetRootParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewTreeHostResetRootParams("
+    return "_ViewTreeResetRootParams("
            "transferredViewOwner: $transferredViewOwner" ")";
   }
 
@@ -771,15 +517,15 @@ class _ViewTreeHostResetRootParams extends bindings.Struct {
 
 
 
-class _ViewTreeHostLayoutRootParams extends bindings.Struct {
+class _ViewTreeLayoutRootParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   layouts_mojom.ViewLayoutParams rootLayoutParams = null;
 
-  _ViewTreeHostLayoutRootParams() : super(kVersions.last.size);
+  _ViewTreeLayoutRootParams() : super(kVersions.last.size);
 
-  static _ViewTreeHostLayoutRootParams deserialize(bindings.Message message) {
+  static _ViewTreeLayoutRootParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -788,11 +534,11 @@ class _ViewTreeHostLayoutRootParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeHostLayoutRootParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeLayoutRootParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeHostLayoutRootParams result = new _ViewTreeHostLayoutRootParams();
+    _ViewTreeLayoutRootParams result = new _ViewTreeLayoutRootParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -826,13 +572,13 @@ class _ViewTreeHostLayoutRootParams extends bindings.Struct {
       encoder0.encodeStruct(rootLayoutParams, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "rootLayoutParams of struct _ViewTreeHostLayoutRootParams: $e";
+          "rootLayoutParams of struct _ViewTreeLayoutRootParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewTreeHostLayoutRootParams("
+    return "_ViewTreeLayoutRootParams("
            "rootLayoutParams: $rootLayoutParams" ")";
   }
 
@@ -846,15 +592,15 @@ class _ViewTreeHostLayoutRootParams extends bindings.Struct {
 
 
 
-class ViewTreeHostLayoutRootResponseParams extends bindings.Struct {
+class ViewTreeLayoutRootResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   layouts_mojom.ViewLayoutInfo info = null;
 
-  ViewTreeHostLayoutRootResponseParams() : super(kVersions.last.size);
+  ViewTreeLayoutRootResponseParams() : super(kVersions.last.size);
 
-  static ViewTreeHostLayoutRootResponseParams deserialize(bindings.Message message) {
+  static ViewTreeLayoutRootResponseParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -863,11 +609,11 @@ class ViewTreeHostLayoutRootResponseParams extends bindings.Struct {
     return result;
   }
 
-  static ViewTreeHostLayoutRootResponseParams decode(bindings.Decoder decoder0) {
+  static ViewTreeLayoutRootResponseParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewTreeHostLayoutRootResponseParams result = new ViewTreeHostLayoutRootResponseParams();
+    ViewTreeLayoutRootResponseParams result = new ViewTreeLayoutRootResponseParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -901,13 +647,13 @@ class ViewTreeHostLayoutRootResponseParams extends bindings.Struct {
       encoder0.encodeStruct(info, 8, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "info of struct ViewTreeHostLayoutRootResponseParams: $e";
+          "info of struct ViewTreeLayoutRootResponseParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "ViewTreeHostLayoutRootResponseParams("
+    return "ViewTreeLayoutRootResponseParams("
            "info: $info" ")";
   }
 
@@ -921,8 +667,266 @@ class ViewTreeHostLayoutRootResponseParams extends bindings.Struct {
 
 
 
-const int _ViewTree_onLayoutName = 0;
-const int _ViewTree_onRootUnavailableName = 1;
+class _ViewTreeListenerOnLayoutParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _ViewTreeListenerOnLayoutParams() : super(kVersions.last.size);
+
+  static _ViewTreeListenerOnLayoutParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewTreeListenerOnLayoutParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewTreeListenerOnLayoutParams result = new _ViewTreeListenerOnLayoutParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_ViewTreeListenerOnLayoutParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class ViewTreeListenerOnLayoutResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  ViewTreeListenerOnLayoutResponseParams() : super(kVersions.last.size);
+
+  static ViewTreeListenerOnLayoutResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewTreeListenerOnLayoutResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewTreeListenerOnLayoutResponseParams result = new ViewTreeListenerOnLayoutResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "ViewTreeListenerOnLayoutResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class _ViewTreeListenerOnRootUnavailableParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  int rootKey = 0;
+
+  _ViewTreeListenerOnRootUnavailableParams() : super(kVersions.last.size);
+
+  static _ViewTreeListenerOnRootUnavailableParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewTreeListenerOnRootUnavailableParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewTreeListenerOnRootUnavailableParams result = new _ViewTreeListenerOnRootUnavailableParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.rootKey = decoder0.decodeUint32(8);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(rootKey, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "rootKey of struct _ViewTreeListenerOnRootUnavailableParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewTreeListenerOnRootUnavailableParams("
+           "rootKey: $rootKey" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["rootKey"] = rootKey;
+    return map;
+  }
+}
+
+
+
+
+class ViewTreeListenerOnRootUnavailableResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  ViewTreeListenerOnRootUnavailableResponseParams() : super(kVersions.last.size);
+
+  static ViewTreeListenerOnRootUnavailableResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewTreeListenerOnRootUnavailableResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewTreeListenerOnRootUnavailableResponseParams result = new ViewTreeListenerOnRootUnavailableResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "ViewTreeListenerOnRootUnavailableResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+const int _ViewTree_getTokenName = 0;
+const int _ViewTree_getServiceProviderName = 1;
+const int _ViewTree_requestLayoutName = 2;
+const int _ViewTree_setRootName = 3;
+const int _ViewTree_resetRootName = 4;
+const int _ViewTree_layoutRootName = 5;
 
 
 
@@ -939,8 +943,12 @@ class _ViewTreeServiceDescription implements service_describer.ServiceDescriptio
 
 abstract class ViewTree {
   static const String serviceName = null;
-  dynamic onLayout([Function responseFactory = null]);
-  dynamic onRootUnavailable(int rootKey,[Function responseFactory = null]);
+  dynamic getToken([Function responseFactory = null]);
+  void getServiceProvider(Object serviceProvider);
+  void requestLayout();
+  void setRoot(int rootKey, Object rootViewOwner);
+  void resetRoot(Object transferredViewOwner);
+  dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]);
 }
 
 
@@ -964,8 +972,8 @@ class _ViewTreeProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewTree_onLayoutName:
-        var r = ViewTreeOnLayoutResponseParams.deserialize(
+      case _ViewTree_getTokenName:
+        var r = ViewTreeGetTokenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -984,8 +992,8 @@ class _ViewTreeProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ViewTree_onRootUnavailableName:
-        var r = ViewTreeOnRootUnavailableResponseParams.deserialize(
+      case _ViewTree_layoutRootName:
+        var r = ViewTreeLayoutRootResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1022,20 +1030,56 @@ class _ViewTreeProxyCalls implements ViewTree {
   _ViewTreeProxyImpl _proxyImpl;
 
   _ViewTreeProxyCalls(this._proxyImpl);
-    dynamic onLayout([Function responseFactory = null]) {
-      var params = new _ViewTreeOnLayoutParams();
+    dynamic getToken([Function responseFactory = null]) {
+      var params = new _ViewTreeGetTokenParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTree_onLayoutName,
+          _ViewTree_getTokenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    dynamic onRootUnavailable(int rootKey,[Function responseFactory = null]) {
-      var params = new _ViewTreeOnRootUnavailableParams();
+    void getServiceProvider(Object serviceProvider) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewTreeGetServiceProviderParams();
+      params.serviceProvider = serviceProvider;
+      _proxyImpl.sendMessage(params, _ViewTree_getServiceProviderName);
+    }
+    void requestLayout() {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewTreeRequestLayoutParams();
+      _proxyImpl.sendMessage(params, _ViewTree_requestLayoutName);
+    }
+    void setRoot(int rootKey, Object rootViewOwner) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewTreeSetRootParams();
       params.rootKey = rootKey;
+      params.rootViewOwner = rootViewOwner;
+      _proxyImpl.sendMessage(params, _ViewTree_setRootName);
+    }
+    void resetRoot(Object transferredViewOwner) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewTreeResetRootParams();
+      params.transferredViewOwner = transferredViewOwner;
+      _proxyImpl.sendMessage(params, _ViewTree_resetRootName);
+    }
+    dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]) {
+      var params = new _ViewTreeLayoutRootParams();
+      params.rootLayoutParams = rootLayoutParams;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTree_onRootUnavailableName,
+          _ViewTree_layoutRootName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1120,12 +1164,14 @@ class ViewTreeStub extends bindings.Stub {
   }
 
 
-  ViewTreeOnLayoutResponseParams _ViewTreeOnLayoutResponseParamsFactory() {
-    var mojo_factory_result = new ViewTreeOnLayoutResponseParams();
+  ViewTreeGetTokenResponseParams _ViewTreeGetTokenResponseParamsFactory(ViewTreeToken token) {
+    var mojo_factory_result = new ViewTreeGetTokenResponseParams();
+    mojo_factory_result.token = token;
     return mojo_factory_result;
   }
-  ViewTreeOnRootUnavailableResponseParams _ViewTreeOnRootUnavailableResponseParamsFactory() {
-    var mojo_factory_result = new ViewTreeOnRootUnavailableResponseParams();
+  ViewTreeLayoutRootResponseParams _ViewTreeLayoutRootResponseParamsFactory(layouts_mojom.ViewLayoutInfo info) {
+    var mojo_factory_result = new ViewTreeLayoutRootResponseParams();
+    mojo_factory_result.info = info;
     return mojo_factory_result;
   }
 
@@ -1137,16 +1183,16 @@ class ViewTreeStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewTree_onLayoutName:
-        var params = _ViewTreeOnLayoutParams.deserialize(
+      case _ViewTree_getTokenName:
+        var params = _ViewTreeGetTokenParams.deserialize(
             message.payload);
-        var response = _impl.onLayout(_ViewTreeOnLayoutResponseParamsFactory);
+        var response = _impl.getToken(_ViewTreeGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTree_onLayoutName,
+                  _ViewTree_getTokenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1154,21 +1200,41 @@ class ViewTreeStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTree_onLayoutName,
+              _ViewTree_getTokenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewTree_onRootUnavailableName:
-        var params = _ViewTreeOnRootUnavailableParams.deserialize(
+      case _ViewTree_getServiceProviderName:
+        var params = _ViewTreeGetServiceProviderParams.deserialize(
             message.payload);
-        var response = _impl.onRootUnavailable(params.rootKey,_ViewTreeOnRootUnavailableResponseParamsFactory);
+        _impl.getServiceProvider(params.serviceProvider);
+        break;
+      case _ViewTree_requestLayoutName:
+        var params = _ViewTreeRequestLayoutParams.deserialize(
+            message.payload);
+        _impl.requestLayout();
+        break;
+      case _ViewTree_setRootName:
+        var params = _ViewTreeSetRootParams.deserialize(
+            message.payload);
+        _impl.setRoot(params.rootKey, params.rootViewOwner);
+        break;
+      case _ViewTree_resetRootName:
+        var params = _ViewTreeResetRootParams.deserialize(
+            message.payload);
+        _impl.resetRoot(params.transferredViewOwner);
+        break;
+      case _ViewTree_layoutRootName:
+        var params = _ViewTreeLayoutRootParams.deserialize(
+            message.payload);
+        var response = _impl.layoutRoot(params.rootLayoutParams,_ViewTreeLayoutRootResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTree_onRootUnavailableName,
+                  _ViewTree_layoutRootName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1176,7 +1242,7 @@ class ViewTreeStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTree_onRootUnavailableName,
+              _ViewTree_layoutRootName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1210,16 +1276,12 @@ class ViewTreeStub extends bindings.Stub {
   }
 }
 
-const int _ViewTreeHost_getTokenName = 0;
-const int _ViewTreeHost_getServiceProviderName = 1;
-const int _ViewTreeHost_requestLayoutName = 2;
-const int _ViewTreeHost_setRootName = 3;
-const int _ViewTreeHost_resetRootName = 4;
-const int _ViewTreeHost_layoutRootName = 5;
+const int _ViewTreeListener_onLayoutName = 0;
+const int _ViewTreeListener_onRootUnavailableName = 1;
 
 
 
-class _ViewTreeHostServiceDescription implements service_describer.ServiceDescription {
+class _ViewTreeListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);
 
@@ -1230,39 +1292,35 @@ class _ViewTreeHostServiceDescription implements service_describer.ServiceDescri
       responseFactory(null);
 }
 
-abstract class ViewTreeHost {
+abstract class ViewTreeListener {
   static const String serviceName = null;
-  dynamic getToken([Function responseFactory = null]);
-  void getServiceProvider(Object serviceProvider);
-  void requestLayout();
-  void setRoot(int rootKey, Object rootViewOwner);
-  void resetRoot(Object transferredViewOwner);
-  dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]);
+  dynamic onLayout([Function responseFactory = null]);
+  dynamic onRootUnavailable(int rootKey,[Function responseFactory = null]);
 }
 
 
-class _ViewTreeHostProxyImpl extends bindings.Proxy {
-  _ViewTreeHostProxyImpl.fromEndpoint(
+class _ViewTreeListenerProxyImpl extends bindings.Proxy {
+  _ViewTreeListenerProxyImpl.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) : super.fromEndpoint(endpoint);
 
-  _ViewTreeHostProxyImpl.fromHandle(core.MojoHandle handle) :
+  _ViewTreeListenerProxyImpl.fromHandle(core.MojoHandle handle) :
       super.fromHandle(handle);
 
-  _ViewTreeHostProxyImpl.unbound() : super.unbound();
+  _ViewTreeListenerProxyImpl.unbound() : super.unbound();
 
-  static _ViewTreeHostProxyImpl newFromEndpoint(
+  static _ViewTreeListenerProxyImpl newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For _ViewTreeHostProxyImpl"));
-    return new _ViewTreeHostProxyImpl.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For _ViewTreeListenerProxyImpl"));
+    return new _ViewTreeListenerProxyImpl.fromEndpoint(endpoint);
   }
 
   service_describer.ServiceDescription get serviceDescription =>
-    new _ViewTreeHostServiceDescription();
+    new _ViewTreeListenerServiceDescription();
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewTreeHost_getTokenName:
-        var r = ViewTreeHostGetTokenResponseParams.deserialize(
+      case _ViewTreeListener_onLayoutName:
+        var r = ViewTreeListenerOnLayoutResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1281,8 +1339,8 @@ class _ViewTreeHostProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ViewTreeHost_layoutRootName:
-        var r = ViewTreeHostLayoutRootResponseParams.deserialize(
+      case _ViewTreeListener_onRootUnavailableName:
+        var r = ViewTreeListenerOnRootUnavailableResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1310,109 +1368,73 @@ class _ViewTreeHostProxyImpl extends bindings.Proxy {
 
   String toString() {
     var superString = super.toString();
-    return "_ViewTreeHostProxyImpl($superString)";
+    return "_ViewTreeListenerProxyImpl($superString)";
   }
 }
 
 
-class _ViewTreeHostProxyCalls implements ViewTreeHost {
-  _ViewTreeHostProxyImpl _proxyImpl;
+class _ViewTreeListenerProxyCalls implements ViewTreeListener {
+  _ViewTreeListenerProxyImpl _proxyImpl;
 
-  _ViewTreeHostProxyCalls(this._proxyImpl);
-    dynamic getToken([Function responseFactory = null]) {
-      var params = new _ViewTreeHostGetTokenParams();
+  _ViewTreeListenerProxyCalls(this._proxyImpl);
+    dynamic onLayout([Function responseFactory = null]) {
+      var params = new _ViewTreeListenerOnLayoutParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTreeHost_getTokenName,
+          _ViewTreeListener_onLayoutName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    void getServiceProvider(Object serviceProvider) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewTreeHostGetServiceProviderParams();
-      params.serviceProvider = serviceProvider;
-      _proxyImpl.sendMessage(params, _ViewTreeHost_getServiceProviderName);
-    }
-    void requestLayout() {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewTreeHostRequestLayoutParams();
-      _proxyImpl.sendMessage(params, _ViewTreeHost_requestLayoutName);
-    }
-    void setRoot(int rootKey, Object rootViewOwner) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewTreeHostSetRootParams();
+    dynamic onRootUnavailable(int rootKey,[Function responseFactory = null]) {
+      var params = new _ViewTreeListenerOnRootUnavailableParams();
       params.rootKey = rootKey;
-      params.rootViewOwner = rootViewOwner;
-      _proxyImpl.sendMessage(params, _ViewTreeHost_setRootName);
-    }
-    void resetRoot(Object transferredViewOwner) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewTreeHostResetRootParams();
-      params.transferredViewOwner = transferredViewOwner;
-      _proxyImpl.sendMessage(params, _ViewTreeHost_resetRootName);
-    }
-    dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]) {
-      var params = new _ViewTreeHostLayoutRootParams();
-      params.rootLayoutParams = rootLayoutParams;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTreeHost_layoutRootName,
+          _ViewTreeListener_onRootUnavailableName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
 }
 
 
-class ViewTreeHostProxy implements bindings.ProxyBase {
+class ViewTreeListenerProxy implements bindings.ProxyBase {
   final bindings.Proxy impl;
-  ViewTreeHost ptr;
+  ViewTreeListener ptr;
 
-  ViewTreeHostProxy(_ViewTreeHostProxyImpl proxyImpl) :
+  ViewTreeListenerProxy(_ViewTreeListenerProxyImpl proxyImpl) :
       impl = proxyImpl,
-      ptr = new _ViewTreeHostProxyCalls(proxyImpl);
+      ptr = new _ViewTreeListenerProxyCalls(proxyImpl);
 
-  ViewTreeHostProxy.fromEndpoint(
+  ViewTreeListenerProxy.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) :
-      impl = new _ViewTreeHostProxyImpl.fromEndpoint(endpoint) {
-    ptr = new _ViewTreeHostProxyCalls(impl);
+      impl = new _ViewTreeListenerProxyImpl.fromEndpoint(endpoint) {
+    ptr = new _ViewTreeListenerProxyCalls(impl);
   }
 
-  ViewTreeHostProxy.fromHandle(core.MojoHandle handle) :
-      impl = new _ViewTreeHostProxyImpl.fromHandle(handle) {
-    ptr = new _ViewTreeHostProxyCalls(impl);
+  ViewTreeListenerProxy.fromHandle(core.MojoHandle handle) :
+      impl = new _ViewTreeListenerProxyImpl.fromHandle(handle) {
+    ptr = new _ViewTreeListenerProxyCalls(impl);
   }
 
-  ViewTreeHostProxy.unbound() :
-      impl = new _ViewTreeHostProxyImpl.unbound() {
-    ptr = new _ViewTreeHostProxyCalls(impl);
+  ViewTreeListenerProxy.unbound() :
+      impl = new _ViewTreeListenerProxyImpl.unbound() {
+    ptr = new _ViewTreeListenerProxyCalls(impl);
   }
 
-  factory ViewTreeHostProxy.connectToService(
+  factory ViewTreeListenerProxy.connectToService(
       bindings.ServiceConnector s, String url, [String serviceName]) {
-    ViewTreeHostProxy p = new ViewTreeHostProxy.unbound();
+    ViewTreeListenerProxy p = new ViewTreeListenerProxy.unbound();
     s.connectToService(url, p, serviceName);
     return p;
   }
 
-  static ViewTreeHostProxy newFromEndpoint(
+  static ViewTreeListenerProxy newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewTreeHostProxy"));
-    return new ViewTreeHostProxy.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewTreeListenerProxy"));
+    return new ViewTreeListenerProxy.fromEndpoint(endpoint);
   }
 
-  String get serviceName => ViewTreeHost.serviceName;
+  String get serviceName => ViewTreeListener.serviceName;
 
   Future close({bool immediate: false}) => impl.close(immediate: immediate);
 
@@ -1429,38 +1451,36 @@ class ViewTreeHostProxy implements bindings.ProxyBase {
   }
 
   String toString() {
-    return "ViewTreeHostProxy($impl)";
+    return "ViewTreeListenerProxy($impl)";
   }
 }
 
 
-class ViewTreeHostStub extends bindings.Stub {
-  ViewTreeHost _impl = null;
+class ViewTreeListenerStub extends bindings.Stub {
+  ViewTreeListener _impl = null;
 
-  ViewTreeHostStub.fromEndpoint(
+  ViewTreeListenerStub.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint, [this._impl])
       : super.fromEndpoint(endpoint);
 
-  ViewTreeHostStub.fromHandle(core.MojoHandle handle, [this._impl])
+  ViewTreeListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
       : super.fromHandle(handle);
 
-  ViewTreeHostStub.unbound() : super.unbound();
+  ViewTreeListenerStub.unbound() : super.unbound();
 
-  static ViewTreeHostStub newFromEndpoint(
+  static ViewTreeListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewTreeHostStub"));
-    return new ViewTreeHostStub.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewTreeListenerStub"));
+    return new ViewTreeListenerStub.fromEndpoint(endpoint);
   }
 
 
-  ViewTreeHostGetTokenResponseParams _ViewTreeHostGetTokenResponseParamsFactory(ViewTreeToken token) {
-    var mojo_factory_result = new ViewTreeHostGetTokenResponseParams();
-    mojo_factory_result.token = token;
+  ViewTreeListenerOnLayoutResponseParams _ViewTreeListenerOnLayoutResponseParamsFactory() {
+    var mojo_factory_result = new ViewTreeListenerOnLayoutResponseParams();
     return mojo_factory_result;
   }
-  ViewTreeHostLayoutRootResponseParams _ViewTreeHostLayoutRootResponseParamsFactory(layouts_mojom.ViewLayoutInfo info) {
-    var mojo_factory_result = new ViewTreeHostLayoutRootResponseParams();
-    mojo_factory_result.info = info;
+  ViewTreeListenerOnRootUnavailableResponseParams _ViewTreeListenerOnRootUnavailableResponseParamsFactory() {
+    var mojo_factory_result = new ViewTreeListenerOnRootUnavailableResponseParams();
     return mojo_factory_result;
   }
 
@@ -1472,16 +1492,16 @@ class ViewTreeHostStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewTreeHost_getTokenName:
-        var params = _ViewTreeHostGetTokenParams.deserialize(
+      case _ViewTreeListener_onLayoutName:
+        var params = _ViewTreeListenerOnLayoutParams.deserialize(
             message.payload);
-        var response = _impl.getToken(_ViewTreeHostGetTokenResponseParamsFactory);
+        var response = _impl.onLayout(_ViewTreeListenerOnLayoutResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTreeHost_getTokenName,
+                  _ViewTreeListener_onLayoutName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1489,41 +1509,21 @@ class ViewTreeHostStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTreeHost_getTokenName,
+              _ViewTreeListener_onLayoutName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewTreeHost_getServiceProviderName:
-        var params = _ViewTreeHostGetServiceProviderParams.deserialize(
+      case _ViewTreeListener_onRootUnavailableName:
+        var params = _ViewTreeListenerOnRootUnavailableParams.deserialize(
             message.payload);
-        _impl.getServiceProvider(params.serviceProvider);
-        break;
-      case _ViewTreeHost_requestLayoutName:
-        var params = _ViewTreeHostRequestLayoutParams.deserialize(
-            message.payload);
-        _impl.requestLayout();
-        break;
-      case _ViewTreeHost_setRootName:
-        var params = _ViewTreeHostSetRootParams.deserialize(
-            message.payload);
-        _impl.setRoot(params.rootKey, params.rootViewOwner);
-        break;
-      case _ViewTreeHost_resetRootName:
-        var params = _ViewTreeHostResetRootParams.deserialize(
-            message.payload);
-        _impl.resetRoot(params.transferredViewOwner);
-        break;
-      case _ViewTreeHost_layoutRootName:
-        var params = _ViewTreeHostLayoutRootParams.deserialize(
-            message.payload);
-        var response = _impl.layoutRoot(params.rootLayoutParams,_ViewTreeHostLayoutRootResponseParamsFactory);
+        var response = _impl.onRootUnavailable(params.rootKey,_ViewTreeListenerOnRootUnavailableResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTreeHost_layoutRootName,
+                  _ViewTreeListener_onRootUnavailableName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1531,7 +1531,7 @@ class ViewTreeHostStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTreeHost_layoutRootName,
+              _ViewTreeListener_onRootUnavailableName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1543,15 +1543,15 @@ class ViewTreeHostStub extends bindings.Stub {
     return null;
   }
 
-  ViewTreeHost get impl => _impl;
-  set impl(ViewTreeHost d) {
+  ViewTreeListener get impl => _impl;
+  set impl(ViewTreeListener d) {
     assert(_impl == null);
     _impl = d;
   }
 
   String toString() {
     var superString = super.toString();
-    return "ViewTreeHostStub($superString)";
+    return "ViewTreeListenerStub($superString)";
   }
 
   int get version => 0;
@@ -1559,7 +1559,7 @@ class ViewTreeHostStub extends bindings.Stub {
   static service_describer.ServiceDescription _cachedServiceDescription;
   static service_describer.ServiceDescription get serviceDescription {
     if (_cachedServiceDescription == null) {
-      _cachedServiceDescription = new _ViewTreeHostServiceDescription();
+      _cachedServiceDescription = new _ViewTreeListenerServiceDescription();
     }
     return _cachedServiceDescription;
   }

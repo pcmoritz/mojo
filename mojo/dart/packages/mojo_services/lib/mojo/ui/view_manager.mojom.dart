@@ -17,18 +17,18 @@ const int kLabelMaxLength = 32;
 
 
 
-class _ViewManagerRegisterViewParams extends bindings.Struct {
+class _ViewManagerCreateViewParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
   ];
   Object view = null;
-  Object viewHost = null;
   Object viewOwner = null;
+  Object viewListener = null;
   String label = null;
 
-  _ViewManagerRegisterViewParams() : super(kVersions.last.size);
+  _ViewManagerCreateViewParams() : super(kVersions.last.size);
 
-  static _ViewManagerRegisterViewParams deserialize(bindings.Message message) {
+  static _ViewManagerCreateViewParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -37,11 +37,11 @@ class _ViewManagerRegisterViewParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewManagerRegisterViewParams decode(bindings.Decoder decoder0) {
+  static _ViewManagerCreateViewParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewManagerRegisterViewParams result = new _ViewManagerRegisterViewParams();
+    _ViewManagerCreateViewParams result = new _ViewManagerCreateViewParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -63,15 +63,15 @@ class _ViewManagerRegisterViewParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.view = decoder0.decodeServiceInterface(8, false, views_mojom.ViewProxy.newFromEndpoint);
+      result.view = decoder0.decodeInterfaceRequest(8, false, views_mojom.ViewStub.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.viewHost = decoder0.decodeInterfaceRequest(16, false, views_mojom.ViewHostStub.newFromEndpoint);
+      result.viewOwner = decoder0.decodeInterfaceRequest(12, false, views_mojom.ViewOwnerStub.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.viewOwner = decoder0.decodeInterfaceRequest(20, false, views_mojom.ViewOwnerStub.newFromEndpoint);
+      result.viewListener = decoder0.decodeServiceInterface(16, false, views_mojom.ViewListenerProxy.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -83,40 +83,40 @@ class _ViewManagerRegisterViewParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInterface(view, 8, false);
+      encoder0.encodeInterfaceRequest(view, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "view of struct _ViewManagerRegisterViewParams: $e";
+          "view of struct _ViewManagerCreateViewParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInterfaceRequest(viewHost, 16, false);
+      encoder0.encodeInterfaceRequest(viewOwner, 12, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewHost of struct _ViewManagerRegisterViewParams: $e";
+          "viewOwner of struct _ViewManagerCreateViewParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInterfaceRequest(viewOwner, 20, false);
+      encoder0.encodeInterface(viewListener, 16, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewOwner of struct _ViewManagerRegisterViewParams: $e";
+          "viewListener of struct _ViewManagerCreateViewParams: $e";
       rethrow;
     }
     try {
       encoder0.encodeString(label, 24, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "label of struct _ViewManagerRegisterViewParams: $e";
+          "label of struct _ViewManagerCreateViewParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewManagerRegisterViewParams("
+    return "_ViewManagerCreateViewParams("
            "view: $view" ", "
-           "viewHost: $viewHost" ", "
            "viewOwner: $viewOwner" ", "
+           "viewListener: $viewListener" ", "
            "label: $label" ")";
   }
 
@@ -129,17 +129,17 @@ class _ViewManagerRegisterViewParams extends bindings.Struct {
 
 
 
-class _ViewManagerRegisterViewTreeParams extends bindings.Struct {
+class _ViewManagerCreateViewTreeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
   ];
   Object viewTree = null;
-  Object viewTreeHost = null;
+  Object viewTreeListener = null;
   String label = null;
 
-  _ViewManagerRegisterViewTreeParams() : super(kVersions.last.size);
+  _ViewManagerCreateViewTreeParams() : super(kVersions.last.size);
 
-  static _ViewManagerRegisterViewTreeParams deserialize(bindings.Message message) {
+  static _ViewManagerCreateViewTreeParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -148,11 +148,11 @@ class _ViewManagerRegisterViewTreeParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewManagerRegisterViewTreeParams decode(bindings.Decoder decoder0) {
+  static _ViewManagerCreateViewTreeParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewManagerRegisterViewTreeParams result = new _ViewManagerRegisterViewTreeParams();
+    _ViewManagerCreateViewTreeParams result = new _ViewManagerCreateViewTreeParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -174,11 +174,11 @@ class _ViewManagerRegisterViewTreeParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.viewTree = decoder0.decodeServiceInterface(8, false, view_trees_mojom.ViewTreeProxy.newFromEndpoint);
+      result.viewTree = decoder0.decodeInterfaceRequest(8, false, view_trees_mojom.ViewTreeStub.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.viewTreeHost = decoder0.decodeInterfaceRequest(16, false, view_trees_mojom.ViewTreeHostStub.newFromEndpoint);
+      result.viewTreeListener = decoder0.decodeServiceInterface(12, false, view_trees_mojom.ViewTreeListenerProxy.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -190,32 +190,32 @@ class _ViewManagerRegisterViewTreeParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInterface(viewTree, 8, false);
+      encoder0.encodeInterfaceRequest(viewTree, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewTree of struct _ViewManagerRegisterViewTreeParams: $e";
+          "viewTree of struct _ViewManagerCreateViewTreeParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInterfaceRequest(viewTreeHost, 16, false);
+      encoder0.encodeInterface(viewTreeListener, 12, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewTreeHost of struct _ViewManagerRegisterViewTreeParams: $e";
+          "viewTreeListener of struct _ViewManagerCreateViewTreeParams: $e";
       rethrow;
     }
     try {
       encoder0.encodeString(label, 24, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "label of struct _ViewManagerRegisterViewTreeParams: $e";
+          "label of struct _ViewManagerCreateViewTreeParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewManagerRegisterViewTreeParams("
+    return "_ViewManagerCreateViewTreeParams("
            "viewTree: $viewTree" ", "
-           "viewTreeHost: $viewTreeHost" ", "
+           "viewTreeListener: $viewTreeListener" ", "
            "label: $label" ")";
   }
 
@@ -228,8 +228,8 @@ class _ViewManagerRegisterViewTreeParams extends bindings.Struct {
 
 
 
-const int _ViewManager_registerViewName = 0;
-const int _ViewManager_registerViewTreeName = 1;
+const int _ViewManager_createViewName = 0;
+const int _ViewManager_createViewTreeName = 1;
 
 
 
@@ -246,8 +246,8 @@ class _ViewManagerServiceDescription implements service_describer.ServiceDescrip
 
 abstract class ViewManager {
   static const String serviceName = "mojo::ui::ViewManager";
-  void registerView(Object view, Object viewHost, Object viewOwner, String label);
-  void registerViewTree(Object viewTree, Object viewTreeHost, String label);
+  void createView(Object view, Object viewOwner, Object viewListener, String label);
+  void createViewTree(Object viewTree, Object viewTreeListener, String label);
 }
 
 
@@ -289,28 +289,28 @@ class _ViewManagerProxyCalls implements ViewManager {
   _ViewManagerProxyImpl _proxyImpl;
 
   _ViewManagerProxyCalls(this._proxyImpl);
-    void registerView(Object view, Object viewHost, Object viewOwner, String label) {
+    void createView(Object view, Object viewOwner, Object viewListener, String label) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
-      var params = new _ViewManagerRegisterViewParams();
+      var params = new _ViewManagerCreateViewParams();
       params.view = view;
-      params.viewHost = viewHost;
       params.viewOwner = viewOwner;
+      params.viewListener = viewListener;
       params.label = label;
-      _proxyImpl.sendMessage(params, _ViewManager_registerViewName);
+      _proxyImpl.sendMessage(params, _ViewManager_createViewName);
     }
-    void registerViewTree(Object viewTree, Object viewTreeHost, String label) {
+    void createViewTree(Object viewTree, Object viewTreeListener, String label) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
-      var params = new _ViewManagerRegisterViewTreeParams();
+      var params = new _ViewManagerCreateViewTreeParams();
       params.viewTree = viewTree;
-      params.viewTreeHost = viewTreeHost;
+      params.viewTreeListener = viewTreeListener;
       params.label = label;
-      _proxyImpl.sendMessage(params, _ViewManager_registerViewTreeName);
+      _proxyImpl.sendMessage(params, _ViewManager_createViewTreeName);
     }
 }
 
@@ -402,15 +402,15 @@ class ViewManagerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewManager_registerViewName:
-        var params = _ViewManagerRegisterViewParams.deserialize(
+      case _ViewManager_createViewName:
+        var params = _ViewManagerCreateViewParams.deserialize(
             message.payload);
-        _impl.registerView(params.view, params.viewHost, params.viewOwner, params.label);
+        _impl.createView(params.view, params.viewOwner, params.viewListener, params.label);
         break;
-      case _ViewManager_registerViewTreeName:
-        var params = _ViewManagerRegisterViewTreeParams.deserialize(
+      case _ViewManager_createViewTreeName:
+        var params = _ViewManagerCreateViewTreeParams.deserialize(
             message.payload);
-        _impl.registerViewTree(params.viewTree, params.viewTreeHost, params.label);
+        _impl.createViewTree(params.viewTree, params.viewTreeListener, params.label);
         break;
       default:
         throw new bindings.MojoCodecError("Unexpected message name");

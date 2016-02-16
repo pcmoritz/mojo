@@ -38,7 +38,8 @@ namespace ui {
 // };
 class InputHandler {
  public:
-  // Creates an input connection associated with the specified view host.
+  // Creates an input connection for the view with the associated
+  // service provider.
   InputHandler(mojo::ServiceProvider* service_provider,
                mojo::ui::InputListener* listener);
   ~InputHandler();
