@@ -18,6 +18,7 @@ group("portable_examples") {
     "//examples/echo",
     "//examples/echo_terminal",
     "//examples/forwarding_content_handler",
+    "//examples/hello_mojo",
     "//examples/http_handler",
     "//examples/indirect_service",
     "//examples/native_run_app",
