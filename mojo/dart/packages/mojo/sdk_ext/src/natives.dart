@@ -132,9 +132,11 @@ class MojoHandleNatives {
   /// Returns a list of two elements. The first entry is an integer, encoding
   /// if the operation was a success or not, as specified in the [MojoResult]
   /// class. In particular, a successful operation is signaled by
-  /// [MojoResult.kOk]. The second entry is itself a List of 2 elements:
+  /// [MojoResult.kOk]. The second entry is itself a list of 2 elements:
   /// an integer of satisfied signals, and an integer of satisfiable signals.
   /// Both entries are encoded as specified in [MojoHandleSignals].
+  ///
+  /// A signal is satisfiable, if the signal may become true in the future.
   ///
   /// The [deadline] specifies how long the call should wait (if no signal is
   /// triggered). If the deadline passes, the returned result-integer is
@@ -155,7 +157,14 @@ class MojoHandleNatives {
 
   /// Waits on many handles at the same time.
   ///
-  /// The returned value is similar to the result of [wait].
+  /// Returns a list with exactly 3 elements:
+  /// - the result integer, encoded as specified in [MojoResult]. In particular,
+  ///   [MojoResult.kOk] signals success.
+  /// - the index of the handle that caused the return. May be `null` if the
+  ///   operation didn't succeed.
+  /// - a list of signal states. May be `null` if the operation didn't succeed.
+  ///   Each signal state is represented by a list of 2 elements: an integer of
+  ///   satisfied signals, and an integer of satisfiable signals (see [wait]).
   ///
   /// Behaves as if [wait] was called on each of the [handleTokens] separately,
   /// completing when the first would complete.
