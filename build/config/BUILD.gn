@@ -33,9 +33,6 @@ config("feature_flags") {
   # TODO(brettw) this probably needs to be parameterized.
   defines = [ "V8_DEPRECATION_WARNINGS" ]  # Don't use deprecated V8 APIs anywhere.
 
-  if (cld_version > 0) {
-    defines += [ "CLD_VERSION=$cld_version" ]
-  }
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
   }
