@@ -12,6 +12,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "base/task_runner.h"
+#include "base/timer/timer.h"
 #include "mojo/gpu/gl_context.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/system/functions.h"
@@ -49,6 +50,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   void InitContext(mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer);
   void DestroyContext();
   void OnContextProviderConnectionError();
+  void OnViewportParameterTimeout();
 
   void Draw();
 
@@ -66,6 +68,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   std::shared_ptr<RenderFrame> current_frame_;
 
   mojo::Binding<ViewportParameterListener> viewport_parameter_listener_binding_;
+  base::Timer viewport_parameter_timeout_;
 
   DISALLOW_COPY_AND_ASSIGN(GpuRasterizer);
 };

@@ -17,10 +17,15 @@
 #include "base/bind.h"
 #include "base/location.h"
 #include "base/logging.h"
+#include "base/time/time.h"
 #include "services/gfx/compositor/backend/vsync_scheduler.h"
 #include "services/gfx/compositor/render/render_frame.h"
 
 namespace compositor {
+namespace {
+constexpr int64_t kViewportParameterTimeoutMs = 1000;
+constexpr int64_t kDefaultVsyncIntervalUs = 100000;  // deliberately sluggish
+}
 
 GpuRasterizer::GpuRasterizer(mojo::ContextProviderPtr context_provider,
                              const std::shared_ptr<VsyncScheduler>& scheduler,
@@ -30,7 +35,8 @@ GpuRasterizer::GpuRasterizer(mojo::ContextProviderPtr context_provider,
       scheduler_(scheduler),
       task_runner_(task_runner),
       error_callback_(error_callback),
-      viewport_parameter_listener_binding_(this) {
+      viewport_parameter_listener_binding_(this),
+      viewport_parameter_timeout_(false, false) {
   DCHECK(context_provider_);
   context_provider_.set_connection_error_handler(
       base::Bind(&GpuRasterizer::OnContextProviderConnectionError,
@@ -49,6 +55,10 @@ void GpuRasterizer::CreateContext() {
   context_provider_->Create(
       viewport_parameter_listener.Pass(),
       base::Bind(&GpuRasterizer::InitContext, base::Unretained(this)));
+  viewport_parameter_timeout_.Start(
+      FROM_HERE, base::TimeDelta::FromMilliseconds(kViewportParameterTimeoutMs),
+      base::Bind(&GpuRasterizer::OnViewportParameterTimeout,
+                 base::Unretained(this)));
 }
 
 void GpuRasterizer::InitContext(
@@ -89,6 +99,11 @@ void GpuRasterizer::DestroyContext() {
     gl_context_->Destroy();
     gl_context_.reset();
   }
+
+  if (viewport_parameter_listener_binding_.is_bound()) {
+    viewport_parameter_timeout_.Stop();
+    viewport_parameter_listener_binding_.Close();
+  }
 }
 
 void GpuRasterizer::OnContextProviderConnectionError() {
@@ -102,11 +117,21 @@ void GpuRasterizer::OnContextLost() {
   CreateContext();
 }
 
+void GpuRasterizer::OnViewportParameterTimeout() {
+  LOG(WARNING) << "Viewport parameter listener timeout after "
+               << kViewportParameterTimeoutMs << " ms: assuming "
+               << kDefaultVsyncIntervalUs
+               << " us vsync interval, rendering will be janky!";
+
+  OnVSyncParametersUpdated(0, kDefaultVsyncIntervalUs);
+}
+
 void GpuRasterizer::OnVSyncParametersUpdated(int64_t timebase,
                                              int64_t interval) {
   DVLOG(1) << "Vsync parameters: timebase=" << timebase
            << ", interval=" << interval;
 
+  viewport_parameter_timeout_.Stop();
   if (!gl_context_)
     return;
 
