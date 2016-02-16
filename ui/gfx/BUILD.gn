@@ -47,8 +47,6 @@ component("gfx") {
     "animation/throb_animation.h",
     "animation/tween.cc",
     "animation/tween.h",
-    "codec/jpeg_codec.cc",
-    "codec/jpeg_codec.h",
     "codec/png_codec.cc",
     "codec/png_codec.h",
     "display.cc",
@@ -94,14 +92,12 @@ component("gfx") {
 
   deps = [
     ":gfx_export",
-    "//base/third_party/dynamic_annotations",
     "//base:base_static",
     "//base:i18n",
+    "//base/third_party/dynamic_annotations",
     "//skia",
-    "//third_party/libjpeg_turbo:libjpeg",
     "//third_party/libpng",
     "//third_party/zlib",
-    "//third_party:jpeg",
     "//ui/gfx/geometry",
   ]
   public_deps = [
@@ -165,7 +161,6 @@ test("gfx_unittests") {
     "animation/multi_animation_unittest.cc",
     "animation/slide_animation_unittest.cc",
     "animation/tween_unittest.cc",
-    "codec/jpeg_codec_unittest.cc",
     "codec/png_codec_unittest.cc",
     "display_change_notifier_unittest.cc",
     "display_unittest.cc",
@@ -196,10 +191,10 @@ test("gfx_unittests") {
     "//base",
     "//base/test:test_support",
     "//skia",
+    "//testing/gtest",
     "//third_party/icu:icuuc",
     "//third_party/libpng",
     "//third_party/zlib",
-    "//testing/gtest",
     "//ui/base",
     "//ui/gfx/geometry",
   ]
