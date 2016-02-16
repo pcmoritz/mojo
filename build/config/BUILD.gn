@@ -4,7 +4,6 @@
 
 import("//build/config/allocator.gni")
 import("//build/config/chrome_build.gni")
-import("//build/config/crypto.gni")
 import("//build/config/features.gni")
 import("//build/config/ui.gni")
 import("//build/module_args/v8.gni")
@@ -39,15 +38,6 @@ config("feature_flags") {
   if (use_udev) {
     # TODO(brettw) should probably be "=1".
     defines += [ "USE_UDEV" ]
-  }
-  if (use_openssl) {
-    defines += [ "USE_OPENSSL=1" ]
-  }
-  if (use_openssl_certs) {
-    defines += [ "USE_OPENSSL_CERTS=1" ]
-  }
-  if (use_nss_certs) {
-    defines += [ "USE_NSS_CERTS=1" ]
   }
   if (use_ozone) {
     defines += [ "USE_OZONE=1" ]

@@ -76,7 +76,6 @@
 #     # files.
 #   }
 import("//build/config/chrome_build.gni")
-import("//build/config/crypto.gni")
 import("//build/config/features.gni")
 import("//build/config/ui.gni")
 
@@ -111,13 +110,6 @@ if (is_desktop_linux) {
   grit_defines += [
     "-D",
     "desktop_linux",
-  ]
-}
-
-if (use_nss_certs) {
-  grit_defines += [
-    "-D",
-    "use_nss_certs",
   ]
 }
 
