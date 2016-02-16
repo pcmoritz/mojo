@@ -80,8 +80,6 @@ def GNArgsForConfig(config):
     gn_args["target_os"] = "ios"
     gn_args["ios_deployment_target"] = "7.0"
     gn_args["clang_use_chrome_plugins"] = False
-    if config.is_simulator:
-      gn_args["use_libjpeg_turbo"] = False
     gn_args["use_ios_simulator"] = config.is_simulator
   elif config.target_os == Config.OS_LINUX:
     pass
