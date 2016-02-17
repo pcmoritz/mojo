@@ -72,10 +72,6 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 		p.writeImportedFiles(mojomFile.Imports)
 	}
 
-	if len(mojomFile.DeclaredObjects) > 0 {
-		p.nl()
-	}
-
 	for i, declaredObject := range mojomFile.DeclaredObjects {
 		p.writeDeclaredObject(declaredObject)
 		if i < len(mojomFile.DeclaredObjects)-1 {
@@ -84,6 +80,7 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 	}
 
 	if mojomFile.FinalComments != nil {
+		p.nl()
 		p.nl()
 		p.writeCommentBlocks(mojomFile.FinalComments)
 	}
@@ -113,6 +110,9 @@ func (p *printer) writeImportedFiles(imports []*mojom.ImportedFile) {
 // writeDeclaredObject writes a declared object's attributes, then its
 // preceeding comments and finally the object itself.
 func (p *printer) writeDeclaredObject(declaredObject mojom.DeclaredObject) {
+	if isNewBlock(declaredObject) {
+		p.nl()
+	}
 	p.writeAttributes(declaredObject.Attributes())
 	p.writeBeforeComments(declaredObject)
 	switch o := declaredObject.(type) {
@@ -207,7 +207,6 @@ func (p *printer) writeUserDefinedConstant(constant *mojom.UserDefinedConstant) 
 	p.writeValueRef(constant.ValueRef())
 	p.write(";")
 	p.writeRightComments(constant)
-	p.nl()
 }
 
 func (p *printer) writeStructField(structField *mojom.StructField) {
@@ -265,7 +264,6 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 	p.decIndent()
 	p.nl()
 	p.write("};")
-	p.nl()
 }
 
 func (p *printer) writeAttributes(attrs *mojom.Attributes) {
@@ -399,19 +397,18 @@ func (p *printer) writeRightComments(el mojom.MojomElement) {
 
 func (p *printer) writeCommentBlocks(comments []lexer.Token) {
 	for i, comment := range comments {
-		if i != 0 &&
-			(comment.LineNo > comments[i-1].LineNo+1 ||
-				comment.Kind == lexer.MultiLineComment ||
-				comments[i-1].Kind == lexer.MultiLineComment) {
-			// New block.
-			p.nl()
-		}
 		switch comment.Kind {
 		case lexer.SingleLineComment:
 			p.write(comment.Text)
 			p.nl()
 		case lexer.MultiLineComment:
 			p.writeMultiLineComment(comment)
+		case lexer.EmptyLine:
+			// We only use EmptyLine here to separate comment blocks. And we collapse
+			// sequences of empty lines to a single empty line.
+			if i != 0 && comments[i-1].Kind != lexer.EmptyLine {
+				p.nl()
+			}
 		default:
 			panic(fmt.Sprintf("%s is not a comment.", comment))
 		}
@@ -494,6 +491,33 @@ func (p *printer) setEolComment(comment lexer.Token) {
 	}
 
 	p.eolComment = &comment
+}
+
+// Standalone utilities that do not operate on the buffer.
+
+// isNewBlock determines if an empty line should be printed above the element
+// under consideration. The purpose is to respect user-intention to separate
+// elements in a mojom file.
+//
+// If the element has attributes, and the first "comment" attached above the
+// attributes is an empty line, the element is a new block.
+// If the element has no attributes and the first "comment" attached above the
+// element itself is an empty line, the element is a new block.
+// Else, the element is not a new block.
+func isNewBlock(declaredObject mojom.DeclaredObject) bool {
+	if declaredObject.Attributes() != nil {
+		comments := declaredObject.Attributes().AttachedComments()
+		if comments == nil || len(comments.Above) == 0 {
+			return false
+		}
+		return comments.Above[0].Kind == lexer.EmptyLine
+	}
+	comments := declaredObject.AttachedComments()
+
+	if comments == nil || len(comments.Above) == 0 {
+		return false
+	}
+	return comments.Above[0].Kind == lexer.EmptyLine
 }
 
 // Following is a utility to sort slices of |ImportedFile|s.

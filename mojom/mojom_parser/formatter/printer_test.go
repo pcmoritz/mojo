@@ -111,7 +111,11 @@ func TestWriteComments(t *testing.T) {
 		cppComment(1, "block 1 line 2"),
 		cppComment(2, "block 1 line 3"),
 
+		lexer.Token{Kind: lexer.EmptyLine},
+
 		cComment(10, "block 2 line 1\nblock 2 line 2\nblock 2 line 3"),
+
+		lexer.Token{Kind: lexer.EmptyLine},
 
 		cppComment(20, "block 3 line 1"),
 		cppComment(21, "block 3 line 2"),
@@ -234,8 +238,7 @@ func TestWriteMojomStruct(t *testing.T) {
 	expected := `struct FooStruct {
   int8 field1 = 10;
   string field2;
-};
-`
+};`
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomStruct)
@@ -265,8 +268,7 @@ func TestWriteMojomUnion(t *testing.T) {
 	expected := `union FooUnion {
   int8 field1@5;
   string field2;
-};
-`
+};`
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomUnion)
 	checkEq(t, expected, p.result())
@@ -287,8 +289,7 @@ func TestWriteMojomEnum(t *testing.T) {
 	expected := `enum FooEnum {
   VAL1,
   VAL2 = 10,
-};
-`
+};`
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomEnum)
@@ -304,7 +305,7 @@ func TestWriteUserDefinedConstant(t *testing.T) {
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(constant)
-	checkEq(t, "const int8 const_foo = 10;\n", p.result())
+	checkEq(t, "const int8 const_foo = 10;", p.result())
 }
 
 func TestWriteMojomMethod(t *testing.T) {

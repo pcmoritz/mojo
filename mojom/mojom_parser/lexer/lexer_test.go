@@ -321,3 +321,10 @@ func TestFilteredTokens(t *testing.T) {
 	checkEq(t, MultiLineComment, filtered[0].Kind)
 	checkEq(t, SingleLineComment, filtered[1].Kind)
 }
+
+func TestEmptyLine(t *testing.T) {
+	ts := tokenizeUnfiltered("\n")
+	checkEq(t, EmptyLine, ts.PeekNext().Kind)
+	ts.ConsumeNext()
+	checkEq(t, EOF, ts.PeekNext().Kind)
+}

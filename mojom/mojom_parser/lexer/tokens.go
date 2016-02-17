@@ -71,6 +71,9 @@ const (
 	// Comments
 	SingleLineComment
 	MultiLineComment
+
+	// Empty Line
+	EmptyLine
 )
 
 // This method is used to generate user-facing strings in compilation error
@@ -170,6 +173,9 @@ func (tokenKind TokenKind) String() string {
 		return "single line comment"
 	case MultiLineComment:
 		return "multi line comment"
+
+	case EmptyLine:
+		return "empty line"
 
 	default:
 		// Note(rudominer) It is important to use %d below so as to avoid

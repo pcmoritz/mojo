@@ -31,7 +31,7 @@ import (
 func Tokenize(source string) TokenStream {
 	return NewFilteredTokenStream(
 		tokenizeUnfiltered(source),
-		[]TokenKind{SingleLineComment, MultiLineComment})
+		[]TokenKind{SingleLineComment, MultiLineComment, EmptyLine})
 }
 
 // tokenizeUnfiltered returns a TokenStream which does not filter out any of the
@@ -209,6 +209,10 @@ func isSkippable(c rune) bool {
 // lexSkip consumes skippable runes.
 func lexSkip(l *lexer) stateFn {
 	for isSkippable(l.Peek()) {
+		l.beginToken()
+		if l.Peek() == '\n' && l.linePos == 0 {
+			l.emitToken(EmptyLine)
+		}
 		l.Consume()
 	}
 	l.beginToken()

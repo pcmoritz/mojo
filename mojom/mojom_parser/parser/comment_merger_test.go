@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"mojom/mojom_parser/lexer"
 	"mojom/mojom_parser/mojom"
 	"testing"
 )
@@ -45,8 +46,10 @@ func TestAttachComments(t *testing.T) {
 	mojom.AttachCommentsToMojomFile(mojomFile, comments)
 
 	topAttrComments := mojomFile.Attributes.AttachedComments()
-	checkEq("// TopComment", topAttrComments.Above[0].Text)
-	checkEq("// NextComment", topAttrComments.Above[1].Text)
+	checkEq(lexer.EmptyLine, topAttrComments.Above[0].Kind)
+	checkEq("// TopComment", topAttrComments.Above[1].Text)
+	checkEq(lexer.EmptyLine, topAttrComments.Above[2].Kind)
+	checkEq("// NextComment", topAttrComments.Above[3].Text)
 	checkEq("/* LeftAttrsComment */", topAttrComments.Left[0].Text)
 	checkEq("// AttrsRightComment", topAttrComments.Right[0].Text)
 
@@ -68,7 +71,8 @@ func TestAttachComments(t *testing.T) {
 	checkEq("// Method1RightComment", method1.AttachedComments().Right[0].Text)
 	checkEq("/* InParam1Comment */", inParam1.AttachedComments().Right[0].Text)
 
-	checkEq("// FinalComments", mojomFile.FinalComments[0].Text)
+	checkEq(lexer.EmptyLine, mojomFile.FinalComments[0].Kind)
+	checkEq("// FinalComments", mojomFile.FinalComments[1].Text)
 }
 
 func TestEmptyFile(t *testing.T) {
