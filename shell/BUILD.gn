@@ -388,6 +388,7 @@ if (is_android) {
       "//services/sharing_sink:bindings_java",
       "//services/vsync",
       "//third_party/android_tools:android_support_v13_java",
+      "//ui/gl:gl_java",
     ]
   }
 

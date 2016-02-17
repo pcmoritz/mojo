@@ -8,6 +8,7 @@
 #include "base/memory/ref_counted.h"
 #include "third_party/khronos/EGL/egl.h"
 #include "ui/gfx/native_widget_types.h"
+#include "ui/gl/android/android_vsync_provider.h"
 #include "ui/gl/gl_implementation.h"
 #include "ui/gl/gl_surface_egl.h"
 #include "ui/gl/gl_surface_osmesa.h"
@@ -48,9 +49,9 @@ scoped_refptr<GLSurface> GLSurface::CreateViewGLSurface(
   }
   DCHECK(GetGLImplementation() == kGLImplementationEGLGLES2);
   if (window != kNullAcceleratedWidget) {
-    scoped_refptr<GLSurface> surface =
+    scoped_refptr<NativeViewGLSurfaceEGL> surface =
         new NativeViewGLSurfaceEGL(window, requested_configuration);
-    if (surface->Initialize())
+    if (surface->Initialize(make_scoped_ptr(new AndroidVSyncProvider())))
       return surface;
   } else {
     scoped_refptr<GLSurface> surface =

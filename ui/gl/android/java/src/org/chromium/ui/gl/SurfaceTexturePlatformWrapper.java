@@ -17,7 +17,6 @@ import org.chromium.base.JNINamespace;
  */
 @JNINamespace("gfx")
 class SurfaceTexturePlatformWrapper {
-
     private static final String TAG = "SurfaceTexturePlatformWrapper";
 
     @CalledByNative
@@ -38,8 +37,8 @@ class SurfaceTexturePlatformWrapper {
     }
 
     @CalledByNative
-    private static void setFrameAvailableCallback(SurfaceTexture surfaceTexture,
-            long nativeSurfaceTextureListener) {
+    private static void setFrameAvailableCallback(
+            SurfaceTexture surfaceTexture, long nativeSurfaceTextureListener) {
         surfaceTexture.setOnFrameAvailableListener(
                 new SurfaceTextureListener(nativeSurfaceTextureListener));
     }

@@ -18,6 +18,8 @@ component("gl") {
   output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
 
   sources = [
+    "android/android_vsync_provider.cc",
+    "android/android_vsync_provider.h",
     "android/gl_jni_registrar.cc",
     "android/gl_jni_registrar.h",
     "android/scoped_java_surface.cc",
@@ -294,12 +296,26 @@ if (is_android) {
 
   generate_jni("gl_jni_headers") {
     sources = [
-      "../android/java/src/org/chromium/ui/gl/SurfaceTextureListener.java",
-      "../android/java/src/org/chromium/ui/gl/SurfaceTexturePlatformWrapper.java",
+      "android/java/src/org/chromium/ui/gl/SurfaceTextureListener.java",
+      "android/java/src/org/chromium/ui/gl/SurfaceTexturePlatformWrapper.java",
+      "android/java/src/org/chromium/ui/gl/VSyncProvider.java",
     ]
     public_deps = [
       ":surface_jni_headers",
     ]
     jni_package = "ui/gl"
+  }
+
+  android_library("gl_java") {
+    java_files = [
+      "android/java/src/org/chromium/ui/gl/RollingMedianComputer.java",
+      "android/java/src/org/chromium/ui/gl/SurfaceTextureListener.java",
+      "android/java/src/org/chromium/ui/gl/SurfaceTexturePlatformWrapper.java",
+      "android/java/src/org/chromium/ui/gl/VSyncProvider.java",
+    ]
+
+    deps = [
+      "//base:base_java",
+    ]
   }
 }

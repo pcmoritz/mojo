@@ -14,6 +14,7 @@
 #include "shell/android/java_application_loader.h"
 #include "shell/android/main.h"
 #include "shell/android/native_handler_thread.h"
+#include "ui/gl/android/gl_jni_registrar.h"
 
 namespace {
 
@@ -40,6 +41,7 @@ bool RegisterJNI(JNIEnv* env) {
 JNI_EXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
   std::vector<base::android::RegisterCallback> register_callbacks;
   register_callbacks.push_back(base::Bind(&RegisterJNI));
+  register_callbacks.push_back(base::Bind(&ui::gl::android::RegisterJni));
   if (!base::android::OnJNIOnLoadRegisterJNI(vm, register_callbacks) ||
       !base::android::OnJNIOnLoadInit(
           std::vector<base::android::InitCallback>())) {
