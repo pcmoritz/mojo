@@ -25,15 +25,14 @@ sys.path.insert(0, os.path.join(SRC_DIR,
                                 'pylib'))
 
 from mojom.error import Error
-from mojom.parse.parser import Parse
-from mojom.parse.translate import Translate
+from mojom.parse import parser_runner
+from mojom.generate import mojom_translator
 
 PACKAGES_DIR = os.path.join(SRC_DIR, 'mojo', 'dart', 'packages')
+SDK_DIR = os.path.join(SRC_DIR, 'mojo', 'public')
 
 # Script that calculates mojom output paths.
-DART_OUTPUTS_SCRIPT = os.path.join(SRC_DIR,
-                                   'mojo',
-                                   'public',
+DART_OUTPUTS_SCRIPT = os.path.join(SDK_DIR,
                                    'tools',
                                    'bindings',
                                    'mojom_list_dart_outputs.py')
@@ -43,36 +42,34 @@ def run(cwd, args):
   return subprocess.check_output(args, cwd=cwd)
 
 
-# Given a parsed mojom, return the path of the .mojom.dart relative to its
+# Given a mojom.Module, return the path of the .mojom.dart relative to its
 # package directory.
 def _mojom_output_path(mojom):
-  name = mojom['name']
-  namespace = mojom['namespace']
+  name = mojom.name
+  namespace = mojom.namespace
   elements = ['lib']
   elements.extend(namespace.split('.'))
   elements.append("%s.dart" % name)
   return os.path.join(*elements)
 
 
-# Given a parsed mojom, return the package or None.
+# Given a mojom.Module, return the package or None.
 def _mojom_package(mojom):
-  attributes = mojom.get('attributes', {})
-  return attributes.get('DartPackage')
+  if mojom.attributes:
+    return mojom.attributes.get('DartPackage')
 
-
-# Load and parse a .mojom file. Returns the parsed mojom.
+# Load and parse a .mojom file. Returns the mojom.Module or raises an Exception
+# if there was an error.
 def _load_mojom(path_to_mojom):
   filename = os.path.abspath(path_to_mojom)
-  name = os.path.basename(filename)
 
-  # Read in mojom file.
-  with open(filename) as f:
-    source = f.read()
   # Parse
-  tree = Parse(source, name)
-  mojom = Translate(tree, name)
-  return mojom
-
+  mojom_file_graph = parser_runner.ParseToMojomFileGraph(SDK_DIR, [filename],
+      meta_data_only=True)
+  if mojom_file_graph is None:
+    raise Exception
+  mojom_dict = mojom_translator.TranslateFileGraph(mojom_file_graph)
+  return mojom_dict[filename]
 
 def _print_regenerate_message(package):
   print("""
