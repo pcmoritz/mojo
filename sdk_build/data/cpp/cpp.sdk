@@ -1,0 +1,20 @@
+# Copyright 2016 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This file contains steps for "building" a C/C++ SDK. It is processed by
+# //mojo/sdk_build/build_sdk.py.
+# TODO(vtl): This isn't done yet.
+
+EXCLUDE_FILES=[".*", "*.gn", "*.gni", "PRESUBMIT.py", "*_win.*"]
+EXCLUDE_PATHS=["*/tests/"]
+
+CopyFiles("mojo/public/c", "third_party/mojo/public/c", recursive=True,
+          exclude_file_patterns=EXCLUDE_FILES,
+          exclude_path_patterns=EXCLUDE_PATHS)
+CopyFiles("mojo/public/cpp", "third_party/mojo/public/cpp", recursive=True,
+          exclude_file_patterns=EXCLUDE_FILES,
+          exclude_path_patterns=EXCLUDE_PATHS+
+              ["mojo/public/cpp/test_support/*"])
+CopyFiles("mojo/public", "third_party/mojo/public", recursive=False,
+          exclude_file_patterns=EXCLUDE_FILES)
