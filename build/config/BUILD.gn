@@ -43,9 +43,6 @@ config("feature_flags") {
   # TODO(brettw) this probably needs to be parameterized.
   defines = [ "V8_DEPRECATION_WARNINGS" ]  # Don't use deprecated V8 APIs anywhere.
 
-  if (dont_embed_build_metadata) {
-    defines += [ "DONT_EMBED_BUILD_METADATA" ]
-  }
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
   }
