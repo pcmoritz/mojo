@@ -155,13 +155,6 @@ def GetTestList(config, verbose_count=0):
                            "run_mojom_translator_python_tests.py"),
               "--build-dir=" + build_dir])
 
-  # mojo tools unit tests:
-  if ShouldRunTest(Config.TEST_TYPE_DEFAULT, Config.TEST_TYPE_UNIT, "tools"):
-    AddEntry("Mojo tools unit tests",
-             ["python", os.path.join("mojo", "tools", "testing",
-                                     "mojom_fetcher",
-                                     "mojom_fetcher_tests.py")])
-
   # Observatory tests (Linux-only):
   if target_os == Config.OS_LINUX and ShouldRunTest(Config.TEST_TYPE_DEFAULT):
     AddEntry("Dart Observatory tests",
