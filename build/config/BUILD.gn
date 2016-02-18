@@ -14,6 +14,17 @@ declare_args() {
   # catching bugs but in some cases may cause conflicts or excessive slowness.
   disable_iterator_debugging = false
 
+  # Set to true to not store any build metadata, e.g. ifdef out all __DATE__
+  # and __TIME__. Set to 0 to reenable the use of these macros in the code
+  # base. See http://crbug.com/314403.
+  #
+  # Continue to embed build meta data in Official builds, basically the
+  # time it was built.
+  # TODO(maruel): This decision should be revisited because having an
+  # official deterministic build has high value too but MSVC toolset can't
+  # generate anything deterministic with WPO enabled AFAIK.
+  dont_embed_build_metadata = !is_official_build
+
   # Set to true to enable dcheck in Release builds.
   dcheck_always_on = false
 
@@ -32,6 +43,9 @@ config("feature_flags") {
   # TODO(brettw) this probably needs to be parameterized.
   defines = [ "V8_DEPRECATION_WARNINGS" ]  # Don't use deprecated V8 APIs anywhere.
 
+  if (dont_embed_build_metadata) {
+    defines += [ "DONT_EMBED_BUILD_METADATA" ]
+  }
   if (dcheck_always_on) {
     defines += [ "DCHECK_ALWAYS_ON=1" ]
   }
