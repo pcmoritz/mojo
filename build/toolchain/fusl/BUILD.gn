@@ -19,7 +19,4 @@ gcc_toolchain("fusl_x64") {
   toolchain_cpu = "x64"
   toolchain_os = "linux"
   is_clang = true
-
-  use_goma = false
-  use_ccache = false
 }
