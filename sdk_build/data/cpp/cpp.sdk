@@ -7,14 +7,36 @@
 # TODO(vtl): This isn't done yet.
 
 EXCLUDE_FILES=[".*", "*.gn", "*.gni", "PRESUBMIT.py", "*_win.*"]
-EXCLUDE_PATHS=["*/tests/"]
+EXCLUDE_PATHS=["*/tests/*"]
 
-CopyFiles("mojo/public/c", "third_party/mojo/public/c", recursive=True,
+CopyFiles("mojo/public",
+          "third_party/mojo/public",
+          recursive=False,
+          exclude_file_patterns=EXCLUDE_FILES)
+
+CopyFiles("mojo/public/c",
+          "third_party/mojo/public/c",
+          recursive=True,
           exclude_file_patterns=EXCLUDE_FILES,
           exclude_path_patterns=EXCLUDE_PATHS)
-CopyFiles("mojo/public/cpp", "third_party/mojo/public/cpp", recursive=True,
+CopyFiles("mojo/public/cpp",
+          "third_party/mojo/public/cpp",
+          recursive=True,
           exclude_file_patterns=EXCLUDE_FILES,
           exclude_path_patterns=EXCLUDE_PATHS+
               ["mojo/public/cpp/test_support/*"])
-CopyFiles("mojo/public", "third_party/mojo/public", recursive=False,
-          exclude_file_patterns=EXCLUDE_FILES)
+
+# For simplicity, copy all of the bindings generators, even though we really
+# only need/want C++.
+CopyFiles("mojo/public/tools/bindings",
+          "third_party/mojo/public/tools/bindings",
+          recursive=True,
+          exclude_file_patterns=EXCLUDE_FILES,
+          exclude_path_patterns=EXCLUDE_PATHS+["*/mojom_tests/*"])
+# The generators need jinja2, which needs markupsafe. Sigh.
+CopyFiles("mojo/public/third_party/jinja2",
+          "third_party/mojo/public/third_party/jinja2",
+          recursive=True)
+CopyFiles("mojo/public/third_party/markupsafe",
+          "third_party/mojo/public/third_party/markupsafe",
+          recursive=True)
