@@ -1,5 +1,5 @@
-#ifndef	_DIRENT_H
-#define	_DIRENT_H
+#ifndef _DIRENT_H
+#define _DIRENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,29 +17,33 @@ extern "C" {
 
 typedef struct __dirstream DIR;
 
-struct dirent
-{
-	ino_t d_ino;
-	off_t d_off;
-	unsigned short d_reclen;
-	unsigned char d_type;
-	char d_name[256];
+struct dirent {
+  ino_t d_ino;
+  off_t d_off;
+  unsigned short d_reclen;
+  unsigned char d_type;
+  char d_name[256];
 };
 
 #define d_fileno d_ino
 
-int            closedir(DIR *);
-DIR           *fdopendir(int);
-DIR           *opendir(const char *);
-struct dirent *readdir(DIR *);
-int            readdir_r(DIR *__restrict, struct dirent *__restrict, struct dirent **__restrict);
-void           rewinddir(DIR *);
-void           seekdir(DIR *, long);
-long           telldir(DIR *);
-int            dirfd(DIR *);
+int closedir(DIR*);
+DIR* fdopendir(int);
+DIR* opendir(const char*);
+struct dirent* readdir(DIR*);
+int readdir_r(DIR* __restrict,
+              struct dirent* __restrict,
+              struct dirent** __restrict);
+void rewinddir(DIR*);
+void seekdir(DIR*, long);
+long telldir(DIR*);
+int dirfd(DIR*);
 
-int alphasort(const struct dirent **, const struct dirent **);
-int scandir(const char *, struct dirent ***, int (*)(const struct dirent *), int (*)(const struct dirent **, const struct dirent **));
+int alphasort(const struct dirent**, const struct dirent**);
+int scandir(const char*,
+            struct dirent***,
+            int (*)(const struct dirent*),
+            int (*)(const struct dirent**, const struct dirent**));
 
 #if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 #define DT_UNKNOWN 0
@@ -51,13 +55,13 @@ int scandir(const char *, struct dirent ***, int (*)(const struct dirent *), int
 #define DT_LNK 10
 #define DT_SOCK 12
 #define DT_WHT 14
-#define IFTODT(x) ((x)>>12 & 017)
-#define DTTOIF(x) ((x)<<12)
-int getdents(int, struct dirent *, size_t);
+#define IFTODT(x) ((x) >> 12 & 017)
+#define DTTOIF(x) ((x) << 12)
+int getdents(int, struct dirent*, size_t);
 #endif
 
 #ifdef _GNU_SOURCE
-int versionsort(const struct dirent **, const struct dirent **);
+int versionsort(const struct dirent**, const struct dirent**);
 #endif
 
 #if defined(_LARGEFILE64_SOURCE) || defined(_GNU_SOURCE)

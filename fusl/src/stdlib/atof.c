@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-double atof(const char *s)
-{
-	return strtod(s, 0);
+double atof(const char* s) {
+  return strtod(s, 0);
 }

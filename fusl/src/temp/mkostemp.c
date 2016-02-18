@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include "libc.h"
 
-int __mkostemps(char *, int, int);
+int __mkostemps(char*, int, int);
 
-int mkostemp(char *template, int flags)
-{
-	return __mkostemps(template, 0, flags);
+int mkostemp(char* template, int flags) {
+  return __mkostemps(template, 0, flags);
 }
 
 LFS64(mkostemp);

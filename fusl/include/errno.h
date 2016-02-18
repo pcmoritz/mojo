@@ -1,4 +1,4 @@
-#ifndef	_ERRNO_H
+#ifndef _ERRNO_H
 #define _ERRNO_H
 
 #ifdef __cplusplus
@@ -9,7 +9,7 @@ extern "C" {
 
 #include <bits/errno.h>
 
-int *__errno_location(void);
+int* __errno_location(void);
 #define errno (*__errno_location())
 
 #ifdef _GNU_SOURCE
@@ -21,4 +21,3 @@ extern char *program_invocation_short_name, *program_invocation_name;
 #endif
 
 #endif
-

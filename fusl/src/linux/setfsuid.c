@@ -2,7 +2,6 @@
 #include "syscall.h"
 #include "libc.h"
 
-int setfsuid(uid_t uid)
-{
-	return syscall(SYS_setfsuid, uid);
+int setfsuid(uid_t uid) {
+  return syscall(SYS_setfsuid, uid);
 }

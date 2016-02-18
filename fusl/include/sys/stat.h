@@ -1,5 +1,5 @@
-#ifndef	_SYS_STAT_H
-#define	_SYS_STAT_H
+#ifndef _SYS_STAT_H
+#define _SYS_STAT_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,7 +26,7 @@ extern "C" {
 #define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec
 
-#define S_IFMT  0170000
+#define S_IFMT 0170000
 
 #define S_IFDIR 0040000
 #define S_IFCHR 0020000
@@ -36,18 +36,18 @@ extern "C" {
 #define S_IFLNK 0120000
 #define S_IFSOCK 0140000
 
-#define S_TYPEISMQ(buf)  0
+#define S_TYPEISMQ(buf) 0
 #define S_TYPEISSEM(buf) 0
 #define S_TYPEISSHM(buf) 0
 #define S_TYPEISTMO(buf) 0
 
-#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
-#define S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
-#define S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
-#define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
-#define S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFIFO)
-#define S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
-#define S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
+#define S_ISDIR(mode) (((mode)&S_IFMT) == S_IFDIR)
+#define S_ISCHR(mode) (((mode)&S_IFMT) == S_IFCHR)
+#define S_ISBLK(mode) (((mode)&S_IFMT) == S_IFBLK)
+#define S_ISREG(mode) (((mode)&S_IFMT) == S_IFREG)
+#define S_ISFIFO(mode) (((mode)&S_IFMT) == S_IFIFO)
+#define S_ISLNK(mode) (((mode)&S_IFMT) == S_IFLNK)
+#define S_ISSOCK(mode) (((mode)&S_IFMT) == S_IFSOCK)
 
 #ifndef S_IRUSR
 #define S_ISUID 04000
@@ -67,29 +67,29 @@ extern "C" {
 #define S_IRWXO 0007
 #endif
 
-#define UTIME_NOW  0x3fffffff
+#define UTIME_NOW 0x3fffffff
 #define UTIME_OMIT 0x3ffffffe
 
-int stat(const char *__restrict, struct stat *__restrict);
-int fstat(int, struct stat *);
-int lstat(const char *__restrict, struct stat *__restrict);
-int fstatat(int, const char *__restrict, struct stat *__restrict, int);
-int chmod(const char *, mode_t);
+int stat(const char* __restrict, struct stat* __restrict);
+int fstat(int, struct stat*);
+int lstat(const char* __restrict, struct stat* __restrict);
+int fstatat(int, const char* __restrict, struct stat* __restrict, int);
+int chmod(const char*, mode_t);
 int fchmod(int, mode_t);
-int fchmodat(int, const char *, mode_t, int);
+int fchmodat(int, const char*, mode_t, int);
 mode_t umask(mode_t);
-int mkdir(const char *, mode_t);
-int mknod(const char *, mode_t, dev_t);
-int mkfifo(const char *, mode_t);
-int mkdirat(int, const char *, mode_t);
-int mknodat(int, const char *, mode_t, dev_t);
-int mkfifoat(int, const char *, mode_t);
+int mkdir(const char*, mode_t);
+int mknod(const char*, mode_t, dev_t);
+int mkfifo(const char*, mode_t);
+int mkdirat(int, const char*, mode_t);
+int mknodat(int, const char*, mode_t, dev_t);
+int mkfifoat(int, const char*, mode_t);
 
-int futimens(int, const struct timespec [2]);
-int utimensat(int, const char *, const struct timespec [2], int);
+int futimens(int, const struct timespec[2]);
+int utimensat(int, const char*, const struct timespec[2], int);
 
 #if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
-int lchmod(const char *, mode_t);
+int lchmod(const char*, mode_t);
 #define S_IREAD S_IRUSR
 #define S_IWRITE S_IWUSR
 #define S_IEXEC S_IXUSR
@@ -111,5 +111,3 @@ int lchmod(const char *, mode_t);
 }
 #endif
 #endif
-
-

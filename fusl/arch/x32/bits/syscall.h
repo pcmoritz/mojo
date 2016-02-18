@@ -1,4 +1,4 @@
-#define __X32_SYSCALL_BIT        0x40000000
+#define __X32_SYSCALL_BIT 0x40000000
 #define __NR_read (__X32_SYSCALL_BIT + 0)
 #define __NR_write (__X32_SYSCALL_BIT + 1)
 #define __NR_open (__X32_SYSCALL_BIT + 2)
@@ -326,11 +326,7 @@
 #define __NR_getdents __NR_getdents64
 #define __NR_fadvise __NR_fadvise64
 
-
-
 /* Repeat with SYS_ prefix */
-
-
 
 #define SYS_read __NR_read
 #define SYS_write __NR_write
@@ -613,7 +609,6 @@
 #define SYS_userfaultfd __NR_userfaultfd
 #define SYS_membarrier __NR_membarrier
 #define SYS_mlock2 __NR_mlock2
-
 
 #define SYS_rt_sigaction __NR_rt_sigaction
 #define SYS_rt_sigreturn __NR_rt_sigreturn

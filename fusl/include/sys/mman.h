@@ -1,5 +1,5 @@
-#ifndef	_SYS_MMAN_H
-#define	_SYS_MMAN_H
+#ifndef _SYS_MMAN_H
+#define _SYS_MMAN_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,34 +18,34 @@ extern "C" {
 
 #include <bits/mman.h>
 
-void *mmap (void *, size_t, int, int, int, off_t);
-int munmap (void *, size_t);
+void* mmap(void*, size_t, int, int, int, off_t);
+int munmap(void*, size_t);
 
-int mprotect (void *, size_t, int);
-int msync (void *, size_t, int);
+int mprotect(void*, size_t, int);
+int msync(void*, size_t, int);
 
-int posix_madvise (void *, size_t, int);
+int posix_madvise(void*, size_t, int);
 
-int mlock (const void *, size_t);
-int munlock (const void *, size_t);
-int mlockall (int);
-int munlockall (void);
+int mlock(const void*, size_t);
+int munlock(const void*, size_t);
+int mlockall(int);
+int munlockall(void);
 
 #ifdef _GNU_SOURCE
 #define MREMAP_MAYMOVE 1
 #define MREMAP_FIXED 2
-void *mremap (void *, size_t, size_t, int, ...);
-int remap_file_pages (void *, size_t, int, size_t, int);
+void* mremap(void*, size_t, size_t, int, ...);
+int remap_file_pages(void*, size_t, int, size_t, int);
 #endif
 
 #if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
-#define MLOCK_ONFAULT   0x01
-int madvise (void *, size_t, int);
-int mincore (void *, size_t, unsigned char *);
+#define MLOCK_ONFAULT 0x01
+int madvise(void*, size_t, int);
+int mincore(void*, size_t, unsigned char*);
 #endif
 
-int shm_open (const char *, int, mode_t);
-int shm_unlink (const char *);
+int shm_open(const char*, int, mode_t);
+int shm_unlink(const char*);
 
 #if defined(_LARGEFILE64_SOURCE) || defined(_GNU_SOURCE)
 #define mmap64 mmap

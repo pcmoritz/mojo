@@ -1,17 +1,12 @@
 #include "libc.h"
 
-void sethostent(int x)
-{
+void sethostent(int x) {}
+
+void* gethostent() {
+  return 0;
 }
 
-void *gethostent()
-{
-	return 0;
-}
-
-void endhostent(void)
-{
-}
+void endhostent(void) {}
 
 weak_alias(sethostent, setnetent);
 weak_alias(gethostent, getnetent);

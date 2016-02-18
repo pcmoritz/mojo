@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include "syscall.h"
 
-int vhangup(void)
-{
-	return syscall(SYS_vhangup);
+int vhangup(void) {
+  return syscall(SYS_vhangup);
 }

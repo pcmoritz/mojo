@@ -1,5 +1,5 @@
-#ifndef	_UTIME_H
-#define	_UTIME_H
+#ifndef _UTIME_H
+#define _UTIME_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,13 +9,12 @@ extern "C" {
 
 #include <bits/alltypes.h>
 
-struct utimbuf
-{
-	time_t actime;
-	time_t modtime;
+struct utimbuf {
+  time_t actime;
+  time_t modtime;
 };
 
-int utime (const char *, const struct utimbuf *);
+int utime(const char*, const struct utimbuf*);
 
 #ifdef __cplusplus
 }

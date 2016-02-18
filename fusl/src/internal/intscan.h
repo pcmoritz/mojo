@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-unsigned long long __intscan(FILE *, unsigned, int, unsigned long long);
+unsigned long long __intscan(FILE*, unsigned, int, unsigned long long);
 
 #endif

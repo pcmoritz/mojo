@@ -9,16 +9,15 @@
  * In the case of stderr where the preexisting buffer is length 1, it
  * is not possible to set line buffering or full buffering. */
 
-int setvbuf(FILE *restrict f, char *restrict buf, int type, size_t size)
-{
-	f->lbf = EOF;
+int setvbuf(FILE* restrict f, char* restrict buf, int type, size_t size) {
+  f->lbf = EOF;
 
-	if (type == _IONBF)
-		f->buf_size = 0;
-	else if (type == _IOLBF)
-		f->lbf = '\n';
+  if (type == _IONBF)
+    f->buf_size = 0;
+  else if (type == _IOLBF)
+    f->lbf = '\n';
 
-	f->flags |= F_SVB;
+  f->flags |= F_SVB;
 
-	return 0;
+  return 0;
 }

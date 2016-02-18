@@ -2,11 +2,10 @@
 #include <sys/resource.h>
 #include "syscall.h"
 
-int nice(int inc)
-{
+int nice(int inc) {
 #ifdef SYS_nice
-	return syscall(SYS_nice, inc);
+  return syscall(SYS_nice, inc);
 #else
-	return setpriority(PRIO_PROCESS, 0, getpriority(PRIO_PROCESS, 0)+inc);
+  return setpriority(PRIO_PROCESS, 0, getpriority(PRIO_PROCESS, 0) + inc);
 #endif
 }

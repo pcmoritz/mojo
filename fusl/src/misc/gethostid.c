@@ -1,4 +1,3 @@
-long gethostid()
-{
-	return 0;
+long gethostid() {
+  return 0;
 }

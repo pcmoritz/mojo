@@ -3,8 +3,8 @@
 #define FDOP_OPEN 3
 
 struct fdop {
-	struct fdop *next, *prev;
-	int cmd, fd, srcfd, oflag;
-	mode_t mode;
-	char path[];
+  struct fdop *next, *prev;
+  int cmd, fd, srcfd, oflag;
+  mode_t mode;
+  char path[];
 };

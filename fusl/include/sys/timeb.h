@@ -9,12 +9,12 @@ extern "C" {
 #include <bits/alltypes.h>
 
 struct timeb {
-	time_t time;
-	unsigned short millitm;
-	short timezone, dstflag;
+  time_t time;
+  unsigned short millitm;
+  short timezone, dstflag;
 };
 
-int ftime(struct timeb *);
+int ftime(struct timeb*);
 
 #ifdef __cplusplus
 }

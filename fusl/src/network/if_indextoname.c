@@ -5,14 +5,14 @@
 #include <string.h>
 #include "syscall.h"
 
-char *if_indextoname(unsigned index, char *name)
-{
-	struct ifreq ifr;
-	int fd, r;
+char* if_indextoname(unsigned index, char* name) {
+  struct ifreq ifr;
+  int fd, r;
 
-	if ((fd = socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0)) < 0) return 0;
-	ifr.ifr_ifindex = index;
-	r = ioctl(fd, SIOCGIFNAME, &ifr);
-	__syscall(SYS_close, fd);
-	return r < 0 ? 0 : strncpy(name, ifr.ifr_name, IF_NAMESIZE);
+  if ((fd = socket(AF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0)) < 0)
+    return 0;
+  ifr.ifr_ifindex = index;
+  r = ioctl(fd, SIOCGIFNAME, &ifr);
+  __syscall(SYS_close, fd);
+  return r < 0 ? 0 : strncpy(name, ifr.ifr_name, IF_NAMESIZE);
 }

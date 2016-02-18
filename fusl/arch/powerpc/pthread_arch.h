@@ -1,17 +1,16 @@
-static inline struct pthread *__pthread_self()
-{
+static inline struct pthread* __pthread_self() {
 #ifdef __clang__
-	char *tp;
-	__asm__ __volatile__ ("mr %0, 2" : "=r"(tp) : : );
+  char* tp;
+  __asm__ __volatile__("mr %0, 2" : "=r"(tp) : :);
 #else
-	register char *tp __asm__("r2");
-	__asm__ __volatile__ ("" : "=r" (tp) );
+  register char* tp __asm__("r2");
+  __asm__ __volatile__("" : "=r"(tp));
 #endif
-	return (pthread_t)(tp - 0x7000 - sizeof(struct pthread));
+  return (pthread_t)(tp - 0x7000 - sizeof(struct pthread));
 }
-                        
+
 #define TLS_ABOVE_TP
-#define TP_ADJ(p) ((char *)(p) + sizeof(struct pthread) + 0x7000)
+#define TP_ADJ(p) ((char*)(p) + sizeof(struct pthread) + 0x7000)
 
 #define DTP_OFFSET 0x8000
 

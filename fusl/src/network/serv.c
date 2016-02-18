@@ -1,14 +1,9 @@
 #include <netdb.h>
 
-void endservent(void)
-{
-}
+void endservent(void) {}
 
-void setservent(int stayopen)
-{
-}
+void setservent(int stayopen) {}
 
-struct servent *getservent(void)
-{
-	return 0;
+struct servent* getservent(void) {
+  return 0;
 }

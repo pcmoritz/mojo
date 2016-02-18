@@ -1,5 +1,5 @@
-#ifndef	_SYS_TYPES_H
-#define	_SYS_TYPES_H
+#ifndef _SYS_TYPES_H
+#define _SYS_TYPES_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,7 +60,7 @@ extern "C" {
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 typedef unsigned u_int32_t;
-typedef char *caddr_t;
+typedef char* caddr_t;
 typedef unsigned char u_char;
 typedef unsigned short u_short, ushort;
 typedef unsigned u_int, uint;

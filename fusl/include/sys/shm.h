@@ -27,9 +27,9 @@ extern "C" {
 #define SHM_W 0200
 
 #define SHM_RDONLY 010000
-#define SHM_RND    020000
-#define SHM_REMAP  040000
-#define SHM_EXEC   0100000
+#define SHM_RND 020000
+#define SHM_REMAP 040000
+#define SHM_EXEC 0100000
 
 #define SHM_LOCK 11
 #define SHM_UNLOCK 12
@@ -42,9 +42,9 @@ extern "C" {
 
 typedef unsigned long shmatt_t;
 
-void *shmat(int, const void *, int);
-int shmctl(int, int, struct shmid_ds *);
-int shmdt(const void *);
+void* shmat(int, const void*, int);
+int shmctl(int, int, struct shmid_ds*);
+int shmdt(const void*);
 int shmget(key_t, size_t, int);
 
 #ifdef __cplusplus

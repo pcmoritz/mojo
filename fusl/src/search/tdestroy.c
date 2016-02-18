@@ -3,19 +3,19 @@
 #include <search.h>
 
 struct node {
-	void *key;
-	struct node *left;
-	struct node *right;
+  void* key;
+  struct node* left;
+  struct node* right;
 };
 
-void tdestroy(void *root, void (*freekey)(void *))
-{
-	struct node *r = root;
+void tdestroy(void* root, void (*freekey)(void*)) {
+  struct node* r = root;
 
-	if (r == 0)
-		return;
-	tdestroy(r->left, freekey);
-	tdestroy(r->right, freekey);
-	if (freekey) freekey(r->key);
-	free(r);
+  if (r == 0)
+    return;
+  tdestroy(r->left, freekey);
+  tdestroy(r->right, freekey);
+  if (freekey)
+    freekey(r->key);
+  free(r);
 }
