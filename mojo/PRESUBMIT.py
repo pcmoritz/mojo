@@ -220,9 +220,9 @@ def _CheckSourceSetsAreOfCorrectType(input_api, output_api, package):
 def _CheckChangePylintsClean(input_api, output_api):
   # Additional python module paths (we're in src/mojo/); not everyone needs
   # them, but it's easiest to add them to everyone's path.
-  # For ply and jinja2:
+  # For jinja2 (and markupsafe):
   third_party_path = os.path.join(
-      input_api.PresubmitLocalPath(), "..", "third_party")
+      input_api.PresubmitLocalPath(), "public", "third_party")
   # For the bindings generator:
   mojo_public_bindings_pylib_path = os.path.join(
       input_api.PresubmitLocalPath(), "public", "tools", "bindings", "pylib")
