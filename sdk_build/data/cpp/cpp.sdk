@@ -24,6 +24,11 @@ CopyDir("mojo/public/cpp",
         recursive=True,
         exclude_file_patterns=EXCLUDE_FILES,
         exclude_path_patterns=EXCLUDE_PATHS+["mojo/public/cpp/test_support/*"])
+CopyDir("mojo/public/interfaces",
+        "third_party/mojo/public/interfaces",
+        recursive=True,
+        exclude_file_patterns=EXCLUDE_FILES,
+        exclude_path_patterns=EXCLUDE_PATHS)
 
 # For simplicity, copy all of the bindings generators, even though we really
 # only need/want C++.
