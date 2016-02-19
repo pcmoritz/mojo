@@ -1269,8 +1269,8 @@ type runtimeTypeInfoTestCase struct {
 	// The contents of the two files
 	mojomContentsA           string
 	mojomContentsB           string
-	expectedRuntimeTypeInfoA *mojom_files.RuntimeTypeInfo
-	expectedRuntimeTypeInfoB *mojom_files.RuntimeTypeInfo
+	expectedRuntimeTypeInfoA *mojom_types.RuntimeTypeInfo
+	expectedRuntimeTypeInfoB *mojom_types.RuntimeTypeInfo
 }
 
 type runtimeTypeInfoTest struct {
@@ -1278,19 +1278,19 @@ type runtimeTypeInfoTest struct {
 	testCaseNum int
 }
 
-func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoA() *mojom_files.RuntimeTypeInfo {
+func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoA() *mojom_types.RuntimeTypeInfo {
 	return t.cases[t.testCaseNum].expectedRuntimeTypeInfoA
 }
 
-func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoB() *mojom_files.RuntimeTypeInfo {
+func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoB() *mojom_types.RuntimeTypeInfo {
 	return t.cases[t.testCaseNum].expectedRuntimeTypeInfoB
 }
 
 func (test *runtimeTypeInfoTest) addTestCase(contentsA, contentsB string) {
-	test.cases = append(test.cases, runtimeTypeInfoTestCase{contentsA, contentsB, new(mojom_files.RuntimeTypeInfo), new(mojom_files.RuntimeTypeInfo)})
-	test.expectedRuntimeTypeInfoA().ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	test.cases = append(test.cases, runtimeTypeInfoTestCase{contentsA, contentsB, new(mojom_types.RuntimeTypeInfo), new(mojom_types.RuntimeTypeInfo)})
+	test.expectedRuntimeTypeInfoA().ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
 	test.expectedRuntimeTypeInfoA().TypeMap = make(map[string]mojom_types.UserDefinedType)
-	test.expectedRuntimeTypeInfoB().ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	test.expectedRuntimeTypeInfoB().ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
 	test.expectedRuntimeTypeInfoB().TypeMap = make(map[string]mojom_types.UserDefinedType)
 }
 
@@ -1476,7 +1476,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		test.addTestCase(contentsA, contentsB)
 
 		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
 			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
 			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
 		}
@@ -1592,7 +1592,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		test.addTestCase(contentsA, contentsB)
 
 		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
 			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
 			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
 		}
@@ -1717,7 +1717,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		test.addTestCase(contentsA, contentsB)
 
 		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_files.ServiceTypeInfo{
+		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
 			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
 			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.Enum1", "TYPE_KEY:b.c.d.FooB"},
 		}
@@ -1879,12 +1879,12 @@ func TestRuntimeTypeInfo(t *testing.T) {
 
 		// Deserialize  RuntimeTypeInfo A
 		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo, nil)
-		runtimeTypeInfoA := mojom_files.RuntimeTypeInfo{}
+		runtimeTypeInfoA := mojom_types.RuntimeTypeInfo{}
 		runtimeTypeInfoA.Decode(decoder)
 
 		// Deserialize  RuntimeTypeInfo B
 		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameB].SerializedRuntimeTypeInfo, nil)
-		runtimeTypeInfoB := mojom_files.RuntimeTypeInfo{}
+		runtimeTypeInfoB := mojom_types.RuntimeTypeInfo{}
 		runtimeTypeInfoB.Decode(decoder)
 
 		// Compare A

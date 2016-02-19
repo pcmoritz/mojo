@@ -129,8 +129,8 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 	// We will populate a RuntimeTypeInfo structure and then serialize it and
 	// the serialized bytes will form the |serialized_runtime_type_info| field
 	// of the MojomFile.
-	typeInfo := mojom_files.RuntimeTypeInfo{}
-	typeInfo.ServicesByName = make(map[string]mojom_files.ServiceTypeInfo)
+	typeInfo := mojom_types.RuntimeTypeInfo{}
+	typeInfo.ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
 	typeInfo.TypeMap = make(map[string]mojom_types.UserDefinedType)
 
 	// We populate the declared_mojom_objects field
@@ -221,10 +221,10 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 // addServiceTypeInfo will add a ServiceTypeInfo to the ServicesByName field of |typeInfo| corresponding
 // to |intrfc| if |intrfc| is a top-level interface, meaning that it has a non-nil service name. In that
 // case this method returns true. Otherwise this method will do nothing and return fals.
-func addServiceTypeInfo(intrfc *mojom.MojomInterface, typeInfo *mojom_files.RuntimeTypeInfo) (isTopLevel bool) {
+func addServiceTypeInfo(intrfc *mojom.MojomInterface, typeInfo *mojom_types.RuntimeTypeInfo) (isTopLevel bool) {
 	isTopLevel = intrfc.ServiceName != nil
 	if isTopLevel {
-		serviceTypeInfo := mojom_files.ServiceTypeInfo{}
+		serviceTypeInfo := mojom_types.ServiceTypeInfo{}
 		serviceTypeInfo.TopLevelInterface = intrfc.TypeKey()
 		serviceTypeInfo.CompleteTypeSet = intrfc.FindReachableTypes()
 		typeInfo.ServicesByName[*intrfc.ServiceName] = serviceTypeInfo
