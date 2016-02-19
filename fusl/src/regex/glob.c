@@ -245,6 +245,3 @@ void globfree(glob_t* g) {
   g->gl_pathc = 0;
   g->gl_pathv = NULL;
 }
-
-LFS64(glob);
-LFS64(globfree);

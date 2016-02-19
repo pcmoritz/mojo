@@ -26,5 +26,3 @@ int getrlimit(int resource, struct rlimit* rlim) {
   FIX(rlim->rlim_max);
   return 0;
 }
-
-LFS64(getrlimit);

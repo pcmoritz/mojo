@@ -9,5 +9,3 @@ int ftw(const char* path,
    * actually undefined, but works on all real-world machines. */
   return nftw(path, (int (*)())fn, fd_limit, FTW_PHYS);
 }
-
-LFS64(ftw);

@@ -140,5 +140,3 @@ int lio_listio(int mode,
 
   return 0;
 }
-
-LFS64(lio_listio);

@@ -24,5 +24,3 @@ struct dirent* readdir(DIR* dir) {
   dir->tell = de->d_off;
   return de;
 }
-
-LFS64(readdir);

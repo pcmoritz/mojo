@@ -52,5 +52,3 @@ int scandir(const char* path,
   *res = names;
   return cnt;
 }
-
-LFS64(scandir);

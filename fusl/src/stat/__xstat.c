@@ -17,11 +17,6 @@ int __xstat(int ver, const char* path, struct stat* buf) {
   return stat(path, buf);
 }
 
-LFS64(__fxstat);
-LFS64(__fxstatat);
-LFS64(__lxstat);
-LFS64(__xstat);
-
 int __xmknod(int ver, const char* path, mode_t mode, dev_t* dev) {
   return mknod(path, mode, *dev);
 }

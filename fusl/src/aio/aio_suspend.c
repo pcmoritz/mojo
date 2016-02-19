@@ -80,5 +80,3 @@ int aio_suspend(const struct aiocb* const cbs[],
     }
   }
 }
-
-LFS64(aio_suspend);

@@ -8,5 +8,3 @@ int fstatat(int fd,
             int flag) {
   return syscall(SYS_fstatat, fd, path, buf, flag);
 }
-
-LFS64(fstatat);

@@ -380,10 +380,3 @@ int __aio_close(int fd) {
     aio_cancel(fd, 0);
   return fd;
 }
-
-LFS64(aio_cancel);
-LFS64(aio_error);
-LFS64(aio_fsync);
-LFS64(aio_read);
-LFS64(aio_write);
-LFS64(aio_return);

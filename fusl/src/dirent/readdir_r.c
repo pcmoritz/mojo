@@ -28,5 +28,3 @@ int readdir_r(DIR* restrict dir,
   *result = buf;
   return 0;
 }
-
-LFS64_2(readdir_r, readdir64_r);

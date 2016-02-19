@@ -130,5 +130,3 @@ int nftw(const char* path,
   pthread_setcancelstate(cs, 0);
   return r;
 }
-
-LFS64(nftw);

@@ -28,6 +28,3 @@ int prlimit(pid_t pid,
   }
   return r;
 }
-
-#undef prlimit64
-LFS64(prlimit);

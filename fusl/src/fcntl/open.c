@@ -19,5 +19,3 @@ int open(const char* filename, int flags, ...) {
 
   return __syscall_ret(fd);
 }
-
-LFS64(open);

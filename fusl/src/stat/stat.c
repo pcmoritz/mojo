@@ -10,5 +10,3 @@ int stat(const char* restrict path, struct stat* restrict buf) {
   return syscall(SYS_fstatat, AT_FDCWD, path, buf, 0);
 #endif
 }
-
-LFS64(stat);
