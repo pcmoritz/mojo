@@ -46,9 +46,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$Owl: Owl/packages/glibc/crypt_freesec.c,v 1.6 2010/02/20 14:45:06 solar
+ *      $Owl: Owl/packages/glibc/crypt_freesec.c,v 1.6 2010/02/20 14:45:06 solar
  *Exp $
- *	$Id: crypt.c,v 1.15 1994/09/13 04:58:49 davidb Exp $
+ *      $Id: crypt.c,v 1.15 1994/09/13 04:58:49 davidb Exp $
  *
  * This is an original implementation of the DES and the crypt(3) interfaces
  * by David Burren.  It has been heavily re-worked by Solar Designer.
@@ -844,8 +844,8 @@ static char* _crypt_extended_r_uut(const char* _key,
   if (*setting == _PASSWORD_EFMT1) {
     /*
      * "new"-style:
-     *	setting - underscore, 4 chars of count, 4 chars of salt
-     *	key - unlimited characters
+     *   setting - underscore, 4 chars of count, 4 chars of salt
+     *   key - unlimited characters
      */
     for (i = 1, count = 0; i < 5; i++) {
       uint32_t value = ascii_to_bin(setting[i]);
@@ -883,8 +883,8 @@ static char* _crypt_extended_r_uut(const char* _key,
   } else {
     /*
      * "old"-style:
-     *	setting - 2 chars of salt
-     *	key - up to 8 characters
+     *   setting - 2 chars of salt
+     *   key - up to 8 characters
      */
     count = 25;
 

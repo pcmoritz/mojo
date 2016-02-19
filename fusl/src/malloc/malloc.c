@@ -133,27 +133,6 @@ static int bin_index_up(size_t x) {
          496;
 }
 
-#if 0
-void __dump_heap(int x)
-{
-	struct chunk *c;
-	int i;
-	for (c = (void *)mal.heap; CHUNK_SIZE(c); c = NEXT_CHUNK(c))
-		fprintf(stderr, "base %p size %zu (%d) flags %d/%d\n",
-			c, CHUNK_SIZE(c), bin_index(CHUNK_SIZE(c)),
-			c->csize & 15,
-			NEXT_CHUNK(c)->psize & 15);
-	for (i=0; i<64; i++) {
-		if (mal.bins[i].head != BIN_TO_CHUNK(i) && mal.bins[i].head) {
-			fprintf(stderr, "bin %d: %p\n", i, mal.bins[i].head);
-			if (!(mal.binmap & 1ULL<<i))
-				fprintf(stderr, "missing from binmap!\n");
-		} else if (mal.binmap & 1ULL<<i)
-			fprintf(stderr, "binmap wrongly contains %d!\n", i);
-	}
-}
-#endif
-
 void* __expand_heap(size_t*);
 
 static struct chunk* expand_heap(size_t n) {

@@ -28,11 +28,6 @@ static inline void a_barrier() {
   /* mips2 sync, but using too many directives causes
    * gcc not to inline it, so encode with .long instead. */
   __asm__ __volatile__(".long 0xf" : : : "memory");
-#if 0
-	__asm__ __volatile__ (
-		".set push ; .set mips2 ; sync ; .set pop"
-		: : : "memory");
-#endif
 }
 
 #define a_pre_llsc a_barrier

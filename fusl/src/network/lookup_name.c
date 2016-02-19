@@ -269,15 +269,13 @@ static const struct policy {
     {"\x20\2", 1, 0xff, 30, 2},
     {"\x20\1", 3, 0xff, 5, 5},
     {"\xfc", 0, 0xfe, 3, 13},
-#if 0
-	/* These are deprecated and/or returned to the address
-	 * pool, so despite the RFC, treating them as special
-	 * is probably wrong. */
-	{ "", 11, 0xff, 1, 3 },
-	{ "\xfe\xc0", 1, 0xc0, 1, 11 },
-	{ "\x3f\xfe", 1, 0xff, 1, 12 },
-#endif
-    /* Last rule must match all addresses to stop loop. */
+    /* These are deprecated and/or returned to the address
+     * pool, so despite the RFC, treating them as special
+     * is probably wrong.
+     * {"", 11, 0xff, 1, 3},
+     * {"\xfe\xc0", 1, 0xc0, 1, 11},
+     * {"\x3f\xfe", 1, 0xff, 1, 12},
+     * Last rule must match all addresses to stop loop. */
     {"", 0, 0, 40, 1},
 };
 

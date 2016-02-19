@@ -137,8 +137,8 @@ static int tre_neg_char_classes_match(tre_ctype_t* classes,
 
 /*
   This algorithm searches for matches basically by reading characters
-  in the searched string one by one, starting at the beginning.	 All
-  matching paths in the TNFA are traversed in parallel.	 When two or
+  in the searched string one by one, starting at the beginning. All
+  matching paths in the TNFA are traversed in parallel. When two or
   more paths reach the same state, exactly one is chosen according to
   tag ordering rules; if returning submatches is not required it does
   not matter which path is chosen.
@@ -200,7 +200,7 @@ static reg_errcode_t tre_tnfa_run_parallel(const tre_tnfa_t* tnfa,
   else
     num_tags = tnfa->num_tags;
 
-  /* Allocate memory for temporary data required for matching.	This needs to
+  /* Allocate memory for temporary data required for matching. This needs to
      be done for every matching operation to be thread safe.  This allocates
      everything in a single large block from the stack frame using alloca()
      or with malloc() if alloca is unavailable. */
@@ -423,7 +423,7 @@ error_exit:
   routine which basically goes through all possible paths in the TNFA
   and chooses the one which results in the best (leftmost and longest)
   match.  This can be spectacularly expensive and may run out of stack
-  space, but there really is no better known generic algorithm.	 Quoting
+  space, but there really is no better known generic algorithm. Quoting
   Henry Spencer from comp.compilers:
   <URL: http://compilers.iecc.com/comparch/article/93-03-102>
 
@@ -756,10 +756,6 @@ retry : {
             for (tmp = trans_i->tags; tmp && *tmp >= 0; tmp++)
               stack->item.tags[*tmp] = pos;
           }
-#if 0 /* XXX - it's important not to look at all transitions here to keep \
-         the stack small! */
-		  break;
-#endif
         }
       }
     }

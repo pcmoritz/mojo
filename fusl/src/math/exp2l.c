@@ -523,8 +523,8 @@ static const float eps[TBLSIZE] = {
  *
  *   This method is due to Gal, with many details due to Gal and Bachelis:
  *
- *	Gal, S. and Bachelis, B.  An Accurate Elementary Mathematical Library
- *	for the IEEE Floating Point Standard.  TOMS 17(1), 26-46 (1991).
+ *      Gal, S. and Bachelis, B.  An Accurate Elementary Mathematical Library
+ *      for the IEEE Floating Point Standard.  TOMS 17(1), 26-46 (1991).
  */
 long double exp2l(long double x) {
   union ldshape u = {x};

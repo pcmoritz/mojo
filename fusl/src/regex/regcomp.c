@@ -98,7 +98,7 @@ typedef struct {
   tre_ctype_t* neg_classes;
 } tre_literal_t;
 
-/* A "catenation" node.	 These are created when two regexps are concatenated.
+/* A "catenation" node. These are created when two regexps are concatenated.
    If there are more than one subexpressions in sequence, the `left' part
    holds all but the last, and `right' part holds the last subexpression
    (catenation is left associative). */
@@ -107,7 +107,7 @@ typedef struct {
   tre_ast_node_t* right;
 } tre_catenation_t;
 
-/* An "iteration" node.	 These are created for the "*", "+", "?", and "{m,n}"
+/* An "iteration" node. These are created for the "*", "+", "?", and "{m,n}"
    operators. */
 typedef struct {
   /* Subexpression to match. */
@@ -117,7 +117,7 @@ typedef struct {
   /* Maximum number of consecutive matches. */
   int max;
   /* If 0, match as many characters as possible, if 1 match as few as
-     possible.	Note that this does not always mean the same thing as
+     possible. Note that this does not always mean the same thing as
      matching as many/few repetitions as possible. */
   unsigned int minimal : 1;
 } tre_iteration_t;
@@ -218,9 +218,9 @@ static tre_ast_node_t* tre_ast_new_catenation(tre_mem_t mem,
 
 typedef struct tre_stack_rec tre_stack_t;
 
-/* Creates a new stack object.	`size' is initial size in bytes, `max_size'
+/* Creates a new stack object. `size' is initial size in bytes, `max_size'
    is maximum size, and `increment' specifies how much more space will be
-   allocated with realloc() if all space gets used up.	Returns the stack
+   allocated with realloc() if all space gets used up. Returns the stack
    object or NULL if out of memory. */
 static tre_stack_t* tre_stack_new(int size, int max_size, int increment);
 
@@ -1486,7 +1486,7 @@ static reg_errcode_t tre_add_tags(tre_mem_t mem,
       case ADDTAGS_AFTER_UNION_LEFT:
         /* Lift the bottom of the `regset' array so that when processing
            the right operand the items currently in the array are
-           invisible.	 The original bottom was saved at ADDTAGS_UNION and
+           invisible. The original bottom was saved at ADDTAGS_UNION and
            will be restored at ADDTAGS_AFTER_UNION_RIGHT below. */
         while (*regset >= 0)
           regset++;
@@ -1513,7 +1513,7 @@ static reg_errcode_t tre_add_tags(tre_mem_t mem,
         /* XXX - This is not always necessary (if the children have
            tags which must be seen for every match of that child). */
         /* XXX - Check if this is the only place where tre_add_tag_right
-           is used.	 If so, use tre_add_tag_left (putting the tag before
+           is used. If so, use tre_add_tag_left (putting the tag before
            the child as opposed after the child) and throw away
            tre_add_tag_right. */
         if (node->num_submatches > 0) {
@@ -2311,23 +2311,6 @@ static reg_errcode_t tre_make_trans(tre_pos_and_tags_t* p1,
            position `p1->position'. */
         trans = transitions + offs[p1->position];
         while (trans->state != NULL) {
-#if 0
-		/* If we find a previous transition from `p1->position' to
-		   `p2->position', it is overwritten.  This can happen only
-		   if there are nested loops in the regexp, like in "((a)*)*".
-		   In POSIX.2 repetition using the outer loop is always
-		   preferred over using the inner loop.	 Therefore the
-		   transition for the inner loop is useless and can be thrown
-		   away. */
-		/* XXX - The same position is used for all nodes in a bracket
-		   expression, so this optimization cannot be used (it will
-		   break bracket expressions) unless I figure out a way to
-		   detect it here. */
-		if (trans->state_id == p2->position)
-		  {
-		    break;
-		  }
-#endif
           trans++;
         }
 
@@ -2424,7 +2407,7 @@ static reg_errcode_t tre_make_trans(tre_pos_and_tags_t* p1,
   return REG_OK;
 }
 
-/* Converts the syntax tree to a TNFA.	All the transitions in the TNFA are
+/* Converts the syntax tree to a TNFA. All the transitions in the TNFA are
    labelled with one character range (there are no transitions on empty
    strings).  The TNFA takes O(n^2) space in the worst case, `n' is size of
    the regexp. */
@@ -2586,7 +2569,7 @@ int regcomp(regex_t* restrict preg, const char* restrict regex, int cflags) {
 
   /* Add a dummy node for the final state.
      XXX - For certain patterns this dummy node can be optimized away,
-           for example "a*" or "ab*".	Figure out a simple way to detect
+           for example "a*" or "ab*". Figure out a simple way to detect
            this possibility. */
   tmp_ast_l = tree;
   tmp_ast_r = tre_ast_new_literal(mem, 0, 0, parse_ctx.position++);

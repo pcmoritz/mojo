@@ -283,7 +283,7 @@
 #define __NR_mq_getsetattr (__NR_mq_open + 5)
 #define __NR_kexec_load 283
 #define __NR_waitid 284
-/* #define __NR_sys_setaltroot	285 */
+/* #define __NR_sys_setaltroot 285 */
 #define __NR_add_key 286
 #define __NR_request_key 287
 #define __NR_keyctl 288
@@ -663,7 +663,7 @@
 #define SYS_mq_getsetattr (SYS_mq_open + 5)
 #define SYS_kexec_load 283
 #define SYS_waitid 284
-/* #define SYS_sys_setaltroot	285 */
+/* #define SYS_sys_setaltroot 285 */
 #define SYS_add_key 286
 #define SYS_request_key 287
 #define SYS_keyctl 288

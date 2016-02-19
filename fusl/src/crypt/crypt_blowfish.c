@@ -5,7 +5,7 @@
 /*
  * The crypt_blowfish homepage is:
  *
- *	http://www.openwall.com/crypt/
+ *      http://www.openwall.com/crypt/
  *
  * This code comes from John the Ripper password cracker, with reentrant
  * and crypt(3) interfaces added, but optimizations specific to password
@@ -40,7 +40,7 @@
  *
  * There's a paper on the algorithm that explains its design decisions:
  *
- *	http://www.usenix.org/events/usenix99/provos.html
+ *      http://www.usenix.org/events/usenix99/provos.html
  *
  * Some of the tricks in BF_ROUND might be inspired by Eric Young's
  * Blowfish library (I can't be sure if I would think of something if I
@@ -370,29 +370,10 @@ static BF_word BF_encrypt(BF_ctx* ctx,
 
   do {
     L ^= ctx->s.P[0];
-#if 0
-		BF_ROUND(L, R, 0);
-		BF_ROUND(R, L, 1);
-		BF_ROUND(L, R, 2);
-		BF_ROUND(R, L, 3);
-		BF_ROUND(L, R, 4);
-		BF_ROUND(R, L, 5);
-		BF_ROUND(L, R, 6);
-		BF_ROUND(R, L, 7);
-		BF_ROUND(L, R, 8);
-		BF_ROUND(R, L, 9);
-		BF_ROUND(L, R, 10);
-		BF_ROUND(R, L, 11);
-		BF_ROUND(L, R, 12);
-		BF_ROUND(R, L, 13);
-		BF_ROUND(L, R, 14);
-		BF_ROUND(R, L, 15);
-#else
     for (int i = 0; i < 16; i += 2) {
       BF_ROUND(L, R, i);
       BF_ROUND(R, L, i + 1);
     }
-#endif
     tmp4 = R;
     R = L;
     L = tmp4 ^ ctx->s.P[BF_N + 1];
