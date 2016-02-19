@@ -15,12 +15,22 @@ import shutil
 import sys
 
 
-def _CopyFiles(source_path, dest_path, **kwargs):
-  """Copies files from the source git repository (the current working directory
-  should be the root of this repository) to the destination path. |source_path|
-  and the keyword arguments are as for the arguments of |GitLsFiles|.
-  |dest_path| should be the "root" destination path. Note that a file such as
-  <source_path>/foo/bar/baz.quux is copied to <dest_path>/foo/bar/baz.quux."""
+def _MakeDirs(*args, **kwargs):
+  """Like |os.makedirs()|, but ignores |OSError| exceptions (it assumes that
+  these are due to the directory already existing)."""
+  try:
+    os.makedirs(*args, **kwargs)
+  except OSError:
+    pass
+
+
+def _CopyDir(source_path, dest_path, **kwargs):
+  """Copies directories from the source git repository (the current working
+  directory should be the root of this repository) to the destination path.
+  |source_path| and the keyword arguments are as for the arguments of
+  |GitLsFiles|. |dest_path| should be the "root" destination path. Note that a
+  file such as <source_path>/foo/bar/baz.quux is copied to
+  <dest_path>/foo/bar/baz.quux."""
 
   # Normalize the source path. Note that this strips any trailing '/'.
   source_path = os.path.normpath(source_path)
@@ -28,16 +38,29 @@ def _CopyFiles(source_path, dest_path, **kwargs):
   for source_file in source_files:
     rel_path = source_file[len(source_path) + 1:]
     dest_file = os.path.join(dest_path, rel_path)
-    try:
-      os.makedirs(os.path.dirname(dest_file))
-    except OSError:
-      pass
-    shutil.copyfile(source_file, dest_file)
+    _MakeDirs(os.path.dirname(dest_file))
+    shutil.copy(source_file, dest_file)
+
+
+def _CopyFiles(source_files, dest_path):
+  """Copies a given source file or files from the source git repository to the
+  given destination path (the current working directory should be the root of
+  this repository) |source_files| should either be a relative path to a single
+  file in the source git repository or an iterable of such paths; note that this
+  does not check that files are actually in the git repository (i.e., are
+  tracked)."""
+
+  if type(source_files) is str:
+    source_files = [source_files]
+  _MakeDirs(dest_path)
+  for source_file in source_files:
+    shutil.copy(source_file,
+                os.path.join(dest_path, os.path.basename(source_file)))
 
 
 def main():
   parser = argparse.ArgumentParser(
-      description="Constructs an SDK from a specification")
+      description="Constructs an SDK from a specification.")
   parser.add_argument("--allow-dirty-tree", dest="allow_dirty_tree",
                       action="store_true",
                       help="proceed even if the source tree is dirty")
@@ -64,11 +87,16 @@ def main():
   except OSError:
     FatalError("failed to create target directory %s" % target_dir)
 
-  def CopyFilesToTargetDir(source_path, rel_dest_path, **kwargs):
-    return _CopyFiles(source_path, os.path.join(target_dir, rel_dest_path),
+  def CopyDirToTargetDir(source_path, rel_dest_path, **kwargs):
+    return _CopyDir(source_path, os.path.join(target_dir, rel_dest_path),
+                    **kwargs)
+
+  def CopyFilesToTargetDir(source_files, rel_dest_path, **kwargs):
+    return _CopyFiles(source_files, os.path.join(target_dir, rel_dest_path),
                       **kwargs)
 
-  execution_globals = {"CopyFiles": CopyFilesToTargetDir,
+  execution_globals = {"CopyDir": CopyDirToTargetDir,
+                       "CopyFiles": CopyFilesToTargetDir,
                        "FatalError": FatalError,
                        "GitLsFiles": GitLsFiles}
   exec args.sdk_spec_file in execution_globals
