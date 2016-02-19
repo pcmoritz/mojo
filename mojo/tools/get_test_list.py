@@ -100,6 +100,12 @@ def GetTestList(config, verbose_count=0):
                  [os.path.join("mojo", "tools", "apptest_runner.py"),
                   os.path.join("mojo", "tools", "data", "apptests"),
                   build_dir] + verbose_flags)
+    # Fusl app tests (Linux excluding Android):
+    if (target_os == Config.OS_LINUX):
+      AddXvfbEntry("Fusl app tests",
+                   [os.path.join("mojo", "tools", "apptest_runner.py"),
+                    os.path.join("mojo", "tools", "data", "fusl_apptests"),
+                    build_dir] + verbose_flags)
     # Non-SFI NaCl app tests (Linux including Android, no asan):
     if config.sanitizer != Config.SANITIZER_ASAN:
       AddXvfbEntry("Non-SFI NaCl App tests",

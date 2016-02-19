@@ -7,7 +7,7 @@ import("//mojo/public/tools/bindings/mojom.gni")
 import("//mojo/tools/embed/rules.gni")
 
 embed_file("embed_icu_data") {
-  source = "$root_build_dir/icudtl.dat"
+  source = "$root_out_dir/icudtl.dat"
   namespace = "icu_data"
   variable = "kICUData"
 
@@ -22,11 +22,11 @@ mojo_native_application("icu_data") {
   ]
 
   deps = [
+    ":embed_icu_data",
     "//base",
     "//mojo/application",
     "//mojo/common",
     "//mojo/environment:chromium",
     "//mojo/services/icu_data/interfaces",
-    ":embed_icu_data",
   ]
 }

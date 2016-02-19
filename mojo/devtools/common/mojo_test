@@ -11,6 +11,7 @@ TODO(vtl|msw): Add a way of specifying data dependencies.
 import argparse
 import logging
 import sys
+import os.path
 
 from devtoolslib import apptest_dart
 from devtoolslib import apptest_gtest
@@ -80,7 +81,10 @@ def main():
     return 1
 
   target_os = "android" if script_args.android else "linux"
-  test_list_globals = {"target_os": target_os}
+  test_list_globals = {
+    "shell_path": config.shell_path,
+    "target_os": target_os,
+  }
   exec script_args.test_list_file in test_list_globals
   test_list = test_list_globals["tests"]
 
