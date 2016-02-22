@@ -68,7 +68,6 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 	p.writeModuleNamespace(mojomFile.ModuleNamespace)
 
 	if len(mojomFile.Imports) > 0 {
-		p.nl()
 		p.writeImportedFiles(mojomFile.Imports)
 	}
 
@@ -95,9 +94,21 @@ func (p *printer) writeModuleNamespace(module *mojom.ModuleNamespace) {
 	p.nl()
 }
 
-// writeImportedFiles sorts and writes a slice of import statements.
+// writeImportedFiles identifies blocks of imports, sorts and writes them.
 func (p *printer) writeImportedFiles(imports []*mojom.ImportedFile) {
-	// TODO(azani): Detect and handle separate blocks of imports.
+	blockStart := 0
+	for i, imported := range imports {
+		if isNewBlock(imported) {
+			p.writeImportedFilesBlock(imports[blockStart:i])
+			blockStart = i
+			p.nl()
+		}
+	}
+	p.writeImportedFilesBlock(imports[blockStart:len(imports)])
+}
+
+// writeImportedFilesBlock sorts and writes a slice of import statements.
+func (p *printer) writeImportedFilesBlock(imports []*mojom.ImportedFile) {
 	sortImportedFiles(imports)
 	for _, imported := range imports {
 		p.writeBeforeComments(imported)
@@ -504,15 +515,17 @@ func (p *printer) setEolComment(comment lexer.Token) {
 // If the element has no attributes and the first "comment" attached above the
 // element itself is an empty line, the element is a new block.
 // Else, the element is not a new block.
-func isNewBlock(declaredObject mojom.DeclaredObject) bool {
-	if declaredObject.Attributes() != nil {
-		comments := declaredObject.Attributes().AttachedComments()
-		if comments == nil || len(comments.Above) == 0 {
-			return false
+func isNewBlock(mojomElement mojom.MojomElement) bool {
+	if declaredObject, ok := mojomElement.(mojom.DeclaredObject); ok {
+		if declaredObject.Attributes() != nil {
+			comments := declaredObject.Attributes().AttachedComments()
+			if comments == nil || len(comments.Above) == 0 {
+				return false
+			}
+			return comments.Above[0].Kind == lexer.EmptyLine
 		}
-		return comments.Above[0].Kind == lexer.EmptyLine
 	}
-	comments := declaredObject.AttachedComments()
+	comments := mojomElement.AttachedComments()
 
 	if comments == nil || len(comments.Above) == 0 {
 		return false

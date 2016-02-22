@@ -21,6 +21,9 @@ func TestFormatMojom(t *testing.T) {
 import "foo1.mojom";
 import "foo2.mojom";
 
+import "afoo1.mojom";
+import "afoo2.mojom";
+
 struct FooStruct { // FooStruct comment.
   // Field 1 comment.
   int8 field1; // Field 1 comment.

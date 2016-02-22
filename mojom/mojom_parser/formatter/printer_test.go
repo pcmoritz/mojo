@@ -91,6 +91,28 @@ func TestWriteImportedFiles(t *testing.T) {
 	checkEq(t, expected, p.result())
 }
 
+func TestWriteImportedFilesBlocks(t *testing.T) {
+	imports := []*mojom.ImportedFile{
+		mojom.NewImportedFile("foo4.mojom", nil),
+		mojom.NewImportedFile("foo3.mojom", nil),
+		mojom.NewImportedFile("foo2.mojom", nil),
+		mojom.NewImportedFile("foo1.mojom", nil),
+	}
+	c := imports[2].NewAttachedComments()
+	c.Above = append(c.Above, lexer.Token{Kind: lexer.EmptyLine})
+
+	p := getNewPrinter()
+	p.writeImportedFiles(imports)
+
+	expected := `import "foo3.mojom";
+import "foo4.mojom";
+
+import "foo1.mojom";
+import "foo2.mojom";
+`
+	checkEq(t, expected, p.result())
+}
+
 func cppComment(line int, c string) (t lexer.Token) {
 	t.Kind = lexer.SingleLineComment
 	t.Text = "// " + c
