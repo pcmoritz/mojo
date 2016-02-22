@@ -71,15 +71,12 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 		p.writeImportedFiles(mojomFile.Imports)
 	}
 
-	for i, declaredObject := range mojomFile.DeclaredObjects {
+	for _, declaredObject := range mojomFile.DeclaredObjects {
 		p.writeDeclaredObject(declaredObject)
-		if i < len(mojomFile.DeclaredObjects)-1 {
-			p.nl()
-		}
+		p.nl()
 	}
 
-	if mojomFile.FinalComments != nil {
-		p.nl()
+	if mojomFile.FinalComments != nil && len(mojomFile.FinalComments) > 0 {
 		p.nl()
 		p.writeCommentBlocks(mojomFile.FinalComments)
 	}
@@ -172,6 +169,9 @@ func (p *printer) writeMojomInterface(mojomInterface *mojom.MojomInterface) {
 
 func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 	p.write(mojomMethod.NameToken().Text)
+	if mojomMethod.DeclaredOrdinal() >= 0 {
+		p.writef("@%v", mojomMethod.DeclaredOrdinal())
+	}
 	p.writeMethodParams(mojomMethod.Parameters)
 	if mojomMethod.ResponseParameters != nil && len(mojomMethod.ResponseParameters.Fields) > 0 {
 		p.write(" => ")
@@ -199,10 +199,13 @@ func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
 // writeMethodParam writes a single pretty-printed method parameter represented
 // by a StructField.
 func (p *printer) writeMethodParam(param *mojom.StructField) {
-	p.writeAttributes(param.Attributes())
+	p.writeAttributesSingleLine(param.Attributes())
 	p.writeBeforeComments(param)
 	p.writeTypeRef(param.FieldType)
 	p.writef(" %v", param.NameToken().Text)
+	if param.DeclaredOrdinal() >= 0 {
+		p.writef("@%v", param.DeclaredOrdinal())
+	}
 	if param.DefaultValue != nil {
 		p.write("=")
 		p.writeValueRef(param.DefaultValue)
@@ -251,6 +254,7 @@ func (p *printer) writeEnumValue(enumValue *mojom.EnumValue) {
 		p.writeValueRef(enumValue.ValueRef())
 	}
 	p.write(",")
+	p.writeRightComments(enumValue)
 }
 
 // writeDeclaredObjectsContainer
@@ -259,8 +263,11 @@ func (p *printer) writeEnumValue(enumValue *mojom.EnumValue) {
 // declarations (fields, enum values, nested declarations and methods) and the
 // closing brace.
 func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsContainer) {
-	// TODO(azani): Detect when a blank line should separate two declared objects.
 	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
+	if len(container.GetDeclaredObjects()) == 0 {
+		p.write("};")
+		return
+	}
 	p.writeRightComments(container.(mojom.MojomElement))
 	p.incIndent()
 	p.nl()
@@ -277,8 +284,29 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 	p.write("};")
 }
 
+// See writeAttributesBase.
 func (p *printer) writeAttributes(attrs *mojom.Attributes) {
-	if attrs == nil || len(attrs.List) == 0 {
+	p.writeAttributesBase(attrs, false)
+}
+
+// writeAttributesSingleLine writes the provided attributes on a single line.
+// This is used by the writeMethodParam to write the attributes of a parameter.
+func (p *printer) writeAttributesSingleLine(attrs *mojom.Attributes) {
+	p.writeAttributesBase(attrs, true)
+}
+
+// writeAttributesBase writes the provided attributes. If singleLine is
+// false, every attribute is written on a new line and a new line is appended
+// after the attributes are written. Otherwise, the attributes are written on
+// a single line.
+func (p *printer) writeAttributesBase(attrs *mojom.Attributes, singleLine bool) {
+	if attrs == nil {
+		return
+	}
+
+	p.writeBeforeComments(attrs)
+
+	if len(attrs.List) == 0 {
 		return
 	}
 
@@ -287,15 +315,24 @@ func (p *printer) writeAttributes(attrs *mojom.Attributes) {
 		p.writeAttribute(&attr)
 		if idx < len(attrs.List)-1 {
 			p.writef(",")
-			p.nl()
+			if singleLine {
+				p.write(" ")
+			} else {
+				p.nl()
+			}
 		}
 	}
 	p.writef("]")
+	if !singleLine {
+		p.nl()
+	}
 }
 
 func (p *printer) writeAttribute(attr *mojom.MojomAttribute) {
+	p.writeBeforeComments(attr)
 	p.writef("%s=", attr.Key)
 	p.writeValueRef(attr.Value)
+	p.writeRightComments(attr)
 }
 
 func (p *printer) writeTypeRef(t mojom.TypeRef) {
@@ -303,6 +340,9 @@ func (p *printer) writeTypeRef(t mojom.TypeRef) {
 	case mojom.TypeKindUserDefined:
 		u := t.(*mojom.UserTypeRef)
 		p.write(u.Identifier())
+		if u.IsInterfaceRequest() {
+			p.write("&")
+		}
 		if u.Nullable() {
 			p.write("?")
 		}

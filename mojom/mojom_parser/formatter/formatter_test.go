@@ -11,6 +11,8 @@ import (
 
 func TestFormatMojom(t *testing.T) {
 	original := `// Top line comment.
+[Attr1=1,
+Attr2=2]
 /* left comment */ module hello.world; // Right comment
 
 // First block line 1
@@ -24,6 +26,8 @@ import "foo2.mojom";
 import "afoo1.mojom";
 import "afoo2.mojom";
 
+[Attr1=1,
+Attr2=2]
 struct FooStruct { // FooStruct comment.
   // Field 1 comment.
   int8 field1; // Field 1 comment.
@@ -39,8 +43,8 @@ struct FooUnion {
 };
 
 enum FooEnum {
-	VALUE1,
-	VALUE2 = 10,
+	VALUE1, // VALUE1 comment.
+	VALUE2 = 10, // VALUE2 comment.
 };
 
 // constant comment.
@@ -51,15 +55,15 @@ interface InterfaceFoo { // Interface comment.
 	const int8 const_in_interface = 20;
 
 	// Method 1 comment.
-	method1(int8 hello);
+	method1@5(int8 hello@10);
 	// Method 2 comment.
-	method2(int8 hello) => (Foo bar);
+	method2([MinVersion=5]int8 hello) => (Foo bar@20);
 	method3();
 	method4() => (Foo bar);
 	method5(int8 p1 /* p1 comment */, int16 p2); // method comment
 };
 
-// Final comments.
+// Final Comments.
 `
 
 	// TODO(azani): Remove this and just fix the tabs.
@@ -71,6 +75,6 @@ interface InterfaceFoo { // Interface comment.
 	}
 
 	if original != actual {
-		t.Fatalf("\nExpected:\n%v\n\n*****\n\nActual:\n%v", original, actual)
+		t.Fatalf("\nExpected:\n%v\n\n*****\n\nActual:\n%v eof", original, actual)
 	}
 }

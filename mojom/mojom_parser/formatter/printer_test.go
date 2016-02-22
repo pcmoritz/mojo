@@ -74,7 +74,19 @@ func TestWriteAttributes(t *testing.T) {
 	p := getNewPrinter()
 	p.writeAttributes(attrs)
 
-	expected := "[key1=10,\nkey2=20]"
+	expected := "[key1=10,\nkey2=20]\n"
+	checkEq(t, expected, p.result())
+}
+
+func TestWriteAttributesSingleLine(t *testing.T) {
+	attrs := mojom.NewAttributes(lexer.Token{})
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key1", nil, mojom.MakeUint64LiteralValue(10)))
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key2", nil, mojom.MakeUint64LiteralValue(20)))
+
+	p := getNewPrinter()
+	p.writeAttributesSingleLine(attrs)
+
+	expected := "[key1=10, key2=20]"
 	checkEq(t, expected, p.result())
 }
 
@@ -207,9 +219,10 @@ func TestWriteTypeRefCompositesAndUserDefined(t *testing.T) {
 			"map<int8, int16>"},
 		{mojom.NewMapTypeRef(mojom.BuiltInType("int8"), mojom.BuiltInType("int16"), true),
 			"map<int8, int16>?"},
-		// TODO(azani): Investigate if interface request should be tested.
 		{mojom.NewUserTypeRef("Foo", false, false, nil, lexer.Token{}), "Foo"},
 		{mojom.NewUserTypeRef("Foo", true, false, nil, lexer.Token{}), "Foo?"},
+		{mojom.NewUserTypeRef("Foo", false, true, nil, lexer.Token{}), "Foo&"},
+		{mojom.NewUserTypeRef("Foo", true, true, nil, lexer.Token{}), "Foo&?"},
 		{mojom.NewArrayTypeRef(mojom.NewUserTypeRef("Foo", false, false, nil, lexer.Token{}), -1, false), "array<Foo>"},
 		{mojom.NewMapTypeRef(
 			mojom.NewUserTypeRef("Foo", false, false, nil, lexer.Token{}),
@@ -261,6 +274,17 @@ func TestWriteMojomStruct(t *testing.T) {
   int8 field1 = 10;
   string field2;
 };`
+
+	p := getNewPrinter()
+	p.writeDeclaredObject(mojomStruct)
+	checkEq(t, expected, p.result())
+}
+
+func TestWriteMojomStructEmpty(t *testing.T) {
+	declData := mojom.DeclData("", nil, lexer.Token{Text: "FooStruct"}, nil)
+	mojomStruct := mojom.NewMojomStruct(declData)
+
+	expected := "struct FooStruct {};"
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomStruct)
