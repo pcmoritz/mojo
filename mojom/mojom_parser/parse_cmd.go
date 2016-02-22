@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 
 /*
- This file contains the main() for the Mojom parser binary. This tool parses
- a set of .mojom files and emits a serialized MojomFileGraph struct. See
- mojom_files.mojom for the definition of MojomFileGraph.
+ This file contains parseCmd which parses a set of .mojom files and emits a
+ serialized MojomFileGraph struct. See mojom_files.mojom for the definition of
+ MojomFileGraph.
 
- The tool is invoked as follows:
+ The parse command is invoked as follows:
 
-     mojom_parser [-I <include_dirs>] [-out <out_file>] [-debug] <mojom_file>...
+     mojom parse [-I <include_dirs>] [-out <out_file>] [-debug] <mojom_file>...
 
  <include_dirs> is comma-separated list of directory paths to search for mojom imports.
  <out_file> is the path to the output file. If not given the output will be written to standard out.
@@ -64,25 +64,38 @@ func (dl *DirectoryList) Set(args string) error {
 	return nil
 }
 
-var directoryListFlag DirectoryList
-
-func init() {
-	flag.Var(&directoryListFlag, "I", "comma-separated list of directory paths to search for mojom imports")
-}
-
-func main() {
-	outFile := flag.String("out", "", "The path to the output file. If not present the output will "+
+// parseCmd implements the parse command for the mojom tool.
+// The slice of strings |args| is the list of arguments passed on the command
+// line starting with the program name and followed by the invoked command.
+func parseCmd(args []string) {
+	flagSet := flag.NewFlagSet("parse", flag.ContinueOnError)
+	var directoryListFlag DirectoryList
+	flagSet.Var(&directoryListFlag, "I", "comma-separated list of directory paths to search for mojom imports")
+	outFile := flagSet.String("out", "", "The path to the output file. If not present the output will "+
 		"be written to standard out.")
-	debug := flag.Bool("debug", false, "Generate debug data including the parse tree and print it to standard out.")
-	metaDataOnly := flag.Bool("meta-data-only", false, "Only parse file attributes and 'module' statement, "+
+	debug := flagSet.Bool("debug", false, "Generate debug data including the parse tree and print it to standard out.")
+	metaDataOnly := flagSet.Bool("meta-data-only", false, "Only parse file attributes and 'module' statement, "+
 		"not mojom declarations or import statements.")
-	flag.Parse()
+	flagSet.SetOutput(ioutil.Discard)
 
-	fileNames := flag.Args()
+	printUsage := func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s parse [-I <include_dirs>] [-out <out_file>] [-debug] [-meta-data-only] <mojom_file>...\n\n", filepath.Base(args[0]))
+		fmt.Fprintf(os.Stderr, UsageString(flagSet))
+	}
+
+	if err := flagSet.Parse(args[2:]); err != nil {
+		if err != flag.ErrHelp {
+			fmt.Fprintln(os.Stderr, err.Error())
+		}
+		printUsage()
+		os.Exit(1)
+	}
+
+	fileNames := flagSet.Args()
 	if len(fileNames) == 0 {
-		ErrorExit(fmt.Sprintf("No .mojom files given.\n"+
-			"Usage: %s [-I <include_dirs>] [-out <out_file>] [-debug] [-meta-data-only] <mojom_file>...",
-			filepath.Base(os.Args[0])))
+		fmt.Fprintln(os.Stderr, "No .mojom files given.")
+		printUsage()
+		os.Exit(1)
 	}
 
 	parseDriver := parser.NewDriver(directoryListFlag, *debug, *metaDataOnly)
@@ -122,11 +135,6 @@ func main() {
 			}
 		}
 	}
-}
-
-func ErrorExit(message string) {
-	fmt.Fprintf(os.Stderr, "%s\n", message)
-	os.Exit(1)
 }
 
 func PrintDebugOutput(debugString string, descriptor *mojom.MojomDescriptor) {
