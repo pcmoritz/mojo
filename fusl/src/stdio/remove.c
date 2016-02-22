@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include "syscall.h"
 
 int remove(const char* path) {
-#ifdef SYS_unlink
-  int r = __syscall(SYS_unlink, path);
-#else
-  int r = __syscall(SYS_unlinkat, AT_FDCWD, path, 0);
-#endif
+  int r = unlink(path);
 #ifdef SYS_rmdir
   if (r == -EISDIR)
     r = __syscall(SYS_rmdir, path);
