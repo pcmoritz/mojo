@@ -139,19 +139,19 @@ func TestMarkUsedAsConstantType(t *testing.T) {
 func TestMarkTypeCompatible(t *testing.T) {
 	userTypeRef := NewUserTypeRef("foo", false, false, nil, lexer.Token{})
 	literalValues := []LiteralValue{
-		MakeStringLiteralValue(""),
-		MakeBoolLiteralValue(false),
-		MakeInt8LiteralValue(0),
-		MakeInt8LiteralValue(-1),
-		MakeInt32LiteralValue(1),
-		MakeUint32LiteralValue(1),
-		MakeInt64LiteralValue(-(1 << 24)),
-		MakeInt64LiteralValue(1 << 25),
-		MakeInt64LiteralValue(1 << 53),
-		MakeInt64LiteralValue(-(1 << 54)),
-		MakeFloatLiteralValue(math.MaxFloat32),
-		MakeDoubleLiteralValue(math.MaxFloat32 * 2),
-		MakeDefaultLiteral(),
+		MakeStringLiteralValue("", nil),
+		MakeBoolLiteralValue(false, nil),
+		MakeInt8LiteralValue(0, nil),
+		MakeInt8LiteralValue(-1, nil),
+		MakeInt32LiteralValue(1, nil),
+		MakeUint32LiteralValue(1, nil),
+		MakeInt64LiteralValue(-(1 << 24), nil),
+		MakeInt64LiteralValue(1<<25, nil),
+		MakeInt64LiteralValue(1<<53, nil),
+		MakeInt64LiteralValue(-(1 << 54), nil),
+		MakeFloatLiteralValue(math.MaxFloat32, nil),
+		MakeDoubleLiteralValue(math.MaxFloat32*2, nil),
+		MakeDefaultLiteral(nil),
 	}
 	cases := []struct {
 		typeRef TypeRef
@@ -218,16 +218,16 @@ func TestMarkUsedAsEnumValueInitializer(t *testing.T) {
 		valueRef ValueRef
 		allowed  bool
 	}{
-		{MakeStringLiteralValue(""), false},
-		{MakeBoolLiteralValue(false), false},
-		{MakeUint8LiteralValue(0), true},
-		{MakeInt8LiteralValue(-1), true},
-		{MakeInt64LiteralValue(math.MaxInt32), true},
-		{MakeInt64LiteralValue(math.MaxInt32 + 1), false},
-		{MakeInt64LiteralValue(math.MinInt32), true},
-		{MakeInt64LiteralValue(math.MinInt32 - 1), false},
-		{MakeDoubleLiteralValue(3.14), false},
-		{MakeDefaultLiteral(), false},
+		{MakeStringLiteralValue("", nil), false},
+		{MakeBoolLiteralValue(false, nil), false},
+		{MakeUint8LiteralValue(0, nil), true},
+		{MakeInt8LiteralValue(-1, nil), true},
+		{MakeInt64LiteralValue(math.MaxInt32, nil), true},
+		{MakeInt64LiteralValue(math.MaxInt32+1, nil), false},
+		{MakeInt64LiteralValue(math.MinInt32, nil), true},
+		{MakeInt64LiteralValue(math.MinInt32-1, nil), false},
+		{MakeDoubleLiteralValue(3.14, nil), false},
+		{MakeDefaultLiteral(nil), false},
 		{userValueRef, true},
 	}
 	for _, c := range cases {
@@ -252,11 +252,11 @@ func TestResolvedConcreteValue(t *testing.T) {
 		valueRef      ValueRef
 		concreteValue ConcreteValue
 	}{
-		{MakeStringLiteralValue("foo"), MakeStringLiteralValue("foo")},
-		{MakeBoolLiteralValue(false), MakeBoolLiteralValue(false)},
-		{MakeInt64LiteralValue(42), MakeInt64LiteralValue(42)},
-		{MakeDoubleLiteralValue(3.14), MakeDoubleLiteralValue(3.14)},
-		{MakeDefaultLiteral(), MakeDefaultLiteral()},
+		{MakeStringLiteralValue("foo", nil), MakeStringLiteralValue("foo", nil)},
+		{MakeBoolLiteralValue(false, nil), MakeBoolLiteralValue(false, nil)},
+		{MakeInt64LiteralValue(42, nil), MakeInt64LiteralValue(42, nil)},
+		{MakeDoubleLiteralValue(3.14, nil), MakeDoubleLiteralValue(3.14, nil)},
+		{MakeDefaultLiteral(nil), MakeDefaultLiteral(nil)},
 		{userValueRef, nil},
 	}
 	for _, c := range cases {
@@ -274,11 +274,11 @@ func TestValueType(t *testing.T) {
 		concreteValue ConcreteValue
 		concreteType  ConcreteType
 	}{
-		{MakeStringLiteralValue("foo"), StringLiteralType},
-		{MakeBoolLiteralValue(false), SimpleTypeBool},
-		{MakeInt64LiteralValue(42), SimpleTypeInt64},
-		{MakeDoubleLiteralValue(3.14), SimpleTypeDouble},
-		{MakeDefaultLiteral(), StringLiteralType},
+		{MakeStringLiteralValue("foo", nil), StringLiteralType},
+		{MakeBoolLiteralValue(false, nil), SimpleTypeBool},
+		{MakeInt64LiteralValue(42, nil), SimpleTypeInt64},
+		{MakeDoubleLiteralValue(3.14, nil), SimpleTypeDouble},
+		{MakeDefaultLiteral(nil), StringLiteralType},
 		{mojomEnum.Values[0], mojomEnum},
 		{FloatInfinity, BuiltInConstant},
 	}
@@ -296,11 +296,11 @@ func TestValue(t *testing.T) {
 		concreteValue ConcreteValue
 		value         interface{}
 	}{
-		{MakeStringLiteralValue("foo"), "foo"},
-		{MakeBoolLiteralValue(false), false},
-		{MakeInt64LiteralValue(42), int64(42)},
-		{MakeDoubleLiteralValue(3.14), 3.14},
-		{MakeDefaultLiteral(), "default"},
+		{MakeStringLiteralValue("foo", nil), "foo"},
+		{MakeBoolLiteralValue(false, nil), false},
+		{MakeInt64LiteralValue(42, nil), int64(42)},
+		{MakeDoubleLiteralValue(3.14, nil), 3.14},
+		{MakeDefaultLiteral(nil), "default"},
 		{enumValue, *enumValue},
 		{FloatInfinity, FloatInfinity},
 	}
@@ -313,10 +313,10 @@ func TestValue(t *testing.T) {
 }
 
 func TestValidateAfterResolution(t *testing.T) {
-	stringLiteral := MakeStringLiteralValue("foo")
-	intLiteral := MakeInt64LiteralValue(42)
-	floatLiteral := MakeDoubleLiteralValue(3.14)
-	defaultLiteral := MakeDefaultLiteral()
+	stringLiteral := MakeStringLiteralValue("foo", nil)
+	intLiteral := MakeInt64LiteralValue(42, nil)
+	floatLiteral := MakeDoubleLiteralValue(3.14, nil)
+	defaultLiteral := MakeDefaultLiteral(nil)
 	cases := []struct {
 		typeRef       *UserTypeRef
 		expectSuccess bool

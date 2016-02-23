@@ -48,7 +48,11 @@ enum FooEnum {
 };
 
 // constant comment.
-const int8 foo_constant = 10; // constant comment.
+const int8 foo_constant1 = 10; // constant comment.
+const int8 foo_constant2 = -10; // constant comment.
+const float foo_constant3 = -10e10; // constant comment.
+const int64 foo_constant4 = 0xAD10; // constant comment.
+const int64 foo_constant5 = -0xAD10; // constant comment.
 
 // Interface Comment.
 interface InterfaceFoo { // Interface comment.

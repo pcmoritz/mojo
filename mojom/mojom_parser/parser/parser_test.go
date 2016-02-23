@@ -62,7 +62,7 @@ func TestSuccessfulParsing(t *testing.T) {
 	cases[testCaseNum].mojomContents = `[cool=true]module mojom.test;`
 	expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 	expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-		mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true)))
+		mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true, nil)))
 	endTestCase()
 
 	////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ func TestSuccessfulParsing(t *testing.T) {
 	{
 		expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 		expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-			mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true)))
+			mojom.NewMojomAttribute("cool", nil, mojom.MakeBoolLiteralValue(true, nil)))
 		expectedFile.AddImport(mojom.NewImportedFile("a.file", nil))
 		endTestCase()
 	}
@@ -126,23 +126,23 @@ func TestSuccessfulParsing(t *testing.T) {
 	const uint64 manyNines = 9999999999999999999;
 	`
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("xu8"),
-		mojom.SimpleTypeUInt8, mojom.MakeUint8LiteralValue(0xFF)))
+		mojom.SimpleTypeUInt8, mojom.MakeUint8LiteralValue(0xFF, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("x8"),
-		mojom.SimpleTypeInt8, mojom.MakeInt8LiteralValue(-0x7F)))
+		mojom.SimpleTypeInt8, mojom.MakeInt8LiteralValue(-0x7F, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("xu16"),
-		mojom.SimpleTypeUInt16, mojom.MakeUint16LiteralValue(65535)))
+		mojom.SimpleTypeUInt16, mojom.MakeUint16LiteralValue(65535, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("x16"),
-		mojom.SimpleTypeInt16, mojom.MakeInt16LiteralValue(-32767)))
+		mojom.SimpleTypeInt16, mojom.MakeInt16LiteralValue(-32767, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("xu32"),
-		mojom.SimpleTypeUInt32, mojom.MakeUint32LiteralValue(0xFFFFFFFF)))
+		mojom.SimpleTypeUInt32, mojom.MakeUint32LiteralValue(0xFFFFFFFF, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("x32"),
-		mojom.SimpleTypeInt32, mojom.MakeInt32LiteralValue(-0x7FFFFFFF)))
+		mojom.SimpleTypeInt32, mojom.MakeInt32LiteralValue(-0x7FFFFFFF, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("xu64"),
-		mojom.SimpleTypeUInt64, mojom.MakeUint64LiteralValue(18446744073709551615)))
+		mojom.SimpleTypeUInt64, mojom.MakeUint64LiteralValue(18446744073709551615, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("x64"),
-		mojom.SimpleTypeInt64, mojom.MakeInt64LiteralValue(-9223372036854775807)))
+		mojom.SimpleTypeInt64, mojom.MakeInt64LiteralValue(-9223372036854775807, nil)))
 	expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("manyNines"),
-		mojom.SimpleTypeUInt64, mojom.MakeUint64LiteralValue(9999999999999999999)))
+		mojom.SimpleTypeUInt64, mojom.MakeUint64LiteralValue(9999999999999999999, nil)))
 	endTestCase()
 
 	////////////////////////////////////////////////////////////
@@ -158,15 +158,15 @@ func TestSuccessfulParsing(t *testing.T) {
 	`
 	{
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("x"),
-			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(1234560000)))
+			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(1234560000, nil)))
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("y"),
-			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(123456789.123456789)))
+			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(123456789.123456789, nil)))
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("z"),
-			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(-0.01)))
+			mojom.SimpleTypeFloat, mojom.MakeDoubleLiteralValue(-0.01, nil)))
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("w"),
-			mojom.SimpleTypeDouble, mojom.MakeDoubleLiteralValue(-0.01)))
+			mojom.SimpleTypeDouble, mojom.MakeDoubleLiteralValue(-0.01, nil)))
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("r"),
-			mojom.SimpleTypeDouble, mojom.MakeDoubleLiteralValue(3.14159e+40)))
+			mojom.SimpleTypeDouble, mojom.MakeDoubleLiteralValue(3.14159e+40, nil)))
 	}
 	endTestCase()
 	////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ func TestSuccessfulParsing(t *testing.T) {
 		structFoo := mojom.NewMojomStruct(mojom.DeclTestData("Foo"))
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
 		attributes := mojom.NewAttributes(lexer.Token{})
-		attributes.List = append(attributes.List, mojom.NewMojomAttribute("happy", nil, mojom.MakeBoolLiteralValue(true)))
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("happy", nil, mojom.MakeBoolLiteralValue(true, nil)))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataAWithOrdinal("x", attributes, 4), mojom.SimpleTypeInt32, nil))
 		expectedFile.AddStruct(structFoo)
 	}
@@ -235,13 +235,13 @@ func TestSuccessfulParsing(t *testing.T) {
 
 		structFoo := mojom.NewMojomStruct(mojom.DeclTestData("Foo"))
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("x", 4), mojom.SimpleTypeInt32, mojom.MakeInt8LiteralValue(42)))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("x", 4), mojom.SimpleTypeInt32, mojom.MakeInt8LiteralValue(42, nil)))
 		attributes := mojom.NewAttributes(lexer.Token{})
-		attributes.List = append(attributes.List, mojom.NewMojomAttribute("age", nil, mojom.MakeInt8LiteralValue(7)))
-		attributes.List = append(attributes.List, mojom.NewMojomAttribute("level", nil, mojom.MakeStringLiteralValue("high")))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataA("y", attributes), mojom.BuiltInType("string"), mojom.MakeStringLiteralValue("Howdy!")))
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("age", nil, mojom.MakeInt8LiteralValue(7, nil)))
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("level", nil, mojom.MakeStringLiteralValue("high", nil)))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataA("y", attributes), mojom.BuiltInType("string"), mojom.MakeStringLiteralValue("Howdy!", nil)))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestData("z"), mojom.BuiltInType("string?"), nil))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("w", 6), mojom.BuiltInType("bool"), mojom.MakeBoolLiteralValue(false)))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("w", 6), mojom.BuiltInType("bool"), mojom.MakeBoolLiteralValue(false, nil)))
 		expectedFile.AddStruct(structFoo)
 	}
 	endTestCase()
@@ -317,7 +317,7 @@ func TestSuccessfulParsing(t *testing.T) {
 		expectedFile.AddImport(mojom.NewImportedFile("gpu/interfaces/command_buffer.mojom", nil))
 
 		attributes := mojom.NewAttributes(lexer.Token{})
-		attributes.List = append(attributes.List, mojom.NewMojomAttribute("ServiceName", nil, mojom.MakeStringLiteralValue("mojo::Gpu")))
+		attributes.List = append(attributes.List, mojom.NewMojomAttribute("ServiceName", nil, mojom.MakeStringLiteralValue("mojo::Gpu", nil)))
 		interfaceGpu := mojom.NewMojomInterface(mojom.DeclTestDataA("Gpu", attributes))
 		expectedFile.AddInterface(interfaceGpu)
 	}
@@ -356,13 +356,13 @@ func TestSuccessfulParsing(t *testing.T) {
 	{
 		expectedFile.Attributes = mojom.NewAttributes(lexer.Token{})
 		expectedFile.Attributes.List = append(expectedFile.Attributes.List,
-			mojom.NewMojomAttribute("php_namespace", nil, mojom.MakeStringLiteralValue("mojom.test.php")))
+			mojom.NewMojomAttribute("php_namespace", nil, mojom.MakeStringLiteralValue("mojom.test.php", nil)))
 
 		expectedFile.AddImport(mojom.NewImportedFile("another.file", nil))
 		expectedFile.AddImport(mojom.NewImportedFile("and.another.file", nil))
 
 		expectedFile.AddConstant(mojom.NewUserDefinedConstant(mojom.DeclTestData("TOO_SMALL_VALUE"),
-			mojom.SimpleTypeInt8, mojom.MakeInt8LiteralValue(6)))
+			mojom.SimpleTypeInt8, mojom.MakeInt8LiteralValue(6, nil)))
 
 		errorCodeEnum := mojom.NewMojomEnum(mojom.DeclTestData("ErrorCodes"))
 		errorCodeEnum.InitAsScope(expectedFile.FileScope)
@@ -372,7 +372,7 @@ func TestSuccessfulParsing(t *testing.T) {
 		tooSmallValueRef := mojom.NewUserValueRef(mojom.AssigneeSpec{"assignee", assigneeType}, "TOO_SMALL_VALUE",
 			expectedFile.FileScope, lexer.Token{})
 
-		errorCodeEnum.AddEnumValue(mojom.DeclTestData("TOO_BIG"), mojom.MakeInt8LiteralValue(5))
+		errorCodeEnum.AddEnumValue(mojom.DeclTestData("TOO_BIG"), mojom.MakeInt8LiteralValue(5, nil))
 		errorCodeEnum.AddEnumValue(mojom.DeclTestData("TOO_SMALL"), tooSmallValueRef)
 		errorCodeEnum.AddEnumValue(mojom.DeclTestData("JUST_RIGHT"), nil)
 		expectedFile.AddEnum(errorCodeEnum)

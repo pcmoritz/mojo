@@ -36,20 +36,22 @@ func TestWriteLiteralValue(t *testing.T) {
 	}{
 		// TODO(azani): Make sure the escaping behavior assumed here is what the
 		// parser does.
-		{"\"hello \\n world\"", mojom.MakeStringLiteralValue("hello \n world")},
-		{"true", mojom.MakeBoolLiteralValue(true)},
-		{"false", mojom.MakeBoolLiteralValue(false)},
-		{"10", mojom.MakeInt8LiteralValue(10)},
-		{"10", mojom.MakeInt16LiteralValue(10)},
-		{"10", mojom.MakeInt32LiteralValue(10)},
-		{"10", mojom.MakeInt64LiteralValue(10)},
-		{"10", mojom.MakeUint8LiteralValue(10)},
-		{"10", mojom.MakeUint16LiteralValue(10)},
-		{"10", mojom.MakeUint32LiteralValue(10)},
-		{"10", mojom.MakeUint64LiteralValue(10)},
-		{"10.5", mojom.MakeDoubleLiteralValue(10.5)},
-		{"10.5", mojom.MakeFloatLiteralValue(10.5)},
-		{"default", mojom.MakeDefaultLiteral()},
+		{"\"hello \\n world\"", mojom.MakeStringLiteralValue("hello \n world", &lexer.Token{Text: "\"hello \\n world\""})},
+		{"true", mojom.MakeBoolLiteralValue(true, &lexer.Token{Text: "true"})},
+		{"false", mojom.MakeBoolLiteralValue(false, &lexer.Token{Text: "false"})},
+		{"10", mojom.MakeInt8LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeInt16LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeInt32LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeInt64LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"-10", mojom.MakeInt64LiteralValue(-10, &lexer.Token{Text: "10"})},
+		{"0x10", mojom.MakeInt64LiteralValue(0x10, &lexer.Token{Text: "0x10"})},
+		{"10", mojom.MakeUint8LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeUint16LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeUint32LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10", mojom.MakeUint64LiteralValue(10, &lexer.Token{Text: "10"})},
+		{"10.5", mojom.MakeDoubleLiteralValue(10.5, &lexer.Token{Text: "10.5"})},
+		{"10.5", mojom.MakeFloatLiteralValue(10.5, &lexer.Token{Text: "10.5"})},
+		{"default", mojom.MakeDefaultLiteral(&lexer.Token{Text: "default"})},
 	}
 
 	for _, testCase := range testCases {
@@ -60,7 +62,7 @@ func TestWriteLiteralValue(t *testing.T) {
 }
 
 func TestWriteAttribute(t *testing.T) {
-	a := mojom.NewMojomAttribute("key", nil, mojom.MakeUint64LiteralValue(10))
+	a := mojom.NewMojomAttribute("key", nil, mojom.MakeUint64LiteralValue(10, &lexer.Token{Text: "10"}))
 	p := getNewPrinter()
 	p.writeAttribute(&a)
 	checkEq(t, "key=10", p.result())
@@ -68,8 +70,8 @@ func TestWriteAttribute(t *testing.T) {
 
 func TestWriteAttributes(t *testing.T) {
 	attrs := mojom.NewAttributes(lexer.Token{})
-	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key1", nil, mojom.MakeUint64LiteralValue(10)))
-	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key2", nil, mojom.MakeUint64LiteralValue(20)))
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key1", nil, mojom.MakeUint64LiteralValue(10, &lexer.Token{Text: "10"})))
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key2", nil, mojom.MakeUint64LiteralValue(20, &lexer.Token{Text: "20"})))
 
 	p := getNewPrinter()
 	p.writeAttributes(attrs)
@@ -80,8 +82,8 @@ func TestWriteAttributes(t *testing.T) {
 
 func TestWriteAttributesSingleLine(t *testing.T) {
 	attrs := mojom.NewAttributes(lexer.Token{})
-	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key1", nil, mojom.MakeUint64LiteralValue(10)))
-	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key2", nil, mojom.MakeUint64LiteralValue(20)))
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key1", nil, mojom.MakeUint64LiteralValue(10, &lexer.Token{Text: "10"})))
+	attrs.List = append(attrs.List, mojom.NewMojomAttribute("key2", nil, mojom.MakeUint64LiteralValue(20, &lexer.Token{Text: "20"})))
 
 	p := getNewPrinter()
 	p.writeAttributesSingleLine(attrs)
@@ -248,7 +250,7 @@ func TestWriteStructField(t *testing.T) {
 	structField := mojom.NewStructField(
 		mojom.DeclDataWithOrdinal("", nil, lexer.Token{Text: "field1"}, nil, 5),
 		mojom.BuiltInType("int8"),
-		mojom.MakeInt8LiteralValue(10))
+		mojom.MakeInt8LiteralValue(10, &lexer.Token{Text: "10"}))
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(structField)
@@ -263,7 +265,7 @@ func TestWriteMojomStruct(t *testing.T) {
 	mojomStruct.AddField(mojom.NewStructField(
 		mojom.DeclData("field1", nil, lexer.Token{Text: "field1"}, nil),
 		mojom.BuiltInType("int8"),
-		mojom.MakeInt8LiteralValue(10)))
+		mojom.MakeInt8LiteralValue(10, &lexer.Token{Text: "10"})))
 
 	mojomStruct.AddField(mojom.NewStructField(
 		mojom.DeclData("field2", nil, lexer.Token{Text: "field2"}, nil),
@@ -330,7 +332,7 @@ func TestWriteMojomEnum(t *testing.T) {
 
 	mojomEnum.AddEnumValue(
 		mojom.DeclData("VAL2", nil, lexer.Token{Text: "VAL2"}, nil),
-		mojom.MakeInt32LiteralValue(10))
+		mojom.MakeInt32LiteralValue(10, &lexer.Token{Text: "10"}))
 
 	expected := `enum FooEnum {
   VAL1,
@@ -347,7 +349,7 @@ func TestWriteUserDefinedConstant(t *testing.T) {
 	constant := mojom.NewUserDefinedConstant(
 		declData,
 		mojom.BuiltInType("int8"),
-		mojom.MakeInt8LiteralValue(10))
+		mojom.MakeInt8LiteralValue(10, &lexer.Token{Text: "10"}))
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(constant)

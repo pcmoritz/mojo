@@ -1166,6 +1166,9 @@ type LiteralValue struct {
 
 	// Does this LiteralValue represent the pseudo value "default"
 	isDefault bool
+
+	// The token that represents the literal value in the source code.
+	token *lexer.Token
 }
 
 // int64Value returns the value of |literalValue| as an int64.
@@ -1214,52 +1217,53 @@ func int32Value(literalValue LiteralValue) (int32Value int32, ok bool) {
 	return
 }
 
-func MakeStringLiteralValue(text string) LiteralValue {
-	return LiteralValue{StringLiteralType, text, false}
+func MakeStringLiteralValue(text string, token *lexer.Token) LiteralValue {
+	return LiteralValue{StringLiteralType, text, false, token}
 }
 
-func MakeBoolLiteralValue(value bool) LiteralValue {
-	return LiteralValue{SimpleTypeBool, value, false}
+func MakeBoolLiteralValue(value bool, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeBool, value, false, token}
 }
 
-func MakeInt8LiteralValue(value int8) LiteralValue {
-	return LiteralValue{SimpleTypeInt8, value, false}
-}
-func MakeInt16LiteralValue(value int16) LiteralValue {
-	return LiteralValue{SimpleTypeInt16, value, false}
-}
-func MakeInt32LiteralValue(value int32) LiteralValue {
-	return LiteralValue{SimpleTypeInt32, value, false}
+func MakeInt8LiteralValue(value int8, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeInt8, value, false, token}
 }
 
-func MakeInt64LiteralValue(value int64) LiteralValue {
-	return LiteralValue{SimpleTypeInt64, value, false}
+func MakeInt16LiteralValue(value int16, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeInt16, value, false, token}
+}
+func MakeInt32LiteralValue(value int32, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeInt32, value, false, token}
 }
 
-func MakeUint8LiteralValue(value uint8) LiteralValue {
-	return LiteralValue{SimpleTypeUInt8, value, false}
-}
-func MakeUint16LiteralValue(value uint16) LiteralValue {
-	return LiteralValue{SimpleTypeUInt16, value, false}
-}
-func MakeUint32LiteralValue(value uint32) LiteralValue {
-	return LiteralValue{SimpleTypeUInt32, value, false}
+func MakeInt64LiteralValue(value int64, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeInt64, value, false, token}
 }
 
-func MakeUint64LiteralValue(value uint64) LiteralValue {
-	return LiteralValue{SimpleTypeUInt64, value, false}
+func MakeUint8LiteralValue(value uint8, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeUInt8, value, false, token}
+}
+func MakeUint16LiteralValue(value uint16, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeUInt16, value, false, token}
+}
+func MakeUint32LiteralValue(value uint32, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeUInt32, value, false, token}
 }
 
-func MakeDoubleLiteralValue(value float64) LiteralValue {
-	return LiteralValue{SimpleTypeDouble, value, false}
+func MakeUint64LiteralValue(value uint64, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeUInt64, value, false, token}
 }
 
-func MakeFloatLiteralValue(value float32) LiteralValue {
-	return LiteralValue{SimpleTypeFloat, value, false}
+func MakeDoubleLiteralValue(value float64, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeDouble, value, false, token}
 }
 
-func MakeDefaultLiteral() LiteralValue {
-	return LiteralValue{StringLiteralType, "default", true}
+func MakeFloatLiteralValue(value float32, token *lexer.Token) LiteralValue {
+	return LiteralValue{SimpleTypeFloat, value, false, token}
+}
+
+func MakeDefaultLiteral(token *lexer.Token) LiteralValue {
+	return LiteralValue{StringLiteralType, "default", true, token}
 }
 
 func (lv LiteralValue) String() string {
@@ -1291,6 +1295,10 @@ func (lv LiteralValue) ValueType() ConcreteType {
 }
 func (v LiteralValue) Value() interface{} {
 	return v.value
+}
+
+func (v LiteralValue) Token() *lexer.Token {
+	return v.token
 }
 
 // A LiteralValue is also a ValueRef and is its own

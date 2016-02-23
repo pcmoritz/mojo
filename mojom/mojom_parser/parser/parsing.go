@@ -309,7 +309,8 @@ func (p *Parser) parseAttributes() (attributes *mojom.Attributes) {
 			// TODO(rudominer) Decide if we support attribute values as Names.
 			// Currently we convert a name into a string literal here.
 			//      See https://github.com/domokit/mojo/issues/561
-			value = mojom.MakeStringLiteralValue(text)
+			valueToken := p.lastConsumed
+			value = mojom.MakeStringLiteralValue(text, &valueToken)
 		} else {
 			value = p.parseLiteral()
 		}
@@ -775,7 +776,8 @@ func (p *Parser) parseStructField(attributes *mojom.Attributes) *mojom.StructFie
 		defaultValueToken = p.peekNextToken("Expecting a default value.")
 		if defaultValueToken.Kind == lexer.Default {
 			p.consumeNextToken()
-			defaultValue = mojom.MakeDefaultLiteral()
+			defaultToken := p.lastConsumed
+			defaultValue = mojom.MakeDefaultLiteral(&defaultToken)
 			defaultKeywordUsed = true
 		} else {
 			assigneeSpec := mojom.AssigneeSpec{
@@ -1126,13 +1128,17 @@ func (p *Parser) parseLiteral() mojom.LiteralValue {
 	nextToken := p.peekNextToken("I was parsing a literal.")
 	switch nextToken.Kind {
 	case lexer.StringLiteral:
-		return mojom.MakeStringLiteralValue(p.readStringLiteral())
+		literal := p.readStringLiteral()
+		valueToken := p.lastConsumed
+		return mojom.MakeStringLiteralValue(literal, &valueToken)
 	case lexer.True:
 		p.consumeNextToken()
-		return mojom.MakeBoolLiteralValue(true)
+		valueToken := p.lastConsumed
+		return mojom.MakeBoolLiteralValue(true, &valueToken)
 	case lexer.False:
 		p.consumeNextToken()
-		return mojom.MakeBoolLiteralValue(false)
+		valueToken := p.lastConsumed
+		return mojom.MakeBoolLiteralValue(false, &valueToken)
 	case lexer.Plus, lexer.Minus, lexer.FloatConst, lexer.IntConstDec, lexer.IntConstHex:
 		return p.parseNumberLiteral()
 
@@ -1162,6 +1168,7 @@ func (p *Parser) parseNumberLiteral() mojom.LiteralValue {
 	switch nextToken.Kind {
 	case lexer.IntConstDec, lexer.IntConstHex:
 		absoluteValue, numBits, signed, ok := p.parsePositiveIntegerLiteral(initialMinus, true, !initialMinus, 64)
+		valueToken := p.lastConsumed
 		if !ok {
 			return mojom.LiteralValue{}
 		}
@@ -1175,34 +1182,35 @@ func (p *Parser) parseNumberLiteral() mojom.LiteralValue {
 		switch numBits {
 		case 8:
 			if signed {
-				return mojom.MakeInt8LiteralValue(int8(value))
+				return mojom.MakeInt8LiteralValue(int8(value), &valueToken)
 			} else {
-				return mojom.MakeUint8LiteralValue(uint8(absoluteValue))
+				return mojom.MakeUint8LiteralValue(uint8(absoluteValue), &valueToken)
 			}
 		case 16:
 			if signed {
-				return mojom.MakeInt16LiteralValue(int16(value))
+				return mojom.MakeInt16LiteralValue(int16(value), &valueToken)
 			} else {
-				return mojom.MakeUint16LiteralValue(uint16(absoluteValue))
+				return mojom.MakeUint16LiteralValue(uint16(absoluteValue), &valueToken)
 			}
 		case 32:
 			if signed {
-				return mojom.MakeInt32LiteralValue(int32(value))
+				return mojom.MakeInt32LiteralValue(int32(value), &valueToken)
 			} else {
-				return mojom.MakeUint32LiteralValue(uint32(absoluteValue))
+				return mojom.MakeUint32LiteralValue(uint32(absoluteValue), &valueToken)
 			}
 		case 64:
 			if signed {
-				return mojom.MakeInt64LiteralValue(value)
+				return mojom.MakeInt64LiteralValue(value, &valueToken)
 			} else {
-				return mojom.MakeUint64LiteralValue(absoluteValue)
+				return mojom.MakeUint64LiteralValue(absoluteValue, &valueToken)
 			}
 		default:
 			panic(fmt.Sprintf("Unexpected value for numBits: %d", numBits))
 		}
 	case lexer.FloatConst:
 		value, _ := p.parsePositiveFloatLiteral(initialMinus)
-		return mojom.MakeDoubleLiteralValue(value)
+		valueToken := p.lastConsumed
+		return mojom.MakeDoubleLiteralValue(value, &valueToken)
 
 	default:
 		p.unexpectedTokenError(nextToken, "a number")

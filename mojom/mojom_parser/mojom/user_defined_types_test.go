@@ -48,11 +48,11 @@ func TestUserDefinedTypeKind(t *testing.T) {
 
 func TestIsAssignmentCompatibleWith(t *testing.T) {
 	literalValues := []LiteralValue{
-		MakeStringLiteralValue(""),
-		MakeBoolLiteralValue(false),
-		MakeInt64LiteralValue(0),
-		MakeDoubleLiteralValue(0),
-		MakeDefaultLiteral(),
+		MakeStringLiteralValue("", nil),
+		MakeBoolLiteralValue(false, nil),
+		MakeInt64LiteralValue(0, nil),
+		MakeDoubleLiteralValue(0, nil),
+		MakeDefaultLiteral(nil),
 	}
 	cases := []struct {
 		userDefinedType UserDefinedType
@@ -106,17 +106,17 @@ func TestStructFieldValidateDefaultValue(t *testing.T) {
 		defaultValue ValueRef
 		expectOK     bool
 	}{
-		{SimpleTypeInt64, MakeInt64LiteralValue(42), true},
-		{SimpleTypeInt64, MakeStringLiteralValue("42"), false},
-		{SimpleTypeInt64, MakeDefaultLiteral(), false},
+		{SimpleTypeInt64, MakeInt64LiteralValue(42, nil), true},
+		{SimpleTypeInt64, MakeStringLiteralValue("42", nil), false},
+		{SimpleTypeInt64, MakeDefaultLiteral(nil), false},
 		// It is initally OK to assign an unknown user value ref to an integer field.
 		{SimpleTypeInt64, NewUserValueRef(AssigneeSpec{
 			"assignee",
 			SimpleTypeInt64,
 		}, "some.type", nil, lexer.Token{}), true},
-		{StringType{}, MakeInt64LiteralValue(42), false},
-		{StringType{}, MakeStringLiteralValue("42"), true},
-		{StringType{}, MakeDefaultLiteral(), false},
+		{StringType{}, MakeInt64LiteralValue(42, nil), false},
+		{StringType{}, MakeStringLiteralValue("42", nil), true},
+		{StringType{}, MakeDefaultLiteral(nil), false},
 		// It is initally OK to assign an unknown user value ref to an string field.
 		{StringType{}, NewUserValueRef(AssigneeSpec{
 			"assignee",
@@ -245,17 +245,17 @@ func TestUserDefinedConstantValidateValue(t *testing.T) {
 		value        ValueRef
 		expectOK     bool
 	}{
-		{SimpleTypeInt64, MakeInt64LiteralValue(42), true},
-		{SimpleTypeInt64, MakeStringLiteralValue("42"), false},
-		{SimpleTypeInt64, MakeDefaultLiteral(), false},
+		{SimpleTypeInt64, MakeInt64LiteralValue(42, nil), true},
+		{SimpleTypeInt64, MakeStringLiteralValue("42", nil), false},
+		{SimpleTypeInt64, MakeDefaultLiteral(nil), false},
 		// It is initally OK to assign an unknown user value ref to an integer field.
 		{SimpleTypeInt64, NewUserValueRef(AssigneeSpec{
 			"assignee",
 			SimpleTypeInt64,
 		}, "some.type", nil, lexer.Token{}), true},
-		{StringType{}, MakeInt64LiteralValue(42), false},
-		{StringType{}, MakeStringLiteralValue("42"), true},
-		{StringType{}, MakeDefaultLiteral(), false},
+		{StringType{}, MakeInt64LiteralValue(42, nil), false},
+		{StringType{}, MakeStringLiteralValue("42", nil), true},
+		{StringType{}, MakeDefaultLiteral(nil), false},
 		// It is initally OK to assign an unknown user value ref to a string field.
 		{StringType{}, NewUserValueRef(AssigneeSpec{
 			"assignee",

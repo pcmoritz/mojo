@@ -69,7 +69,7 @@ func NewTestEnumValue(name string) *EnumValue {
 }
 
 func NewTestConstant(name string, value int64) *UserDefinedConstant {
-	return NewUserDefinedConstant(DeclTestData(name), SimpleTypeInt64, MakeInt64LiteralValue(value))
+	return NewUserDefinedConstant(DeclTestData(name), SimpleTypeInt64, MakeInt64LiteralValue(value, nil))
 }
 
 func DeclTestData(name string) DeclarationData {

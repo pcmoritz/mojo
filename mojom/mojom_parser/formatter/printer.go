@@ -381,7 +381,34 @@ func (p *printer) writeTypeRef(t mojom.TypeRef) {
 func (p *printer) writeValueRef(value mojom.ValueRef) {
 	switch v := value.(type) {
 	case mojom.LiteralValue:
-		p.write(v.String())
+		// The sign of a numeric literal is a separate token from the number itself.
+		// So the token that is stored does not include a sign. Here we check if
+		// the literal is a signed constant and if so, we print a negative sign if
+		// appropriate.
+		if _, ok := v.ValueType().(mojom.LiteralType); ok {
+			negative := false
+			switch num := v.Value().(type) {
+			case int8:
+				negative = num < 0
+			case int16:
+				negative = num < 0
+			case int32:
+				negative = num < 0
+			case int64:
+				negative = num < 0
+			case float32:
+				negative = num < 0
+			case float64:
+				negative = num < 0
+			}
+			if negative {
+				p.write("-")
+			}
+		}
+		if v.Token() == nil {
+			panic(fmt.Sprintf("nil token when trying to print %s.", v.String()))
+		}
+		p.write(v.Token().Text)
 	case *mojom.UserValueRef:
 		p.write(v.Identifier())
 	default:
