@@ -77,7 +77,6 @@ static int in_set(const wchar_t* set, int c) {
   return 0;
 }
 
-#if 1
 #undef getwc
 #define getwc(f) \
   ((f)->rpos < (f)->rend && *(f)->rpos < 128 ? *(f)->rpos++ : (getwc)(f))
@@ -85,7 +84,6 @@ static int in_set(const wchar_t* set, int c) {
 #undef ungetwc
 #define ungetwc(c, f) \
   ((f)->rend && (c) < 128U ? *--(f)->rpos : ungetwc((c), (f)))
-#endif
 
 int vfwscanf(FILE* restrict f, const wchar_t* restrict fmt, va_list ap) {
   int width;
