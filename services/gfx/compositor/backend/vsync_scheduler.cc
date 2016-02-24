@@ -84,7 +84,8 @@ bool VsyncScheduler::State::Start(int64_t vsync_timebase,
       return true;
 
     // Get running with these new parameters.
-    // Note that |last_delivered_update_time_| is preserved.
+    // Note that |last_delivered_update_time_| and
+    // |last_delivered_presentation_time_| are preserved.
     running_ = true;
     generation_++;  // cancels pending undelivered callbacks
     vsync_timebase_ = vsync_timebase;
@@ -120,8 +121,10 @@ void VsyncScheduler::State::ScheduleFrame(SchedulingMode scheduling_mode) {
 void VsyncScheduler::State::ScheduleLocked(MojoTimeTicks now) {
   DCHECK(running_);
   DCHECK(now >= vsync_timebase_);
-  DVLOG(2) << "schedule: now=" << now << ", need_update_=" << need_update_
-           << ", last_delivered_update_time_=" << last_delivered_update_time_;
+  DVLOG(2) << "schedule: now=" << now << ", need_update=" << need_update_
+           << ", last_delivered_update_time=" << last_delivered_update_time_
+           << ", last_delivered_presentation_time="
+           << last_delivered_presentation_time_;
   if (pending_dispatch_)
     return;
 
@@ -136,12 +139,18 @@ void VsyncScheduler::State::ScheduleLocked(MojoTimeTicks now) {
   // This time may be in the past.
   int64_t update_time = snapshot_time - snapshot_phase_ + update_phase_;
   DCHECK(update_time <= snapshot_time);
+  int64_t presentation_time =
+      snapshot_time - snapshot_phase_ + presentation_phase_;
 
-  // When changing vsync parameters, it's possible for the next update time
-  // to regress.  Prevent applications from observing that.
-  if (update_time <= last_delivered_update_time_) {
-    int64_t frames =
-        (last_delivered_update_time_ - update_time) / vsync_interval_ + 1;
+  // When changing vsync parameters, it's possible for the next update or
+  // presentation time to regress.  Prevent applications from observing that
+  // by skipping frames if needed to preserve monotonicity.
+  if (update_time <= last_delivered_update_time_ ||
+      presentation_time <= last_delivered_presentation_time_) {
+    int64_t delay =
+        std::max(last_delivered_update_time_ - update_time,
+                 last_delivered_presentation_time_ - presentation_time);
+    int64_t frames = delay / vsync_interval_ + 1;
     int64_t adjustment = frames * vsync_interval_;
     update_time += adjustment;
     snapshot_time += adjustment;
@@ -250,6 +259,7 @@ void VsyncScheduler::State::Dispatch(int32_t generation,
 
     SetFrameInfoLocked(&frame_info, update_time);
     last_delivered_update_time_ = update_time;
+    last_delivered_presentation_time_ = frame_info.presentation_time;
   }
 
   if (action == Action::kUpdate) {

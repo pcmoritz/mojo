@@ -354,10 +354,11 @@ TEST_F(VsyncSchedulerTest, StartWithNewParameters) {
   // At the moment when the update is delivered, change parameters again.
   // We're too late to cancel the prior update but we do cancel the prior
   // snapshot and we'll follow it up with another update with the new
-  // parameters.
+  // parameters.  We also skip ahead a little bit to preserve monotonicity
+  // of the presentation time.
   FastForwardTo(37000);
-  ExpectUpdateCallback(46000, kVsyncInterval, 54000, 57000);
-  ExpectSnapshotCallback(46000, kVsyncInterval, 54000, 57000);
+  ExpectUpdateCallback(56000, kVsyncInterval, 64000, 67000);
+  ExpectSnapshotCallback(56000, kVsyncInterval, 64000, 67000);
   EXPECT_TRUE(scheduler_->Start(kVsyncTimebase, kVsyncInterval, kUpdatePhase,
                                 kSnapshotPhase, kPresentationPhase));
 }

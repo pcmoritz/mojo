@@ -148,6 +148,8 @@ class VsyncScheduler : public Scheduler {
     bool need_update_ = false;
     bool pending_dispatch_ = false;
     int64_t last_delivered_update_time_ = std::numeric_limits<int64_t>::min();
+    int64_t last_delivered_presentation_time_ =
+        std::numeric_limits<int64_t>::min();
 
     DISALLOW_COPY_AND_ASSIGN(State);
   };
