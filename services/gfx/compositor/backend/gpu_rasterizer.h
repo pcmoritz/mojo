@@ -31,13 +31,22 @@ class VsyncScheduler;
 class GpuRasterizer : public mojo::ViewportParameterListener,
                       public mojo::GLContext::Observer {
  public:
+  // Callback invoked when a frame completes.
+  // |presented| is true if the frame was actually presented, false if
+  // the frame was discarded.
+  using FrameCallback = base::Callback<void(bool presented)>;
+
   GpuRasterizer(mojo::ContextProviderPtr context_provider,
                 const std::shared_ptr<VsyncScheduler>& scheduler,
                 const scoped_refptr<base::TaskRunner>& task_runner,
                 const base::Closure& error_callback);
   ~GpuRasterizer() override;
 
-  void SubmitFrame(const std::shared_ptr<RenderFrame>& frame);
+  // Submits a frame to be drawn.
+  // If the GL context isn't ready yet, the frame will be retained unless
+  // superceded by another frame.
+  void SubmitFrame(const std::shared_ptr<RenderFrame>& frame,
+                   const FrameCallback& frame_callback);
 
  private:
   // |ViewportParameterListener|:
@@ -65,10 +74,13 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   std::unique_ptr<mojo::skia::GaneshContext> ganesh_context_;
   std::unique_ptr<mojo::skia::GaneshFramebufferSurface> ganesh_surface_;
 
-  std::shared_ptr<RenderFrame> current_frame_;
+  std::shared_ptr<RenderFrame> frame_;
+  FrameCallback frame_callback_;
 
   mojo::Binding<ViewportParameterListener> viewport_parameter_listener_binding_;
   base::Timer viewport_parameter_timeout_;
+
+  base::WeakPtrFactory<GpuRasterizer> weak_ptr_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(GpuRasterizer);
 };

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <mutex>
+#include <queue>
 
 #include "base/callback.h"
 #include "base/macros.h"
@@ -34,55 +35,55 @@ class GpuOutput : public Output {
   void SubmitFrame(const std::shared_ptr<RenderFrame>& frame) override;
 
  private:
-  // Frame queue, held by a std::shared_ptr.
-  // This object acts as a shared fifo between both threads.
-  class FrameQueue {
-   public:
-    FrameQueue();
-    ~FrameQueue();
-
-    // Puts a pending frame into the queue, drops existing frames if needed.
-    // Returns true if the queue was previously empty.
-    bool PutFrame(const std::shared_ptr<RenderFrame>& frame);
-
-    // Takes a pending frame from the queue.
-    std::shared_ptr<RenderFrame> TakeFrame();
-
-   private:
-    std::mutex mutex_;
-    std::shared_ptr<RenderFrame> next_frame_;  // guarded by |mutex_|
-
-    DISALLOW_COPY_AND_ASSIGN(FrameQueue);
-  };
-
-  // Wrapper around state which is only accessible by the rasterizer thread.
+  // Wrapper around state which is made available to the rasterizer thread.
   class RasterizerDelegate {
    public:
-    explicit RasterizerDelegate(const std::shared_ptr<FrameQueue>& frame_queue);
+    RasterizerDelegate();
     ~RasterizerDelegate();
 
-    void CreateRasterizer(
-        mojo::InterfaceHandle<mojo::ContextProvider> context_provider_info,
+    void PostInitialize(
+        mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
         const std::shared_ptr<VsyncScheduler>& scheduler,
         const scoped_refptr<base::TaskRunner>& task_runner,
         const base::Closure& error_callback);
 
-    void SubmitNextFrame();
+    void PostDestroy(scoped_ptr<RasterizerDelegate> self);
+
+    void PostFrame(const std::shared_ptr<RenderFrame>& frame);
 
    private:
-    std::shared_ptr<FrameQueue> frame_queue_;
+    void PostSubmit();
+
+    // Called on rasterizer thread.
+    void InitializeTask(
+        mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
+        const std::shared_ptr<VsyncScheduler>& scheduler,
+        const scoped_refptr<base::TaskRunner>& task_runner,
+        const base::Closure& error_callback);
+
+    // Called on rasterizer thread.
+    void SubmitTask();
+
+    // Called on rasterizer thread.
+    void OnFrameSubmitted(int64_t frame_time,
+                          int64_t presentation_time,
+                          int64_t submit_time,
+                          bool presented);
+
+    std::unique_ptr<base::Thread> thread_;
+    scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
     std::unique_ptr<GpuRasterizer> rasterizer_;
+
+    std::mutex mutex_;
+    std::queue<std::shared_ptr<RenderFrame>> frames_;  // guarded by |mutex_|
 
     DISALLOW_COPY_AND_ASSIGN(RasterizerDelegate);
   };
 
-  std::shared_ptr<FrameQueue> frame_queue_;
   std::shared_ptr<VsyncScheduler> scheduler_;
   scoped_ptr<RasterizerDelegate> rasterizer_delegate_;  // can't use unique_ptr
                                                         // here due to
                                                         // base::Bind (sadness)
-  std::unique_ptr<base::Thread> rasterizer_thread_;
-  scoped_refptr<base::SingleThreadTaskRunner> rasterizer_task_runner_;
 
   DISALLOW_COPY_AND_ASSIGN(GpuOutput);
 };

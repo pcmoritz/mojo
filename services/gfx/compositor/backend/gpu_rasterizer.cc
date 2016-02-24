@@ -12,7 +12,7 @@
 #include <GLES2/gl2extmojo.h>
 #include <MGL/mgl.h>
 #include <MGL/mgl_onscreen.h>
-#include <utility>
+#include <MGL/mgl_signal_sync_point.h>
 
 #include "base/bind.h"
 #include "base/location.h"
@@ -36,8 +36,12 @@ GpuRasterizer::GpuRasterizer(mojo::ContextProviderPtr context_provider,
       task_runner_(task_runner),
       error_callback_(error_callback),
       viewport_parameter_listener_binding_(this),
-      viewport_parameter_timeout_(false, false) {
+      viewport_parameter_timeout_(false, false),
+      weak_ptr_factory_(this) {
   DCHECK(context_provider_);
+  DCHECK(scheduler_);
+  DCHECK(task_runner_);
+
   context_provider_.set_connection_error_handler(
       base::Bind(&GpuRasterizer::OnContextProviderConnectionError,
                  base::Unretained(this)));
@@ -78,7 +82,7 @@ void GpuRasterizer::InitContext(
   gl_context_->AddObserver(this);
   ganesh_context_.reset(new mojo::skia::GaneshContext(gl_context_));
 
-  if (current_frame_)
+  if (frame_)
     Draw();
 }
 
@@ -148,26 +152,30 @@ void GpuRasterizer::OnVSyncParametersUpdated(int64_t timebase,
   }
 }
 
-void GpuRasterizer::SubmitFrame(const std::shared_ptr<RenderFrame>& frame) {
+void GpuRasterizer::SubmitFrame(const std::shared_ptr<RenderFrame>& frame,
+                                const FrameCallback& frame_callback) {
   DCHECK(frame);
 
-  if (current_frame_ == frame)
+  if (frame_ && !frame_callback_.is_null())
+    frame_callback_.Run(false);  // frame discarded
+
+  frame_ = frame;
+  frame_callback_ = frame_callback;
+  if (!gl_context_)
     return;
 
-  current_frame_ = frame;
-  if (gl_context_)
-    Draw();
+  Draw();
 }
 
 void GpuRasterizer::Draw() {
   DCHECK(gl_context_);
   DCHECK(ganesh_context_);
-  DCHECK(current_frame_);
+  DCHECK(frame_);
 
   gl_context_->MakeCurrent();
 
   // Update the viewport.
-  const SkRect& viewport = current_frame_->viewport();
+  const SkRect& viewport = frame_->viewport();
   bool stale_surface = false;
   if (!ganesh_surface_ ||
       ganesh_surface_->surface()->width() != viewport.width() ||
@@ -185,11 +193,14 @@ void GpuRasterizer::Draw() {
       ganesh_surface_.reset(
           new mojo::skia::GaneshFramebufferSurface(ganesh_scope));
 
-    current_frame_->Paint(ganesh_surface_->canvas());
+    frame_->Paint(ganesh_surface_->canvas());
   }
 
-  // Swap buffers.
+  // Swap buffers and listen for completion.
+  // TODO: Investigate using |MGLSignalSyncPoint| to wait for completion.
   MGLSwapBuffers();
+  frame_callback_.Run(true);
+  frame_callback_.Reset();
 }
 
 void GpuRasterizer::PostErrorCallback() {
