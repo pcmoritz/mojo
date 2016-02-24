@@ -191,13 +191,11 @@ bool RectNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
                           RenderLayerBuilder* layer_builder,
                           SceneDef* scene,
                           NodeDef* node) {
-  if (!node->SnapshotChildren(snapshot_builder, layer_builder, scene))
-    return false;
-
   SkPaint paint;
   paint.setColor(MakeSkColor(color_));
   layer_builder->DrawRect(content_rect_.To<SkRect>(), paint);
-  return true;
+
+  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
 }
 
 ImageNodeOp::ImageNodeOp(const mojo::Rect& content_rect,
@@ -238,16 +236,14 @@ bool ImageNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
     return false;
   }
 
-  if (!node->SnapshotChildren(snapshot_builder, layer_builder, scene))
-    return false;
-
   layer_builder->DrawImage(
       image_resource_->image(), content_rect_.To<SkRect>(),
       image_rect_ ? image_rect_->To<SkRect>()
                   : SkRect::MakeWH(image_resource_->image()->width(),
                                    image_resource_->image()->height()),
       blend_ ? MakePaintForBlend(*blend_) : SkPaint());
-  return true;
+
+  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
 }
 
 SceneNodeOp::SceneNodeOp(uint32_t scene_resource_id, uint32_t scene_version)
@@ -298,10 +294,10 @@ bool SceneNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
     return false;
   }
 
-  if (!node->SnapshotChildren(snapshot_builder, layer_builder, scene))
+  if (!referenced_scene->Snapshot(snapshot_builder, layer_builder))
     return false;
 
-  return referenced_scene->Snapshot(snapshot_builder, layer_builder);
+  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
 }
 
 LayerNodeOp::LayerNodeOp(const mojo::Size& size,

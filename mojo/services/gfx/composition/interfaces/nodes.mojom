@@ -17,9 +17,9 @@ import "mojo/services/gfx/composition/interfaces/hit_tests.mojom";
 // acyclic graph of drawing commands.
 //
 // The node graph is processed in pre-order traversal.  Starting from the
-// root, the compositor applies the transformation, clip, recursively
-// processes the node's children according to the node's combinator rule,
-// then applies the node's own operation.
+// root, the compositor applies the transformation, clip, applies the
+// node's operation (if any), then recursively processes the node's children
+// according to the node's combinator rule.
 //
 // BLOCKED NODES
 //
