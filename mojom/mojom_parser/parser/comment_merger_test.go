@@ -27,6 +27,7 @@ func TestAttachComments(t *testing.T) {
 
 	interface InterfaceFoo {
 		Method1(int32 in_param1 /* InParam1Comment */, int32 in_param2); // Method1RightComment
+		// FinalInterfaceComment
 	};
 
 	// FinalComments
@@ -59,6 +60,7 @@ func TestAttachComments(t *testing.T) {
 	interfaceFoo := mojomFile.DeclaredObjects[0].(*mojom.MojomInterface)
 	// Sanity-check that we got the right object.
 	checkEq("InterfaceFoo", interfaceFoo.SimpleName())
+	checkEq("// FinalInterfaceComment", interfaceFoo.AttachedComments().Final[0].Text)
 
 	method1 := interfaceFoo.MethodsByOrdinal[0]
 	// Sanity-check that we got the right method.

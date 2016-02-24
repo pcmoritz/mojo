@@ -78,7 +78,7 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 
 	if mojomFile.FinalComments != nil && len(mojomFile.FinalComments) > 0 {
 		p.nl()
-		p.writeCommentBlocks(mojomFile.FinalComments)
+		p.writeCommentBlocks(mojomFile.FinalComments, true)
 	}
 }
 
@@ -264,7 +264,8 @@ func (p *printer) writeEnumValue(enumValue *mojom.EnumValue) {
 // closing brace.
 func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsContainer) {
 	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
-	if len(container.GetDeclaredObjects()) == 0 {
+
+	if len(container.GetDeclaredObjects()) == 0 && !containsFinalComments(container.(mojom.MojomElement)) {
 		p.write("};")
 		return
 	}
@@ -278,6 +279,9 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 			p.nl()
 		}
 	}
+
+	// Write the comments at the end of the struct, enum, union or interface body.
+	p.writeFinalComments(container.(mojom.MojomElement))
 
 	p.decIndent()
 	p.nl()
@@ -434,7 +438,20 @@ func (p *printer) writeAboveComments(el mojom.MojomElement) {
 		return
 	}
 
-	p.writeCommentBlocks(attachedComments.Above)
+	p.writeCommentBlocks(attachedComments.Above, true)
+}
+
+func (p *printer) writeFinalComments(el mojom.MojomElement) {
+	attachedComments := el.AttachedComments()
+	if attachedComments == nil || len(attachedComments.Final) == 0 {
+		return
+	}
+
+	p.nl()
+	if attachedComments.Final[0].Kind == lexer.EmptyLine {
+		p.nl()
+	}
+	p.writeCommentBlocks(attachedComments.Final, false)
 }
 
 // writeLeftComments writes the comments left of a MojomElement.
@@ -470,17 +487,23 @@ func (p *printer) writeRightComments(el mojom.MojomElement) {
 		}
 		p.writef(" %s", comment.Text)
 	}
-
 }
 
-func (p *printer) writeCommentBlocks(comments []lexer.Token) {
+// writeCommentBlocks writes a slice of comments. If finalEol is true, a new
+// line is written after all the comments are written.
+func (p *printer) writeCommentBlocks(comments []lexer.Token, finalEol bool) {
 	for i, comment := range comments {
 		switch comment.Kind {
 		case lexer.SingleLineComment:
 			p.write(comment.Text)
-			p.nl()
+			if finalEol || i < len(comments)-1 {
+				p.nl()
+			}
 		case lexer.MultiLineComment:
 			p.writeMultiLineComment(comment)
+			if finalEol || i < len(comments)-1 {
+				p.nl()
+			}
 		case lexer.EmptyLine:
 			// We only use EmptyLine here to separate comment blocks. And we collapse
 			// sequences of empty lines to a single empty line.
@@ -498,12 +521,15 @@ func (p *printer) writeMultiLineComment(comment lexer.Token) {
 		panic(fmt.Sprintf("This is not a MultiLineComment: %s", comment))
 	}
 
-	for i, line := range strings.Split(comment.Text, "\n") {
+	lines := strings.Split(comment.Text, "\n")
+	for i, line := range lines {
 		if i != 0 {
 			p.write("   ")
 		}
 		p.write(strings.Trim(line, " "))
-		p.nl()
+		if i < len(lines)-1 {
+			p.nl()
+		}
 	}
 }
 
@@ -598,6 +624,23 @@ func isNewBlock(mojomElement mojom.MojomElement) bool {
 		return false
 	}
 	return comments.Above[0].Kind == lexer.EmptyLine
+}
+
+// If the element has AttachedComments and there is at least one comment
+// in AttachedComments.Final which is not an EmptyLine, containsFinalComments
+// returns true. Otherwise, it returns false.
+func containsFinalComments(el mojom.MojomElement) bool {
+	attachedComments := el.AttachedComments()
+	if attachedComments == nil {
+		return false
+	}
+
+	for _, comment := range attachedComments.Final {
+		if comment.Kind != lexer.EmptyLine {
+			return true
+		}
+	}
+	return false
 }
 
 // Following is a utility to sort slices of |ImportedFile|s.

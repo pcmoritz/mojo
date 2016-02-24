@@ -45,6 +45,8 @@ struct FooUnion {
 enum FooEnum {
 	VALUE1, // VALUE1 comment.
 	VALUE2 = 10, // VALUE2 comment.
+
+	// FooEnum Final Comment.
 };
 
 // constant comment.

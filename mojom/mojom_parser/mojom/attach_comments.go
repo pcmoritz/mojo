@@ -35,15 +35,39 @@ func AttachCommentsToMojomFile(mojomFile *MojomFile, comments []lexer.Token) {
 	}
 	elementStream := NewMojomFileVisitor(mojomFile)
 	commentStream := NewCommentStream(comments)
+	containerStack := new(containerStack)
 	var firstLineElement MojomElement
 
 	for elementStream.Peek() != nil {
+
+		// As long as the closing brace of the top element on the stack is before
+		// the next element in the element stream, that means that comments between
+		// the current position in the comment stream and the closing brace belong
+		// to the element at the top of the stack.
+		for !containerStack.IsEmpty() && containerStack.Peek().ClosingBraceToken().SourcePos < elementStream.Peek().MainToken().SourcePos {
+			element := containerStack.Pop()
+			final := commentStream.GetBeforeToken(element.ClosingBraceToken())
+			if len(final) > 0 {
+				attachedComments := element.AttachedComments()
+				if attachedComments == nil {
+					attachedComments = element.NewAttachedComments()
+				}
+				attachedComments.Final = final
+			}
+		}
+
 		var above []lexer.Token
 		var left []lexer.Token
 		var right []lexer.Token
 
 		curElement := elementStream.Next()
 		nextElement := elementStream.Peek()
+
+		// When an element that has a body is found, push it onto the stack.
+		if el, ok := curElement.(mojomElementContainer); ok {
+			containerStack.Push(el)
+		}
+
 		if firstLineElement == nil {
 			firstLineElement = curElement
 			// Get the comments on preceeding lines.
@@ -81,6 +105,20 @@ func AttachCommentsToMojomFile(mojomFile *MojomFile, comments []lexer.Token) {
 				attachedComments.Right = right
 			}
 			firstLineElement = nil
+		}
+	}
+
+	// For all the elements that remain on the stack, we check to see if any
+	// comments are left before that element's closing brace.
+	for !containerStack.IsEmpty() {
+		element := containerStack.Pop()
+		final := commentStream.GetBeforeToken(element.ClosingBraceToken())
+		if len(final) > 0 {
+			attachedComments := element.AttachedComments()
+			if attachedComments == nil {
+				attachedComments = element.NewAttachedComments()
+			}
+			attachedComments.Final = final
 		}
 	}
 	mojomFile.FinalComments = commentStream.GetRemaining()
@@ -164,6 +202,10 @@ type AttachedComments struct {
 
 	// Right lists comments to the right of the element.
 	Right []lexer.Token
+
+	// Final lists comments that are in the body of an enum, struct, union or
+	// interface and not followed by any declaration or field.
+	Final []lexer.Token
 }
 
 // CommentsAttachment can be embedded in structs to add a pointer to
@@ -171,6 +213,11 @@ type AttachedComments struct {
 // MojomElement interface.
 type CommentsAttachment struct {
 	attachedComments *AttachedComments
+}
+
+type mojomElementContainer interface {
+	MojomElement
+	ClosingBraceToken() *lexer.Token
 }
 
 // See MojomElement.
@@ -182,4 +229,40 @@ func (a *CommentsAttachment) AttachedComments() *AttachedComments {
 func (a *CommentsAttachment) NewAttachedComments() *AttachedComments {
 	a.attachedComments = new(AttachedComments)
 	return a.attachedComments
+}
+
+// containerStack is a stack for mojomElementContainer objects. Specifically,
+// it is used to keep track of nested scopes and make sure that comments within
+// a given scope are attached to the scope in question and not another scope.
+type containerStack struct {
+	stack []mojomElementContainer
+}
+
+// Peek returns the top element on the stack and leaves the stack intact.
+func (c *containerStack) Peek() mojomElementContainer {
+	if c.IsEmpty() {
+		panic("The stack is empty, nothing to peek at.")
+	}
+	return c.stack[len(c.stack)-1]
+}
+
+// Pop removes the top element from the stack and returns that element.
+func (c *containerStack) Pop() (el mojomElementContainer) {
+	if c.IsEmpty() {
+		panic("The stack is empty, nothing to pop.")
+	}
+
+	el = c.stack[len(c.stack)-1]
+	c.stack = c.stack[:len(c.stack)-1]
+	return
+}
+
+// Push puts an element on top of the stack.
+func (c *containerStack) Push(el mojomElementContainer) {
+	c.stack = append(c.stack, el)
+}
+
+// IsEmpty returns true if the stack is empty and false otherwise.
+func (c *containerStack) IsEmpty() bool {
+	return len(c.stack) == 0
 }

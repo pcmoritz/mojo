@@ -465,6 +465,9 @@ func (p *Parser) parseInterfaceDecl(attributes *mojom.Attributes) (mojomInterfac
 		return
 	}
 
+	closingBraceToken := p.lastConsumed
+	mojomInterface.SetClosingBraceToken(&closingBraceToken)
+
 	p.matchSemicolon()
 
 	return
@@ -688,6 +691,9 @@ func (p *Parser) parseStructDecl(attributes *mojom.Attributes) (mojomStruct *moj
 		return
 	}
 
+	closingBraceToken := p.lastConsumed
+	mojomStruct.SetClosingBraceToken(&closingBraceToken)
+
 	p.matchSemicolon()
 
 	return
@@ -848,6 +854,9 @@ func (p *Parser) parseUnionDecl(attributes *mojom.Attributes) (union *mojom.Mojo
 		return
 	}
 
+	closingBraceToken := p.lastConsumed
+	union.SetClosingBraceToken(&closingBraceToken)
+
 	if p.matchSemicolon() {
 		union.ComputeFieldTags()
 	}
@@ -937,6 +946,9 @@ func (p *Parser) parseEnumDecl(attributes *mojom.Attributes) (enum *mojom.MojomE
 	if !p.match(lexer.RBrace) {
 		return
 	}
+
+	closingBraceToken := p.lastConsumed
+	enum.SetClosingBraceToken(&closingBraceToken)
 
 	p.matchSemicolon()
 

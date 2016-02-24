@@ -158,7 +158,7 @@ func TestWriteComments(t *testing.T) {
 		cppComment(22, "block 3 line 3"),
 	}
 	p := getNewPrinter()
-	p.writeCommentBlocks(comments)
+	p.writeCommentBlocks(comments, true)
 
 	expected := `// block 1 line 1
 // block 1 line 2

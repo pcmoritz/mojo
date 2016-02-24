@@ -258,10 +258,21 @@ func (b UserDefinedTypeBase) Scope() *Scope {
 // enums and constants.
 type DeclaredObjectsContainerBase struct {
 	DeclaredObjects []DeclaredObject
+	// The token of the right brace that terminates the body of the declared
+	// objects container.
+	closingBraceToken *lexer.Token
 }
 
 func (c DeclaredObjectsContainerBase) GetDeclaredObjects() []DeclaredObject {
 	return c.DeclaredObjects
+}
+
+func (c *DeclaredObjectsContainerBase) ClosingBraceToken() *lexer.Token {
+	return c.closingBraceToken
+}
+
+func (c *DeclaredObjectsContainerBase) SetClosingBraceToken(closingBraceToken *lexer.Token) {
+	c.closingBraceToken = closingBraceToken
 }
 
 type DeclaredObjectsContainer interface {
