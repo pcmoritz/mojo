@@ -10,22 +10,22 @@ EXCLUDE_FILES=[".*", "*.gn", "*.gni", "PRESUBMIT.py", "*_win.*"]
 EXCLUDE_PATHS=["*/tests/*"]
 
 CopyDir("mojo/public",
-        "third_party/mojo/public",
+        "mojo/public",
         recursive=False,
         exclude_file_patterns=EXCLUDE_FILES)
 
 CopyDir("mojo/public/c",
-        "third_party/mojo/public/c",
+        "mojo/public/c",
         recursive=True,
         exclude_file_patterns=EXCLUDE_FILES,
         exclude_path_patterns=EXCLUDE_PATHS)
 CopyDir("mojo/public/cpp",
-        "third_party/mojo/public/cpp",
+        "mojo/public/cpp",
         recursive=True,
-        exclude_file_patterns=EXCLUDE_FILES,
+        exclude_file_patterns=EXCLUDE_FILES+["application_test_*.*"],
         exclude_path_patterns=EXCLUDE_PATHS+["mojo/public/cpp/test_support/*"])
 CopyDir("mojo/public/interfaces",
-        "third_party/mojo/public/interfaces",
+        "mojo/public/interfaces",
         recursive=True,
         exclude_file_patterns=EXCLUDE_FILES,
         exclude_path_patterns=EXCLUDE_PATHS)
@@ -33,29 +33,29 @@ CopyDir("mojo/public/interfaces",
 # For simplicity, copy all of the bindings generators, even though we really
 # only need/want C++.
 CopyDir("mojo/public/tools/bindings",
-        "third_party/mojo/public/tools/bindings",
+        "mojo/public/tools/bindings",
         recursive=True,
         exclude_file_patterns=EXCLUDE_FILES,
         exclude_path_patterns=EXCLUDE_PATHS+["*/mojom_tests/*"])
 # The generators need jinja2, which needs markupsafe. Sigh.
 CopyDir("mojo/public/third_party/jinja2",
-        "third_party/mojo/public/third_party/jinja2",
+        "mojo/public/third_party/jinja2",
         recursive=True)
 CopyDir("mojo/public/third_party/markupsafe",
-        "third_party/mojo/public/third_party/markupsafe",
+        "mojo/public/third_party/markupsafe",
         recursive=True)
 # We currently need some stuff to glue the mojom parser to the generators.
 CopyDir("mojo/public/python/dummy_mojo_system",
-        "third_party/mojo/public/python/dummy_mojo_system",
+        "mojo/public/python/dummy_mojo_system",
         recursive=True)
 CopyDir("mojo/public/python/mojo_bindings",
-        "third_party/mojo/public/python/mojo_bindings",
+        "mojo/public/python/mojo_bindings",
         recursive=True)
 
 # Scripts to download binaries.
 CopyFiles(["sdk_build/data/common/download_file_from_google_storage.py",
            "sdk_build/data/common/download_mojom_parser.sh"],
-          "third_party/mojo_sdk_setup")
+          "mojo_sdk_setup")
 
 # Seed an example.
 CopyDir("examples/hello_mojo",
