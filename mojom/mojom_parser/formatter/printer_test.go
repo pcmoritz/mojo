@@ -286,7 +286,7 @@ func TestWriteMojomStructEmpty(t *testing.T) {
 	declData := mojom.DeclData("", nil, lexer.Token{Text: "FooStruct"}, nil)
 	mojomStruct := mojom.NewMojomStruct(declData)
 
-	expected := "struct FooStruct {};"
+	expected := "struct FooStruct{};"
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomStruct)

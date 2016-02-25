@@ -85,6 +85,9 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 // writeModuleNamespace writes a mojom file's module statement and associated
 // comments.
 func (p *printer) writeModuleNamespace(module *mojom.ModuleNamespace) {
+	if module == nil {
+		return
+	}
 	p.writeBeforeComments(module)
 	p.writef("module %s;", module.Identifier)
 	p.writeRightComments(module)
@@ -173,7 +176,7 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 		p.writef("@%v", mojomMethod.DeclaredOrdinal())
 	}
 	p.writeMethodParams(mojomMethod.Parameters)
-	if mojomMethod.ResponseParameters != nil && len(mojomMethod.ResponseParameters.Fields) > 0 {
+	if mojomMethod.ResponseParameters != nil {
 		p.write(" => ")
 		p.writeMethodParams(mojomMethod.ResponseParameters)
 	}
@@ -263,12 +266,12 @@ func (p *printer) writeEnumValue(enumValue *mojom.EnumValue) {
 // declarations (fields, enum values, nested declarations and methods) and the
 // closing brace.
 func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsContainer) {
-	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
 
 	if len(container.GetDeclaredObjects()) == 0 && !containsFinalComments(container.(mojom.MojomElement)) {
-		p.write("};")
+		p.writef("%v{};", container.(mojom.DeclaredObject).NameToken().Text)
 		return
 	}
+	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
 	p.writeRightComments(container.(mojom.MojomElement))
 	p.incIndent()
 	p.nl()
