@@ -4366,7 +4366,7 @@ class _BoundsCheckTestInterfaceServiceDescription implements service_describer.S
 }
 
 abstract class BoundsCheckTestInterface {
-  static const String serviceName = null;
+  static const String serviceName = "this.is.the.service.name.for.BoundsCheckTestInterface";
   dynamic method0(int param0,[Function responseFactory = null]);
   void method1(int param0);
 }

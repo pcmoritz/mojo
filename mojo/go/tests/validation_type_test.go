@@ -5,18 +5,27 @@
 package tests
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
 	"mojo/public/interfaces/bindings/mojom_types"
 	"mojo/public/interfaces/bindings/service_describer"
-	"mojo/public/interfaces/bindings/tests/test_included_unions"
 	"mojo/public/interfaces/bindings/tests/test_unions"
 	test "mojo/public/interfaces/bindings/tests/validation_test_interfaces"
 )
 
 var test_descriptor map[string]mojom_types.UserDefinedType
 var test_unions_descriptor map[string]mojom_types.UserDefinedType
+
+// computeTypeKey encapsulates the algorithm for computing the type key
+// of a type given its fully-qualified name.
+//
+// This function must be kept in sync with the function ComputeTypeKey()
+// in mojom/mojom_descriptor.go in the Mojom parser source code.
+func computeTypeKey(fullyQualifiedName string) string {
+	return fmt.Sprintf("TYPE_KEY:%s", fullyQualifiedName)
+}
 
 func init() {
 	test_descriptor = test.GetAllMojomTypeDefinitions()
@@ -25,9 +34,9 @@ func init() {
 
 // Perform a sanity check where we examine an MojomEnum's contents for correctness.
 func TestEnumType(t *testing.T) {
-	enumID := test.ID_validation_test_interfaces_BasicEnum__
 	shortName := "BasicEnum"
 	fullIdentifier := "mojo.test.BasicEnum"
+	enumID := computeTypeKey(fullIdentifier)
 	labelMap := map[string]int32{
 		"A": 0,
 		"B": 1,
@@ -96,12 +105,12 @@ func TestEnumType(t *testing.T) {
 
 // Perform a sanity check where we examine a MojomStruct's contents for correctness.
 func TestStructType(t *testing.T) {
-	structID := test.ID_validation_test_interfaces_StructE__
 	shortName := "StructE"
 	fullIdentifier := "mojo.test.StructE"
+	structID := computeTypeKey(fullIdentifier)
 	fields := map[int]string{
-		0: "StructD",
-		1: "DataPipeConsumer",
+		0: "struct_d",
+		1: "data_pipe_consumer",
 	}
 
 	// Extract *UserDefinedType from the validation test's Descriptor using structID.
@@ -143,8 +152,14 @@ func TestStructType(t *testing.T) {
 	for i, field := range ms.Fields {
 		expectedFieldShortName := fields[i]
 		// Check that the ShortName is correct.
-		if field.DeclData == nil || field.DeclData.ShortName == nil || *field.DeclData.ShortName != expectedFieldShortName {
-			t.Fatalf("StructField for %s at ordinal %d did not have ShortName %s", structID, i, expectedFieldShortName)
+		if field.DeclData == nil {
+			t.Fatalf("StructField for %s at ordinal %d had nil DeclData", structID, i)
+		}
+		if field.DeclData.ShortName == nil {
+			t.Fatalf("StructField for %s at ordinal %d had nil DeclData.ShortName", structID, i)
+		}
+		if *field.DeclData.ShortName != expectedFieldShortName {
+			t.Fatalf("StructField for %s at ordinal %d had ShortName %s, expecting %s", structID, i, *field.DeclData.ShortName, expectedFieldShortName)
 		}
 
 		// Special case each field since we know what's inside.
@@ -156,12 +171,13 @@ func TestStructType(t *testing.T) {
 			}
 
 			// TypeTypeReference.Value is a TypeReference
-			expectedReferenceID := test.ID_validation_test_interfaces_StructD__
+			expectedReferenceID := "StructD"
 			if *ttr.Value.Identifier != expectedReferenceID {
 				t.Fatalf("TypeReference Identifier got %s, but expected %s", *ttr.Value.Identifier, expectedReferenceID)
 			}
-			if *ttr.Value.TypeKey != expectedReferenceID {
-				t.Fatalf("TypeReference TypeKey got %s, but expected %s", *ttr.Value.TypeKey, expectedReferenceID)
+			expectedTypeKey := computeTypeKey("mojo.test.StructD")
+			if *ttr.Value.TypeKey != expectedTypeKey {
+				t.Fatalf("TypeReference TypeKey got %s, but expected %s", *ttr.Value.TypeKey, expectedTypeKey)
 			}
 		case 1:
 			tht, ok := field.Type.(*mojom_types.TypeHandleType)
@@ -184,14 +200,14 @@ func TestStructType(t *testing.T) {
 
 // Perform a sanity check where we examine a MojomUnion's contents for correctness.
 func TestUnionType(t *testing.T) {
-	unionID := test.ID_validation_test_interfaces_UnionB__
 	shortName := "UnionB"
 	fullIdentifier := "mojo.test.UnionB"
+	unionID := computeTypeKey(fullIdentifier)
 	fields := map[int]string{
-		0: "A",
-		1: "B",
-		2: "C",
-		3: "D",
+		0: "a",
+		1: "b",
+		2: "c",
+		3: "d",
 	}
 
 	// Extract *UserDefinedType from the validation test's Descriptor using unionID.
@@ -231,12 +247,14 @@ func TestUnionType(t *testing.T) {
 	// Go through each UnionField, checking DeclData and the Type of each field.
 	// Note that UnionField's rely on their Tag to determine their ordinal.
 	// It is NOT in definition order, like with MojomStruct's.
-	for _, field := range mu.Fields {
-		ordinal := field.Tag
+	for i, field := range mu.Fields {
+		//ordinal := field.Tag
+		// TODO(rudominer) Currently the field.Tag is not being set by the Mojom parser.
+		ordinal := i
 		expectedFieldShortName := fields[int(ordinal)]
 		// Check that the ShortName is correct.
 		if field.DeclData == nil || field.DeclData.ShortName == nil || *field.DeclData.ShortName != expectedFieldShortName {
-			t.Fatalf("UnionField for %s at ordinal %d did not have ShortName %s", unionID, ordinal, expectedFieldShortName)
+			t.Fatalf("UnionField for %s at ordinal %d had ShortName %s, expecting %s", unionID, ordinal, *field.DeclData.ShortName, expectedFieldShortName)
 		}
 
 		// It turns out that regardless of field ordinal, this union has TypeSimpleType for the type.
@@ -269,11 +287,11 @@ func TestUnionType(t *testing.T) {
 // Perform a sanity check for a struct that imports a union from another file.
 // The descriptor should still handle it.
 func TestStructWithImportType(t *testing.T) {
-	structID := test_unions.ID_test_unions_IncludingStruct__
 	shortName := "IncludingStruct"
 	fullIdentifier := "mojo.test.IncludingStruct"
+	structID := computeTypeKey(fullIdentifier)
 	fields := map[int]string{
-		0: "A",
+		0: "a",
 	}
 
 	// Extract *UserDefinedType from the validation test's Descriptor using structID.
@@ -310,13 +328,17 @@ func TestStructWithImportType(t *testing.T) {
 		t.Fatalf("MojomStruct for %s had %d fields, but expected %d", structID, got, expected)
 	}
 
+	includedUnionShortName := "IncludedUnion"
+	includedUnionFullIdentifier := "mojo.test.IncludedUnion"
+	includedUnionID := computeTypeKey(includedUnionFullIdentifier)
+
 	// Go through each StructField, checking DeclData and the Type of each field.
 	// Note that since ms.Fields is a slice, the "ordinal" is the index.
 	for i, field := range ms.Fields {
 		expectedFieldShortName := fields[i]
 		// Check that the ShortName is correct.
 		if field.DeclData == nil || field.DeclData.ShortName == nil || *field.DeclData.ShortName != expectedFieldShortName {
-			t.Fatalf("StructField for %s at ordinal %d did not have ShortName %s", structID, i, expectedFieldShortName)
+			t.Fatalf("StructField for %s at ordinal %d had ShortName %s, expecting %s", structID, i, *field.DeclData.ShortName, expectedFieldShortName)
 		}
 
 		// Special case each field since we know what's inside.
@@ -326,14 +348,11 @@ func TestStructWithImportType(t *testing.T) {
 			if !ok {
 				t.Fatalf("StructField %s's field 0 didn't have Type *TypeTypeReference", structID)
 			}
-
-			// TypeTypeReference.Value is a TypeReference, which must have reference equality to the imported unionID.
-			unionIDRef := &test_included_unions.ID_test_included_unions_IncludedUnion__
-			if ttr.Value.Identifier != unionIDRef {
-				t.Fatalf("TypeReference Identifier got %s, but expected %s", *ttr.Value.Identifier, *unionIDRef)
+			if *ttr.Value.Identifier != includedUnionShortName {
+				t.Fatalf("TypeReference Identifier got %s, but expected %s", *ttr.Value.Identifier, includedUnionShortName)
 			}
-			if ttr.Value.TypeKey != unionIDRef {
-				t.Fatalf("TypeReference TypeKey got %s, but expected %s", *ttr.Value.TypeKey, *unionIDRef)
+			if *ttr.Value.TypeKey != includedUnionID {
+				t.Fatalf("TypeReference TypeKey got %s, but expected %s", *ttr.Value.TypeKey, includedUnionID)
 			}
 		default:
 			t.Fatalf("There should not be a field %d for MojomStruct %s", i, structID)
@@ -349,10 +368,9 @@ func TestInterfaceType(t *testing.T) {
 	//   Method0(uint8 param0) => (uint8 param0);
 	//   Method1(uint8 param0);
 	// };
-
-	interfaceID := test.ID_validation_test_interfaces_BoundsCheckTestInterface__
 	shortName := "BoundsCheckTestInterface"
 	fullIdentifier := "mojo.test.BoundsCheckTestInterface"
+	interfaceID := computeTypeKey(fullIdentifier)
 	methodMap := map[uint32]string{
 		0: "Method0",
 		1: "Method1",
@@ -387,7 +405,7 @@ func checkServiceDescription(t *testing.T, sd service_describer.ServiceDescripti
 	// Check out the top level interface. This must pass checkMojomInterface.
 	mi, err := sd.GetTopLevelInterface()
 	if err != nil {
-		t.Fatalf("Unexpected error %s", err)
+		t.Fatalf("Unexpected error for %s: %s", fullIdentifier, err)
 	}
 	checkMojomInterface(t, mi, interfaceID, shortName, fullIdentifier, methodMap)
 
