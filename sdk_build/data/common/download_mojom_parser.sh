@@ -3,7 +3,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Note: In the SDK, this script lives in third_party/mojo_sdk_setup.
+# Note: In the SDK, this script lives in mojo_sdk_setup.
 SCRIPT_DIR=$(dirname $0)
 DOWNLOADER=${SCRIPT_DIR}/download_file_from_google_storage.py
 

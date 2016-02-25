@@ -58,6 +58,30 @@ def _CopyFiles(source_files, dest_path):
                 os.path.join(dest_path, os.path.basename(source_file)))
 
 
+def _GitGetRevision():
+  """Returns the HEAD revision of the source git repository (the current working
+  directory should be the root of this repository)."""
+
+  return Git("rev-parse", "HEAD").strip()
+
+
+def _ReadFile(source_file):
+  """Reads the specified file from the source git repository (note: It does not
+  verify that |source_file| is actually in the git repository, i.e., is tracked)
+  and returns its contents."""
+
+  with open(source_file, "rb") as f:
+    return f.read()
+
+
+def _WriteFile(dest_file, contents):
+  """Writes the given contents to the specified destination file."""
+
+  _MakeDirs(os.path.dirname(dest_file))
+  with open(dest_file, "wb") as f:
+    return f.write(contents)
+
+
 def main():
   parser = argparse.ArgumentParser(
       description="Constructs an SDK from a specification.")
@@ -87,6 +111,8 @@ def main():
   except OSError:
     FatalError("failed to create target directory %s" % target_dir)
 
+  # Wrappers to actually write things to the target directory:
+
   def CopyDirToTargetDir(source_path, rel_dest_path, **kwargs):
     return _CopyDir(source_path, os.path.join(target_dir, rel_dest_path),
                     **kwargs)
@@ -95,10 +121,16 @@ def main():
     return _CopyFiles(source_files, os.path.join(target_dir, rel_dest_path),
                       **kwargs)
 
+  def WriteFileToTargetDir(rel_dest_file, contents):
+    return _WriteFile(os.path.join(target_dir, rel_dest_file), contents)
+
   execution_globals = {"CopyDir": CopyDirToTargetDir,
                        "CopyFiles": CopyFilesToTargetDir,
                        "FatalError": FatalError,
-                       "GitLsFiles": GitLsFiles}
+                       "GitGetRevision": _GitGetRevision,
+                       "GitLsFiles": GitLsFiles,
+                       "ReadFile": _ReadFile,
+                       "WriteFile": WriteFileToTargetDir}
   exec args.sdk_spec_file in execution_globals
 
   return 0
