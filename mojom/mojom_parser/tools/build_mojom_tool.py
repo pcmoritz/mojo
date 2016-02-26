@@ -3,9 +3,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""Build and optionally upload mojom_parser to Google Cloud Storage.
+"""Builds and optionally uploads the mojom tool to Google Cloud Storage.
 
-This script is used to build a new version of the mojom_parser binary for both
+This script is used to build a new version of the mojom tool binary for both
 mac and linux and optionally upload them to Google Cloud Storage based on their
 SHA1 digest. It operates in 2 steps:
   1) Invokes the Go compiler to build the mojom parser for all
@@ -13,7 +13,7 @@ SHA1 digest. It operates in 2 steps:
   2) If the --upload flag is specified, for each of the binaries built:
     i) Computes the sha1 digest of the binary file.
     ii) Uploads the file to Google Cloud Storage using the sha1 as the filename.
-    iii) Updates a local file named "mojom_parser.sha1" to contain the sha1
+    iii) Updates a local file named "mojom.sha1" to contain the sha1
     digest of the file that was uploaded. This allows "gclient sync" to download
     the file.
 
@@ -24,11 +24,11 @@ In order to use this script to upload a new version of the parser, you need:
 
 If you want to hack on the parser and use your locally-built version, from the
 Mojo source root directory do:
-1) Run this script: mojom/mojom_parser/tools/build_mojom_parser.py
+1) Run this script: mojom/mojom_parser/tools/build_mojom_tool.py
 2) Copy the architecture-specific binary to the architecture-specific location:
 For example for linux do:
-cp mojom_parser_linux_amd64  \
-mojo/public/tools/bindings/mojom_parser/bin/linux64/mojom_parser
+cp mojom_linux_amd64  \
+mojo/public/tools/bindings/mojom_parser/bin/linux64/mojom
 
 This script will build for all architectures before it attempts to upload any
 binary. If any of the builds fail, the whole script will abort and nothing will
@@ -118,7 +118,7 @@ class ParserBuilder(object):
     sha1_file = '%s.sha1' % self._get_output_path(target_os, target_arch)
     assert os.path.exists(sha1_file)
     stamp_file = os.path.join(self._src_root, 'mojo', 'public', 'tools',
-        'bindings', 'mojom_parser', 'bin', target_dir, 'mojom_parser.sha1')
+        'bindings', 'mojom_parser', 'bin', target_dir, 'mojom.sha1')
     shutil.move(sha1_file, stamp_file)
     self._info_print(
         "Wrote stamp file %s. You probably want to commit this." % stamp_file)
@@ -184,7 +184,7 @@ class ParserBuilder(object):
     if self._quiet:
       stdout = open(os.devnull, 'w')
     self._info_print(
-        "Uploading mojom_parser (%s,%s) to GCS..." % (target_os, target_arch))
+        "Uploading mojom tool (%s,%s) to GCS..." % (target_os, target_arch))
     return subprocess.call(upload_cmd, stdout=stdout)
 
   def _get_dir_name_for_arch(self, target_os, target_arch):
@@ -196,7 +196,7 @@ class ParserBuilder(object):
 
   def _get_output_path(self, target_os, target_arch):
     return os.path.join(self._out_dir,
-                        'mojom_parser_%s_%s' % (target_os, target_arch))
+                        'mojom_%s_%s' % (target_os, target_arch))
 
   def _get_depot_tools_path(self, src_root):
     name = 'find_depot_tools'

@@ -8,6 +8,6 @@ group("mojom") {
   testonly = true
   deps = []
   if (is_linux && defined(go_build_tool) && go_build_tool != "") {
-    deps += [ "//mojom/mojom_parser" ]
+    deps += [ "//mojom/mojom_parser:mojom_tool" ]
   }
 }
