@@ -85,7 +85,7 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 // writeModuleNamespace writes a mojom file's module statement and associated
 // comments.
 func (p *printer) writeModuleNamespace(module *mojom.ModuleNamespace) {
-	if module == nil {
+	if module == nil || module.Identifier == "" {
 		return
 	}
 	p.writeBeforeComments(module)
@@ -526,10 +526,18 @@ func (p *printer) writeMultiLineComment(comment lexer.Token) {
 
 	lines := strings.Split(comment.Text, "\n")
 	for i, line := range lines {
-		if i != 0 {
-			p.write("   ")
+		trimmed := strings.Trim(line, " \t")
+		// If a line starts with * we assume the user is trying to use the pattern
+		// whereby they align the comment with spaces after the *. Otherwise,
+		// we try to align the comment by prepending 3 spaces.
+		if i != 0 && len(trimmed) > 0 {
+			if trimmed[0] == '*' {
+				p.write(" ")
+			} else {
+				p.write("   ")
+			}
 		}
-		p.write(strings.Trim(line, " "))
+		p.write(trimmed)
 		if i < len(lines)-1 {
 			p.nl()
 		}

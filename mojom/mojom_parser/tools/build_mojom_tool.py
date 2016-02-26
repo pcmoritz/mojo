@@ -28,7 +28,7 @@ Mojo source root directory do:
 2) Copy the architecture-specific binary to the architecture-specific location:
 For example for linux do:
 cp mojom_linux_amd64  \
-mojo/public/tools/bindings/mojom_parser/bin/linux64/mojom
+mojo/public/tools/bindings/mojom_tool/bin/linux64/mojom
 
 This script will build for all architectures before it attempts to upload any
 binary. If any of the builds fail, the whole script will abort and nothing will
@@ -118,7 +118,7 @@ class ParserBuilder(object):
     sha1_file = '%s.sha1' % self._get_output_path(target_os, target_arch)
     assert os.path.exists(sha1_file)
     stamp_file = os.path.join(self._src_root, 'mojo', 'public', 'tools',
-        'bindings', 'mojom_parser', 'bin', target_dir, 'mojom.sha1')
+        'bindings', 'mojom_tool', 'bin', target_dir, 'mojom.sha1')
     shutil.move(sha1_file, stamp_file)
     self._info_print(
         "Wrote stamp file %s. You probably want to commit this." % stamp_file)
@@ -163,7 +163,7 @@ class ParserBuilder(object):
   def _upload_binary(self, target_os, target_arch):
     """Computes the sha1 digest of the contents of the specified binary, then
     uploads the contents of the file at that path to the Google Cloud Storage
-    bucket "mojo" using the filename "mojom_parser/$%target/$sha1." $target
+    bucket "mojo" using the filename "mojom_tool/$%target/$sha1." $target
     is computed based upon the target_os and target_arch. A file whose name is
     the name of the binary with .sha1 appended is created containing the sha1.
 

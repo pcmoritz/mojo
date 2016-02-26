@@ -29,6 +29,19 @@ func TestWriteModuleNamespace(t *testing.T) {
 	checkEq(t, "module hello.world;\n", p.result())
 }
 
+func TestWriteModuleNamespaceNil(t *testing.T) {
+	p := getNewPrinter()
+	p.writeModuleNamespace(nil)
+	checkEq(t, "", p.result())
+}
+
+func TestWriteModuleNamespaceEmpty(t *testing.T) {
+	m := mojom.NewModuleNamespace("", nil)
+	p := getNewPrinter()
+	p.writeModuleNamespace(m)
+	checkEq(t, "", p.result())
+}
+
 func TestWriteLiteralValue(t *testing.T) {
 	testCases := []struct {
 		expected string
@@ -125,6 +138,20 @@ import "foo1.mojom";
 import "foo2.mojom";
 `
 	checkEq(t, expected, p.result())
+}
+
+func TestWriteMultilineComments(t *testing.T) {
+	commentText := `/*
+ * Some comment.
+ * More comments.
+ * Even more comments.
+
+ * And after a space.
+ */`
+	token := lexer.Token{Kind: lexer.MultiLineComment, Text: commentText}
+	p := getNewPrinter()
+	p.writeMultiLineComment(token)
+	checkEq(t, commentText, p.result())
 }
 
 func cppComment(line int, c string) (t lexer.Token) {
