@@ -8,5 +8,5 @@ ssize_t sendto(int fd,
                int flags,
                const struct sockaddr* addr,
                socklen_t alen) {
-  return socketcall_cp(sendto, fd, buf, len, flags, addr, alen);
+  return syscall_cp(SYS_sendto, fd, buf, len, flags, addr, alen);
 }

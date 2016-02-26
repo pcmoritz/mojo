@@ -63,9 +63,6 @@ __attribute__((visibility("hidden"))) long __syscall_ret(unsigned long),
 #define __syscall(...) __SYSCALL_DISP(__syscall, __VA_ARGS__)
 #define syscall(...) __syscall_ret(__syscall(__VA_ARGS__))
 
-#define socketcall __socketcall
-#define socketcall_cp __socketcall_cp
-
 #define __syscall_cp0(n) (__syscall_cp)(n, 0, 0, 0, 0, 0, 0)
 #define __syscall_cp1(n, a) (__syscall_cp)(n, __scc(a), 0, 0, 0, 0, 0)
 #define __syscall_cp2(n, a, b) (__syscall_cp)(n, __scc(a), __scc(b), 0, 0, 0, 0)
@@ -80,20 +77,6 @@ __attribute__((visibility("hidden"))) long __syscall_ret(unsigned long),
 
 #define __syscall_cp(...) __SYSCALL_DISP(__syscall_cp, __VA_ARGS__)
 #define syscall_cp(...) __syscall_ret(__syscall_cp(__VA_ARGS__))
-
-#ifndef SYSCALL_USE_SOCKETCALL
-#define __socketcall(nm, a, b, c, d, e, f) syscall(SYS_##nm, a, b, c, d, e, f)
-#define __socketcall_cp(nm, a, b, c, d, e, f) \
-  syscall_cp(SYS_##nm, a, b, c, d, e, f)
-#else
-#define __socketcall(nm, a, b, c, d, e, f) \
-  syscall(SYS_socketcall, __SC_##nm,       \
-          ((long[6]){(long)a, (long)b, (long)c, (long)d, (long)e, (long)f}))
-#define __socketcall_cp(nm, a, b, c, d, e, f) \
-  syscall_cp(                                 \
-      SYS_socketcall, __SC_##nm,              \
-      ((long[6]){(long)a, (long)b, (long)c, (long)d, (long)e, (long)f}))
-#endif
 
 /* fixup legacy 16-bit junk */
 
@@ -219,29 +202,6 @@ __attribute__((visibility("hidden"))) long __syscall_ret(unsigned long),
 #undef SYS_sendfile
 #define SYS_sendfile SYS_sendfile64
 #endif
-
-/* socketcall calls */
-
-#define __SC_socket 1
-#define __SC_bind 2
-#define __SC_connect 3
-#define __SC_listen 4
-#define __SC_accept 5
-#define __SC_getsockname 6
-#define __SC_getpeername 7
-#define __SC_socketpair 8
-#define __SC_send 9
-#define __SC_recv 10
-#define __SC_sendto 11
-#define __SC_recvfrom 12
-#define __SC_shutdown 13
-#define __SC_setsockopt 14
-#define __SC_getsockopt 15
-#define __SC_sendmsg 16
-#define __SC_recvmsg 17
-#define __SC_accept4 18
-#define __SC_recvmmsg 19
-#define __SC_sendmmsg 20
 
 #ifdef SYS_open
 #define __sys_open2(x, pn, fl) __syscall2(SYS_open, pn, (fl) | O_LARGEFILE)

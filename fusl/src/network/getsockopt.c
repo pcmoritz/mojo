@@ -6,5 +6,5 @@ int getsockopt(int fd,
                int optname,
                void* restrict optval,
                socklen_t* restrict optlen) {
-  return socketcall(getsockopt, fd, level, optname, optval, optlen, 0);
+  return syscall(SYS_getsockopt, fd, level, optname, optval, optlen, 0);
 }

@@ -13,7 +13,7 @@ ssize_t recvmsg(int fd, struct msghdr* msg, int flags) {
     msg = &h;
   }
 #endif
-  r = socketcall_cp(recvmsg, fd, msg, flags, 0, 0, 0);
+  r = syscall_cp(SYS_recvmsg, fd, msg, flags, 0, 0, 0);
 #if LONG_MAX > INT_MAX
   if (orig)
     *orig = h;

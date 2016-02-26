@@ -2,5 +2,5 @@
 #include "syscall.h"
 
 int shutdown(int fd, int how) {
-  return socketcall(shutdown, fd, how, 0, 0, 0, 0);
+  return syscall(SYS_shutdown, fd, how, 0, 0, 0, 0);
 }

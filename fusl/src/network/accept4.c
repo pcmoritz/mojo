@@ -11,7 +11,7 @@ int accept4(int fd,
             int flg) {
   if (!flg)
     return accept(fd, addr, len);
-  int ret = socketcall_cp(accept4, fd, addr, len, flg, 0, 0);
+  int ret = syscall_cp(SYS_accept4, fd, addr, len, flg, 0, 0);
   if (ret >= 0 || (errno != ENOSYS && errno != EINVAL))
     return ret;
   ret = accept(fd, addr, len);

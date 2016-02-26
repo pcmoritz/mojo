@@ -4,11 +4,11 @@
 #include "syscall.h"
 
 int socket(int domain, int type, int protocol) {
-  int s = socketcall(socket, domain, type, protocol, 0, 0, 0);
+  int s = syscall(SYS_socket, domain, type, protocol, 0, 0, 0);
   if (s < 0 && (errno == EINVAL || errno == EPROTONOSUPPORT) &&
       (type & (SOCK_CLOEXEC | SOCK_NONBLOCK))) {
-    s = socketcall(socket, domain, type & ~(SOCK_CLOEXEC | SOCK_NONBLOCK),
-                   protocol, 0, 0, 0);
+    s = syscall(SYS_socket, domain, type & ~(SOCK_CLOEXEC | SOCK_NONBLOCK),
+                protocol, 0, 0, 0);
     if (s < 0)
       return s;
     if (type & SOCK_CLOEXEC)
