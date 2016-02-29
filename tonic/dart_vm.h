@@ -19,6 +19,7 @@ class DartVM {
 
     const uint8_t* vm_isolate_snapshot;
     const uint8_t* instructions_snapshot;
+    const uint8_t* data_snapshot;
     Dart_IsolateCreateCallback create;
     Dart_IsolateInterruptCallback interrupt;
     Dart_IsolateUnhandledExceptionCallback unhandled_exception;

@@ -21,9 +21,10 @@ static const char* kDartArgs[] = {
 
 void InitDartVM() {
   CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
-  CHECK(Dart_Initialize(mojo::dart::vm_isolate_snapshot_buffer, nullptr,
-                        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-                        nullptr, nullptr, nullptr, nullptr) == nullptr);
+  CHECK(Dart_Initialize(
+      mojo::dart::vm_isolate_snapshot_buffer,
+      nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+      nullptr, nullptr, nullptr, nullptr) == nullptr);
 }
 
 Dart_Isolate CreateDartIsolate() {

@@ -14,6 +14,7 @@ static char* dart_vm_error_ = NULL;
 DartVM::Config::Config() {
   vm_isolate_snapshot = nullptr;
   instructions_snapshot = nullptr;
+  data_snapshot = nullptr;
   create = nullptr;
   interrupt = nullptr;
   unhandled_exception = nullptr;
@@ -42,6 +43,7 @@ bool DartVM::Initialize(const Config& config,
 
   dart_vm_error_ = Dart_Initialize(config.vm_isolate_snapshot,
                                    config.instructions_snapshot,
+                                   config.data_snapshot,
                                    config.create,
                                    config.interrupt,
                                    config.unhandled_exception,
