@@ -18,7 +18,7 @@ import sys
 # How to roll the dart sdk: Just change this url! We write this to the stamp
 # file after we download, and then check the stamp file for differences.
 SDK_URL_BASE = ('https://gsdview.appspot.com/dart-archive/channels/dev/raw/'
-                '1.14.0-dev.5.0/sdk/')
+                '1.15.0-dev.4.0/sdk/')
 
 LINUX_64_SDK = 'dartsdk-linux-x64-release.zip'
 MACOS_64_SDK = 'dartsdk-macos-x64-release.zip'
@@ -28,8 +28,6 @@ THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 MOJO_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', '..'))
 DART_SDK_DIR = os.path.join(MOJO_DIR, 'third_party', 'dart-sdk')
 STAMP_FILE = os.path.join(DART_SDK_DIR, 'STAMP_FILE')
-LIBRARIES_FILE = os.path.join(DART_SDK_DIR,'dart-sdk',
-                              'lib', '_internal', 'libraries.dart')
 
 def RunCommand(command, fail_hard=True):
   """Run command and return success (True) or failure; or if fail_hard is
