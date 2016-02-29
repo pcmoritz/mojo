@@ -148,35 +148,40 @@ static Dart_Handle PrepareBuiltinLibraries(const std::string& package_root,
   return result;
 }
 
-static const intptr_t kStartIsolateArgumentsLength = 2;
+static const intptr_t kStartIsolateArgumentsLength = 7;
 
 static void SetupStartIsolateArguments(
     const DartControllerConfig& config,
     Dart_Handle main_closure,
     Dart_Handle* start_isolate_args) {
   // start_isolate_args:
-  // [0] -> main closure
-  // [1] -> args list.
-  // args list:
-  // [0] -> mojo handle.
-  // [1] -> script uri
-  // [2] -> list of script arguments in config.
-  start_isolate_args[0] = main_closure;     // entryPoint
+  // [0] -> null
+  // [1] -> main closure
+  // [2] -> args list, list of script arguments in config,
+  // [3] -> mojo handle,
+  // [4] -> true,  // isSpawnUri
+  // [5] -> null,
+  // [6] -> null,
+  start_isolate_args[0] = Dart_Null();
   DART_CHECK_VALID(start_isolate_args[0]);
-  start_isolate_args[1] = Dart_NewList(3);  // args
+  start_isolate_args[1] = main_closure;     // entryPoint
   DART_CHECK_VALID(start_isolate_args[1]);
-  Dart_Handle base_uri = Dart_NewStringFromUTF8(
-      reinterpret_cast<const uint8_t*>(config.base_uri.data()),
-      config.base_uri.length());
-  Dart_ListSetAt(start_isolate_args[1], 0, Dart_NewInteger(config.handle));
-  Dart_ListSetAt(start_isolate_args[1], 1, base_uri);
   Dart_Handle script_args = Dart_NewList(config.script_flags_count);
   DART_CHECK_VALID(script_args);
-  Dart_ListSetAt(start_isolate_args[1], 2, script_args);
+  start_isolate_args[2] = script_args;
+  DART_CHECK_VALID(start_isolate_args[2]);
   for (intptr_t i = 0; i < config.script_flags_count; i++) {
     Dart_ListSetAt(script_args, i,
                    Dart_NewStringFromCString(config.script_flags[i]));
   }
+  start_isolate_args[3] = Dart_NewInteger(config.handle);
+  DART_CHECK_VALID(start_isolate_args[3]);
+  start_isolate_args[4] = Dart_True();
+  DART_CHECK_VALID(start_isolate_args[4]);
+  start_isolate_args[5] = Dart_Null();
+  DART_CHECK_VALID(start_isolate_args[5]);
+  start_isolate_args[6] = Dart_Null();
+  DART_CHECK_VALID(start_isolate_args[6]);
 }
 
 static void CloseHandlesOnError(Dart_Handle error) {
@@ -241,7 +246,7 @@ static void SetupIsolate(Dart_Isolate isolate,
   DART_CHECK_VALID(isolate_lib);
 
   result = Dart_Invoke(isolate_lib,
-                       Dart_NewStringFromCString("_startMainIsolate"),
+                       Dart_NewStringFromCString("_startIsolate"),
                        kStartIsolateArgumentsLength,
                        start_isolate_args);
   DART_CHECK_VALID(result);
@@ -356,7 +361,7 @@ Dart_Isolate DartController::CreateIsolateHelper(
       service_isolate_spawned_ = true;
       const intptr_t port =
           (SupportDartMojoIo() && enable_observatory_) ? 0 : -1;
-      InitializeDartMojoIo();
+      InitializeDartMojoIo("");
       if (!VmService::Setup("127.0.0.1", port)) {
         *config.error = strdup(VmService::GetErrorMessage());
         return nullptr;
@@ -367,7 +372,7 @@ Dart_Isolate DartController::CreateIsolateHelper(
     tonic::DartScriptLoaderSync::LoadScript(
         config.script_uri,
         isolate_data->library_provider());
-    InitializeDartMojoIo();
+    InitializeDartMojoIo(config.base_uri);
   }
 
   if (isolate_data->library_loader().error_during_loading()) {
@@ -493,7 +498,7 @@ bool DartController::SupportDartMojoIo() {
   return service_connector_ != nullptr;
 }
 
-void DartController::InitializeDartMojoIo() {
+void DartController::InitializeDartMojoIo(const std::string& base_uri) {
   Dart_Isolate current_isolate = Dart_CurrentIsolate();
   CHECK(current_isolate != nullptr);
   if (!SupportDartMojoIo()) {
@@ -526,13 +531,17 @@ void DartController::InitializeDartMojoIo() {
   Dart_Handle files_service_handle =
       Dart_NewInteger(files_service_mojo_handle);
   CHECK(!Dart_IsError(files_service_handle));
+  Dart_Handle script_path = Dart_NewStringFromUTF8(
+      reinterpret_cast<const uint8_t*>(base_uri.data()),
+      base_uri.length());
   Dart_Handle arguments[] = {
     network_service_handle,
     files_service_handle,
+    script_path,
   };
   Dart_Handle result = Dart_Invoke(mojo_io_library,
                                    method_name,
-                                   2,
+                                   3,
                                    &arguments[0]);
   CHECK(!Dart_IsError(result));
 }

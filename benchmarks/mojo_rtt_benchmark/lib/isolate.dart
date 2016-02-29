@@ -105,7 +105,7 @@ class IsolateMessageApp extends Application {
   }
 }
 
-main(List args) {
-  MojoHandle appHandle = new MojoHandle(args[0]);
+main(List args, Object handleToken) {
+  MojoHandle appHandle = new MojoHandle(handleToken);
   new IsolateMessageApp.fromHandle(appHandle);
 }

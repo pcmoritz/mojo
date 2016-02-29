@@ -112,8 +112,7 @@ Future runTest(
 }
 
 main(List args) async {
-  assert(args.length == 3);
-  List<String> testData = args[2];
+  List<String> testData = args;
 
   // First test the parser.
   parser.parserTests();

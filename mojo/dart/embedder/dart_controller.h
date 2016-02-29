@@ -134,7 +134,7 @@ class DartController {
   // Does this controller support the 'dart:io' library?
   static bool SupportDartMojoIo();
   // Initialize 'dart:io' for the current isolate.
-  static void InitializeDartMojoIo();
+  static void InitializeDartMojoIo(const std::string& base_uri);
   // Shutdown 'dart:io' for the current isolate.
   static void ShutdownDartMojoIo();
 

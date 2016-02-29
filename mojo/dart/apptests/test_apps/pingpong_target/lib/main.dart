@@ -70,8 +70,7 @@ class PingPongApplication extends Application {
   }
 }
 
-main(List args) {
-  MojoHandle appHandle = new MojoHandle(args[0]);
-  String url = args[1];
+main(List args, Object handleToken) {
+  MojoHandle appHandle = new MojoHandle(handleToken);
   new PingPongApplication.fromHandle(appHandle);
 }

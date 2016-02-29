@@ -38,13 +38,16 @@ FilesProxy _files;
 DirectoryProxy _rootDirectory;
 DirectoryProxy _systemTempDirectory;
 
-void _initialize(int networkServiceHandle, int filesServiceHandle) {
+void _initialize(
+    int networkServiceHandle, int filesServiceHandle, String scriptPath) {
   if (networkServiceHandle != MojoHandle.INVALID) {
     _networkServiceHandle = networkServiceHandle;
   }
   if (filesServiceHandle != MojoHandle.INVALID) {
     _filesServiceHandle = filesServiceHandle;
   }
+  // TODO(floitsch): do this lazily once _Platform.script is a getter.
+  _Platform.script = Uri.parse(scriptPath);
 }
 
 void _shutdown() {

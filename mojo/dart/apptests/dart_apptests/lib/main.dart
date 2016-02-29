@@ -15,7 +15,7 @@ import 'src/service_describer_apptests.dart' as service_describer;
 import 'src/uri_apptests.dart' as uri;
 import 'src/versioning_apptests.dart' as versioning;
 
-main(List args) {
+main(List args, Object handleToken) {
   final tests = [
     connect_to_loader_apptests.connectToLoaderApptests,
     echo.echoApptests,
@@ -27,5 +27,5 @@ main(List args) {
     uri.tests,
     versioning.tests
   ];
-  runAppTests(args[0], tests);
+  runAppTests(handleToken, tests);
 }

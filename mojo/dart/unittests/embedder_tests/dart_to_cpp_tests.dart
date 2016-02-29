@@ -107,10 +107,8 @@ class DartSideImpl implements DartSide {
   Future<bool> get future => _completer.future;
 }
 
-main(List args) {
-  assert(args.length == 3);
-  int mojoHandle = args[0];
-  var rawHandle = new core.MojoHandle(mojoHandle);
+main(List args, Object handleToken) {
+  var rawHandle = new core.MojoHandle(handleToken);
   var endpoint = new core.MojoMessagePipeEndpoint(rawHandle);
   var dartSide = new DartSideImpl(endpoint);
   dartSide.future.then((_) {
