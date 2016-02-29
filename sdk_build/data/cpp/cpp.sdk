@@ -34,6 +34,13 @@ CopyDir("mojo/public/interfaces",
         exclude_file_patterns=EXCLUDE_FILES,
         exclude_path_patterns=EXCLUDE_PATHS)
 
+# For native Mojo apps, we need thunks.
+CopyDir("mojo/public/platform/native",
+        "mojo/public/platform/native",
+        recursive=True,
+        exclude_file_patterns=EXCLUDE_FILES,
+        exclude_path_patterns=EXCLUDE_PATHS)
+
 # For simplicity, copy all of the bindings generators, even though we really
 # only need/want C++.
 CopyDir("mojo/public/tools/bindings",
@@ -48,7 +55,7 @@ CopyDir("mojo/public/third_party/jinja2",
 CopyDir("mojo/public/third_party/markupsafe",
         "mojo/public/third_party/markupsafe",
         recursive=True)
-# We currently need some stuff to glue the mojom parser to the generators.
+# We currently need some stuff to glue the mojom tool to the generators.
 CopyDir("mojo/public/python/dummy_mojo_system",
         "mojo/public/python/dummy_mojo_system",
         recursive=True)
@@ -58,7 +65,7 @@ CopyDir("mojo/public/python/mojo_bindings",
 
 # Scripts to download binaries.
 CopyFiles(["sdk_build/data/common/download_file_from_google_storage.py",
-           "sdk_build/data/common/download_mojom_parser.sh",
+           "sdk_build/data/common/download_mojom_tool.sh",
            "sdk_build/data/cpp/download_clang.sh"],
           "mojo_sdk_setup")
 

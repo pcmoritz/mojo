@@ -21,7 +21,7 @@ case "$UNAME" in
     ;;
 esac
 
-FILE=${SCRIPT_DIR}/../mojo/public/tools/bindings/mojom_parser/bin/${HOST_ARCH}/mojom_parser
+FILE=${SCRIPT_DIR}/../mojo/public/tools/bindings/mojom_tool/bin/${HOST_ARCH}/mojom
 HASH=$(cat "${FILE}.sha1")
 # This includes the bucket name first.
 GS_NAME=mojo/mojom_parser/${HOST_ARCH}/${HASH}
