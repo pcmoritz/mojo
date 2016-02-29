@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library dart_to_cpp_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -1308,18 +1306,12 @@ class CppSideStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _CppSide_startTestName:
-        var params = _CppSideStartTestParams.deserialize(
-            message.payload);
         _impl.startTest();
         break;
       case _CppSide_testFinishedName:
-        var params = _CppSideTestFinishedParams.deserialize(
-            message.payload);
         _impl.testFinished();
         break;
       case _CppSide_pingResponseName:
-        var params = _CppSidePingResponseParams.deserialize(
-            message.payload);
         _impl.pingResponse();
         break;
       case _CppSide_echoResponseName:
@@ -1565,8 +1557,6 @@ class DartSideStub extends bindings.Stub {
         _impl.setClient(params.cppSide);
         break;
       case _DartSide_pingName:
-        var params = _DartSidePingParams.deserialize(
-            message.payload);
         _impl.ping();
         break;
       case _DartSide_echoName:

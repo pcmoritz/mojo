@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library clipboard_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -602,7 +599,6 @@ class _ClipboardWriteClipboardDataParams extends bindings.Struct {
         encoder0.encodeNullPointer(16, true);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = data.length;
         var keys0 = data.keys.toList();
         var values0 = data.values.toList();
         
@@ -672,11 +668,11 @@ class ClipboardType extends bindings.MojoEnum {
   factory ClipboardType(int v) {
     switch (v) {
       case 0:
-        return copyPaste;
+        return ClipboardType.copyPaste;
       case 1:
-        return selection;
+        return ClipboardType.selection;
       case 2:
-        return drag;
+        return ClipboardType.drag;
       default:
         return null;
     }

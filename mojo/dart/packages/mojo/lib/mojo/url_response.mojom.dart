@@ -3,12 +3,8 @@
 // found in the LICENSE file.
 
 library url_response_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:mojo/mojo/http_header.mojom.dart' as http_header_mojom;
 import 'package:mojo/mojo/network_error.mojom.dart' as network_error_mojom;

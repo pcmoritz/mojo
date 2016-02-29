@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library files_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/files/directory.mojom.dart' as directory_mojom;
 import 'package:mojo_services/mojo/files/types.mojom.dart' as types_mojom;

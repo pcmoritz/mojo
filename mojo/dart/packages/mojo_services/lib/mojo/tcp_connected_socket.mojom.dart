@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library tcp_connected_socket_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -67,9 +64,7 @@ class _TcpConnectedSocketProxyImpl extends bindings.Proxy {
 
 
 class _TcpConnectedSocketProxyCalls implements TcpConnectedSocket {
-  _TcpConnectedSocketProxyImpl _proxyImpl;
-
-  _TcpConnectedSocketProxyCalls(this._proxyImpl);
+  _TcpConnectedSocketProxyCalls(_TcpConnectedSocketProxyImpl _);
 }
 
 

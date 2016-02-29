@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library notifications_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -666,13 +663,9 @@ class NotificationClientStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _NotificationClient_onSelectedName:
-        var params = _NotificationClientOnSelectedParams.deserialize(
-            message.payload);
         _impl.onSelected();
         break;
       case _NotificationClient_onDismissedName:
-        var params = _NotificationClientOnDismissedParams.deserialize(
-            message.payload);
         _impl.onDismissed();
         break;
       default:
@@ -878,8 +871,6 @@ class NotificationStub extends bindings.Stub {
         _impl.update(params.notificationData);
         break;
       case _Notification_cancelName:
-        var params = _NotificationCancelParams.deserialize(
-            message.payload);
         _impl.cancel();
         break;
       default:

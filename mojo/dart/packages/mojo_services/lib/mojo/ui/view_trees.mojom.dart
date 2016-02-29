@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library view_trees_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
 import 'package:mojo_services/mojo/ui/layouts.mojom.dart' as layouts_mojom;
@@ -1184,8 +1181,6 @@ class ViewTreeStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ViewTree_getTokenName:
-        var params = _ViewTreeGetTokenParams.deserialize(
-            message.payload);
         var response = _impl.getToken(_ViewTreeGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1211,8 +1206,6 @@ class ViewTreeStub extends bindings.Stub {
         _impl.getServiceProvider(params.serviceProvider);
         break;
       case _ViewTree_requestLayoutName:
-        var params = _ViewTreeRequestLayoutParams.deserialize(
-            message.payload);
         _impl.requestLayout();
         break;
       case _ViewTree_setRootName:
@@ -1493,8 +1486,6 @@ class ViewTreeListenerStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ViewTreeListener_onLayoutName:
-        var params = _ViewTreeListenerOnLayoutParams.deserialize(
-            message.payload);
         var response = _impl.onLayout(_ViewTreeListenerOnLayoutResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

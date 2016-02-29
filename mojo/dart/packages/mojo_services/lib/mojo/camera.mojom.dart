@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library camera_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -803,13 +800,9 @@ class CameraRollServiceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _CameraRollService_updateName:
-        var params = _CameraRollServiceUpdateParams.deserialize(
-            message.payload);
         _impl.update();
         break;
       case _CameraRollService_getCountName:
-        var params = _CameraRollServiceGetCountParams.deserialize(
-            message.payload);
         var response = _impl.getCount(_CameraRollServiceGetCountResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1063,8 +1056,6 @@ class CameraServiceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _CameraService_getLatestFrameName:
-        var params = _CameraServiceGetLatestFrameParams.deserialize(
-            message.payload);
         var response = _impl.getLatestFrame(_CameraServiceGetLatestFrameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

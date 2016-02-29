@@ -3,12 +3,8 @@
 // found in the LICENSE file.
 
 library sample_import2_mojom;
-
-import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:_mojo_for_test_only/imported/sample_import.mojom.dart' as sample_import_mojom;
@@ -33,9 +29,9 @@ class Color extends bindings.MojoEnum {
   factory Color(int v) {
     switch (v) {
       case 0:
-        return red;
+        return Color.red;
       case 1:
-        return black;
+        return Color.black;
       default:
         return null;
     }

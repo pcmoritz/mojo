@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library sample_import_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -38,13 +36,13 @@ class Shape extends bindings.MojoEnum {
   factory Shape(int v) {
     switch (v) {
       case 1:
-        return rectangle;
+        return Shape.rectangle;
       case 2:
-        return circle;
+        return Shape.circle;
       case 3:
-        return triangle;
+        return Shape.triangle;
       case 3:
-        return last;
+        return Shape.last;
       default:
         return null;
     }
@@ -129,11 +127,11 @@ class AnotherShape extends bindings.MojoEnum {
   factory AnotherShape(int v) {
     switch (v) {
       case 10:
-        return rectangle;
+        return AnotherShape.rectangle;
       case 11:
-        return circle;
+        return AnotherShape.circle;
       case 12:
-        return triangle;
+        return AnotherShape.triangle;
       default:
         return null;
     }
@@ -211,11 +209,11 @@ class YetAnotherShape extends bindings.MojoEnum {
   factory YetAnotherShape(int v) {
     switch (v) {
       case 20:
-        return rectangle;
+        return YetAnotherShape.rectangle;
       case 21:
-        return circle;
+        return YetAnotherShape.circle;
       case 22:
-        return triangle;
+        return YetAnotherShape.triangle;
       default:
         return null;
     }
@@ -613,8 +611,6 @@ class ImportedInterfaceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ImportedInterface_doSomethingName:
-        var params = _ImportedInterfaceDoSomethingParams.deserialize(
-            message.payload);
         _impl.doSomething();
         break;
       default:

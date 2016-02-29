@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library views_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
 import 'package:mojo_services/mojo/gfx/composition/scenes.mojom.dart' as scenes_mojom;
@@ -1383,8 +1380,6 @@ class ViewOwnerStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ViewOwner_getTokenName:
-        var params = _ViewOwnerGetTokenParams.deserialize(
-            message.payload);
         var response = _impl.getToken(_ViewOwnerGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1709,8 +1704,6 @@ class ViewStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _View_getTokenName:
-        var params = _ViewGetTokenParams.deserialize(
-            message.payload);
         var response = _impl.getToken(_ViewGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1741,8 +1734,6 @@ class ViewStub extends bindings.Stub {
         _impl.createScene(params.scene);
         break;
       case _View_requestLayoutName:
-        var params = _ViewRequestLayoutParams.deserialize(
-            message.payload);
         _impl.requestLayout();
         break;
       case _View_addChildName:

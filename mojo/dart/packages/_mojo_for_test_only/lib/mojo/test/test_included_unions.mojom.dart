@@ -3,12 +3,8 @@
 // found in the LICENSE file.
 
 library test_included_unions_mojom;
-
-import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
@@ -52,7 +48,7 @@ class IncludedUnion extends bindings.Union {
     }
     IncludedUnion result = new IncludedUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     IncludedUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case IncludedUnionTag.a:
@@ -67,7 +63,7 @@ class IncludedUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {

@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library input_events_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/input_event_constants.mojom.dart' as input_event_constants_mojom;

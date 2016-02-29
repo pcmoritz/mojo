@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library media_common_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class MediaResult extends bindings.MojoEnum {
@@ -76,39 +71,39 @@ class MediaResult extends bindings.MojoEnum {
   factory MediaResult(int v) {
     switch (v) {
       case 0:
-        return ok;
+        return MediaResult.ok;
       case -1:
-        return unknownError;
+        return MediaResult.unknownError;
       case -2:
-        return internalError;
+        return MediaResult.internalError;
       case -3:
-        return notImplemented;
+        return MediaResult.notImplemented;
       case -4:
-        return unsupportedOperation;
+        return MediaResult.unsupportedOperation;
       case -5:
-        return unsupportedConfig;
+        return MediaResult.unsupportedConfig;
       case -6:
-        return invalidArgument;
+        return MediaResult.invalidArgument;
       case -7:
-        return insufficientResources;
+        return MediaResult.insufficientResources;
       case -8:
-        return badState;
+        return MediaResult.badState;
       case -9:
-        return bufOverflow;
+        return MediaResult.bufOverflow;
       case -10:
-        return flushed;
+        return MediaResult.flushed;
       case -11:
-        return busy;
+        return MediaResult.busy;
       case -12:
-        return protocolError;
+        return MediaResult.protocolError;
       case -13:
-        return alreadyExists;
+        return MediaResult.alreadyExists;
       case -14:
-        return notFound;
+        return MediaResult.notFound;
       case -15:
-        return shuttingDown;
+        return MediaResult.shuttingDown;
       case -16:
-        return connectionLost;
+        return MediaResult.connectionLost;
       default:
         return null;
     }

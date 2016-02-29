@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library mojom_files_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types_mojom;
 
@@ -375,7 +370,6 @@ class MojomFileGraph extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = files.length;
         var keys0 = files.keys.toList();
         var values0 = files.values.toList();
         
@@ -403,7 +397,6 @@ class MojomFileGraph extends bindings.Struct {
         encoder0.encodeNullPointer(16, false);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = resolvedTypes.length;
         var keys0 = resolvedTypes.keys.toList();
         var values0 = resolvedTypes.values.toList();
         
@@ -431,7 +424,6 @@ class MojomFileGraph extends bindings.Struct {
         encoder0.encodeNullPointer(24, false);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = resolvedValues.length;
         var keys0 = resolvedValues.keys.toList();
         var values0 = resolvedValues.values.toList();
         

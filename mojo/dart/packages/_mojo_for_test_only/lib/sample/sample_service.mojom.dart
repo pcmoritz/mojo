@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library sample_service_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -43,13 +41,13 @@ class BarType extends bindings.MojoEnum {
   factory BarType(int v) {
     switch (v) {
       case 1:
-        return vertical;
+        return BarType.vertical;
       case 2:
-        return horizontal;
+        return BarType.horizontal;
       case 3:
-        return both;
+        return BarType.both;
       case 4:
-        return invalid;
+        return BarType.invalid;
       default:
         return null;
     }
@@ -1724,7 +1722,6 @@ class NonNullableMapStruct extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = mapField.length;
         var keys0 = mapField.keys.toList();
         var values0 = mapField.values.toList();
         
@@ -2218,9 +2215,9 @@ class ServiceBazOptions extends bindings.MojoEnum {
   factory ServiceBazOptions(int v) {
     switch (v) {
       case 0:
-        return regular;
+        return ServiceBazOptions.regular;
       case 1:
-        return extra;
+        return ServiceBazOptions.extra;
       default:
         return null;
     }

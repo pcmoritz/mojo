@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library validation_test_interfaces_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -41,15 +39,15 @@ class BasicEnum extends bindings.MojoEnum {
   factory BasicEnum(int v) {
     switch (v) {
       case 0:
-        return a;
+        return BasicEnum.a;
       case 1:
-        return b;
+        return BasicEnum.b;
       case 0:
-        return c;
+        return BasicEnum.c;
       case -3:
-        return d;
+        return BasicEnum.d;
       case 10:
-        return e;
+        return BasicEnum.e;
       default:
         return null;
     }
@@ -968,7 +966,6 @@ class StructH extends bindings.Struct {
         encoder0.encodeNullPointer(40, true);
       } else {
         var encoder1 = encoder0.encoderForMap(40);
-        int size0 = e.length;
         var keys0 = e.keys.toList();
         var values0 = e.values.toList();
         encoder1.encodeUint8Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -1172,13 +1169,13 @@ class StructWithEnumEnumWithin extends bindings.MojoEnum {
   factory StructWithEnumEnumWithin(int v) {
     switch (v) {
       case 0:
-        return a;
+        return StructWithEnumEnumWithin.a;
       case 1:
-        return b;
+        return StructWithEnumEnumWithin.b;
       case 2:
-        return c;
+        return StructWithEnumEnumWithin.c;
       case 3:
-        return d;
+        return StructWithEnumEnumWithin.d;
       default:
         return null;
     }
@@ -2694,7 +2691,6 @@ class _ConformanceTestInterfaceMethod10Params extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = param0.length;
         var keys0 = param0.keys.toList();
         var values0 = param0.values.toList();
         
@@ -3653,7 +3649,7 @@ class UnionA extends bindings.Union {
     }
     UnionA result = new UnionA();
 
-    // TODO(azani): Handle unknown union member.
+    
     UnionATag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionATag.a:
@@ -3754,7 +3750,7 @@ class UnionA extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3775,7 +3771,6 @@ class UnionA extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, true);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = e.length;
           var keys0 = e.keys.toList();
           var values0 = e.values.toList();
           
@@ -3802,7 +3797,6 @@ class UnionA extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = i.length;
           var keys0 = i.keys.toList();
           var values0 = i.values.toList();
           
@@ -4043,7 +4037,7 @@ class UnionB extends bindings.Union {
     }
     UnionB result = new UnionB();
 
-    // TODO(azani): Handle unknown union member.
+    
     UnionBTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionBTag.a:
@@ -4070,7 +4064,7 @@ class UnionB extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -4208,9 +4202,7 @@ class _InterfaceAProxyImpl extends bindings.Proxy {
 
 
 class _InterfaceAProxyCalls implements InterfaceA {
-  _InterfaceAProxyImpl _proxyImpl;
-
-  _InterfaceAProxyCalls(this._proxyImpl);
+  _InterfaceAProxyCalls(_InterfaceAProxyImpl _);
 }
 
 

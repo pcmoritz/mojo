@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library navigation_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/url_request.mojom.dart' as url_request_mojom;
 
@@ -35,11 +32,11 @@ class Target extends bindings.MojoEnum {
   factory Target(int v) {
     switch (v) {
       case 0:
-        return default_;
+        return Target.default_;
       case 1:
-        return sourceNode;
+        return Target.sourceNode;
       case 2:
-        return newNode;
+        return Target.newNode;
       default:
         return null;
     }

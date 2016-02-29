@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_transport_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
 import 'package:mojo_services/mojo/media/media_pipe.mojom.dart' as media_pipe_mojom;
@@ -1063,8 +1060,6 @@ class MediaProducerStub extends bindings.Stub {
         }
         break;
       case _MediaProducer_disconnectName:
-        var params = _MediaProducerDisconnectParams.deserialize(
-            message.payload);
         _impl.disconnect();
         break;
       default:
@@ -1326,8 +1321,6 @@ class MediaPullModeProducerStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _MediaPullModeProducer_getBufferName:
-        var params = _MediaPullModeProducerGetBufferParams.deserialize(
-            message.payload);
         var response = _impl.getBuffer(_MediaPullModeProducerGetBufferResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

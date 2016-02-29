@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library interface_control_messages_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 const int kRunMessageId = 4294967295;
 const int kRunOrClosePipeMessageId = 4294967294;

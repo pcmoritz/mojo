@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library quads_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/surface_id.mojom.dart' as surface_id_mojom;
@@ -36,11 +31,11 @@ class YuvColorSpace extends bindings.MojoEnum {
   factory YuvColorSpace(int v) {
     switch (v) {
       case 0:
-        return rec601;
+        return YuvColorSpace.rec601;
       case 1:
-        return rec709;
+        return YuvColorSpace.rec709;
       case 2:
-        return jpeg;
+        return YuvColorSpace.jpeg;
       default:
         return null;
     }
@@ -121,27 +116,27 @@ class Material extends bindings.MojoEnum {
   factory Material(int v) {
     switch (v) {
       case 1:
-        return checkerboard;
+        return Material.checkerboard;
       case 2:
-        return debugBorder;
+        return Material.debugBorder;
       case 3:
-        return ioSurfaceContent;
+        return Material.ioSurfaceContent;
       case 4:
-        return pictureContent;
+        return Material.pictureContent;
       case 5:
-        return renderPass;
+        return Material.renderPass;
       case 6:
-        return solidColor;
+        return Material.solidColor;
       case 7:
-        return streamVideoContent;
+        return Material.streamVideoContent;
       case 8:
-        return surfaceContent;
+        return Material.surfaceContent;
       case 9:
-        return textureContent;
+        return Material.textureContent;
       case 10:
-        return tiledContent;
+        return Material.tiledContent;
       case 11:
-        return yuvVideoContent;
+        return Material.yuvVideoContent;
       default:
         return null;
     }
@@ -301,69 +296,69 @@ class SkXfermode extends bindings.MojoEnum {
   factory SkXfermode(int v) {
     switch (v) {
       case 0:
-        return kClearMode;
+        return SkXfermode.kClearMode;
       case 1:
-        return kSrcMode;
+        return SkXfermode.kSrcMode;
       case 2:
-        return kDstMode;
+        return SkXfermode.kDstMode;
       case 3:
-        return kSrcOverMode;
+        return SkXfermode.kSrcOverMode;
       case 4:
-        return kDstOverMode;
+        return SkXfermode.kDstOverMode;
       case 5:
-        return kSrcInMode;
+        return SkXfermode.kSrcInMode;
       case 6:
-        return kDstInMode;
+        return SkXfermode.kDstInMode;
       case 7:
-        return kSrcOutMode;
+        return SkXfermode.kSrcOutMode;
       case 8:
-        return kDstOutMode;
+        return SkXfermode.kDstOutMode;
       case 9:
-        return kSrcATopMode;
+        return SkXfermode.kSrcATopMode;
       case 10:
-        return kDstATopMode;
+        return SkXfermode.kDstATopMode;
       case 11:
-        return kXorMode;
+        return SkXfermode.kXorMode;
       case 12:
-        return kPlusMode;
+        return SkXfermode.kPlusMode;
       case 13:
-        return kModulateMode;
+        return SkXfermode.kModulateMode;
       case 14:
-        return kScreenMode;
+        return SkXfermode.kScreenMode;
       case 14:
-        return kLastCoeffMode;
+        return SkXfermode.kLastCoeffMode;
       case 15:
-        return kOverlayMode;
+        return SkXfermode.kOverlayMode;
       case 16:
-        return kDarkenMode;
+        return SkXfermode.kDarkenMode;
       case 17:
-        return kLightenMode;
+        return SkXfermode.kLightenMode;
       case 18:
-        return kColorDodgeMode;
+        return SkXfermode.kColorDodgeMode;
       case 19:
-        return kColorBurnMode;
+        return SkXfermode.kColorBurnMode;
       case 20:
-        return kHardLightMode;
+        return SkXfermode.kHardLightMode;
       case 21:
-        return kSoftLightMode;
+        return SkXfermode.kSoftLightMode;
       case 22:
-        return kDifferenceMode;
+        return SkXfermode.kDifferenceMode;
       case 23:
-        return kExclusionMode;
+        return SkXfermode.kExclusionMode;
       case 24:
-        return kMultiplyMode;
+        return SkXfermode.kMultiplyMode;
       case 24:
-        return kLastSeparableMode;
+        return SkXfermode.kLastSeparableMode;
       case 25:
-        return kHueMode;
+        return SkXfermode.kHueMode;
       case 26:
-        return kSaturationMode;
+        return SkXfermode.kSaturationMode;
       case 27:
-        return kColorMode;
+        return SkXfermode.kColorMode;
       case 28:
-        return kLuminosityMode;
+        return SkXfermode.kLuminosityMode;
       case 28:
-        return kLastMode;
+        return SkXfermode.kLastMode;
       default:
         return null;
     }

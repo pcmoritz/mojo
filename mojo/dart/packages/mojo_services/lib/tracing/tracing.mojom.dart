@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library tracing_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -554,8 +551,6 @@ class TraceProviderStub extends bindings.Stub {
         _impl.startTracing(params.categories, params.recorder);
         break;
       case _TraceProvider_stopTracingName:
-        var params = _TraceProviderStopTracingParams.deserialize(
-            message.payload);
         _impl.stopTracing();
         break;
       default:
@@ -954,8 +949,6 @@ class TraceCollectorStub extends bindings.Stub {
         _impl.start(params.stream, params.categories);
         break;
       case _TraceCollector_stopAndFlushName:
-        var params = _TraceCollectorStopAndFlushParams.deserialize(
-            message.payload);
         _impl.stopAndFlush();
         break;
       default:

@@ -3,12 +3,8 @@
 // found in the LICENSE file.
 
 library http_request_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 
@@ -130,7 +126,6 @@ class HttpRequest extends bindings.Struct {
         encoder0.encodeNullPointer(24, true);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = headers.length;
         var keys0 = headers.keys.toList();
         var values0 = headers.values.toList();
         

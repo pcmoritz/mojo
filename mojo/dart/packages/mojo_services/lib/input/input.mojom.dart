@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library input_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -388,8 +385,6 @@ class InputClientStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _InputClient_onBackButtonName:
-        var params = _InputClientOnBackButtonParams.deserialize(
-            message.payload);
         var response = _impl.onBackButton(_InputClientOnBackButtonResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

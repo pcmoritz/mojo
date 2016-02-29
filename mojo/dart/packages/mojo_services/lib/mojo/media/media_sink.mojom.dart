@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_sink_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_clock.mojom.dart' as media_clock_mojom;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
@@ -1025,8 +1022,6 @@ class MediaSinkStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _MediaSink_getClockDispositionName:
-        var params = _MediaSinkGetClockDispositionParams.deserialize(
-            message.payload);
         var response = _impl.getClockDisposition(_MediaSinkGetClockDispositionResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1084,13 +1079,9 @@ class MediaSinkStub extends bindings.Stub {
         }
         break;
       case _MediaSink_playName:
-        var params = _MediaSinkPlayParams.deserialize(
-            message.payload);
         _impl.play();
         break;
       case _MediaSink_pauseName:
-        var params = _MediaSinkPauseParams.deserialize(
-            message.payload);
         _impl.pause();
         break;
       default:

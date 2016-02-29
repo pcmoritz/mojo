@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library types_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 const int kOpenFlagRead = 1;
 const int kOpenFlagWrite = 2;
@@ -61,23 +56,23 @@ class Error extends bindings.MojoEnum {
   factory Error(int v) {
     switch (v) {
       case 0:
-        return ok;
+        return Error.ok;
       case 1:
-        return unknown;
+        return Error.unknown;
       case 2:
-        return invalidArgument;
+        return Error.invalidArgument;
       case 3:
-        return permissionDenied;
+        return Error.permissionDenied;
       case 4:
-        return outOfRange;
+        return Error.outOfRange;
       case 5:
-        return unimplemented;
+        return Error.unimplemented;
       case 6:
-        return closed;
+        return Error.closed;
       case 7:
-        return unavailable;
+        return Error.unavailable;
       case 8:
-        return internal;
+        return Error.internal;
       default:
         return null;
     }
@@ -146,11 +141,11 @@ class Whence extends bindings.MojoEnum {
   factory Whence(int v) {
     switch (v) {
       case 0:
-        return fromCurrent;
+        return Whence.fromCurrent;
       case 1:
-        return fromStart;
+        return Whence.fromStart;
       case 2:
-        return fromEnd;
+        return Whence.fromEnd;
       default:
         return null;
     }
@@ -207,11 +202,11 @@ class FileType extends bindings.MojoEnum {
   factory FileType(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return FileType.unknown;
       case 1:
-        return regularFile;
+        return FileType.regularFile;
       case 2:
-        return directory;
+        return FileType.directory;
       default:
         return null;
     }

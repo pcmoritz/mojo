@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library view_associates_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
 import 'package:mojo_services/mojo/ui/views.mojom.dart' as views_mojom;
@@ -810,9 +807,7 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
 
 
 class _ViewInspectorProxyCalls implements ViewInspector {
-  _ViewInspectorProxyImpl _proxyImpl;
-
-  _ViewInspectorProxyCalls(this._proxyImpl);
+  _ViewInspectorProxyCalls(_ViewInspectorProxyImpl _);
 }
 
 

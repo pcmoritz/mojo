@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library device_info_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -188,19 +185,19 @@ class DeviceInfoDeviceType extends bindings.MojoEnum {
   factory DeviceInfoDeviceType(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return DeviceInfoDeviceType.unknown;
       case 1:
-        return headless;
+        return DeviceInfoDeviceType.headless;
       case 2:
-        return watch;
+        return DeviceInfoDeviceType.watch;
       case 3:
-        return phone;
+        return DeviceInfoDeviceType.phone;
       case 4:
-        return tablet;
+        return DeviceInfoDeviceType.tablet;
       case 5:
-        return desktop;
+        return DeviceInfoDeviceType.desktop;
       case 6:
-        return tv;
+        return DeviceInfoDeviceType.tv;
       default:
         return null;
     }
@@ -423,8 +420,6 @@ class DeviceInfoStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _DeviceInfo_getDeviceTypeName:
-        var params = _DeviceInfoGetDeviceTypeParams.deserialize(
-            message.payload);
         var response = _impl.getDeviceType(_DeviceInfoGetDeviceTypeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

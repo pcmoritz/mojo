@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library media_types_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class MediaTypeScheme extends bindings.MojoEnum {
@@ -64,31 +59,31 @@ class MediaTypeScheme extends bindings.MojoEnum {
   factory MediaTypeScheme(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return MediaTypeScheme.unknown;
       case 1:
-        return none;
+        return MediaTypeScheme.none;
       case 2:
-        return anyElementary;
+        return MediaTypeScheme.anyElementary;
       case 3:
-        return anyAudio;
+        return MediaTypeScheme.anyAudio;
       case 4:
-        return anyVideo;
+        return MediaTypeScheme.anyVideo;
       case 5:
-        return anySubpicture;
+        return MediaTypeScheme.anySubpicture;
       case 6:
-        return anyText;
+        return MediaTypeScheme.anyText;
       case 7:
-        return anyMultiplexed;
+        return MediaTypeScheme.anyMultiplexed;
       case 8:
-        return any;
+        return MediaTypeScheme.any;
       case 9:
-        return multiplexed;
+        return MediaTypeScheme.multiplexed;
       case 10:
-        return lpcm;
+        return MediaTypeScheme.lpcm;
       case 11:
-        return compressedAudio;
+        return MediaTypeScheme.compressedAudio;
       case 12:
-        return video;
+        return MediaTypeScheme.video;
       default:
         return null;
     }
@@ -174,17 +169,17 @@ class LpcmSampleFormat extends bindings.MojoEnum {
   factory LpcmSampleFormat(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return LpcmSampleFormat.unknown;
       case 1:
-        return any;
+        return LpcmSampleFormat.any;
       case 2:
-        return unsigned8;
+        return LpcmSampleFormat.unsigned8;
       case 3:
-        return signed16;
+        return LpcmSampleFormat.signed16;
       case 4:
-        return signed24In32;
+        return LpcmSampleFormat.signed24In32;
       case 5:
-        return float;
+        return LpcmSampleFormat.float;
       default:
         return null;
     }
@@ -247,11 +242,11 @@ class AudioEncoding extends bindings.MojoEnum {
   factory AudioEncoding(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return AudioEncoding.unknown;
       case 1:
-        return any;
+        return AudioEncoding.any;
       case 2:
-        return vorbis;
+        return AudioEncoding.vorbis;
       default:
         return null;
     }
@@ -311,13 +306,13 @@ class VideoEncoding extends bindings.MojoEnum {
   factory VideoEncoding(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return VideoEncoding.unknown;
       case 1:
-        return any;
+        return VideoEncoding.any;
       case 2:
-        return theora;
+        return VideoEncoding.theora;
       case 3:
-        return vp8;
+        return VideoEncoding.vp8;
       default:
         return null;
     }
@@ -406,31 +401,31 @@ class VideoProfile extends bindings.MojoEnum {
   factory VideoProfile(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return VideoProfile.unknown;
       case 1:
-        return notApplicable;
+        return VideoProfile.notApplicable;
       case 2:
-        return h264Baseline;
+        return VideoProfile.h264Baseline;
       case 3:
-        return h264Main;
+        return VideoProfile.h264Main;
       case 4:
-        return h264Extended;
+        return VideoProfile.h264Extended;
       case 5:
-        return h264High;
+        return VideoProfile.h264High;
       case 6:
-        return h264High10;
+        return VideoProfile.h264High10;
       case 7:
-        return h264High422;
+        return VideoProfile.h264High422;
       case 8:
-        return h264High444Predictive;
+        return VideoProfile.h264High444Predictive;
       case 9:
-        return h264ScalableBaseline;
+        return VideoProfile.h264ScalableBaseline;
       case 10:
-        return h264ScalableHigh;
+        return VideoProfile.h264ScalableHigh;
       case 11:
-        return h264StereoHigh;
+        return VideoProfile.h264StereoHigh;
       case 12:
-        return h264MultiviewHigh;
+        return VideoProfile.h264MultiviewHigh;
       default:
         return null;
     }
@@ -546,37 +541,37 @@ class PixelFormat extends bindings.MojoEnum {
   factory PixelFormat(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return PixelFormat.unknown;
       case 1:
-        return i420;
+        return PixelFormat.i420;
       case 2:
-        return yv12;
+        return PixelFormat.yv12;
       case 3:
-        return yv16;
+        return PixelFormat.yv16;
       case 4:
-        return yv12A;
+        return PixelFormat.yv12A;
       case 5:
-        return yv24;
+        return PixelFormat.yv24;
       case 6:
-        return nv12;
+        return PixelFormat.nv12;
       case 7:
-        return nv21;
+        return PixelFormat.nv21;
       case 8:
-        return uyvy;
+        return PixelFormat.uyvy;
       case 9:
-        return yuy2;
+        return PixelFormat.yuy2;
       case 10:
-        return argb;
+        return PixelFormat.argb;
       case 11:
-        return xrgb;
+        return PixelFormat.xrgb;
       case 12:
-        return rgb24;
+        return PixelFormat.rgb24;
       case 13:
-        return rgb32;
+        return PixelFormat.rgb32;
       case 14:
-        return mjpeg;
+        return PixelFormat.mjpeg;
       case 15:
-        return mt21;
+        return PixelFormat.mt21;
       default:
         return null;
     }
@@ -665,15 +660,15 @@ class ColorSpace extends bindings.MojoEnum {
   factory ColorSpace(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return ColorSpace.unknown;
       case 1:
-        return notApplicable;
+        return ColorSpace.notApplicable;
       case 2:
-        return jpeg;
+        return ColorSpace.jpeg;
       case 3:
-        return hdRec709;
+        return ColorSpace.hdRec709;
       case 4:
-        return sdRec601;
+        return ColorSpace.sdRec601;
       default:
         return null;
     }
@@ -2053,7 +2048,7 @@ class MediaTypeDetails extends bindings.Union {
     }
     MediaTypeDetails result = new MediaTypeDetails();
 
-    // TODO(azani): Handle unknown union member.
+    
     MediaTypeDetailsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case MediaTypeDetailsTag.multiplexed:
@@ -2084,7 +2079,7 @@ class MediaTypeDetails extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -2210,7 +2205,7 @@ class MediaTypeSetDetails extends bindings.Union {
     }
     MediaTypeSetDetails result = new MediaTypeSetDetails();
 
-    // TODO(azani): Handle unknown union member.
+    
     MediaTypeSetDetailsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case MediaTypeSetDetailsTag.multiplexed:
@@ -2241,7 +2236,7 @@ class MediaTypeSetDetails extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {

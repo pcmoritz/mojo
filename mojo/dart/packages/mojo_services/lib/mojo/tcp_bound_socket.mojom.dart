@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library tcp_bound_socket_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/network_error.mojom.dart' as network_error_mojom;
 import 'package:mojo_services/mojo/net_address.mojom.dart' as net_address_mojom;

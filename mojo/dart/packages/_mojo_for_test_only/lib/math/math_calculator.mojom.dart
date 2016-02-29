@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library math_calculator_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -786,8 +784,6 @@ class CalculatorStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _Calculator_clearName:
-        var params = _CalculatorClearParams.deserialize(
-            message.payload);
         var response = _impl.clear(_CalculatorClearResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

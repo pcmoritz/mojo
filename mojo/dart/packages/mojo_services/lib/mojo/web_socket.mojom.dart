@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library web_socket_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/network_error.mojom.dart' as network_error_mojom;
 
@@ -905,11 +902,11 @@ class WebSocketMessageType extends bindings.MojoEnum {
   factory WebSocketMessageType(int v) {
     switch (v) {
       case 0:
-        return continuation;
+        return WebSocketMessageType.continuation;
       case 1:
-        return text;
+        return WebSocketMessageType.text;
       case 2:
-        return binary;
+        return WebSocketMessageType.binary;
       default:
         return null;
     }

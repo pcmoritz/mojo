@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library speech_recognizer_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 class Error extends bindings.MojoEnum {
@@ -52,23 +49,23 @@ class Error extends bindings.MojoEnum {
   factory Error(int v) {
     switch (v) {
       case 1:
-        return networkTimeout;
+        return Error.networkTimeout;
       case 2:
-        return network;
+        return Error.network;
       case 3:
-        return audio;
+        return Error.audio;
       case 4:
-        return server;
+        return Error.server;
       case 5:
-        return client;
+        return Error.client;
       case 6:
-        return speechTimeout;
+        return Error.speechTimeout;
       case 7:
-        return noMatch;
+        return Error.noMatch;
       case 8:
-        return recognizerBusy;
+        return Error.recognizerBusy;
       case 9:
-        return insufficientPermissions;
+        return Error.insufficientPermissions;
       default:
         return null;
     }
@@ -454,7 +451,7 @@ class ResultOrError extends bindings.Union {
     }
     ResultOrError result = new ResultOrError();
 
-    // TODO(azani): Handle unknown union member.
+    
     ResultOrErrorTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ResultOrErrorTag.errorCode:
@@ -486,7 +483,7 @@ class ResultOrError extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -720,8 +717,6 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _SpeechRecognizerService_listenName:
-        var params = _SpeechRecognizerServiceListenParams.deserialize(
-            message.payload);
         var response = _impl.listen(_SpeechRecognizerServiceListenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -742,8 +737,6 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
         }
         break;
       case _SpeechRecognizerService_stopListeningName:
-        var params = _SpeechRecognizerServiceStopListeningParams.deserialize(
-            message.payload);
         _impl.stopListening();
         break;
       default:

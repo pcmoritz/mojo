@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library location_service_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/location.mojom.dart' as location_mojom;
 
@@ -195,13 +192,13 @@ class LocationServiceUpdatePriority extends bindings.MojoEnum {
   factory LocationServiceUpdatePriority(int v) {
     switch (v) {
       case 0:
-        return priorityBalancedPowerAccuracy;
+        return LocationServiceUpdatePriority.priorityBalancedPowerAccuracy;
       case 1:
-        return priorityHighAccuracy;
+        return LocationServiceUpdatePriority.priorityHighAccuracy;
       case 2:
-        return priorityLowPower;
+        return LocationServiceUpdatePriority.priorityLowPower;
       case 3:
-        return priorityNoPower;
+        return LocationServiceUpdatePriority.priorityNoPower;
       default:
         return null;
     }

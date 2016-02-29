@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library http_server_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/http_server/http_request.mojom.dart' as http_request_mojom;
 import 'package:mojo_services/http_server/http_response.mojom.dart' as http_response_mojom;
@@ -699,8 +696,6 @@ class HttpServerStub extends bindings.Stub {
         }
         break;
       case _HttpServer_getPortName:
-        var params = _HttpServerGetPortParams.deserialize(
-            message.payload);
         var response = _impl.getPort(_HttpServerGetPortResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

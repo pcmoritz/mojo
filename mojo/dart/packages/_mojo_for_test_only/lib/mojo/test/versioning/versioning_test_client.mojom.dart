@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library versioning_test_client_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -32,9 +30,9 @@ class Department extends bindings.MojoEnum {
   factory Department(int v) {
     switch (v) {
       case 0:
-        return sales;
+        return Department.sales;
       case 1:
-        return dev;
+        return Department.dev;
       default:
         return null;
     }
@@ -1344,8 +1342,6 @@ class HumanResourceDatabaseStub extends bindings.Stub {
         }
         break;
       case _HumanResourceDatabase_listEmployeeIdsName:
-        var params = _HumanResourceDatabaseListEmployeeIdsParams.deserialize(
-            message.payload);
         var response = _impl.listEmployeeIds(_HumanResourceDatabaseListEmployeeIdsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

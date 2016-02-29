@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library file_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/files/types.mojom.dart' as types_mojom;
 
@@ -3045,8 +3042,6 @@ class FileStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _File_closeName:
-        var params = _FileCloseParams.deserialize(
-            message.payload);
         var response = _impl.close(_FileCloseResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -3155,8 +3150,6 @@ class FileStub extends bindings.Stub {
         }
         break;
       case _File_tellName:
-        var params = _FileTellParams.deserialize(
-            message.payload);
         var response = _impl.tell(_FileTellResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -3199,8 +3192,6 @@ class FileStub extends bindings.Stub {
         }
         break;
       case _File_statName:
-        var params = _FileStatParams.deserialize(
-            message.payload);
         var response = _impl.stat(_FileStatResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -3309,8 +3300,6 @@ class FileStub extends bindings.Stub {
         }
         break;
       case _File_asBufferName:
-        var params = _FileAsBufferParams.deserialize(
-            message.payload);
         var response = _impl.asBuffer(_FileAsBufferResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

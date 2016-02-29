@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library directory_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/files/file.mojom.dart' as file_mojom;
 import 'package:mojo_services/mojo/files/types.mojom.dart' as types_mojom;
@@ -1599,8 +1596,6 @@ class DirectoryStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _Directory_readName:
-        var params = _DirectoryReadParams.deserialize(
-            message.payload);
         var response = _impl.read(_DirectoryReadResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1621,8 +1616,6 @@ class DirectoryStub extends bindings.Stub {
         }
         break;
       case _Directory_statName:
-        var params = _DirectoryStatParams.deserialize(
-            message.payload);
         var response = _impl.stat(_DirectoryStatResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

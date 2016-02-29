@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library sample_factory_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -1547,8 +1545,6 @@ class NamedObjectStub extends bindings.Stub {
         _impl.setName(params.name);
         break;
       case _NamedObject_getNameName:
-        var params = _NamedObjectGetNameParams.deserialize(
-            message.payload);
         var response = _impl.getName(_NamedObjectGetNameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

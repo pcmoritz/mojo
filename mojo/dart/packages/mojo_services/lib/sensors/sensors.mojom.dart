@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library sensors_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 class SensorType extends bindings.MojoEnum {
@@ -82,43 +79,43 @@ class SensorType extends bindings.MojoEnum {
   factory SensorType(int v) {
     switch (v) {
       case 0:
-        return accelerometer;
+        return SensorType.accelerometer;
       case 1:
-        return ambientTemperature;
+        return SensorType.ambientTemperature;
       case 2:
-        return gameRotationVector;
+        return SensorType.gameRotationVector;
       case 3:
-        return geomagneticRotationVector;
+        return SensorType.geomagneticRotationVector;
       case 4:
-        return gravity;
+        return SensorType.gravity;
       case 5:
-        return gyroscope;
+        return SensorType.gyroscope;
       case 6:
-        return gyroscopeUncalibrated;
+        return SensorType.gyroscopeUncalibrated;
       case 7:
-        return heartRate;
+        return SensorType.heartRate;
       case 8:
-        return light;
+        return SensorType.light;
       case 9:
-        return linearAcceleration;
+        return SensorType.linearAcceleration;
       case 10:
-        return magneticField;
+        return SensorType.magneticField;
       case 11:
-        return magneticFieldUncalibrated;
+        return SensorType.magneticFieldUncalibrated;
       case 12:
-        return pressure;
+        return SensorType.pressure;
       case 13:
-        return proximity;
+        return SensorType.proximity;
       case 14:
-        return relativeHumidity;
+        return SensorType.relativeHumidity;
       case 15:
-        return rotationVector;
+        return SensorType.rotationVector;
       case 16:
-        return significantMotion;
+        return SensorType.significantMotion;
       case 17:
-        return stepCounter;
+        return SensorType.stepCounter;
       case 18:
-        return stepDetector;
+        return SensorType.stepDetector;
       default:
         return null;
     }

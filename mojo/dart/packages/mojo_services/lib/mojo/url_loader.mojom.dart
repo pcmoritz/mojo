@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library url_loader_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/network_error.mojom.dart' as network_error_mojom;
 import 'package:mojo/mojo/url_request.mojom.dart' as url_request_mojom;
@@ -798,8 +795,6 @@ class UrlLoaderStub extends bindings.Stub {
         }
         break;
       case _UrlLoader_followRedirectName:
-        var params = _UrlLoaderFollowRedirectParams.deserialize(
-            message.payload);
         var response = _impl.followRedirect(_UrlLoaderFollowRedirectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -820,8 +815,6 @@ class UrlLoaderStub extends bindings.Stub {
         }
         break;
       case _UrlLoader_queryStatusName:
-        var params = _UrlLoaderQueryStatusParams.deserialize(
-            message.payload);
         var response = _impl.queryStatus(_UrlLoaderQueryStatusResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

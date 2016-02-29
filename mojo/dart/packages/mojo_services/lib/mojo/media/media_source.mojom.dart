@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_source_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_clock.mojom.dart' as media_clock_mojom;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
@@ -1440,8 +1437,6 @@ class MediaSourceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _MediaSource_getStreamsName:
-        var params = _MediaSourceGetStreamsParams.deserialize(
-            message.payload);
         var response = _impl.getStreams(_MediaSourceGetStreamsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1462,8 +1457,6 @@ class MediaSourceStub extends bindings.Stub {
         }
         break;
       case _MediaSource_getClockDispositionName:
-        var params = _MediaSourceGetClockDispositionParams.deserialize(
-            message.payload);
         var response = _impl.getClockDisposition(_MediaSourceGetClockDispositionResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1526,8 +1519,6 @@ class MediaSourceStub extends bindings.Stub {
         }
         break;
       case _MediaSource_prepareName:
-        var params = _MediaSourcePrepareParams.deserialize(
-            message.payload);
         var response = _impl.prepare(_MediaSourcePrepareResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

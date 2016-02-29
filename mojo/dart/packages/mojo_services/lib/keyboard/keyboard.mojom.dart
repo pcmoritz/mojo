@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library keyboard_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/native_viewport_event_dispatcher.mojom.dart' as native_viewport_event_dispatcher_mojom;
 
@@ -29,7 +26,7 @@ class SubmitAction extends bindings.MojoEnum {
   factory SubmitAction(int v) {
     switch (v) {
       case 0:
-        return done;
+        return SubmitAction.done;
       default:
         return null;
     }
@@ -85,13 +82,13 @@ class KeyboardType extends bindings.MojoEnum {
   factory KeyboardType(int v) {
     switch (v) {
       case 0:
-        return text;
+        return KeyboardType.text;
       case 1:
-        return number;
+        return KeyboardType.number;
       case 2:
-        return phone;
+        return KeyboardType.phone;
       case 3:
-        return datetime;
+        return KeyboardType.datetime;
       default:
         return null;
     }
@@ -1990,13 +1987,9 @@ class KeyboardServiceStub extends bindings.Stub {
         _impl.show(params.client, params.type);
         break;
       case _KeyboardService_showByRequestName:
-        var params = _KeyboardServiceShowByRequestParams.deserialize(
-            message.payload);
         _impl.showByRequest();
         break;
       case _KeyboardService_hideName:
-        var params = _KeyboardServiceHideParams.deserialize(
-            message.payload);
         _impl.hide();
         break;
       case _KeyboardService_setTextName:

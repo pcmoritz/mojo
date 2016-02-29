@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library input_event_constants_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class EventType extends bindings.MojoEnum {
@@ -46,19 +41,19 @@ class EventType extends bindings.MojoEnum {
   factory EventType(int v) {
     switch (v) {
       case 0:
-        return unknown;
+        return EventType.unknown;
       case 1:
-        return keyPressed;
+        return EventType.keyPressed;
       case 2:
-        return keyReleased;
+        return EventType.keyReleased;
       case 3:
-        return pointerCancel;
+        return EventType.pointerCancel;
       case 4:
-        return pointerDown;
+        return EventType.pointerDown;
       case 5:
-        return pointerMove;
+        return EventType.pointerMove;
       case 6:
-        return pointerUp;
+        return EventType.pointerUp;
       default:
         return null;
     }
@@ -153,31 +148,31 @@ class EventFlags extends bindings.MojoEnum {
   factory EventFlags(int v) {
     switch (v) {
       case 0:
-        return none;
+        return EventFlags.none;
       case 1:
-        return capsLockDown;
+        return EventFlags.capsLockDown;
       case 2:
-        return shiftDown;
+        return EventFlags.shiftDown;
       case 4:
-        return controlDown;
+        return EventFlags.controlDown;
       case 8:
-        return altDown;
+        return EventFlags.altDown;
       case 16:
-        return leftMouseButton;
+        return EventFlags.leftMouseButton;
       case 32:
-        return middleMouseButton;
+        return EventFlags.middleMouseButton;
       case 64:
-        return rightMouseButton;
+        return EventFlags.rightMouseButton;
       case 128:
-        return commandDown;
+        return EventFlags.commandDown;
       case 256:
-        return extended;
+        return EventFlags.extended;
       case 512:
-        return isSynthesized;
+        return EventFlags.isSynthesized;
       case 1024:
-        return altgrDown;
+        return EventFlags.altgrDown;
       case 2048:
-        return mod3Down;
+        return EventFlags.mod3Down;
       default:
         return null;
     }
@@ -254,11 +249,11 @@ class MouseEventFlags extends bindings.MojoEnum {
   factory MouseEventFlags(int v) {
     switch (v) {
       case 65536:
-        return isDoubleClick;
+        return MouseEventFlags.isDoubleClick;
       case 131072:
-        return isTripleClick;
+        return MouseEventFlags.isTripleClick;
       case 262144:
-        return isNonClient;
+        return MouseEventFlags.isNonClient;
       default:
         return null;
     }
@@ -312,9 +307,9 @@ class PointerKind extends bindings.MojoEnum {
   factory PointerKind(int v) {
     switch (v) {
       case 0:
-        return touch;
+        return PointerKind.touch;
       case 1:
-        return mouse;
+        return PointerKind.mouse;
       default:
         return null;
     }

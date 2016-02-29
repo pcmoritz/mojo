@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_player_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_metadata.mojom.dart' as media_metadata_mojom;
 import 'package:mojo_services/mojo/media/media_state.mojom.dart' as media_state_mojom;
@@ -612,13 +609,9 @@ class MediaPlayerStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _MediaPlayer_playName:
-        var params = _MediaPlayerPlayParams.deserialize(
-            message.payload);
         _impl.play();
         break;
       case _MediaPlayer_pauseName:
-        var params = _MediaPlayerPauseParams.deserialize(
-            message.payload);
         _impl.pause();
         break;
       case _MediaPlayer_getStatusName:

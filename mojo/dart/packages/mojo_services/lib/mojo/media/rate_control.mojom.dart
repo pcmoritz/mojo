@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library rate_control_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -1123,8 +1120,6 @@ class RateControlStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _RateControl_getCurrentTransformName:
-        var params = _RateControlGetCurrentTransformParams.deserialize(
-            message.payload);
         var response = _impl.getCurrentTransform(_RateControlGetCurrentTransformResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1170,8 +1165,6 @@ class RateControlStub extends bindings.Stub {
         _impl.setRateAtTargetTime(params.referenceDelta, params.targetDelta, params.targetTime);
         break;
       case _RateControl_cancelPendingChangesName:
-        var params = _RateControlCancelPendingChangesParams.deserialize(
-            message.payload);
         _impl.cancelPendingChanges();
         break;
       default:

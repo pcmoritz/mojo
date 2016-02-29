@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library surfaces_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/quads.mojom.dart' as quads_mojom;
@@ -49,19 +46,19 @@ class ResourceFormat extends bindings.MojoEnum {
   factory ResourceFormat(int v) {
     switch (v) {
       case 0:
-        return rgba8888;
+        return ResourceFormat.rgba8888;
       case 1:
-        return rgba4444;
+        return ResourceFormat.rgba4444;
       case 2:
-        return bgra8888;
+        return ResourceFormat.bgra8888;
       case 3:
-        return alpha8;
+        return ResourceFormat.alpha8;
       case 4:
-        return luminance8;
+        return ResourceFormat.luminance8;
       case 5:
-        return rgb565;
+        return ResourceFormat.rgb565;
       case 6:
-        return etc1;
+        return ResourceFormat.etc1;
       default:
         return null;
     }
@@ -1720,8 +1717,6 @@ class SurfaceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _Surface_getIdNamespaceName:
-        var params = _SurfaceGetIdNamespaceParams.deserialize(
-            message.payload);
         var response = _impl.getIdNamespace(_SurfaceGetIdNamespaceResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

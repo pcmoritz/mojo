@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library service_describer_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types_mojom;
 
@@ -535,7 +532,6 @@ class ServiceDescriptionGetAllTypeDefinitionsResponseParams extends bindings.Str
         encoder0.encodeNullPointer(8, true);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = definitions.length;
         var keys0 = definitions.keys.toList();
         var values0 = definitions.values.toList();
         
@@ -1022,8 +1018,6 @@ class ServiceDescriptionStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ServiceDescription_getTopLevelInterfaceName:
-        var params = _ServiceDescriptionGetTopLevelInterfaceParams.deserialize(
-            message.payload);
         var response = _impl.getTopLevelInterface(_ServiceDescriptionGetTopLevelInterfaceResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -1066,8 +1060,6 @@ class ServiceDescriptionStub extends bindings.Stub {
         }
         break;
       case _ServiceDescription_getAllTypeDefinitionsName:
-        var params = _ServiceDescriptionGetAllTypeDefinitionsParams.deserialize(
-            message.payload);
         var response = _impl.getAllTypeDefinitions(_ServiceDescriptionGetAllTypeDefinitionsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

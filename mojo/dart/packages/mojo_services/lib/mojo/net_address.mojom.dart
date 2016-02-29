@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library net_address_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class NetAddressFamily extends bindings.MojoEnum {
@@ -34,11 +29,11 @@ class NetAddressFamily extends bindings.MojoEnum {
   factory NetAddressFamily(int v) {
     switch (v) {
       case 0:
-        return unspecified;
+        return NetAddressFamily.unspecified;
       case 1:
-        return ipv4;
+        return NetAddressFamily.ipv4;
       case 2:
-        return ipv6;
+        return NetAddressFamily.ipv6;
       default:
         return null;
     }

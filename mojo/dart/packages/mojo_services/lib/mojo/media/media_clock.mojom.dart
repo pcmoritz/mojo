@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_clock_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 class ClockDisposition extends bindings.MojoEnum {
@@ -43,17 +40,17 @@ class ClockDisposition extends bindings.MojoEnum {
   factory ClockDisposition(int v) {
     switch (v) {
       case 0:
-        return passive;
+        return ClockDisposition.passive;
       case 1:
-        return slave;
+        return ClockDisposition.slave;
       case 2:
-        return preferSlave;
+        return ClockDisposition.preferSlave;
       case 3:
-        return indifferent;
+        return ClockDisposition.indifferent;
       case 4:
-        return preferMaster;
+        return ClockDisposition.preferMaster;
       case 5:
-        return master;
+        return ClockDisposition.master;
       default:
         return null;
     }
@@ -149,9 +146,7 @@ class _ClockProxyImpl extends bindings.Proxy {
 
 
 class _ClockProxyCalls implements Clock {
-  _ClockProxyImpl _proxyImpl;
-
-  _ClockProxyCalls(this._proxyImpl);
+  _ClockProxyCalls(_ClockProxyImpl _);
 }
 
 

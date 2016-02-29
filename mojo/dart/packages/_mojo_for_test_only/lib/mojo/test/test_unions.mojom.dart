@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library test_unions_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -33,9 +31,9 @@ class AnEnum extends bindings.MojoEnum {
   factory AnEnum(int v) {
     switch (v) {
       case 0:
-        return first;
+        return AnEnum.first;
       case 1:
-        return second;
+        return AnEnum.second;
       default:
         return null;
     }
@@ -277,7 +275,6 @@ class StructOfUnions extends bindings.Struct {
         encoder0.encodeNullPointer(40, false);
       } else {
         var encoder1 = encoder0.encoderForMap(40);
-        int size0 = mOu.length;
         var keys0 = mOu.keys.toList();
         var values0 = mOu.values.toList();
         encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -299,7 +296,6 @@ class StructOfUnions extends bindings.Struct {
         encoder0.encodeNullPointer(48, false);
       } else {
         var encoder1 = encoder0.encoderForMap(48);
-        int size0 = mHu.length;
         var keys0 = mHu.keys.toList();
         var values0 = mHu.values.toList();
         encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -861,7 +857,6 @@ class SmallStruct extends bindings.Struct {
         encoder0.encodeNullPointer(56, true);
       } else {
         var encoder1 = encoder0.encoderForMap(56);
-        int size0 = podUnionMap.length;
         var keys0 = podUnionMap.keys.toList();
         var values0 = podUnionMap.values.toList();
         
@@ -889,7 +884,6 @@ class SmallStruct extends bindings.Struct {
         encoder0.encodeNullPointer(64, true);
       } else {
         var encoder1 = encoder0.encoderForMap(64);
-        int size0 = nullablePodUnionMap.length;
         var keys0 = nullablePodUnionMap.keys.toList();
         var values0 = nullablePodUnionMap.values.toList();
         
@@ -2157,7 +2151,7 @@ class PodUnion extends bindings.Union {
     }
     PodUnion result = new PodUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     PodUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case PodUnionTag.fInt8:
@@ -2224,7 +2218,7 @@ class PodUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -2505,7 +2499,7 @@ class UnionOfUnions extends bindings.Union {
     }
     UnionOfUnions result = new UnionOfUnions();
 
-    // TODO(azani): Handle unknown union member.
+    
     UnionOfUnionsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionOfUnionsTag.u:
@@ -2614,7 +2608,7 @@ class UnionOfUnions extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -2646,7 +2640,6 @@ class UnionOfUnions extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = mOu.length;
           var keys0 = mOu.keys.toList();
           var values0 = mOu.values.toList();
           encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2664,7 +2657,6 @@ class UnionOfUnions extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = mHu.length;
           var keys0 = mHu.keys.toList();
           var values0 = mHu.values.toList();
           encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2895,7 +2887,7 @@ class ObjectUnion extends bindings.Union {
     }
     ObjectUnion result = new ObjectUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     ObjectUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ObjectUnionTag.fInt8:
@@ -2959,7 +2951,7 @@ class ObjectUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -2983,7 +2975,6 @@ class ObjectUnion extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = fMapInt8.length;
           var keys0 = fMapInt8.keys.toList();
           var values0 = fMapInt8.values.toList();
           
@@ -3211,7 +3202,7 @@ class HandleUnion extends bindings.Union {
     }
     HandleUnion result = new HandleUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     HandleUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case HandleUnionTag.fHandle:
@@ -3246,7 +3237,7 @@ class HandleUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3392,7 +3383,7 @@ class ObjectOnlyUnion extends bindings.Union {
     }
     ObjectOnlyUnion result = new ObjectOnlyUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     ObjectOnlyUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ObjectOnlyUnionTag.dummy1:
@@ -3408,7 +3399,7 @@ class ObjectOnlyUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3489,7 +3480,7 @@ class OldUnion extends bindings.Union {
     }
     OldUnion result = new OldUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     OldUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case OldUnionTag.fInt8:
@@ -3504,7 +3495,7 @@ class OldUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3596,7 +3587,7 @@ class NewUnion extends bindings.Union {
     }
     NewUnion result = new NewUnion();
 
-    // TODO(azani): Handle unknown union member.
+    
     NewUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case NewUnionTag.fInt8:
@@ -3615,7 +3606,7 @@ class NewUnion extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3885,8 +3876,6 @@ class SmallCacheStub extends bindings.Stub {
         _impl.setIntValue(params.intValue);
         break;
       case _SmallCache_getIntValueName:
-        var params = _SmallCacheGetIntValueParams.deserialize(
-            message.payload);
         var response = _impl.getIntValue(_SmallCacheGetIntValueResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

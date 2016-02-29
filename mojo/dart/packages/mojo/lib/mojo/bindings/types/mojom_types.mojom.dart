@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library mojom_types_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-
 
 
 class SimpleType extends bindings.MojoEnum {
@@ -58,27 +53,27 @@ class SimpleType extends bindings.MojoEnum {
   factory SimpleType(int v) {
     switch (v) {
       case 0:
-        return bool;
+        return SimpleType.bool;
       case 1:
-        return double;
+        return SimpleType.double;
       case 2:
-        return float;
+        return SimpleType.float;
       case 3:
-        return int8;
+        return SimpleType.int8;
       case 4:
-        return int16;
+        return SimpleType.int16;
       case 5:
-        return int32;
+        return SimpleType.int32;
       case 6:
-        return int64;
+        return SimpleType.int64;
       case 7:
-        return uint8;
+        return SimpleType.uint8;
       case 8:
-        return uint16;
+        return SimpleType.uint16;
       case 9:
-        return uint32;
+        return SimpleType.uint32;
       case 10:
-        return uint64;
+        return SimpleType.uint64;
       default:
         return null;
     }
@@ -160,17 +155,17 @@ class BuiltinConstantValue extends bindings.MojoEnum {
   factory BuiltinConstantValue(int v) {
     switch (v) {
       case 0:
-        return doubleInfinity;
+        return BuiltinConstantValue.doubleInfinity;
       case 1:
-        return doubleNegativeInfinity;
+        return BuiltinConstantValue.doubleNegativeInfinity;
       case 2:
-        return doubleNan;
+        return BuiltinConstantValue.doubleNan;
       case 3:
-        return floatInfinity;
+        return BuiltinConstantValue.floatInfinity;
       case 4:
-        return floatNegativeInfinity;
+        return BuiltinConstantValue.floatNegativeInfinity;
       case 5:
-        return floatNan;
+        return BuiltinConstantValue.floatNan;
       default:
         return null;
     }
@@ -315,15 +310,15 @@ class HandleTypeKind extends bindings.MojoEnum {
   factory HandleTypeKind(int v) {
     switch (v) {
       case 0:
-        return unspecified;
+        return HandleTypeKind.unspecified;
       case 1:
-        return messagePipe;
+        return HandleTypeKind.messagePipe;
       case 2:
-        return dataPipeConsumer;
+        return HandleTypeKind.dataPipeConsumer;
       case 3:
-        return dataPipeProducer;
+        return HandleTypeKind.dataPipeProducer;
       case 4:
-        return sharedBuffer;
+        return HandleTypeKind.sharedBuffer;
       default:
         return null;
     }
@@ -1862,7 +1857,6 @@ class MojomInterface extends bindings.Struct {
         encoder0.encodeNullPointer(24, false);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = methods.length;
         var keys0 = methods.keys.toList();
         var values0 = methods.values.toList();
         encoder1.encodeUint32Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2865,7 +2859,6 @@ class RuntimeTypeInfo extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = servicesByName.length;
         var keys0 = servicesByName.keys.toList();
         var values0 = servicesByName.values.toList();
         
@@ -2893,7 +2886,6 @@ class RuntimeTypeInfo extends bindings.Struct {
         encoder0.encodeNullPointer(16, false);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = typeMap.length;
         var keys0 = typeMap.keys.toList();
         var values0 = typeMap.values.toList();
         
@@ -3043,7 +3035,7 @@ class Type extends bindings.Union {
     }
     Type result = new Type();
 
-    // TODO(azani): Handle unknown union member.
+    
     TypeTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case TypeTag.simpleType:
@@ -3087,7 +3079,7 @@ class Type extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3225,7 +3217,7 @@ class UserDefinedType extends bindings.Union {
     }
     UserDefinedType result = new UserDefinedType();
 
-    // TODO(azani): Handle unknown union member.
+    
     UserDefinedTypeTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UserDefinedTypeTag.enumType:
@@ -3256,7 +3248,7 @@ class UserDefinedType extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3354,7 +3346,7 @@ class DefaultFieldValue extends bindings.Union {
     }
     DefaultFieldValue result = new DefaultFieldValue();
 
-    // TODO(azani): Handle unknown union member.
+    
     DefaultFieldValueTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case DefaultFieldValueTag.value:
@@ -3374,7 +3366,7 @@ class DefaultFieldValue extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3474,7 +3466,7 @@ class Value extends bindings.Union {
     }
     Value result = new Value();
 
-    // TODO(azani): Handle unknown union member.
+    
     ValueTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ValueTag.literalValue:
@@ -3502,7 +3494,7 @@ class Value extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3734,7 +3726,7 @@ class LiteralValue extends bindings.Union {
     }
     LiteralValue result = new LiteralValue();
 
-    // TODO(azani): Handle unknown union member.
+    
     LiteralValueTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case LiteralValueTag.boolValue:
@@ -3793,7 +3785,7 @@ class LiteralValue extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -3939,7 +3931,7 @@ class UserDefinedValue extends bindings.Union {
     }
     UserDefinedValue result = new UserDefinedValue();
 
-    // TODO(azani): Handle unknown union member.
+    
     UserDefinedValueTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UserDefinedValueTag.enumValue:
@@ -3960,7 +3952,7 @@ class UserDefinedValue extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {

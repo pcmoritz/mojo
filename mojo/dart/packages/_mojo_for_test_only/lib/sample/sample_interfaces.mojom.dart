@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library sample_interfaces_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -30,7 +28,7 @@ class Enum extends bindings.MojoEnum {
   factory Enum(int v) {
     switch (v) {
       case 0:
-        return value;
+        return Enum.value;
       default:
         return null;
     }
@@ -2337,8 +2335,6 @@ class IntegerAccessorStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _IntegerAccessor_getIntegerName:
-        var params = _IntegerAccessorGetIntegerParams.deserialize(
-            message.payload);
         var response = _impl.getInteger(_IntegerAccessorGetIntegerResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -2622,8 +2618,6 @@ class SampleInterfaceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _SampleInterface_sampleMethod0Name:
-        var params = _SampleInterfaceSampleMethod0Params.deserialize(
-            message.payload);
         _impl.sampleMethod0();
         break;
       case _SampleInterface_sampleMethod1Name:
@@ -2649,8 +2643,6 @@ class SampleInterfaceStub extends bindings.Stub {
         }
         break;
       case _SampleInterface_sampleMethod2Name:
-        var params = _SampleInterfaceSampleMethod2Params.deserialize(
-            message.payload);
         _impl.sampleMethod2();
         break;
       default:

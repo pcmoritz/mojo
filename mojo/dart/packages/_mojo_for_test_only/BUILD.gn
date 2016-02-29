@@ -14,6 +14,7 @@ bindings_sources = [
   "lib/mojo/test/test_unions.mojom.dart",
   "lib/mojo/test/test_included_unions.mojom.dart",
   "lib/mojo/test/rect.mojom.dart",
+  "lib/mojo/test/test_enums.mojom.dart",
   "lib/mojo/test/test_structs.mojom.dart",
   "lib/mojo/test/versioning/versioning_test_client.mojom.dart",
   "lib/mojo/test/test_included_unions.mojom.dart",

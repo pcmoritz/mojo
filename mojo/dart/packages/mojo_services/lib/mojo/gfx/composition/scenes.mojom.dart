@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library scenes_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/gfx/composition/nodes.mojom.dart' as nodes_mojom;
 import 'package:mojo_services/mojo/gfx/composition/resources.mojom.dart' as resources_mojom;
@@ -154,7 +151,6 @@ class SceneUpdate extends bindings.Struct {
         encoder0.encodeNullPointer(16, true);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = resources.length;
         var keys0 = resources.keys.toList();
         var values0 = resources.values.toList();
         encoder1.encodeUint32Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -176,7 +172,6 @@ class SceneUpdate extends bindings.Struct {
         encoder0.encodeNullPointer(24, true);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = nodes.length;
         var keys0 = nodes.keys.toList();
         var values0 = nodes.values.toList();
         encoder1.encodeUint32Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);

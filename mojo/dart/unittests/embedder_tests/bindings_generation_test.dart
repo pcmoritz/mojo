@@ -16,6 +16,8 @@ import 'package:_mojo_for_test_only/expect.dart';
 import 'package:_mojo_for_test_only/mojo/test/rect.mojom.dart' as rect;
 import 'package:_mojo_for_test_only/mojo/test/serialization_test_structs.mojom.dart'
     as serialization;
+import 'package:_mojo_for_test_only/mojo/test/test_enums.mojom.dart'
+    as enums;
 import 'package:_mojo_for_test_only/mojo/test/test_structs.mojom.dart'
     as structs;
 import 'package:_mojo_for_test_only/mojo/test/test_unions.mojom.dart'
@@ -298,9 +300,15 @@ testSerializeEnum() {
   Expect.equals(constants.f4, constants2.f4);
 }
 
+void testEnumShadowing() {
+  var v = new enums.TestEnum(1);
+  Expect.equals(enums.TestEnum.v, v);
+}
+
 testEnums() async {
   testSerializeEnum();
   await testCheckEnumCapsImpl();
+  testEnumShadowing();
 }
 
 void closingProviderIsolate(core.MojoMessagePipeEndpoint endpoint) {

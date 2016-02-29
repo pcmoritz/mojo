@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library media_pipe_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
 
@@ -635,9 +632,9 @@ class MediaPipeSendResult extends bindings.MojoEnum {
   factory MediaPipeSendResult(int v) {
     switch (v) {
       case 0:
-        return consumed;
+        return MediaPipeSendResult.consumed;
       case 1:
-        return flushed;
+        return MediaPipeSendResult.flushed;
       default:
         return null;
     }
@@ -923,8 +920,6 @@ class MediaPipeStub extends bindings.Stub {
         }
         break;
       case _MediaPipe_flushName:
-        var params = _MediaPipeFlushParams.deserialize(
-            message.payload);
         var response = _impl.flush(_MediaPipeFlushResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

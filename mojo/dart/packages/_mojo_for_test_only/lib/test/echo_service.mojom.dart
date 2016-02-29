@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library echo_service_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -747,8 +745,6 @@ class EchoServiceStub extends bindings.Stub {
         }
         break;
       case _EchoService_quitName:
-        var params = _EchoServiceQuitParams.deserialize(
-            message.payload);
         _impl.quit();
         break;
       default:

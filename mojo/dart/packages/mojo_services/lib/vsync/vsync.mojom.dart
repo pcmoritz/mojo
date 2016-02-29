@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library vsync_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -330,8 +327,6 @@ class VSyncProviderStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _VSyncProvider_awaitVSyncName:
-        var params = _VSyncProviderAwaitVSyncParams.deserialize(
-            message.payload);
         var response = _impl.awaitVSync(_VSyncProviderAwaitVSyncResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

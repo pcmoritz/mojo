@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library input_key_codes_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class KeyboardCode extends bindings.MojoEnum {
@@ -538,347 +533,347 @@ class KeyboardCode extends bindings.MojoEnum {
   factory KeyboardCode(int v) {
     switch (v) {
       case 8:
-        return back;
+        return KeyboardCode.back;
       case 9:
-        return tab;
+        return KeyboardCode.tab;
       case 12:
-        return clear;
+        return KeyboardCode.clear;
       case 13:
-        return return_;
+        return KeyboardCode.return_;
       case 16:
-        return shift;
+        return KeyboardCode.shift;
       case 17:
-        return control;
+        return KeyboardCode.control;
       case 18:
-        return menu;
+        return KeyboardCode.menu;
       case 19:
-        return pause;
+        return KeyboardCode.pause;
       case 20:
-        return capital;
+        return KeyboardCode.capital;
       case 21:
-        return kana;
+        return KeyboardCode.kana;
       case 21:
-        return hangul;
+        return KeyboardCode.hangul;
       case 23:
-        return junja;
+        return KeyboardCode.junja;
       case 24:
-        return final_;
+        return KeyboardCode.final_;
       case 25:
-        return hanja;
+        return KeyboardCode.hanja;
       case 25:
-        return kanji;
+        return KeyboardCode.kanji;
       case 27:
-        return escape;
+        return KeyboardCode.escape;
       case 28:
-        return convert;
+        return KeyboardCode.convert;
       case 29:
-        return nonconvert;
+        return KeyboardCode.nonconvert;
       case 30:
-        return accept;
+        return KeyboardCode.accept;
       case 31:
-        return modechange;
+        return KeyboardCode.modechange;
       case 32:
-        return space;
+        return KeyboardCode.space;
       case 33:
-        return prior;
+        return KeyboardCode.prior;
       case 34:
-        return next;
+        return KeyboardCode.next;
       case 35:
-        return end;
+        return KeyboardCode.end;
       case 36:
-        return home;
+        return KeyboardCode.home;
       case 37:
-        return left;
+        return KeyboardCode.left;
       case 38:
-        return up;
+        return KeyboardCode.up;
       case 39:
-        return right;
+        return KeyboardCode.right;
       case 40:
-        return down;
+        return KeyboardCode.down;
       case 41:
-        return select;
+        return KeyboardCode.select;
       case 42:
-        return print;
+        return KeyboardCode.print;
       case 43:
-        return execute;
+        return KeyboardCode.execute;
       case 44:
-        return snapshot;
+        return KeyboardCode.snapshot;
       case 45:
-        return insert;
+        return KeyboardCode.insert;
       case 46:
-        return delete;
+        return KeyboardCode.delete;
       case 47:
-        return help;
+        return KeyboardCode.help;
       case 48:
-        return num0;
+        return KeyboardCode.num0;
       case 49:
-        return num1;
+        return KeyboardCode.num1;
       case 50:
-        return num2;
+        return KeyboardCode.num2;
       case 51:
-        return num3;
+        return KeyboardCode.num3;
       case 52:
-        return num4;
+        return KeyboardCode.num4;
       case 53:
-        return num5;
+        return KeyboardCode.num5;
       case 54:
-        return num6;
+        return KeyboardCode.num6;
       case 55:
-        return num7;
+        return KeyboardCode.num7;
       case 56:
-        return num8;
+        return KeyboardCode.num8;
       case 57:
-        return num9;
+        return KeyboardCode.num9;
       case 65:
-        return a;
+        return KeyboardCode.a;
       case 66:
-        return b;
+        return KeyboardCode.b;
       case 67:
-        return c;
+        return KeyboardCode.c;
       case 68:
-        return d;
+        return KeyboardCode.d;
       case 69:
-        return e;
+        return KeyboardCode.e;
       case 70:
-        return f;
+        return KeyboardCode.f;
       case 71:
-        return g;
+        return KeyboardCode.g;
       case 72:
-        return h;
+        return KeyboardCode.h;
       case 73:
-        return i;
+        return KeyboardCode.i;
       case 74:
-        return j;
+        return KeyboardCode.j;
       case 75:
-        return k;
+        return KeyboardCode.k;
       case 76:
-        return l;
+        return KeyboardCode.l;
       case 77:
-        return m;
+        return KeyboardCode.m;
       case 78:
-        return n;
+        return KeyboardCode.n;
       case 79:
-        return o;
+        return KeyboardCode.o;
       case 80:
-        return p;
+        return KeyboardCode.p;
       case 81:
-        return q;
+        return KeyboardCode.q;
       case 82:
-        return r;
+        return KeyboardCode.r;
       case 83:
-        return s;
+        return KeyboardCode.s;
       case 84:
-        return t;
+        return KeyboardCode.t;
       case 85:
-        return u;
+        return KeyboardCode.u;
       case 86:
-        return v;
+        return KeyboardCode.v;
       case 87:
-        return w;
+        return KeyboardCode.w;
       case 88:
-        return x;
+        return KeyboardCode.x;
       case 89:
-        return y;
+        return KeyboardCode.y;
       case 90:
-        return z;
+        return KeyboardCode.z;
       case 91:
-        return lwin;
+        return KeyboardCode.lwin;
       case 91:
-        return command;
+        return KeyboardCode.command;
       case 92:
-        return rwin;
+        return KeyboardCode.rwin;
       case 93:
-        return apps;
+        return KeyboardCode.apps;
       case 95:
-        return sleep;
+        return KeyboardCode.sleep;
       case 96:
-        return numpaD0;
+        return KeyboardCode.numpaD0;
       case 97:
-        return numpad1;
+        return KeyboardCode.numpad1;
       case 98:
-        return numpad2;
+        return KeyboardCode.numpad2;
       case 99:
-        return numpad3;
+        return KeyboardCode.numpad3;
       case 100:
-        return numpad4;
+        return KeyboardCode.numpad4;
       case 101:
-        return numpad5;
+        return KeyboardCode.numpad5;
       case 102:
-        return numpad6;
+        return KeyboardCode.numpad6;
       case 103:
-        return numpad7;
+        return KeyboardCode.numpad7;
       case 104:
-        return numpad8;
+        return KeyboardCode.numpad8;
       case 105:
-        return numpad9;
+        return KeyboardCode.numpad9;
       case 106:
-        return multiply;
+        return KeyboardCode.multiply;
       case 107:
-        return add;
+        return KeyboardCode.add;
       case 108:
-        return separator;
+        return KeyboardCode.separator;
       case 109:
-        return subtract;
+        return KeyboardCode.subtract;
       case 110:
-        return decimal;
+        return KeyboardCode.decimal;
       case 111:
-        return divide;
+        return KeyboardCode.divide;
       case 112:
-        return f1;
+        return KeyboardCode.f1;
       case 113:
-        return f2;
+        return KeyboardCode.f2;
       case 114:
-        return f3;
+        return KeyboardCode.f3;
       case 115:
-        return f4;
+        return KeyboardCode.f4;
       case 116:
-        return f5;
+        return KeyboardCode.f5;
       case 117:
-        return f6;
+        return KeyboardCode.f6;
       case 118:
-        return f7;
+        return KeyboardCode.f7;
       case 119:
-        return f8;
+        return KeyboardCode.f8;
       case 120:
-        return f9;
+        return KeyboardCode.f9;
       case 121:
-        return f10;
+        return KeyboardCode.f10;
       case 122:
-        return f11;
+        return KeyboardCode.f11;
       case 123:
-        return f12;
+        return KeyboardCode.f12;
       case 124:
-        return f13;
+        return KeyboardCode.f13;
       case 125:
-        return f14;
+        return KeyboardCode.f14;
       case 126:
-        return f15;
+        return KeyboardCode.f15;
       case 127:
-        return f16;
+        return KeyboardCode.f16;
       case 128:
-        return f17;
+        return KeyboardCode.f17;
       case 129:
-        return f18;
+        return KeyboardCode.f18;
       case 130:
-        return f19;
+        return KeyboardCode.f19;
       case 131:
-        return f20;
+        return KeyboardCode.f20;
       case 132:
-        return f21;
+        return KeyboardCode.f21;
       case 133:
-        return f22;
+        return KeyboardCode.f22;
       case 134:
-        return f23;
+        return KeyboardCode.f23;
       case 135:
-        return f24;
+        return KeyboardCode.f24;
       case 144:
-        return numlock;
+        return KeyboardCode.numlock;
       case 145:
-        return scroll;
+        return KeyboardCode.scroll;
       case 160:
-        return lshift;
+        return KeyboardCode.lshift;
       case 161:
-        return rshift;
+        return KeyboardCode.rshift;
       case 162:
-        return lcontrol;
+        return KeyboardCode.lcontrol;
       case 163:
-        return rcontrol;
+        return KeyboardCode.rcontrol;
       case 164:
-        return lmenu;
+        return KeyboardCode.lmenu;
       case 165:
-        return rmenu;
+        return KeyboardCode.rmenu;
       case 166:
-        return browserBack;
+        return KeyboardCode.browserBack;
       case 167:
-        return browserForward;
+        return KeyboardCode.browserForward;
       case 168:
-        return browserRefresh;
+        return KeyboardCode.browserRefresh;
       case 169:
-        return browserStop;
+        return KeyboardCode.browserStop;
       case 170:
-        return browserSearch;
+        return KeyboardCode.browserSearch;
       case 171:
-        return browserFavorites;
+        return KeyboardCode.browserFavorites;
       case 172:
-        return browserHome;
+        return KeyboardCode.browserHome;
       case 173:
-        return volumeMute;
+        return KeyboardCode.volumeMute;
       case 174:
-        return volumeDown;
+        return KeyboardCode.volumeDown;
       case 175:
-        return volumeUp;
+        return KeyboardCode.volumeUp;
       case 176:
-        return mediaNextTrack;
+        return KeyboardCode.mediaNextTrack;
       case 177:
-        return mediaPrevTrack;
+        return KeyboardCode.mediaPrevTrack;
       case 178:
-        return mediaStop;
+        return KeyboardCode.mediaStop;
       case 179:
-        return mediaPlayPause;
+        return KeyboardCode.mediaPlayPause;
       case 180:
-        return mediaLaunchMail;
+        return KeyboardCode.mediaLaunchMail;
       case 181:
-        return mediaLaunchMediaSelect;
+        return KeyboardCode.mediaLaunchMediaSelect;
       case 182:
-        return mediaLaunchApp1;
+        return KeyboardCode.mediaLaunchApp1;
       case 183:
-        return mediaLaunchApp2;
+        return KeyboardCode.mediaLaunchApp2;
       case 186:
-        return oem1;
+        return KeyboardCode.oem1;
       case 187:
-        return oemPlus;
+        return KeyboardCode.oemPlus;
       case 188:
-        return oemComma;
+        return KeyboardCode.oemComma;
       case 189:
-        return oemMinus;
+        return KeyboardCode.oemMinus;
       case 190:
-        return oemPeriod;
+        return KeyboardCode.oemPeriod;
       case 191:
-        return oem2;
+        return KeyboardCode.oem2;
       case 192:
-        return oem3;
+        return KeyboardCode.oem3;
       case 219:
-        return oem4;
+        return KeyboardCode.oem4;
       case 220:
-        return oem5;
+        return KeyboardCode.oem5;
       case 221:
-        return oem6;
+        return KeyboardCode.oem6;
       case 222:
-        return oem7;
+        return KeyboardCode.oem7;
       case 223:
-        return oem8;
+        return KeyboardCode.oem8;
       case 226:
-        return oem102;
+        return KeyboardCode.oem102;
       case 229:
-        return processkey;
+        return KeyboardCode.processkey;
       case 231:
-        return packet;
+        return KeyboardCode.packet;
       case 243:
-        return dbeSbcschar;
+        return KeyboardCode.dbeSbcschar;
       case 244:
-        return dbeDbcschar;
+        return KeyboardCode.dbeDbcschar;
       case 246:
-        return attn;
+        return KeyboardCode.attn;
       case 247:
-        return crsel;
+        return KeyboardCode.crsel;
       case 248:
-        return exsel;
+        return KeyboardCode.exsel;
       case 249:
-        return ereof;
+        return KeyboardCode.ereof;
       case 250:
-        return play;
+        return KeyboardCode.play;
       case 251:
-        return zoom;
+        return KeyboardCode.zoom;
       case 252:
-        return noname;
+        return KeyboardCode.noname;
       case 253:
-        return pa1;
+        return KeyboardCode.pa1;
       case 254:
-        return oemClear;
+        return KeyboardCode.oemClear;
       case 0:
-        return unknown;
+        return KeyboardCode.unknown;
       case 225:
-        return altgr;
+        return KeyboardCode.altgr;
       default:
         return null;
     }

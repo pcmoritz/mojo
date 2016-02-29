@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library application_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
 import 'package:mojo/mojo/shell.mojom.dart' as shell_mojom;
@@ -498,8 +495,6 @@ class ApplicationStub extends bindings.Stub {
         _impl.acceptConnection(params.requestorUrl, params.services, params.exposedServices, params.resolvedUrl);
         break;
       case _Application_requestQuitName:
-        var params = _ApplicationRequestQuitParams.deserialize(
-            message.payload);
         _impl.requestQuit();
         break;
       default:

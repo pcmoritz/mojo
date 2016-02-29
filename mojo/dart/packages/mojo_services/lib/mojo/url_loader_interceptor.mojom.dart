@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library url_loader_interceptor_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/url_request.mojom.dart' as url_request_mojom;
 import 'package:mojo/mojo/url_response.mojom.dart' as url_response_mojom;
@@ -1075,8 +1072,6 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
         }
         break;
       case _UrlLoaderInterceptor_interceptFollowRedirectName:
-        var params = _UrlLoaderInterceptorInterceptFollowRedirectParams.deserialize(
-            message.payload);
         var response = _impl.interceptFollowRedirect(_UrlLoaderInterceptorInterceptFollowRedirectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

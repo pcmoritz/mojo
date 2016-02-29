@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library resources_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
@@ -315,7 +312,7 @@ class Resource extends bindings.Union {
     }
     Resource result = new Resource();
 
-    // TODO(azani): Handle unknown union member.
+    
     ResourceTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ResourceTag.scene:
@@ -336,7 +333,7 @@ class Resource extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -528,8 +525,6 @@ class MailboxTextureCallbackStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _MailboxTextureCallback_onMailboxTextureReleasedName:
-        var params = _MailboxTextureCallbackOnMailboxTextureReleasedParams.deserialize(
-            message.payload);
         _impl.onMailboxTextureReleased();
         break;
       default:

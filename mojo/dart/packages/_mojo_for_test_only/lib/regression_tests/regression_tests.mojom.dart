@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library regression_tests_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -32,9 +30,9 @@ class EnumWithReference extends bindings.MojoEnum {
   factory EnumWithReference(int v) {
     switch (v) {
       case 30:
-        return kStereoAndKeyboardMic;
+        return EnumWithReference.kStereoAndKeyboardMic;
       case 30:
-        return kMax;
+        return EnumWithReference.kMax;
       default:
         return null;
     }
@@ -102,9 +100,9 @@ class EnumWithLowercase extends bindings.MojoEnum {
   factory EnumWithLowercase(int v) {
     switch (v) {
       case 0:
-        return planarF16;
+        return EnumWithLowercase.planarF16;
       case 1:
-        return planarF32;
+        return EnumWithLowercase.planarF32;
       default:
         return null;
     }
@@ -169,7 +167,7 @@ class EnumWithNumbers extends bindings.MojoEnum {
   factory EnumWithNumbers(int v) {
     switch (v) {
       case 4:
-        return k21;
+        return EnumWithNumbers.k21;
       default:
         return null;
     }
@@ -227,7 +225,7 @@ class EnumWithK extends bindings.MojoEnum {
   factory EnumWithK(int v) {
     switch (v) {
       case 0:
-        return k;
+        return EnumWithK.k;
       default:
         return null;
     }
@@ -291,11 +289,11 @@ class EnumWithInternalAllCaps extends bindings.MojoEnum {
   factory EnumWithInternalAllCaps(int v) {
     switch (v) {
       case 0:
-        return standard;
+        return EnumWithInternalAllCaps.standard;
       case 1:
-        return fullscreen;
+        return EnumWithInternalAllCaps.fullscreen;
       case 2:
-        return immersive;
+        return EnumWithInternalAllCaps.immersive;
       default:
         return null;
     }
@@ -370,9 +368,9 @@ class NormalEnum extends bindings.MojoEnum {
   factory NormalEnum(int v) {
     switch (v) {
       case 0:
-        return first;
+        return NormalEnum.first;
       case 1:
-        return second;
+        return NormalEnum.second;
       default:
         return null;
     }
@@ -467,27 +465,27 @@ class CamelCaseTestEnum extends bindings.MojoEnum {
   factory CamelCaseTestEnum(int v) {
     switch (v) {
       case 0:
-        return boolThing;
+        return CamelCaseTestEnum.boolThing;
       case 1:
-        return doubleThing;
+        return CamelCaseTestEnum.doubleThing;
       case 2:
-        return floatThing;
+        return CamelCaseTestEnum.floatThing;
       case 3:
-        return int8Thing;
+        return CamelCaseTestEnum.int8Thing;
       case 4:
-        return int16Thing;
+        return CamelCaseTestEnum.int16Thing;
       case 5:
-        return int32Th1Ng;
+        return CamelCaseTestEnum.int32Th1Ng;
       case 6:
-        return int64Th1ng;
+        return CamelCaseTestEnum.int64Th1ng;
       case 7:
-        return uint8TH1ng;
+        return CamelCaseTestEnum.uint8TH1ng;
       case 8:
-        return uint16tH1Ng;
+        return CamelCaseTestEnum.uint16tH1Ng;
       case 9:
-        return uint32Th1ng;
+        return CamelCaseTestEnum.uint32Th1ng;
       case 10:
-        return uint64Th1Ng;
+        return CamelCaseTestEnum.uint64Th1Ng;
       default:
         return null;
     }
@@ -2615,8 +2613,6 @@ class CheckMethodWithEmptyResponseStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _CheckMethodWithEmptyResponse_withoutParameterAndEmptyResponseName:
-        var params = _CheckMethodWithEmptyResponseWithoutParameterAndEmptyResponseParams.deserialize(
-            message.payload);
         var response = _impl.withoutParameterAndEmptyResponse(_CheckMethodWithEmptyResponseWithoutParameterAndEmptyResponseResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -3313,8 +3309,6 @@ class TestInterfaceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _TestInterface_someMessageName:
-        var params = _TestInterfaceSomeMessageParams.deserialize(
-            message.payload);
         _impl.someMessage();
         break;
       default:
@@ -3791,8 +3785,6 @@ class ServiceNameStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _ServiceName_serviceName_Name:
-        var params = _ServiceNameServiceNameParams.deserialize(
-            message.payload);
         var response = _impl.serviceName_(_ServiceNameServiceNameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

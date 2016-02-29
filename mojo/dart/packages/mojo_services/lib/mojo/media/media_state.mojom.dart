@@ -3,12 +3,7 @@
 // found in the LICENSE file.
 
 library media_state_mojom;
-
-import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
-import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 
 
 class MediaState extends bindings.MojoEnum {
@@ -40,15 +35,15 @@ class MediaState extends bindings.MojoEnum {
   factory MediaState(int v) {
     switch (v) {
       case 0:
-        return fault;
+        return MediaState.fault;
       case 1:
-        return unprepared;
+        return MediaState.unprepared;
       case 2:
-        return paused;
+        return MediaState.paused;
       case 3:
-        return playing;
+        return MediaState.playing;
       case 4:
-        return ended;
+        return MediaState.ended;
       default:
         return null;
     }

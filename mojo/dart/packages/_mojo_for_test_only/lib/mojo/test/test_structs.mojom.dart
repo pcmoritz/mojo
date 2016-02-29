@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 library test_structs_mojom;
-
 import 'dart:async';
 import 'dart:collection';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -192,7 +190,6 @@ class StructOfStructs extends bindings.Struct {
         encoder0.encodeNullPointer(32, false);
       } else {
         var encoder1 = encoder0.encoderForMap(32);
-        int size0 = mNdfv.length;
         var keys0 = mNdfv.keys.toList();
         var values0 = mNdfv.values.toList();
         encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -214,7 +211,6 @@ class StructOfStructs extends bindings.Struct {
         encoder0.encodeNullPointer(40, false);
       } else {
         var encoder1 = encoder0.encoderForMap(40);
-        int size0 = mHs.length;
         var keys0 = mHs.keys.toList();
         var values0 = mHs.values.toList();
         encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -1963,15 +1959,15 @@ class ScopedConstantsEType extends bindings.MojoEnum {
   factory ScopedConstantsEType(int v) {
     switch (v) {
       case 0:
-        return e0;
+        return ScopedConstantsEType.e0;
       case 1:
-        return e1;
+        return ScopedConstantsEType.e1;
       case 10:
-        return e2;
+        return ScopedConstantsEType.e2;
       case 10:
-        return e3;
+        return ScopedConstantsEType.e3;
       case 11:
-        return e4;
+        return ScopedConstantsEType.e4;
       default:
         return null;
     }
@@ -2582,7 +2578,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = f0.length;
         var keys0 = f0.keys.toList();
         var values0 = f0.values.toList();
         encoder1.encodeBoolArray(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2598,7 +2593,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(16, false);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = f1.length;
         var keys0 = f1.keys.toList();
         var values0 = f1.values.toList();
         encoder1.encodeInt8Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2614,7 +2608,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(24, false);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = f2.length;
         var keys0 = f2.keys.toList();
         var values0 = f2.values.toList();
         encoder1.encodeUint8Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2630,7 +2623,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(32, false);
       } else {
         var encoder1 = encoder0.encoderForMap(32);
-        int size0 = f3.length;
         var keys0 = f3.keys.toList();
         var values0 = f3.values.toList();
         encoder1.encodeInt16Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2646,7 +2638,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(40, false);
       } else {
         var encoder1 = encoder0.encoderForMap(40);
-        int size0 = f4.length;
         var keys0 = f4.keys.toList();
         var values0 = f4.values.toList();
         encoder1.encodeUint16Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2662,7 +2653,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(48, false);
       } else {
         var encoder1 = encoder0.encoderForMap(48);
-        int size0 = f5.length;
         var keys0 = f5.keys.toList();
         var values0 = f5.values.toList();
         encoder1.encodeInt32Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2678,7 +2668,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(56, false);
       } else {
         var encoder1 = encoder0.encoderForMap(56);
-        int size0 = f6.length;
         var keys0 = f6.keys.toList();
         var values0 = f6.values.toList();
         encoder1.encodeUint32Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2694,7 +2683,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(64, false);
       } else {
         var encoder1 = encoder0.encoderForMap(64);
-        int size0 = f7.length;
         var keys0 = f7.keys.toList();
         var values0 = f7.values.toList();
         encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2710,7 +2698,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(72, false);
       } else {
         var encoder1 = encoder0.encoderForMap(72);
-        int size0 = f8.length;
         var keys0 = f8.keys.toList();
         var values0 = f8.values.toList();
         encoder1.encodeUint64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2726,7 +2713,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(80, false);
       } else {
         var encoder1 = encoder0.encoderForMap(80);
-        int size0 = f9.length;
         var keys0 = f9.keys.toList();
         var values0 = f9.values.toList();
         encoder1.encodeFloatArray(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2742,7 +2728,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(88, false);
       } else {
         var encoder1 = encoder0.encoderForMap(88);
-        int size0 = f10.length;
         var keys0 = f10.keys.toList();
         var values0 = f10.values.toList();
         encoder1.encodeDoubleArray(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -2758,7 +2743,6 @@ class MapKeyTypes extends bindings.Struct {
         encoder0.encodeNullPointer(96, false);
       } else {
         var encoder1 = encoder0.encoderForMap(96);
-        int size0 = f11.length;
         var keys0 = f11.keys.toList();
         var values0 = f11.values.toList();
         
@@ -3570,7 +3554,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(8, false);
       } else {
         var encoder1 = encoder0.encoderForMap(8);
-        int size0 = f0.length;
         var keys0 = f0.keys.toList();
         var values0 = f0.values.toList();
         
@@ -3605,7 +3588,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(16, false);
       } else {
         var encoder1 = encoder0.encoderForMap(16);
-        int size0 = f1.length;
         var keys0 = f1.keys.toList();
         var values0 = f1.values.toList();
         
@@ -3640,7 +3622,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(24, false);
       } else {
         var encoder1 = encoder0.encoderForMap(24);
-        int size0 = f2.length;
         var keys0 = f2.keys.toList();
         var values0 = f2.values.toList();
         
@@ -3675,7 +3656,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(32, false);
       } else {
         var encoder1 = encoder0.encoderForMap(32);
-        int size0 = f3.length;
         var keys0 = f3.keys.toList();
         var values0 = f3.values.toList();
         
@@ -3710,7 +3690,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(40, false);
       } else {
         var encoder1 = encoder0.encoderForMap(40);
-        int size0 = f4.length;
         var keys0 = f4.keys.toList();
         var values0 = f4.values.toList();
         
@@ -3752,7 +3731,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(48, false);
       } else {
         var encoder1 = encoder0.encoderForMap(48);
-        int size0 = f5.length;
         var keys0 = f5.keys.toList();
         var values0 = f5.values.toList();
         
@@ -3794,7 +3772,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(56, false);
       } else {
         var encoder1 = encoder0.encoderForMap(56);
-        int size0 = f6.length;
         var keys0 = f6.keys.toList();
         var values0 = f6.values.toList();
         
@@ -3822,7 +3799,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(64, false);
       } else {
         var encoder1 = encoder0.encoderForMap(64);
-        int size0 = f7.length;
         var keys0 = f7.keys.toList();
         var values0 = f7.values.toList();
         
@@ -3840,7 +3816,6 @@ class MapValueTypes extends bindings.Struct {
               encoder2.encodeNullPointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
             } else {
               var encoder3 = encoder2.encoderForMap(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1);
-              int size2 = values0[i1].length;
               var keys2 = values0[i1].keys.toList();
               var values2 = values0[i1].values.toList();
               
@@ -3871,7 +3846,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(72, false);
       } else {
         var encoder1 = encoder0.encoderForMap(72);
-        int size0 = f8.length;
         var keys0 = f8.keys.toList();
         var values0 = f8.values.toList();
         
@@ -3894,7 +3868,6 @@ class MapValueTypes extends bindings.Struct {
                   encoder3.encodeNullPointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i2, false);
                 } else {
                   var encoder4 = encoder3.encoderForMap(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i2);
-                  int size3 = values0[i1][i2].length;
                   var keys3 = values0[i1][i2].keys.toList();
                   var values3 = values0[i1][i2].values.toList();
                   
@@ -3927,7 +3900,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(80, false);
       } else {
         var encoder1 = encoder0.encoderForMap(80);
-        int size0 = f9.length;
         var keys0 = f9.keys.toList();
         var values0 = f9.values.toList();
         
@@ -3949,7 +3921,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(88, false);
       } else {
         var encoder1 = encoder0.encoderForMap(88);
-        int size0 = f10.length;
         var keys0 = f10.keys.toList();
         var values0 = f10.values.toList();
         
@@ -3977,7 +3948,6 @@ class MapValueTypes extends bindings.Struct {
         encoder0.encodeNullPointer(96, false);
       } else {
         var encoder1 = encoder0.encoderForMap(96);
-        int size0 = f11.length;
         var keys0 = f11.keys.toList();
         var values0 = f11.values.toList();
         
@@ -3995,7 +3965,6 @@ class MapValueTypes extends bindings.Struct {
               encoder2.encodeNullPointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
             } else {
               var encoder3 = encoder2.encoderForMap(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1);
-              int size2 = values0[i1].length;
               var keys2 = values0[i1].keys.toList();
               var values2 = values0[i1].values.toList();
               
@@ -6899,11 +6868,11 @@ class DartKeywordStructKeywords extends bindings.MojoEnum {
   factory DartKeywordStructKeywords(int v) {
     switch (v) {
       case 0:
-        return await_;
+        return DartKeywordStructKeywords.await_;
       case 1:
-        return is_;
+        return DartKeywordStructKeywords.is_;
       case 2:
-        return rethrow_;
+        return DartKeywordStructKeywords.rethrow_;
       default:
         return null;
     }
@@ -7374,7 +7343,7 @@ class UnionOfStructs extends bindings.Union {
     }
     UnionOfStructs result = new UnionOfStructs();
 
-    // TODO(azani): Handle unknown union member.
+    
     UnionOfStructsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionOfStructsTag.nr:
@@ -7472,7 +7441,7 @@ class UnionOfStructs extends bindings.Union {
   }
 
   void encode(bindings.Encoder encoder0, int offset) {
-    // TODO(azani): Error when trying to encode an unknown member.
+    
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
     switch (_tag) {
@@ -7504,7 +7473,6 @@ class UnionOfStructs extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = mNdfv.length;
           var keys0 = mNdfv.keys.toList();
           var values0 = mNdfv.values.toList();
           encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);
@@ -7522,7 +7490,6 @@ class UnionOfStructs extends bindings.Union {
           encoder0.encodeNullPointer(offset + 8, false);
         } else {
           var encoder1 = encoder0.encoderForMap(offset + 8);
-          int size0 = mHs.length;
           var keys0 = mHs.keys.toList();
           var values0 = mHs.values.toList();
           encoder1.encodeInt64Array(keys0, bindings.ArrayDataHeader.kHeaderSize, bindings.kNothingNullable, bindings.kUnspecifiedArrayLength);

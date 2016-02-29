@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library nfc_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 
@@ -661,8 +658,6 @@ class NfcTransmissionStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _NfcTransmission_cancelName:
-        var params = _NfcTransmissionCancelParams.deserialize(
-            message.payload);
         _impl.cancel();
         break;
       default:
@@ -1113,13 +1108,9 @@ class NfcStub extends bindings.Stub {
         }
         break;
       case _Nfc_registerName:
-        var params = _NfcRegisterParams.deserialize(
-            message.payload);
         _impl.register();
         break;
       case _Nfc_unregisterName:
-        var params = _NfcUnregisterParams.deserialize(
-            message.payload);
         _impl.unregister();
         break;
       default:

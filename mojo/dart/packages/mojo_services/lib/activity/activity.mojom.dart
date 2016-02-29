@@ -3,12 +3,9 @@
 // found in the LICENSE file.
 
 library activity_mojom;
-
 import 'dart:async';
-
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
-import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 
 class SystemUiVisibility extends bindings.MojoEnum {
@@ -34,11 +31,11 @@ class SystemUiVisibility extends bindings.MojoEnum {
   factory SystemUiVisibility(int v) {
     switch (v) {
       case 0:
-        return standard;
+        return SystemUiVisibility.standard;
       case 1:
-        return fullscreen;
+        return SystemUiVisibility.fullscreen;
       case 2:
-        return immersive;
+        return SystemUiVisibility.immersive;
       default:
         return null;
     }
@@ -98,13 +95,13 @@ class ScreenOrientation extends bindings.MojoEnum {
   factory ScreenOrientation(int v) {
     switch (v) {
       case 0:
-        return unspecified;
+        return ScreenOrientation.unspecified;
       case 1:
-        return landscape;
+        return ScreenOrientation.landscape;
       case 2:
-        return portrait;
+        return ScreenOrientation.portrait;
       case 3:
-        return nosensor;
+        return ScreenOrientation.nosensor;
       default:
         return null;
     }
@@ -166,13 +163,13 @@ class HapticFeedbackType extends bindings.MojoEnum {
   factory HapticFeedbackType(int v) {
     switch (v) {
       case 0:
-        return longPress;
+        return HapticFeedbackType.longPress;
       case 1:
-        return virtualKey;
+        return HapticFeedbackType.virtualKey;
       case 2:
-        return keyboardTap;
+        return HapticFeedbackType.keyboardTap;
       case 3:
-        return clockTick;
+        return HapticFeedbackType.clockTick;
       default:
         return null;
     }
@@ -237,15 +234,15 @@ class AuralFeedbackType extends bindings.MojoEnum {
   factory AuralFeedbackType(int v) {
     switch (v) {
       case 0:
-        return click;
+        return AuralFeedbackType.click;
       case 1:
-        return navigationLeft;
+        return AuralFeedbackType.navigationLeft;
       case 2:
-        return navigationUp;
+        return AuralFeedbackType.navigationUp;
       case 3:
-        return navigationRight;
+        return AuralFeedbackType.navigationRight;
       case 4:
-        return navigationDown;
+        return AuralFeedbackType.navigationDown;
       default:
         return null;
     }
@@ -1932,8 +1929,6 @@ class ActivityStub extends bindings.Stub {
         _impl.startActivity(params.intent);
         break;
       case _Activity_finishCurrentActivityName:
-        var params = _ActivityFinishCurrentActivityParams.deserialize(
-            message.payload);
         _impl.finishCurrentActivity();
         break;
       case _Activity_setTaskDescriptionName:
@@ -2233,8 +2228,6 @@ class PathServiceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _PathService_getAppDataDirName:
-        var params = _PathServiceGetAppDataDirParams.deserialize(
-            message.payload);
         var response = _impl.getAppDataDir(_PathServiceGetAppDataDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -2255,8 +2248,6 @@ class PathServiceStub extends bindings.Stub {
         }
         break;
       case _PathService_getFilesDirName:
-        var params = _PathServiceGetFilesDirParams.deserialize(
-            message.payload);
         var response = _impl.getFilesDir(_PathServiceGetFilesDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
@@ -2277,8 +2268,6 @@ class PathServiceStub extends bindings.Stub {
         }
         break;
       case _PathService_getCacheDirName:
-        var params = _PathServiceGetCacheDirParams.deserialize(
-            message.payload);
         var response = _impl.getCacheDir(_PathServiceGetCacheDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
