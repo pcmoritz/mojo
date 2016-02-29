@@ -20,8 +20,8 @@ namespace gles2 {
 
 // static
 ControlThunksImpl* ControlThunksImpl::Get() {
-  static base::LazyInstance<ControlThunksImpl>::Leaky thunks;
-  return thunks.Pointer();
+  static auto* thunks = new ControlThunksImpl;
+  return thunks;
 }
 
 MGLContext ControlThunksImpl::CreateContext(

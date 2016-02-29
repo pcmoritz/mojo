@@ -5,7 +5,6 @@
 #ifndef MOJO_GLES2_CONTROL_THUNKS_IMPL_H_
 #define MOJO_GLES2_CONTROL_THUNKS_IMPL_H_
 
-#include "base/lazy_instance.h"
 #include "base/macros.h"
 #include "base/threading/thread_local.h"
 #include "gpu/GLES2/gl2extchromium.h"
@@ -56,7 +55,6 @@ class ControlThunksImpl {
   gpu::gles2::GLES2Interface* CurrentGLES2Interface();
 
  private:
-  friend base::DefaultLazyInstanceTraits<gles2::ControlThunksImpl>;
   ControlThunksImpl();
   ~ControlThunksImpl();
 

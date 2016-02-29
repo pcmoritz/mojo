@@ -9,9 +9,9 @@
 #include "base/base_switches.h"
 #include "base/bind.h"
 #include "base/command_line.h"
+#include "base/compiler_specific.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
-#include "base/lazy_instance.h"
 #include "base/macros.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/memory/scoped_vector.h"
@@ -52,19 +52,6 @@ using mojo::ServiceProviderPtr;
 
 namespace shell {
 namespace {
-
-// Used to ensure we only init once.
-class Setup {
- public:
-  Setup() {
-    mojo::embedder::Init(mojo::embedder::CreateSimplePlatformSupport());
-  }
-
-  ~Setup() {}
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(Setup);
-};
 
 ApplicationManager::Options MakeApplicationManagerOptions() {
   ApplicationManager::Options options;
@@ -253,8 +240,11 @@ Context::~Context() {
 
 // static
 void Context::EnsureEmbedderIsInitialized() {
-  static base::LazyInstance<Setup>::Leaky setup = LAZY_INSTANCE_INITIALIZER;
-  setup.Get();
+  static bool initialized = ([]() {
+    mojo::embedder::Init(mojo::embedder::CreateSimplePlatformSupport());
+    return true;
+  })();
+  ALLOW_UNUSED_LOCAL(initialized);
 }
 
 void Context::SetShellFileRoot(const base::FilePath& path) {
