@@ -267,11 +267,11 @@ func (p *printer) writeEnumValue(enumValue *mojom.EnumValue) {
 // closing brace.
 func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsContainer) {
 
+	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
 	if len(container.GetDeclaredObjects()) == 0 && !containsFinalComments(container.(mojom.MojomElement)) {
-		p.writef("%v{};", container.(mojom.DeclaredObject).NameToken().Text)
+		p.writef("};")
 		return
 	}
-	p.writef("%v {", container.(mojom.DeclaredObject).NameToken().Text)
 	p.writeRightComments(container.(mojom.MojomElement))
 	p.incIndent()
 	p.nl()
@@ -322,15 +322,16 @@ func (p *printer) writeAttributesBase(attrs *mojom.Attributes, singleLine bool) 
 		p.writeAttribute(&attr)
 		if idx < len(attrs.List)-1 {
 			p.writef(",")
-			if singleLine {
-				p.write(" ")
-			} else {
+			if !singleLine {
 				p.nl()
 			}
+			p.write(" ")
 		}
 	}
 	p.writef("]")
-	if !singleLine {
+	if singleLine {
+		p.write(" ")
+	} else {
 		p.nl()
 	}
 }
@@ -573,7 +574,7 @@ func (p *printer) write(s string) {
 func (p *printer) nl() {
 	// Before going to the next line, print the last comment on the line.
 	if p.eolComment != nil {
-		p.writef(" %s", p.eolComment.Text)
+		p.writef("  %s", p.eolComment.Text)
 		p.eolComment = nil
 	}
 

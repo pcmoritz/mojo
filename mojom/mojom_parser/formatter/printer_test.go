@@ -89,7 +89,7 @@ func TestWriteAttributes(t *testing.T) {
 	p := getNewPrinter()
 	p.writeAttributes(attrs)
 
-	expected := "[key1=10,\nkey2=20]\n"
+	expected := "[key1=10,\n key2=20]\n"
 	checkEq(t, expected, p.result())
 }
 
@@ -101,7 +101,7 @@ func TestWriteAttributesSingleLine(t *testing.T) {
 	p := getNewPrinter()
 	p.writeAttributesSingleLine(attrs)
 
-	expected := "[key1=10, key2=20]"
+	expected := "[key1=10, key2=20] "
 	checkEq(t, expected, p.result())
 }
 
@@ -313,7 +313,7 @@ func TestWriteMojomStructEmpty(t *testing.T) {
 	declData := mojom.DeclData("", nil, lexer.Token{Text: "FooStruct"}, nil)
 	mojomStruct := mojom.NewMojomStruct(declData)
 
-	expected := "struct FooStruct{};"
+	expected := "struct FooStruct {};"
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomStruct)
