@@ -199,6 +199,19 @@ void Graph::PrimeSinks() {
   }
 }
 
+void Graph::FlushOutput(const OutputRef& output) {
+  DCHECK(output);
+  engine_.FlushOutput(output);
+}
+
+void Graph::FlushAllOutputs(PartRef part) {
+  DCHECK(part.valid());
+  size_t output_count = part.output_count();
+  for (size_t output_index = 0; output_index < output_count; output_index++) {
+    FlushOutput(part.output(output_index));
+  }
+}
+
 PartRef Graph::Add(Stage* stage) {
   stages_.push_back(stage);
 

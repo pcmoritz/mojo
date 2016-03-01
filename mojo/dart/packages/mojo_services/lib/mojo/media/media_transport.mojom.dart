@@ -845,6 +845,126 @@ class MediaConsumerPushPacketResponseParams extends bindings.Struct {
 
 
 
+class _MediaConsumerFlushParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _MediaConsumerFlushParams() : super(kVersions.last.size);
+
+  static _MediaConsumerFlushParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaConsumerFlushParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaConsumerFlushParams result = new _MediaConsumerFlushParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_MediaConsumerFlushParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class MediaConsumerFlushResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  MediaConsumerFlushResponseParams() : super(kVersions.last.size);
+
+  static MediaConsumerFlushResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaConsumerFlushResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaConsumerFlushResponseParams result = new MediaConsumerFlushResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "MediaConsumerFlushResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
 const int _MediaProducer_connectName = 0;
 const int _MediaProducer_disconnectName = 1;
 
@@ -1398,6 +1518,7 @@ class MediaPullModeProducerStub extends bindings.Stub {
 
 const int _MediaConsumer_setBufferName = 0;
 const int _MediaConsumer_pushPacketName = 1;
+const int _MediaConsumer_flushName = 2;
 
 
 
@@ -1416,6 +1537,7 @@ abstract class MediaConsumer {
   static const String serviceName = null;
   dynamic setBuffer(core.MojoSharedBuffer buffer,int size,[Function responseFactory = null]);
   dynamic pushPacket(media_pipe_mojom.MediaPacket packet,[Function responseFactory = null]);
+  dynamic flush([Function responseFactory = null]);
 }
 
 
@@ -1479,6 +1601,26 @@ class _MediaConsumerProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
+      case _MediaConsumer_flushName:
+        var r = MediaConsumerFlushResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
       default:
         proxyError("Unexpected message type: ${message.header.type}");
         close(immediate: true);
@@ -1513,6 +1655,14 @@ class _MediaConsumerProxyCalls implements MediaConsumer {
       return _proxyImpl.sendMessageWithRequestId(
           params,
           _MediaConsumer_pushPacketName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    dynamic flush([Function responseFactory = null]) {
+      var params = new _MediaConsumerFlushParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _MediaConsumer_flushName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1605,6 +1755,10 @@ class MediaConsumerStub extends bindings.Stub {
     var mojo_factory_result = new MediaConsumerPushPacketResponseParams();
     return mojo_factory_result;
   }
+  MediaConsumerFlushResponseParams _MediaConsumerFlushResponseParamsFactory() {
+    var mojo_factory_result = new MediaConsumerFlushResponseParams();
+    return mojo_factory_result;
+  }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
     if (bindings.ControlMessageHandler.isControlMessage(message)) {
@@ -1654,6 +1808,28 @@ class MediaConsumerStub extends bindings.Stub {
           return buildResponseWithId(
               response,
               _MediaConsumer_pushPacketName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _MediaConsumer_flushName:
+        var params = _MediaConsumerFlushParams.deserialize(
+            message.payload);
+        var response = _impl.flush(_MediaConsumerFlushResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _MediaConsumer_flushName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _MediaConsumer_flushName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

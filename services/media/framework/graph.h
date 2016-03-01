@@ -187,6 +187,12 @@ class Graph {
   // Primes all the sinks in the graph.
   void PrimeSinks();
 
+  // Flushes the output and the subgraph downstream of it.
+  void FlushOutput(const OutputRef& output);
+
+  // Flushes the output and the subgraph downstream of it.
+  void FlushAllOutputs(PartRef part);
+
  private:
   // Adds a stage to the graph.
   PartRef Add(Stage* stage);

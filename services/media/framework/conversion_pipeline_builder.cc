@@ -75,11 +75,10 @@ int Score(
 // Finds the media type set that best matches in_type.
 const std::unique_ptr<StreamTypeSet>* FindBestLpcm(
     const LpcmStreamType& in_type,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets) {
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets) {
   const std::unique_ptr<StreamTypeSet>* best = nullptr;
   int best_score = 0;
-  for (const std::unique_ptr<StreamTypeSet>& out_type_set : *out_type_sets) {
+  for (const std::unique_ptr<StreamTypeSet>& out_type_set : out_type_sets) {
     switch (out_type_set->scheme()) {
       case StreamType::Scheme::kAnyElementary:
       case StreamType::Scheme::kAnyAudio:
@@ -107,9 +106,7 @@ const std::unique_ptr<StreamTypeSet>* FindBestLpcm(
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForCompressedAudio(
     const CompressedAudioStreamType& in_type,
-    const std::unique_ptr<StreamType>& in_type_ptr,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets,
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
     std::unique_ptr<StreamType>* out_type) {
@@ -117,7 +114,7 @@ AddResult AddTransformsForCompressedAudio(
   DCHECK(graph);
 
   // See if we have a matching COMPRESSED_AUDIO type.
-  for (const std::unique_ptr<StreamTypeSet>& out_type_set : *out_type_sets) {
+  for (const std::unique_ptr<StreamTypeSet>& out_type_set : out_type_sets) {
     switch (out_type_set->scheme()) {
       case StreamType::Scheme::kAnyElementary:
       case StreamType::Scheme::kAnyAudio:
@@ -152,7 +149,7 @@ AddResult AddTransformsForCompressedAudio(
 
   // Need to decode. Create a decoder and go from there.
   std::shared_ptr<Decoder> decoder;
-  Result result = Decoder::Create(in_type_ptr, &decoder);
+  Result result = Decoder::Create(in_type, &decoder);
   if (result !=  Result::kOk) {
     // No decoder found.
     *out_type = nullptr;
@@ -219,8 +216,7 @@ AddResult AddTransformsForLpcm(
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForLpcm(
     const LpcmStreamType& in_type,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets,
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
     std::unique_ptr<StreamType>* out_type) {
@@ -262,35 +258,32 @@ AddResult AddTransformsForLpcm(
 // (out_type_sets). If the call succeeds, *out_type is set to the new output
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransforms(
-    const std::unique_ptr<StreamType>& in_type,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets,
+    const StreamType& in_type,
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
     std::unique_ptr<StreamType>* out_type) {
-  DCHECK(in_type);
   DCHECK(graph);
   DCHECK(out_type);
 
-  switch (in_type->scheme()) {
+  switch (in_type.scheme()) {
     case StreamType::Scheme::kLpcm:
       return AddTransformsForLpcm(
-          *in_type->lpcm(),
+          *in_type.lpcm(),
           out_type_sets,
           graph,
           output,
           out_type);
     case StreamType::Scheme::kCompressedAudio:
       return AddTransformsForCompressedAudio(
-          *in_type->compressed_audio(),
-          in_type,
+          *in_type.compressed_audio(),
           out_type_sets,
           graph,
           output,
           out_type);
     default:
       NOTREACHED() << "conversion not supported for scheme"
-          << in_type->scheme();
+          << in_type.scheme();
       *out_type = nullptr;
       return AddResult::kFailed;
   }
@@ -299,24 +292,19 @@ AddResult AddTransforms(
 }  // namespace
 
 bool BuildConversionPipeline(
-    const std::unique_ptr<StreamType>& in_type,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets,
+    const StreamType& in_type,
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
     std::unique_ptr<StreamType>* out_type) {
-  DCHECK(in_type);
-  DCHECK(out_type_sets);
   DCHECK(graph);
   DCHECK(output);
   DCHECK(out_type);
 
   OutputRef out = *output;
-
-  const std::unique_ptr<StreamType>* type_to_convert = &in_type;
-  std::unique_ptr<StreamType> next_in_type;
+  const StreamType* type_to_convert = &in_type;
+  std::unique_ptr<StreamType> converted_type;
   while (true) {
-    std::unique_ptr<StreamType> converted_type;
     switch (AddTransforms(
         *type_to_convert,
         out_type_sets,
@@ -339,8 +327,7 @@ bool BuildConversionPipeline(
         return true;
     }
 
-    next_in_type = std::move(converted_type);
-    type_to_convert = &next_in_type;
+    type_to_convert = converted_type.get();
   }
 }
 

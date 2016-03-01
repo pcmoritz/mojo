@@ -8,5 +8,6 @@ group("media") {
     "//services/media/common",
     "//services/media/framework",
     "//services/media/framework_create",
+    "//services/media/framework_mojo",
   ]
 }

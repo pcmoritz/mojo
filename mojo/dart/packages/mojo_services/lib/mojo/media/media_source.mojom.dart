@@ -1102,6 +1102,126 @@ class MediaSourcePrepareResponseParams extends bindings.Struct {
 
 
 
+class _MediaSourceFlushParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _MediaSourceFlushParams() : super(kVersions.last.size);
+
+  static _MediaSourceFlushParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaSourceFlushParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaSourceFlushParams result = new _MediaSourceFlushParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_MediaSourceFlushParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
+class MediaSourceFlushResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  MediaSourceFlushResponseParams() : super(kVersions.last.size);
+
+  static MediaSourceFlushResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaSourceFlushResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaSourceFlushResponseParams result = new MediaSourceFlushResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "MediaSourceFlushResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+
+
 const int _MediaSource_getStreamsName = 0;
 const int _MediaSource_getClockDispositionName = 1;
 const int _MediaSource_getMasterClockName = 2;
@@ -1110,6 +1230,7 @@ const int _MediaSource_getProducerName = 4;
 const int _MediaSource_getPullModeProducerName = 5;
 const int _MediaSource_getStatusName = 6;
 const int _MediaSource_prepareName = 7;
+const int _MediaSource_flushName = 8;
 
 
 
@@ -1134,6 +1255,7 @@ abstract class MediaSource {
   void getPullModeProducer(int streamIndex, Object producer);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
   dynamic prepare([Function responseFactory = null]);
+  dynamic flush([Function responseFactory = null]);
 }
 
 
@@ -1219,6 +1341,26 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         break;
       case _MediaSource_prepareName:
         var r = MediaSourcePrepareResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      case _MediaSource_flushName:
+        var r = MediaSourceFlushResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1326,6 +1468,14 @@ class _MediaSourceProxyCalls implements MediaSource {
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
+    dynamic flush([Function responseFactory = null]) {
+      var params = new _MediaSourceFlushParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _MediaSource_flushName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
 }
 
 
@@ -1425,6 +1575,10 @@ class MediaSourceStub extends bindings.Stub {
   }
   MediaSourcePrepareResponseParams _MediaSourcePrepareResponseParamsFactory() {
     var mojo_factory_result = new MediaSourcePrepareResponseParams();
+    return mojo_factory_result;
+  }
+  MediaSourceFlushResponseParams _MediaSourceFlushResponseParamsFactory() {
+    var mojo_factory_result = new MediaSourceFlushResponseParams();
     return mojo_factory_result;
   }
 
@@ -1534,6 +1688,28 @@ class MediaSourceStub extends bindings.Stub {
           return buildResponseWithId(
               response,
               _MediaSource_prepareName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _MediaSource_flushName:
+        var params = _MediaSourceFlushParams.deserialize(
+            message.payload);
+        var response = _impl.flush(_MediaSourceFlushResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _MediaSource_flushName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _MediaSource_flushName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

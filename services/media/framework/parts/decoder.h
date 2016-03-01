@@ -19,7 +19,7 @@ class Decoder : public Transform {
  public:
   // Creates a Decoder object for a given stream type.
   static Result Create(
-      const std::unique_ptr<StreamType>& stream_type,
+      const StreamType& stream_type,
       std::shared_ptr<Decoder>* decoder_out);
 
   ~Decoder() override {}
@@ -29,7 +29,7 @@ class Decoder : public Transform {
 
  protected:
   // Initializes the decoder. Called by Decoder::Create.
-  virtual Result Init(const std::unique_ptr<StreamType>& stream_type) = 0;
+  virtual Result Init(const StreamType& stream_type) = 0;
 };
 
 }  // namespace media

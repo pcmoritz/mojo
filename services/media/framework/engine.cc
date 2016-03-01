@@ -39,6 +39,9 @@ void Engine::UnprepareInput(const InputRef& input) {
 }
 
 void Engine::FlushOutput(const OutputRef& output) {
+  if (!output.connected()) {
+    return;
+  }
   VisitDownstream(
       output,
       [] (const OutputRef& output,

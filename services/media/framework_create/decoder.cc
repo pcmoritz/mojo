@@ -8,7 +8,7 @@ namespace mojo {
 namespace media {
 
 Result Decoder::Create(
-    const std::unique_ptr<StreamType>& stream_type,
+    const StreamType& stream_type,
     std::shared_ptr<Decoder>* decoder_out) {
   return Result::kUnsupportedOperation;
 }

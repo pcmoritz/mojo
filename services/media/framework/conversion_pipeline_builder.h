@@ -17,9 +17,8 @@ namespace media {
 // *output and delivers the resulting output type via *out_type. If it fails,
 // returns false, sets *out_type to nullptr and leaves *output unchanged.
 bool BuildConversionPipeline(
-    const std::unique_ptr<StreamType>& in_type,
-    const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-        out_type_sets,
+    const StreamType& in_type,
+    const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
     std::unique_ptr<StreamType>* out_type);
