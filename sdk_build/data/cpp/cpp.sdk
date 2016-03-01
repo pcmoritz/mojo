@@ -90,3 +90,6 @@ CopyDir("examples/hello_mojo",
 
 # Put in a simple example Makefile (in the root directory).
 CopyFiles("sdk_build/data/cpp/Makefile", "")
+
+# Bring in the license and authors files.
+CopyFiles(["LICENSE", "AUTHORS"], "")
