@@ -65,6 +65,7 @@ v8.log
 /third_party/smhasher/src/
 /third_party/snappy/src/
 /third_party/yasm/source/patched-yasm/
+/tonic/
 /tools/grit/
 /v8/
 

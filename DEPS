@@ -31,6 +31,7 @@ vars = {
   'boringssl_revision': '642f1498d056dbba3e50ed5a232ab2f482626dec',
   'lss_revision': '6f97298fe3794e92c8c896a6bc06e0b36e4c3de3',
   'nacl_revision': 'f5bc68c59b147b66d553dc6fc17426682cf138e2',
+  'tonic_revision': '7e6944c008443b7753388a904bdeaf3461f5d889',
 }
 
 # Only these hosts are allowed for dependencies in this DEPS file.
@@ -68,6 +69,9 @@ deps = {
 
   'src/dart':
     Var('chromium_git') + '/external/github.com/dart-lang/sdk.git' + '@' + Var('dart_revision'),
+
+  'src/tonic':
+    Var('chromium_git') + '/external/github.com/domokit/tonic' + '@' + Var('tonic_revision'),
 
   'src/dart/third_party/observatory_pub_packages':
     Var('chromium_git') +
