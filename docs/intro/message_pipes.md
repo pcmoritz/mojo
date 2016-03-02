@@ -11,13 +11,13 @@ of the meaning of the data or of the handles (other than their intrinsic
 properties).
 
 That said, Mojo provides a *standard* way of communicating over message pipes,
-namely via a standardized protocol together with [Mojom IDL](mojom.md) files.
+namely via a standardized protocol together with [Mojom](mojom.md) IDL files.
 
 ## Messages
 
 A *message* consists of two things:
 * a finite sequence of bytes, and
-* a finite sequence of Mojo handles.
+* a finite sequence of [Mojo handles](handles.md).
 
 Both of these are determined when the message is sent (or *written*). Messages
 are *framed* in the sense that they are "atomic" units: they are sent and
@@ -75,4 +75,44 @@ about this in the context of Mojom.)
 
 ## "Synchronous" operation
 
-**TODO(vtl)**
+Though message pipes are asynchronous as discussed above, they may be used in a
+synchronous fashion: immediately after sending a *request* message, one can then
+just block and wait for the *response* message (and then read it and process
+it). Of course, this requires that the protocol support this:
+* Message pipes must be used in a "directional" way: there must be fixed request
+  and response directions or, equivalently, one endpoint belongs to the *client*
+  and the other to the *server* (or *impl*). (Historical note: This is the case
+  for the current Mojom protocol, but not in previous versions.) The issue here
+  is that without this, the sender of the request messages may have to process
+  incoming request messages from its peer.
+* Request messages must have unique response messages. (In the Mojom protocol,
+  request messages have optional unique responses. For messages without
+  responses, one can just proceed immediately without waiting. However, without
+  response messages there may be flow control issues; again, see above.) The
+  important point is that for each request message, there is a well-defined
+  number of response messages for each request and not arbitrary "callback"
+  messages.
+* The sending of a response message must not depend on a future action of the
+  client. (This is a higher-level semantic that is not enforced by the Mojom
+  protocol. E.g., one may define a Mojom interface in which the response to a
+  message *Foo* isn't sent until the client sends a request *Bar*.)
+
+That said, whether one wants to, or even can, use this synchronous mode of
+operation may depend on a number of things:
+* For message-loop-centric programming languages, this mode is at best
+  undesirable (and possibly infeasible, depending on what facilities are exposed
+  to user code). (E.g., this is the case for JavaScript and Dart.)
+* Similarly, on a message-loop programming model (in which threads -- if there
+  are more than one -- are mostly coordinated by "message passing"), it is
+  typically undesirable to block any thread (with a message loop). Indeed, if
+  other message pipes are serviced by a message loop, blocking the thread may
+  result in deadlock. (E.g., this is the usual programming model for the
+  standard Mojom C++ bindings.)
+* Even when blocking is permissible, it may not be desirable to do so:
+  advancement of the program then relies on trusting the server to be
+  responsive and send responses in a timely fashion.
+* Mixing asynchronous and synchronous operation is problematic: one cannot send
+  a request and synchronously wait for a response while responses to other
+  messages are still pending. (Theoretically, one could buffer such other
+  responses until the response to particular request is received, and process
+  those other responses later, but this would be dubious at best.)
