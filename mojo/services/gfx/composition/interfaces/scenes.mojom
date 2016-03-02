@@ -151,8 +151,8 @@ interface Scene {
   //
   // Publishing a scene graph applies all pending updates.  It is an error
   // to publish updates which cause the scene state to become inconsistent,
-  // such as by having nodes which refer to non-existent resources; the
-  // connection will be closed.
+  // such as by having nodes which refer to non-existent resources or
+  // introducing cycles in the scene's nodes; the connection will be closed.
   Publish(SceneMetadata? metadata);
 
   // Gets a scheduler for scheduling upcoming scene operations.

@@ -16,7 +16,9 @@ import "mojo/services/gfx/composition/interfaces/hit_tests.mojom";
 // references to embedded scenes.  Nodes are arranged to form a directed
 // acyclic graph of drawing commands.
 //
-// The node graph is processed in pre-order traversal.  Starting from the
+// RENDERING
+//
+// The node graph is renderer in pre-order traversal.  Starting from the
 // root, the compositor applies the transformation, clip, applies the
 // node's operation (if any), then recursively processes the node's children
 // according to the node's combinator rule.
@@ -53,15 +55,51 @@ import "mojo/services/gfx/composition/interfaces/hit_tests.mojom";
 // missing content for an earlier version of that content or for a placeholder
 // if not available.
 //
+// INSTANCING
+//
+// The compositor allows nodes to be referenced and reused multiple times
+// within a scene (this is known as instancing).  Instancing makes it easier
+// to take advantage of combinators for interleaving placeholder content
+// when certain nodes are blocked from rendering (see above).  It also allows
+// common elements to be reused if desired.
+//
+// Likewise, the compositor allows scenes to be multiply referenced so that
+// the same content can be presented simultaneously in several places.
+//
+// CYCLES
+//
+// The compositor forbids cycles among nodes within scenes and will
+// reject scene updates which introduce node cycles by closing the client's
+// connection.
+//
+// Likewise, the compositor forbids cycles across scenes and will respond
+// to them by considering any scene within a cycle to be blocked from
+// rendering.
+//
+// For example, if there are scenes A, B, and C linked such that rendering
+// would traverse a path A -> B -> C -> B, the compositor will consider both
+// scenes B and C to be blocked and will apply A's combinator rules as required
+// to resolve the problem at the point where it would have entered the cycle.
+// This may cause A itself to be blocked if there are no applicable |PRUNE|
+// or |FALLBACK| predicated alternatives.
+//
+// This policy protects clients from cross-scene cycles which may have been
+// introduced downstream in the graph without their knowledge or which may
+// occur transiently, so long as they are not within the cycle themselves.
+// It also ensures that cycles are resolved deterministically regardless of
+// where they are encountered during traversal; all scenes within the cycle
+// are suppressed.
+//
 // TIPS
 //
 // 1. Reuse nodes when possible to reduce the size of the graph.  Consider
 //    using LayerNodeOps to flatten common elements to a texture which can
 //    be redrawn efficiently in many places.
 //
-// 2. Insert PRUNE or FALLBACK nodes in places where blocking is likely to
+// 2. Insert |PRUNE| or |FALLBACK| nodes in places where blocking is likely to
 //    occur, such as when embedding scenes produced by other applications.
-//    Provide alternate content where possible.
+//    Provide alternate content where possible to avoid stalling the
+//    rendering pipeline at these points.
 //
 struct Node {
   // The combinator specifies how child nodes are processed.
@@ -101,11 +139,8 @@ struct Node {
 
   // The ids of the children of this node.
   // It is an error to specify a node id that does not refer to a valid
-  // node; the compositor will close the connection when the scene
-  // is published.
-  // If a cycle is introduced then the node will be considered to be blocked
-  // at the point where recursion occurs.  A subsequent rearrangement of
-  // scenes which removes the cycle will unblock the node.
+  // node or which creates a cycle in the graph; the compositor will close
+  // the connection when the scene is published.
   array<uint32>? child_node_ids;
 
   // The drawing operation to apply when processing this node.
@@ -171,9 +206,8 @@ struct SceneNodeOp {
   // It is an error to specify a resource id that does not refer to a scene
   // resource; the compositor will close the connection when the scene
   // is published.
-  // If a cycle is introduced then the node will be considered to be blocked
-  // at the point where recursion occurs.  A subsequent rearrangement of
-  // scenes which removes the cycle will unblock the node.
+  // If a cycle is introduced then the scene will be substituted with
+  // placeholder content by the compositor.
   uint32 scene_resource_id;
 
   // The version of the scene that we would like to reference.

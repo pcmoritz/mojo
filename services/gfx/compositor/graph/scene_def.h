@@ -6,32 +6,38 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_SCENE_DEF_H_
 
 #include <iosfwd>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "base/callback.h"
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
+#include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "services/gfx/compositor/graph/node_def.h"
+#include "services/gfx/compositor/graph/resource_def.h"
+#include "services/gfx/compositor/graph/scene_label.h"
 
 namespace compositor {
 
-class RenderLayer;
-class RenderLayerBuilder;
+class SceneContent;
 class SceneDef;
 class SnapshotBuilder;
 
 // Resolves a scene token to a scene definition.
-using SceneResolver =
-    base::Callback<SceneDef*(mojo::gfx::composition::SceneToken*)>;
+using SceneResolver = base::Callback<base::WeakPtr<SceneDef>(
+    const mojo::gfx::composition::SceneToken&)>;
 
 // Sends a scene unavailable message with the specified resource id.
 using SceneUnavailableSender = base::Callback<void(uint32_t)>;
 
 // Scene definition.
 // Contains all of the resources and nodes of a published scene.
+//
+// TODO(jeffbrown): Consider renaming to |Scene| since there is now an
+// asymmetry between the stateful nature of this class compared with
+// |NodeDef| and |ResourceDef| which are immutable but similarly named.
 class SceneDef {
  public:
   // Outcome of a call to |Present|.
@@ -41,21 +47,19 @@ class SceneDef {
     kFailed,
   };
 
-  SceneDef(mojo::gfx::composition::SceneTokenPtr scene_token,
-           const std::string& label);
+  SceneDef(const SceneLabel& label);
   ~SceneDef();
 
-  // Gets the token used to refer to this scene globally.
-  // Caller does not obtain ownership of the token.
-  mojo::gfx::composition::SceneToken* scene_token() {
-    return scene_token_.get();
+  base::WeakPtr<SceneDef> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
+
+  // Gets the scene label.
+  const SceneLabel& label() const { return label_; }
+  std::string FormattedLabel() const {
+    return label_.FormattedLabelForVersion(version_);
   }
 
   // Gets the currently published scene graph version.
-  uint32_t version() { return version_; }
-
-  // Gets the root node, or nullptr if none.
-  NodeDef* root_node() { return root_node_; }
+  uint32_t version() const { return version_; }
 
   // Enqueues a pending update event to the scene graph.
   void EnqueueUpdate(mojo::gfx::composition::SceneUpdatePtr update);
@@ -81,30 +85,17 @@ class SceneDef {
   bool UnlinkReferencedScene(SceneDef* scene,
                              const SceneUnavailableSender& unavailable_sender);
 
-  // Generates a snapshot of the scene.
-  // Returns true if successful, false if the scene is blocked from rendering.
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder);
-
-  // Finds the resource with the specified id.
-  // Returns nullptr if not found.
-  ResourceDef* FindResource(uint32_t resource_id,
-                            ResourceDef::Type resource_type);
-  SceneResourceDef* FindSceneResource(uint32_t scene_resource_id) {
-    return static_cast<SceneResourceDef*>(
-        FindResource(scene_resource_id, ResourceDef::Type::kScene));
-  }
-  ImageResourceDef* FindImageResource(uint32_t image_resource_id) {
-    return static_cast<ImageResourceDef*>(
-        FindResource(image_resource_id, ResourceDef::Type::kImage));
+  // Finds resources or nodes in the current version, returns nullptr if absent.
+  const ResourceDef* FindResource(uint32_t resource_id) const;
+  const NodeDef* FindNode(uint32_t node_id) const;
+  const NodeDef* FindRootNode() const {
+    return FindNode(mojo::gfx::composition::kSceneRootNodeId);
   }
 
-  // Finds the node with the specified id.
-  // Returns nullptr if not found.
-  NodeDef* FindNode(uint32_t node_id);
-
-  const std::string& label() { return label_; }
-  std::string FormattedLabel();
+  // Finds the most recently presented content of the specified version,
+  // returns nullptr if absent.
+  // If the version is |kSceneVersionNone| returns the current version.
+  const SceneContent* FindContent(uint32_t version) const;
 
  private:
   struct Publication {
@@ -126,42 +117,30 @@ class SceneDef {
                    const SceneResolver& resolver,
                    const SceneUnavailableSender& unavailable_sender,
                    std::ostream& err);
-  bool Validate(std::ostream& err);
 
-  bool SnapshotInner(SnapshotBuilder* snapshot_builder,
-                     RenderLayerBuilder* layer_builder);
-  std::shared_ptr<RenderLayer> SnapshotLayer(SnapshotBuilder* snapshot_builder);
-  void Invalidate();
-  bool HasSceneResources();
+  scoped_refptr<const ResourceDef> CreateResource(
+      uint32_t resource_id,
+      mojo::gfx::composition::ResourcePtr resource_decl,
+      const SceneResolver& resolver,
+      const SceneUnavailableSender& unavailable_sender,
+      std::ostream& err);
+  scoped_refptr<const NodeDef> CreateNode(
+      uint32_t node_id,
+      mojo::gfx::composition::NodePtr node_decl,
+      std::ostream& err);
 
-  ResourceDef* CreateResource(uint32_t resource_id,
-                              mojo::gfx::composition::ResourcePtr resource_decl,
-                              const SceneResolver& resolver,
-                              const SceneUnavailableSender& unavailable_sender,
-                              std::ostream& err);
-  NodeDef* CreateNode(uint32_t node_id,
-                      mojo::gfx::composition::NodePtr node_decl,
-                      std::ostream& err);
-  NodeOp* CreateNodeOp(uint32_t node_id,
-                       mojo::gfx::composition::NodeOpPtr node_op_decl,
-                       std::ostream& err);
+  const SceneLabel label_;
 
-  mojo::gfx::composition::SceneTokenPtr scene_token_;
-  const std::string label_;
-  std::string formatted_label_cache_;
-
-  uint32_t version_ = mojo::gfx::composition::kSceneVersionNone;
   std::vector<mojo::gfx::composition::SceneUpdatePtr> pending_updates_;
   std::vector<std::unique_ptr<Publication>> pending_publications_;
-  std::unordered_map<uint32_t, std::unique_ptr<ResourceDef>> resources_;
-  std::unordered_map<uint32_t, std::unique_ptr<NodeDef>> nodes_;
-  NodeDef* root_node_ = nullptr;
 
-  std::shared_ptr<RenderLayer> cached_layer_;
+  uint32_t version_ = mojo::gfx::composition::kSceneVersionNone;
+  std::unordered_map<uint32_t, scoped_refptr<const ResourceDef>> resources_;
+  std::unordered_map<uint32_t, scoped_refptr<const NodeDef>> nodes_;
 
-  // Used to detect cycles during a snapshot operation.
-  // This is safe because the object will only be used by a single thread.
-  bool visited_ = false;
+  scoped_refptr<const SceneContent> content_;
+
+  base::WeakPtrFactory<SceneDef> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(SceneDef);
 };

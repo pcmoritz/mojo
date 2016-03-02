@@ -8,6 +8,8 @@
 #include <memory>
 
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
+#include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/resources.mojom.h"
 #include "services/gfx/compositor/render/render_image.h"
 
@@ -16,39 +18,53 @@ namespace compositor {
 class SceneDef;
 
 // Abstract scene graph resource definition.
-class ResourceDef {
+//
+// Instances of this class are immutable and reference counted so they may
+// be shared by multiple versions of the same scene.
+class ResourceDef : public base::RefCounted<ResourceDef> {
  public:
   enum class Type { kScene, kImage };
 
-  ResourceDef() = default;
-  virtual ~ResourceDef() = default;
+  ResourceDef();
 
   // Gets the resource type.
   virtual Type type() const = 0;
+
+ protected:
+  friend class base::RefCounted<ResourceDef>;
+  virtual ~ResourceDef();
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ResourceDef);
 };
 
 // Reference to another scene expressed as a resource definition.
-// The pointer may be null if the referenced scene has become unavailable.
 class SceneResourceDef : public ResourceDef {
  public:
-  explicit SceneResourceDef(SceneDef* referenced_scene);
-  ~SceneResourceDef() override;
+  explicit SceneResourceDef(
+      const mojo::gfx::composition::SceneToken& scene_token,
+      const base::WeakPtr<SceneDef>& referenced_scene);
 
   Type type() const override;
 
-  // The referenced scene, may be null if unavailable.
-  SceneDef* referenced_scene() { return referenced_scene_; }
+  const mojo::gfx::composition::SceneToken& scene_token() const {
+    return scene_token_;
+  }
 
-  // Clears the referenced scene.
-  // This is called by |SceneDef::UnlinkReferencedScene| when the
-  // referenced scene is no longer available.
-  void clear_referenced_scene() { referenced_scene_ = nullptr; }
+  // The referenced scene, may be null if the scene is unavailable.
+  const base::WeakPtr<SceneDef>& referenced_scene() const {
+    return referenced_scene_;
+  }
+
+  // Returns a copy of the resource without its referenced scene.
+  scoped_refptr<const SceneResourceDef> Unlink() const;
+
+ protected:
+  ~SceneResourceDef() override;
 
  private:
-  SceneDef* referenced_scene_;
+  mojo::gfx::composition::SceneToken scene_token_;
+  base::WeakPtr<SceneDef> referenced_scene_;
 
   DISALLOW_COPY_AND_ASSIGN(SceneResourceDef);
 };
@@ -57,12 +73,14 @@ class SceneResourceDef : public ResourceDef {
 class ImageResourceDef : public ResourceDef {
  public:
   explicit ImageResourceDef(const std::shared_ptr<RenderImage>& image);
-  ~ImageResourceDef() override;
 
   Type type() const override;
 
-  // The referenced image, may be null if unavailable.
-  const std::shared_ptr<RenderImage>& image() { return image_; }
+  // The referenced image, never null.
+  const std::shared_ptr<RenderImage>& image() const { return image_; }
+
+ protected:
+  ~ImageResourceDef() override;
 
  private:
   std::shared_ptr<RenderImage> image_;

@@ -6,159 +6,153 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_NODE_DEF_H_
 
 #include <iosfwd>
-#include <memory>
-#include <string>
 #include <vector>
 
-#include "base/callback.h"
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
 #include "mojo/services/gfx/composition/interfaces/nodes.mojom.h"
-#include "services/gfx/compositor/graph/resource_def.h"
+#include "services/gfx/compositor/graph/snapshot.h"
+
+class SkCanvas;
 
 namespace compositor {
 
-class RenderImage;
-class RenderLayerBuilder;
+class SceneContent;
+class SceneContentBuilder;
 class SceneDef;
-class SnapshotBuilder;
-class NodeOp;
 
-// Scene graph node definition.
-class NodeDef {
+// Represents a scene graph node.
+//
+// The base class mainly acts as a container for other nodes and does not
+// draw any content of its own.
+//
+// Instances of this class are immutable and reference counted so they may
+// be shared by multiple versions of the same scene.
+class NodeDef : public base::RefCounted<NodeDef> {
  public:
   using Combinator = mojo::gfx::composition::Node::Combinator;
 
   NodeDef(uint32_t node_id,
           mojo::TransformPtr content_transform,
           mojo::RectPtr content_clip,
-          uint32_t hit_id,
           Combinator combinator,
-          const std::vector<uint32_t>& child_node_ids,
-          NodeOp* op);
-  ~NodeDef();
+          const std::vector<uint32_t>& child_node_ids);
 
-  uint32_t node_id() { return node_id_; }
-  const mojo::Transform* content_transform() {
+  uint32_t node_id() const { return node_id_; }
+  const mojo::Transform* content_transform() const {
     return content_transform_.get();
   }
-  const mojo::Rect* content_clip() { return content_clip_.get(); }
-  uint32_t hit_id() { return hit_id_; }
-  Combinator combinator() { return combinator_; }
-  const std::vector<uint32_t>& child_node_ids() { return child_node_ids_; }
-  NodeOp* op() { return op_.get(); }
+  const mojo::Rect* content_clip() const { return content_clip_.get(); }
+  Combinator combinator() const { return combinator_; }
+  const std::vector<uint32_t>& child_node_ids() const {
+    return child_node_ids_;
+  }
 
-  std::string FormattedLabel(SceneDef* scene);
+  // Gets a descriptive label.
+  std::string FormattedLabel(const SceneContent* content) const;
 
-  // Updated by |Validate()|.
-  const std::vector<NodeDef*>& child_nodes() { return child_nodes_; }
+  // Called by the scene content builder to traverse the node's dependencies
+  // recursively and ensure they are included in the scene's local content.
+  // Returns true if successful, false if the node contains linkage errors.
+  virtual bool RecordContent(SceneContentBuilder* builder) const;
 
-  // Validates and prepares the object for rendering.
-  // Returns true if successful, false if errors were reported.
-  bool Validate(SceneDef* scene, std::ostream& err);
+  // Called by the snapshot builder to traverse the node's dependencies
+  // recursively follow links into other scenes, evaluate whether the
+  // node can be rendered, and record which path was taken for the purposes
+  // of satisfying combinators.
+  virtual Snapshot::Disposition RecordSnapshot(const SceneContent* content,
+                                               SnapshotBuilder* builder) const;
 
-  // Generates a snapshot of the node into the specified builder.
-  // Returns true if successful, false if the node is blocked from rendering.
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder,
-                SceneDef* scene);
+  // Called to record drawing commands from a snapshot.
+  void RecordPicture(const SceneContent* content,
+                     const Snapshot* snapshot,
+                     SkCanvas* canvas) const;
 
-  // Generates a snapshot of the node's children into the specified builder.
-  // Returns true if successful, false if the children are blocked from
-  // rendering.
-  bool SnapshotChildren(SnapshotBuilder* snapshot_builder,
-                        RenderLayerBuilder* layer_builder,
-                        SceneDef* scene);
+ protected:
+  friend class base::RefCounted<NodeDef>;
+  virtual ~NodeDef();
+
+  // Applies a unary function to the children selected by the node's
+  // combinator rule during a snapshot.
+  // Stops when |Func| returns false.
+  // |Func| should have the signature |bool func(const NodeDef*)|.
+  template <typename Func>
+  void TraverseSnapshottedChildren(const SceneContent* content,
+                                   const Snapshot* snapshot,
+                                   const Func& func) const;
+
+  virtual void RecordPictureInner(const SceneContent* content,
+                                  const Snapshot* snapshot,
+                                  SkCanvas* canvas) const;
 
  private:
-  bool SnapshotInner(SnapshotBuilder* snapshot_builder,
-                     RenderLayerBuilder* layer_builder,
-                     SceneDef* scene);
-
-  uint32_t node_id_;
+  uint32_t const node_id_;
   mojo::TransformPtr const content_transform_;
   mojo::RectPtr const content_clip_;
-  uint32_t const hit_id_;
   Combinator const combinator_;
   std::vector<uint32_t> const child_node_ids_;
-  std::unique_ptr<NodeOp> const op_;
-
-  std::vector<NodeDef*> child_nodes_;
-
-  // Used to detect cycles during a snapshot operation.
-  // This is safe because the object will only be used by a single thread.
-  bool visited_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(NodeDef);
 };
 
-// Abstract scene graph node operation.
-class NodeOp {
+// Represents a rectangle node.
+//
+// Draws a solid color filled rectangle node underneath its children.
+class RectNodeDef : public NodeDef {
  public:
-  NodeOp() = default;
-  virtual ~NodeOp() = default;
+  RectNodeDef(uint32_t node_id,
+              mojo::TransformPtr content_transform,
+              mojo::RectPtr content_clip,
+              Combinator combinator,
+              const std::vector<uint32_t>& child_node_ids,
+              const mojo::Rect& content_rect,
+              const mojo::gfx::composition::Color& color);
 
-  // Validates and prepares the object for rendering.
-  // Returns true if successful, false if errors were reported.
-  virtual bool Validate(SceneDef* scene, NodeDef* node, std::ostream& err);
+  const mojo::Rect& content_rect() const { return content_rect_; }
+  const mojo::gfx::composition::Color& color() const { return color_; }
 
-  // Generates a snapshot of the node operation into the specified builder.
-  // This method is responsible for calling |SnapshotChildren| to process
-  // the children of the node.  Returns true if successful, false if the node
-  // is blocked from rendering.
-  virtual bool Snapshot(SnapshotBuilder* snapshot_builder,
-                        RenderLayerBuilder* layer_builder,
-                        SceneDef* scene,
-                        NodeDef* node) = 0;
+ protected:
+  ~RectNodeDef() override;
+
+  void RecordPictureInner(const SceneContent* content,
+                          const Snapshot* snapshot,
+                          SkCanvas* canvas) const override;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(NodeOp);
+  mojo::Rect const content_rect_;
+  mojo::gfx::composition::Color const color_;
+
+  DISALLOW_COPY_AND_ASSIGN(RectNodeDef);
 };
 
-// A solid color filled rectangle node definition.
-class RectNodeOp : public NodeOp {
+// Represents an image node.
+//
+// Draws an image filled rectangle underneath its children.
+class ImageNodeDef : public NodeDef {
  public:
-  RectNodeOp(const mojo::Rect& content_rect,
-             const mojo::gfx::composition::Color& color);
-  ~RectNodeOp() override;
+  ImageNodeDef(uint32_t node_id,
+               mojo::TransformPtr content_transform,
+               mojo::RectPtr content_clip,
+               Combinator combinator,
+               const std::vector<uint32_t>& child_node_ids,
+               const mojo::Rect& content_rect,
+               mojo::RectPtr image_rect,
+               uint32 image_resource_id,
+               mojo::gfx::composition::BlendPtr blend);
 
-  const mojo::Rect& content_rect() { return content_rect_; }
-  const mojo::gfx::composition::Color& color() { return color_; }
+  const mojo::Rect& content_rect() const { return content_rect_; }
+  const mojo::Rect* image_rect() const { return image_rect_.get(); }
+  uint32_t image_resource_id() const { return image_resource_id_; }
+  const mojo::gfx::composition::Blend* blend() const { return blend_.get(); }
 
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder,
-                SceneDef* scene,
-                NodeDef* node) override;
+  bool RecordContent(SceneContentBuilder* builder) const override;
 
- private:
-  mojo::Rect content_rect_;
-  mojo::gfx::composition::Color color_;
+ protected:
+  ~ImageNodeDef() override;
 
-  DISALLOW_COPY_AND_ASSIGN(RectNodeOp);
-};
-
-// An image filled rectangle node definition.
-class ImageNodeOp : public NodeOp {
- public:
-  ImageNodeOp(const mojo::Rect& content_rect,
-              mojo::RectPtr image_rect,
-              uint32 image_resource_id,
-              mojo::gfx::composition::BlendPtr blend);
-  ~ImageNodeOp() override;
-
-  const mojo::Rect& content_rect() { return content_rect_; }
-  mojo::Rect* image_rect() { return image_rect_.get(); }
-  uint32_t image_resource_id() { return image_resource_id_; }
-  mojo::gfx::composition::Blend* blend() { return blend_.get(); }
-
-  // Updated by |Validate()|.
-  ImageResourceDef* image_resource() { return image_resource_; }
-
-  bool Validate(SceneDef* scene, NodeDef* node, std::ostream& err) override;
-
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder,
-                SceneDef* scene,
-                NodeDef* node) override;
+  void RecordPictureInner(const SceneContent* content,
+                          const Snapshot* snapshot,
+                          SkCanvas* canvas) const override;
 
  private:
   mojo::Rect const content_rect_;
@@ -166,58 +160,72 @@ class ImageNodeOp : public NodeOp {
   uint32_t const image_resource_id_;
   mojo::gfx::composition::BlendPtr const blend_;
 
-  ImageResourceDef* image_resource_ = nullptr;
-
-  DISALLOW_COPY_AND_ASSIGN(ImageNodeOp);
+  DISALLOW_COPY_AND_ASSIGN(ImageNodeDef);
 };
 
-// An embedded scene node definition.
-class SceneNodeOp : public NodeOp {
+// Represents a scene node.
+//
+// Draws an embedded scene underneath its children.
+class SceneNodeDef : public NodeDef {
  public:
-  SceneNodeOp(uint32_t scene_resource_id, uint32_t scene_version);
-  ~SceneNodeOp() override;
+  SceneNodeDef(uint32_t node_id,
+               mojo::TransformPtr content_transform,
+               mojo::RectPtr content_clip,
+               Combinator combinator,
+               const std::vector<uint32_t>& child_node_ids,
+               uint32_t scene_resource_id,
+               uint32_t scene_version);
 
-  uint32_t scene_resource_id() { return scene_resource_id_; }
-  uint32_t scene_version() { return scene_version_; }
+  uint32_t scene_resource_id() const { return scene_resource_id_; }
+  uint32_t scene_version() const { return scene_version_; }
 
-  // Updated by |Validate()|.
-  SceneResourceDef* scene_resource() { return scene_resource_; }
+  bool RecordContent(SceneContentBuilder* builder) const override;
 
-  bool Validate(SceneDef* scene, NodeDef* node, std::ostream& err) override;
+  Snapshot::Disposition RecordSnapshot(const SceneContent* content,
+                                       SnapshotBuilder* builder) const override;
 
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder,
-                SceneDef* scene,
-                NodeDef* node) override;
+ protected:
+  ~SceneNodeDef() override;
+
+  void RecordPictureInner(const SceneContent* content,
+                          const Snapshot* snapshot,
+                          SkCanvas* canvas) const override;
 
  private:
   uint32_t const scene_resource_id_;
   uint32_t const scene_version_;
 
-  SceneResourceDef* scene_resource_ = nullptr;
-
-  DISALLOW_COPY_AND_ASSIGN(SceneNodeOp);
+  DISALLOW_COPY_AND_ASSIGN(SceneNodeDef);
 };
 
-// A composited layer node definition.
-class LayerNodeOp : public NodeOp {
+// Represents a layer node.
+//
+// Composites its children to a layer and applies a blending operation.
+class LayerNodeDef : public NodeDef {
  public:
-  LayerNodeOp(const mojo::Size& size, mojo::gfx::composition::BlendPtr blend);
-  ~LayerNodeOp() override;
+  LayerNodeDef(uint32_t node_id,
+               mojo::TransformPtr content_transform,
+               mojo::RectPtr content_clip,
+               Combinator combinator,
+               const std::vector<uint32_t>& child_node_ids,
+               const mojo::Size& size,
+               mojo::gfx::composition::BlendPtr blend);
 
-  const mojo::Size& size() { return size_; }
-  mojo::gfx::composition::Blend* blend() { return blend_.get(); }
+  const mojo::Size& size() const { return size_; }
+  const mojo::gfx::composition::Blend* blend() const { return blend_.get(); }
 
-  bool Snapshot(SnapshotBuilder* snapshot_builder,
-                RenderLayerBuilder* layer_builder,
-                SceneDef* scene,
-                NodeDef* node) override;
+ protected:
+  ~LayerNodeDef() override;
+
+  void RecordPictureInner(const SceneContent* content,
+                          const Snapshot* snapshot,
+                          SkCanvas* canvas) const override;
 
  private:
   mojo::Size const size_;
   mojo::gfx::composition::BlendPtr const blend_;
 
-  DISALLOW_COPY_AND_ASSIGN(LayerNodeOp);
+  DISALLOW_COPY_AND_ASSIGN(LayerNodeDef);
 };
 
 }  // namespace compositor

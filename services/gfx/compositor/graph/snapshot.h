@@ -7,15 +7,20 @@
 
 #include <iosfwd>
 #include <memory>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
 #include "mojo/services/geometry/interfaces/geometry.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 
 namespace compositor {
 
+class NodeDef;
 class SceneDef;
+class SceneContent;
+class SceneNodeDef;
 class RenderFrame;
 
 // Describes a single frame snapshot of the scene graph, sufficient for
@@ -33,9 +38,16 @@ class RenderFrame;
 //
 // Snapshot objects are not thread-safe since they have direct references to
 // the scene graph definition.  However, the snapshot's frame is thread-safe
-// and is intended to be shared by other components.
+// and is intended to be sent to the backend rasterizer.
 class Snapshot {
  public:
+  // Describes the result of a snapshot operation.
+  enum class Disposition {
+    kSuccess,  // The snapshot was successful.
+    kBlocked,  // The node was blocked from rendering.
+    kCycle,    // The node was blocked due to a cycle, must unwind fully.
+  };
+
   ~Snapshot();
 
   // Returns true if the snapshot is valid.
@@ -61,28 +73,53 @@ class Snapshot {
   //
   // Returns true if the snapshot became invalid as a result of this operation,
   // or false if it was already invalid.
-  bool InvalidateScene(SceneDef* scene_def);
+  bool InvalidateScene(const SceneDef* scene_def);
+
+  // Returns true if the specified node was blocked from rendering.
+  // Only meaningful while the snapshot is valid.
+  bool IsBlocked(const NodeDef* node) const;
+
+  // Gets the scene content which was resolved by following a scene node link.
+  // Only meaningful while the snapshot is valid.
+  const SceneContent* GetResolvedSceneContent(
+      const SceneNodeDef* scene_node) const;
 
  private:
   friend class SnapshotBuilder;
 
   Snapshot();
 
-  std::unordered_set<SceneDef*> dependencies_;
+  void ClearContent();
+
+  // Just the set of dependent scene tokens.  Used for invalidation.
+  std::unordered_set<uint32_t> dependencies_;
+
+  // The root scene in the graph.
+  // This reference together with |resolved_scenes| retains all of the
+  // nodes used by the snapshot so that we can use bare pointers for nodes
+  // and avoid excess reference counting overhead in other data structures.
+  scoped_refptr<const SceneContent> root_scene_content_;
+
+  // Map of scenes which were resolved from scene nodes.
+  std::unordered_map<const SceneNodeDef*, scoped_refptr<const SceneContent>>
+      resolved_scene_contents_;
+
+  // Node states, true if snapshotted successfully, false if blocked.
+  std::unordered_map<const NodeDef*, Disposition> node_dispositions_;
+
+  // A frame ready to be rendered.
   std::shared_ptr<RenderFrame> frame_;
+
+  // True if the snapshot is still valid.
   bool valid_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(Snapshot);
 };
 
-// Builder for snapshots.
+// Builds a table of all of the state which will be required for rendering
+// a scene graph.
 class SnapshotBuilder {
  public:
-  // Creates a snapshot builder.
-  //
-  // |block_log|, if not null, the snapshotter will append information to
-  // this stream describing the parts of the scene graph for which
-  // composition was blocked.
   explicit SnapshotBuilder(std::ostream* block_log);
   ~SnapshotBuilder();
 
@@ -90,18 +127,38 @@ class SnapshotBuilder {
   // describing the parts of the scene graph for which composition was blocked.
   std::ostream* block_log() { return block_log_; }
 
-  // Adds a scene dependency to the snapshot.
-  void AddSceneDependency(SceneDef* scene);
+  // Snapshots the requested node.
+  Snapshot::Disposition SnapshotNode(const NodeDef* node,
+                                     const SceneContent* content);
+
+  // Snapshots the requested scene.
+  Snapshot::Disposition SnapshotScene(const SceneDef* scene,
+                                      uint32_t version,
+                                      const SceneNodeDef* referrer_node,
+                                      const SceneContent* referrer_content);
 
   // Builds a snapshot rooted at the specified scene.
   std::unique_ptr<Snapshot> Build(
-      SceneDef* root_scene,
+      const SceneDef* root_scene,
       const mojo::Rect& viewport,
       const mojo::gfx::composition::FrameInfo& frame_info);
 
  private:
+  // Snapshots the root scene of a renderer.
+  // This is just like |SnapshotScene| but the errors are reported a little
+  // differently since there is no referrer node.
+  Snapshot::Disposition SnapshotRenderer(const SceneDef* scene);
+
+  // Snapshots the root node of a scene and detects cycles.
+  // This is just like |SnapshotNode| but performs cycle detection which
+  // isn't otherwise needed.
+  Snapshot::Disposition SnapshotRootAndDetectCycles(
+      const NodeDef* node,
+      const SceneContent* content);
+
   std::ostream* const block_log_;
   std::unique_ptr<Snapshot> snapshot_;
+  const SceneContent* cycle_ = nullptr;  // point where a cycle was detected
 
   DISALLOW_COPY_AND_ASSIGN(SnapshotBuilder);
 };

@@ -34,8 +34,8 @@ class SceneState {
 
   // Gets the token used to refer to this scene globally.
   // Caller does not obtain ownership of the token.
-  mojo::gfx::composition::SceneToken* scene_token() {
-    return scene_def_.scene_token();
+  const mojo::gfx::composition::SceneToken* scene_token() {
+    return scene_token_.get();
   }
 
   // Gets or sets the scene listener interface.
@@ -58,10 +58,8 @@ class SceneState {
   void DispatchSceneFrameCallbacks(
       const mojo::gfx::composition::FrameInfo& frame_info);
 
-  const std::string& label() { return scene_def_.label(); }
-  std::string FormattedLabel() { return scene_def_.FormattedLabel(); }
-
  private:
+  mojo::gfx::composition::SceneTokenPtr scene_token_;
   std::unique_ptr<mojo::gfx::composition::Scene> scene_impl_;
   mojo::gfx::composition::SceneListenerPtr scene_listener_;
   std::vector<SceneFrameCallback> pending_frame_callbacks_;

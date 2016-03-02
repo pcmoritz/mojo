@@ -4,14 +4,19 @@
 
 #include "services/gfx/compositor/graph/node_def.h"
 
+#include <ostream>
+
 #include "base/logging.h"
-#include "base/strings/stringprintf.h"
 #include "mojo/services/gfx/composition/cpp/formatting.h"
 #include "mojo/skia/type_converters.h"
+#include "services/gfx/compositor/graph/scene_content.h"
 #include "services/gfx/compositor/graph/scene_def.h"
 #include "services/gfx/compositor/graph/snapshot.h"
 #include "services/gfx/compositor/render/render_image.h"
-#include "services/gfx/compositor/render/render_layer.h"
+#include "third_party/skia/include/core/SkCanvas.h"
+#include "third_party/skia/include/core/SkColor.h"
+#include "third_party/skia/include/core/SkPaint.h"
+#include "third_party/skia/include/core/SkRect.h"
 
 namespace compositor {
 namespace {
@@ -19,306 +24,388 @@ SkColor MakeSkColor(const mojo::gfx::composition::Color& color) {
   return SkColorSetARGBInline(color.alpha, color.red, color.green, color.blue);
 }
 
-SkPaint MakePaintForBlend(const mojo::gfx::composition::Blend& blend) {
-  SkPaint result;
-  result.setAlpha(blend.alpha);
-  return result;
+void SetPaintForBlend(SkPaint* paint, mojo::gfx::composition::Blend* blend) {
+  DCHECK(paint);
+  if (blend)
+    paint->setAlpha(blend->alpha);
 }
 }  // namespace
 
 NodeDef::NodeDef(uint32_t node_id,
                  mojo::TransformPtr content_transform,
                  mojo::RectPtr content_clip,
-                 uint32_t hit_id,
                  Combinator combinator,
-                 const std::vector<uint32_t>& child_node_ids,
-                 NodeOp* op)
+                 const std::vector<uint32_t>& child_node_ids)
     : node_id_(node_id),
       content_transform_(content_transform.Pass()),
       content_clip_(content_clip.Pass()),
-      hit_id_(hit_id),
       combinator_(combinator),
-      child_node_ids_(child_node_ids),
-      op_(op) {}
+      child_node_ids_(child_node_ids) {}
 
 NodeDef::~NodeDef() {}
 
-bool NodeDef::Validate(SceneDef* scene, std::ostream& err) {
-  child_nodes_.clear();
-  for (uint32_t child_node_id : child_node_ids_) {
-    NodeDef* child_node = scene->FindNode(child_node_id);
-    if (!child_node) {
-      err << "Node refers to unknown child: " << FormattedLabel(scene)
-          << ", child_node_id=" << child_node_id;
+std::string NodeDef::FormattedLabel(const SceneContent* content) const {
+  return content->FormattedLabelForNode(node_id_);
+}
+
+bool NodeDef::RecordContent(SceneContentBuilder* builder) const {
+  DCHECK(builder);
+
+  for (const auto& child_node_id : child_node_ids_) {
+    if (!builder->RequireNode(child_node_id, node_id_))
       return false;
-    }
-    child_nodes_.push_back(child_node);
   }
-
-  return !op_ || op_->Validate(scene, this, err);
-}
-
-bool NodeDef::Snapshot(SnapshotBuilder* snapshot_builder,
-                       RenderLayerBuilder* layer_builder,
-                       SceneDef* scene) {
-  DCHECK(snapshot_builder);
-  DCHECK(layer_builder);
-  DCHECK(scene);
-
-  // Detect cycles.
-  if (visited_) {
-    if (snapshot_builder->block_log()) {
-      *snapshot_builder->block_log()
-          << "Node blocked due to recursive cycle: " << FormattedLabel(scene)
-          << std::endl;
-    }
-    return false;
-  }
-
-  // Snapshot the contents of the node.
-  visited_ = true;
-  bool success = SnapshotInner(snapshot_builder, layer_builder, scene);
-  visited_ = false;
-  return success;
-}
-
-bool NodeDef::SnapshotInner(SnapshotBuilder* snapshot_builder,
-                            RenderLayerBuilder* layer_builder,
-                            SceneDef* scene) {
-  // TODO(jeffbrown): Frequently referenced and reused nodes, especially
-  // layer nodes, may benefit from caching.
-  layer_builder->PushNode(node_id_, hit_id_);
-  if (content_transform_)
-    layer_builder->ApplyTransform(content_transform_.To<SkMatrix>());
-  if (content_clip_)
-    layer_builder->ApplyClip(content_clip_->To<SkRect>());
-
-  bool success =
-      op_ ? op_->Snapshot(snapshot_builder, layer_builder, scene, this)
-          : SnapshotChildren(snapshot_builder, layer_builder, scene);
-  if (!success)
-    return false;
-
-  layer_builder->PopNode();
   return true;
 }
 
-bool NodeDef::SnapshotChildren(SnapshotBuilder* snapshot_builder,
-                               RenderLayerBuilder* layer_builder,
-                               SceneDef* scene) {
-  DCHECK(snapshot_builder);
-  DCHECK(layer_builder);
-  DCHECK(scene);
+Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
+                                              SnapshotBuilder* builder) const {
+  DCHECK(content);
+  DCHECK(builder);
 
   switch (combinator_) {
     // MERGE: All or nothing.
     case Combinator::MERGE: {
-      for (NodeDef* child_node : child_nodes_) {
-        if (!child_node->Snapshot(snapshot_builder, layer_builder, scene)) {
-          if (snapshot_builder->block_log()) {
-            *snapshot_builder->block_log()
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        Snapshot::Disposition disposition =
+            builder->SnapshotNode(child_node, content);
+        if (disposition == Snapshot::Disposition::kCycle)
+          return disposition;
+        if (disposition == Snapshot::Disposition::kBlocked) {
+          if (builder->block_log()) {
+            *builder->block_log()
                 << "Node with MERGE combinator blocked since "
                    "one of its children is blocked: "
-                << FormattedLabel(scene) << ", blocked child "
-                << child_node->FormattedLabel(scene) << std::endl;
+                << FormattedLabel(content) << ", blocked child "
+                << child_node->FormattedLabel(content) << std::endl;
           }
-          return false;  // blocked
+          return disposition;
         }
       }
-      return true;
+      return Snapshot::Disposition::kSuccess;
     }
 
     // PRUNE: Silently discard blocked children.
     case Combinator::PRUNE: {
-      for (NodeDef* child_node : child_nodes_) {
-        RenderLayerBuilder child_layer_builder;
-        if (child_node->Snapshot(snapshot_builder, &child_layer_builder,
-                                 scene)) {
-          layer_builder->DrawLayer(child_layer_builder.Build());
-        }
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        Snapshot::Disposition disposition =
+            builder->SnapshotNode(child_node, content);
+        if (disposition == Snapshot::Disposition::kCycle)
+          return disposition;
       }
-      return true;
+      return Snapshot::Disposition::kSuccess;
     }
 
     // FALLBACK: Keep only the first unblocked child.
     case Combinator::FALLBACK: {
-      if (child_nodes_.empty())
-        return true;
-      for (NodeDef* child_node : child_nodes_) {
-        RenderLayerBuilder child_layer_builder;
-        if (child_node->Snapshot(snapshot_builder, &child_layer_builder,
-                                 scene)) {
-          layer_builder->DrawLayer(child_layer_builder.Build());
-          return true;
-        }
+      if (child_node_ids_.empty())
+        return Snapshot::Disposition::kSuccess;
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        Snapshot::Disposition disposition =
+            builder->SnapshotNode(child_node, content);
+        if (disposition != Snapshot::Disposition::kBlocked)
+          return disposition;
       }
-      if (snapshot_builder->block_log()) {
-        *snapshot_builder->block_log()
-            << "Node with FALLBACK combinator blocked since "
-               "all of its children are blocked: "
-            << FormattedLabel(scene) << std::endl;
+      if (builder->block_log()) {
+        *builder->block_log() << "Node with FALLBACK combinator blocked since "
+                                 "all of its children are blocked: "
+                              << FormattedLabel(content) << std::endl;
       }
-      return false;  // blocked
+      return Snapshot::Disposition::kBlocked;
     }
 
     default: {
-      if (snapshot_builder->block_log()) {
-        *snapshot_builder->block_log()
-            << "Unrecognized combinator: " << FormattedLabel(scene)
+      if (builder->block_log()) {
+        *builder->block_log()
+            << "Unrecognized combinator: " << FormattedLabel(content)
             << std::endl;
       }
-      return false;
+      return Snapshot::Disposition::kBlocked;
     }
   }
 }
 
-std::string NodeDef::FormattedLabel(SceneDef* scene) {
-  return base::StringPrintf("%s[%d]", scene->FormattedLabel().c_str(),
-                            node_id_);
+template <typename Func>
+void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
+                                          const Snapshot* snapshot,
+                                          const Func& func) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+
+  switch (combinator_) {
+    // MERGE: All or nothing.
+    case Combinator::MERGE: {
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        DCHECK(!snapshot->IsBlocked(child_node));
+        if (!func(child_node))
+          return;
+      }
+      return;
+    }
+
+    // PRUNE: Silently discard blocked children.
+    case Combinator::PRUNE: {
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        if (!snapshot->IsBlocked(child_node) && !func(child_node))
+          return;
+      }
+      return;
+    }
+
+    // FALLBACK: Keep only the first unblocked child.
+    case Combinator::FALLBACK: {
+      if (child_node_ids_.empty())
+        return;
+      for (uint32_t child_node_id : child_node_ids_) {
+        const NodeDef* child_node = content->GetNode(child_node_id);
+        DCHECK(child_node);
+        if (!snapshot->IsBlocked(child_node)) {
+          func(child_node);  // don't care about the result because we
+          return;            // always stop after the first one
+        }
+      }
+      NOTREACHED();
+      return;
+    }
+
+    default: {
+      NOTREACHED();
+      return;
+    }
+  }
 }
 
-bool NodeOp::Validate(SceneDef* scene, NodeDef* node, std::ostream& err) {
-  return true;
+void NodeDef::RecordPicture(const SceneContent* content,
+                            const Snapshot* snapshot,
+                            SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
+
+  const bool must_save = content_transform_ || content_clip_;
+  if (must_save) {
+    canvas->save();
+    if (content_transform_)
+      canvas->concat(content_transform_.To<SkMatrix>());
+    if (content_clip_)
+      canvas->clipRect(content_clip_->To<SkRect>());
+  }
+
+  RecordPictureInner(content, snapshot, canvas);
+
+  if (must_save)
+    canvas->restore();
 }
 
-RectNodeOp::RectNodeOp(const mojo::Rect& content_rect,
-                       const mojo::gfx::composition::Color& color)
-    : content_rect_(content_rect), color_(color) {}
+void NodeDef::RecordPictureInner(const SceneContent* content,
+                                 const Snapshot* snapshot,
+                                 SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
 
-RectNodeOp::~RectNodeOp() {}
+  TraverseSnapshottedChildren(
+      content, snapshot,
+      [this, content, snapshot, canvas](const NodeDef* child_node) -> bool {
+        child_node->RecordPicture(content, snapshot, canvas);
+        return true;
+      });
+}
 
-bool RectNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
-                          RenderLayerBuilder* layer_builder,
-                          SceneDef* scene,
-                          NodeDef* node) {
+RectNodeDef::RectNodeDef(uint32_t node_id,
+                         mojo::TransformPtr content_transform,
+                         mojo::RectPtr content_clip,
+                         Combinator combinator,
+                         const std::vector<uint32_t>& child_node_ids,
+                         const mojo::Rect& content_rect,
+                         const mojo::gfx::composition::Color& color)
+    : NodeDef(node_id,
+              content_transform.Pass(),
+              content_clip.Pass(),
+              combinator,
+              child_node_ids),
+      content_rect_(content_rect),
+      color_(color) {}
+
+RectNodeDef::~RectNodeDef() {}
+
+void RectNodeDef::RecordPictureInner(const SceneContent* content,
+                                     const Snapshot* snapshot,
+                                     SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
+
   SkPaint paint;
   paint.setColor(MakeSkColor(color_));
-  layer_builder->DrawRect(content_rect_.To<SkRect>(), paint);
+  canvas->drawRect(content_rect_.To<SkRect>(), paint);
 
-  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
+  NodeDef::RecordPictureInner(content, snapshot, canvas);
 }
 
-ImageNodeOp::ImageNodeOp(const mojo::Rect& content_rect,
-                         mojo::RectPtr image_rect,
-                         uint32 image_resource_id,
-                         mojo::gfx::composition::BlendPtr blend)
-    : content_rect_(content_rect),
+ImageNodeDef::ImageNodeDef(uint32_t node_id,
+                           mojo::TransformPtr content_transform,
+                           mojo::RectPtr content_clip,
+                           Combinator combinator,
+                           const std::vector<uint32_t>& child_node_ids,
+                           const mojo::Rect& content_rect,
+                           mojo::RectPtr image_rect,
+                           uint32 image_resource_id,
+                           mojo::gfx::composition::BlendPtr blend)
+    : NodeDef(node_id,
+              content_transform.Pass(),
+              content_clip.Pass(),
+              combinator,
+              child_node_ids),
+      content_rect_(content_rect),
       image_rect_(image_rect.Pass()),
       image_resource_id_(image_resource_id),
       blend_(blend.Pass()) {}
 
-ImageNodeOp::~ImageNodeOp() {}
+ImageNodeDef::~ImageNodeDef() {}
 
-bool ImageNodeOp::Validate(SceneDef* scene, NodeDef* node, std::ostream& err) {
-  image_resource_ = scene->FindImageResource(image_resource_id_);
-  if (!image_resource_) {
-    err << "Node refers to unknown or invalid image resource: "
-        << node->FormattedLabel(scene)
-        << ", image_resource_id=" << image_resource_id_;
-    return false;
-  }
-  return true;
+bool ImageNodeDef::RecordContent(SceneContentBuilder* builder) const {
+  DCHECK(builder);
+
+  return NodeDef::RecordContent(builder) &&
+         builder->RequireResource(image_resource_id_, ResourceDef::Type::kImage,
+                                  node_id());
 }
 
-bool ImageNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
-                           RenderLayerBuilder* layer_builder,
-                           SceneDef* scene,
-                           NodeDef* node) {
-  DCHECK(image_resource_);
+void ImageNodeDef::RecordPictureInner(const SceneContent* content,
+                                      const Snapshot* snapshot,
+                                      SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
 
-  if (!image_resource_->image()) {
-    if (snapshot_builder->block_log()) {
-      *snapshot_builder->block_log()
-          << "Node blocked due to its referenced image "
-             "resource being unavailable: "
-          << node->FormattedLabel(scene) << std::endl;
-    }
-    return false;
-  }
+  auto image_resource = static_cast<const ImageResourceDef*>(
+      content->GetResource(image_resource_id_, ResourceDef::Type::kImage));
+  DCHECK(image_resource);
 
-  layer_builder->DrawImage(
-      image_resource_->image(), content_rect_.To<SkRect>(),
-      image_rect_ ? image_rect_->To<SkRect>()
-                  : SkRect::MakeWH(image_resource_->image()->width(),
-                                   image_resource_->image()->height()),
-      blend_ ? MakePaintForBlend(*blend_) : SkPaint());
+  SkPaint paint;
+  SetPaintForBlend(&paint, blend_.get());
 
-  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
+  canvas->drawImageRect(image_resource->image()->image().get(),
+                        image_rect_
+                            ? image_rect_->To<SkRect>()
+                            : SkRect::MakeWH(image_resource->image()->width(),
+                                             image_resource->image()->height()),
+                        content_rect_.To<SkRect>(), &paint);
+
+  NodeDef::RecordPictureInner(content, snapshot, canvas);
 }
 
-SceneNodeOp::SceneNodeOp(uint32_t scene_resource_id, uint32_t scene_version)
-    : scene_resource_id_(scene_resource_id), scene_version_(scene_version) {}
+SceneNodeDef::SceneNodeDef(uint32_t node_id,
+                           mojo::TransformPtr content_transform,
+                           mojo::RectPtr content_clip,
+                           Combinator combinator,
+                           const std::vector<uint32_t>& child_node_ids,
+                           uint32_t scene_resource_id,
+                           uint32_t scene_version)
+    : NodeDef(node_id,
+              content_transform.Pass(),
+              content_clip.Pass(),
+              combinator,
+              child_node_ids),
+      scene_resource_id_(scene_resource_id),
+      scene_version_(scene_version) {}
 
-SceneNodeOp::~SceneNodeOp() {}
+SceneNodeDef::~SceneNodeDef() {}
 
-bool SceneNodeOp::Validate(SceneDef* scene, NodeDef* node, std::ostream& err) {
-  scene_resource_ = scene->FindSceneResource(scene_resource_id_);
-  if (!scene_resource_) {
-    err << "Node refers to unknown or invalid scene resource: "
-        << node->FormattedLabel(scene)
-        << ", scene_resource_id=" << scene_resource_id_;
-    return false;
-  }
-  return true;
+bool SceneNodeDef::RecordContent(SceneContentBuilder* builder) const {
+  DCHECK(builder);
+
+  return NodeDef::RecordContent(builder) &&
+         builder->RequireResource(scene_resource_id_, ResourceDef::Type::kScene,
+                                  node_id());
 }
 
-bool SceneNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
-                           RenderLayerBuilder* layer_builder,
-                           SceneDef* scene,
-                           NodeDef* node) {
-  DCHECK(scene_resource_);
+Snapshot::Disposition SceneNodeDef::RecordSnapshot(
+    const SceneContent* content,
+    SnapshotBuilder* builder) const {
+  DCHECK(content);
+  DCHECK(builder);
 
-  SceneDef* referenced_scene = scene_resource_->referenced_scene();
+  auto scene_resource = static_cast<const SceneResourceDef*>(
+      content->GetResource(scene_resource_id_, ResourceDef::Type::kScene));
+  DCHECK(scene_resource);
+
+  SceneDef* referenced_scene = scene_resource->referenced_scene().get();
   if (!referenced_scene) {
-    if (snapshot_builder->block_log()) {
-      *snapshot_builder->block_log()
-          << "Node blocked due to its referenced scene "
-             "resource being unavailable: "
-          << node->FormattedLabel(scene) << std::endl;
+    if (builder->block_log()) {
+      *builder->block_log()
+          << "Scene node blocked because its referenced scene is unavailable: "
+          << FormattedLabel(content) << std::endl;
     }
-    return false;
+    return Snapshot::Disposition::kBlocked;
   }
 
-  uint32_t actual_version = referenced_scene->version();
-  if (scene_version_ != mojo::gfx::composition::kSceneVersionNone &&
-      actual_version != mojo::gfx::composition::kSceneVersionNone &&
-      scene_version_ != actual_version) {
-    if (snapshot_builder->block_log()) {
-      *snapshot_builder->block_log()
-          << "Node blocked due to its referenced scene "
-             "resource not having the desired version: "
-          << node->FormattedLabel(scene)
-          << ", requested_version=" << scene_version_
-          << ", actual_version=" << actual_version << std::endl;
-    }
-    return false;
-  }
-
-  if (!referenced_scene->Snapshot(snapshot_builder, layer_builder))
-    return false;
-
-  return node->SnapshotChildren(snapshot_builder, layer_builder, scene);
+  Snapshot::Disposition disposition =
+      builder->SnapshotScene(referenced_scene, scene_version_, this, content);
+  if (disposition != Snapshot::Disposition::kSuccess)
+    return disposition;
+  return NodeDef::RecordSnapshot(content, builder);
 }
 
-LayerNodeOp::LayerNodeOp(const mojo::Size& size,
-                         mojo::gfx::composition::BlendPtr blend)
-    : size_(size), blend_(blend.Pass()) {}
+void SceneNodeDef::RecordPictureInner(const SceneContent* content,
+                                      const Snapshot* snapshot,
+                                      SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
 
-LayerNodeOp::~LayerNodeOp() {}
+  const SceneContent* resolved_content =
+      snapshot->GetResolvedSceneContent(this);
+  DCHECK(resolved_content);
 
-bool LayerNodeOp::Snapshot(SnapshotBuilder* snapshot_builder,
-                           RenderLayerBuilder* layer_builder,
-                           SceneDef* scene,
-                           NodeDef* node) {
-  SkRect content_rect = SkRect::MakeWH(size_.width, size_.height);
-  RenderLayerBuilder children_layer_builder(&content_rect);
-  if (!node->SnapshotChildren(snapshot_builder, &children_layer_builder, scene))
-    return false;
+  const NodeDef* root_node = resolved_content->GetRootNodeIfExists();
+  DCHECK(root_node);  // must have a root otherwise would have been blocked
+  root_node->RecordPicture(resolved_content, snapshot, canvas);
 
-  layer_builder->DrawSavedLayer(
-      children_layer_builder.Build(), content_rect,
-      blend_ ? MakePaintForBlend(*blend_) : SkPaint());
-  return true;
+  NodeDef::RecordPictureInner(content, snapshot, canvas);
+}
+
+LayerNodeDef::LayerNodeDef(uint32_t node_id,
+                           mojo::TransformPtr content_transform,
+                           mojo::RectPtr content_clip,
+                           Combinator combinator,
+                           const std::vector<uint32_t>& child_node_ids,
+                           const mojo::Size& size,
+                           mojo::gfx::composition::BlendPtr blend)
+    : NodeDef(node_id,
+              content_transform.Pass(),
+              content_clip.Pass(),
+              combinator,
+              child_node_ids),
+      size_(size),
+      blend_(blend.Pass()) {}
+
+LayerNodeDef::~LayerNodeDef() {}
+
+void LayerNodeDef::RecordPictureInner(const SceneContent* content,
+                                      const Snapshot* snapshot,
+                                      SkCanvas* canvas) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(canvas);
+
+  SkPaint paint;
+  SetPaintForBlend(&paint, blend_.get());
+
+  canvas->saveLayer(SkRect::MakeWH(size_.width, size_.height), &paint);
+  NodeDef::RecordPictureInner(content, snapshot, canvas);
+  canvas->restore();
 }
 
 }  // namespace compositor

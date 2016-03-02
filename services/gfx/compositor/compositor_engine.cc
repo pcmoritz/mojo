@@ -264,23 +264,16 @@ void CompositorEngine::HitTest(
   DCHECK(point);
   DVLOG(1) << "HitTest: renderer=" << renderer_state << ", point=" << point;
 
-  mojo::gfx::composition::HitTestResultPtr result;
-  if (renderer_state->frame()) {
-    result =
-        renderer_state->frame()->HitTest(SkPoint::Make(point->x, point->y));
-  }
-  if (!result) {
-    result = mojo::gfx::composition::HitTestResult::New();
-    result->hits.resize(0u);
-  }
-
+  // TODO(jeffbrown): hit tests on scenes
+  auto result = mojo::gfx::composition::HitTestResult::New();
   callback.Run(result.Pass());
 }
 
-SceneDef* CompositorEngine::ResolveSceneReference(
-    mojo::gfx::composition::SceneToken* scene_token) {
-  SceneState* scene_state = FindScene(scene_token->value);
-  return scene_state ? scene_state->scene_def() : nullptr;
+base::WeakPtr<SceneDef> CompositorEngine::ResolveSceneReference(
+    const mojo::gfx::composition::SceneToken& scene_token) {
+  SceneState* scene_state = FindScene(scene_token.value);
+  return scene_state ? scene_state->scene_def()->GetWeakPtr()
+                     : base::WeakPtr<SceneDef>();
 }
 
 void CompositorEngine::SendResourceUnavailable(SceneState* scene_state,
@@ -361,7 +354,7 @@ void CompositorEngine::SnapshotRenderer(
   if (VLOG_IS_ON(2)) {
     std::ostringstream block_log;
     SnapshotRendererInner(renderer_state, frame_info, &block_log);
-    if (!renderer_state->valid()) {
+    if (!renderer_state->frame()) {
       DVLOG(2) << "Rendering completely blocked: " << block_log.str();
     } else if (!block_log.str().empty()) {
       DVLOG(2) << "Rendering partially blocked: " << block_log.str();
@@ -389,7 +382,7 @@ void CompositorEngine::SnapshotRendererInner(
       builder.Build(renderer_state->root_scene()->scene_def(),
                     renderer_state->root_scene_viewport(), frame_info));
 
-  if (renderer_state->valid())
+  if (renderer_state->frame())
     renderer_state->output()->SubmitFrame(renderer_state->frame());
 }
 

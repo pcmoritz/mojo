@@ -51,7 +51,7 @@ class RenderImage {
   uint32_t width() const { return image_->width(); }
   uint32_t height() const { return image_->height(); }
 
-  // Gets the underlying image to rasterize.
+  // Gets the underlying image to rasterize, never null.
   const skia::RefPtr<SkImage>& image() const { return image_; }
 
  private:

@@ -8,7 +8,9 @@ namespace compositor {
 
 SceneState::SceneState(mojo::gfx::composition::SceneTokenPtr scene_token,
                        const std::string& label)
-    : scene_def_(scene_token.Pass(), label), weak_factory_(this) {}
+    : scene_token_(scene_token.Pass()),
+      scene_def_(SceneLabel(scene_token_->value, label)),
+      weak_factory_(this) {}
 
 SceneState::~SceneState() {
   // The scene implementation and all of its bindings must be destroyed
@@ -32,7 +34,7 @@ void SceneState::DispatchSceneFrameCallbacks(
 std::ostream& operator<<(std::ostream& os, SceneState* scene_state) {
   if (!scene_state)
     return os << "null";
-  return os << scene_state->FormattedLabel();
+  return os << scene_state->scene_def()->FormattedLabel();
 }
 
 }  // namespace compositor

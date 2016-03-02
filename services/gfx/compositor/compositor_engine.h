@@ -105,8 +105,8 @@ class CompositorEngine {
   void OnPresentScene(const base::WeakPtr<SceneState>& scene_state_weak,
                       int64_t presentation_time);
 
-  SceneDef* ResolveSceneReference(
-      mojo::gfx::composition::SceneToken* scene_token);
+  base::WeakPtr<SceneDef> ResolveSceneReference(
+      const mojo::gfx::composition::SceneToken& scene_token);
   void SendResourceUnavailable(SceneState* scene_state, uint32_t resource_id);
 
   SceneState* FindScene(uint32_t scene_token);
