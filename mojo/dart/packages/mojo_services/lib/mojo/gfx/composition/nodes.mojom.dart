@@ -73,12 +73,12 @@ class NodeCombinator extends bindings.MojoEnum {
 
 class Node extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(56, 0)
+    const bindings.StructDataHeader(64, 0)
   ];
   geometry_mojom.Transform contentTransform = null;
   geometry_mojom.Rect contentClip = null;
-  int hitId = 0;
   NodeCombinator combinator = new NodeCombinator(0);
+  hit_tests_mojom.HitTestBehavior hitTestBehavior = null;
   List<int> childNodeIds = null;
   NodeOp op = null;
 
@@ -129,11 +129,7 @@ class Node extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.hitId = decoder0.decodeUint32(24);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.combinator = NodeCombinator.decode(decoder0, 28);
+        result.combinator = NodeCombinator.decode(decoder0, 24);
         if (result.combinator == null) {
           throw new bindings.MojoCodecError(
             'Trying to decode null union for non-nullable NodeCombinator.');
@@ -141,11 +137,16 @@ class Node extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.childNodeIds = decoder0.decodeUint32Array(32, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
+      var decoder1 = decoder0.decodePointer(32, true);
+      result.hitTestBehavior = hit_tests_mojom.HitTestBehavior.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
-        result.op = NodeOp.decode(decoder0, 40);
+      result.childNodeIds = decoder0.decodeUint32Array(40, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+        result.op = NodeOp.decode(decoder0, 48);
     }
     return result;
   }
@@ -167,28 +168,28 @@ class Node extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeUint32(hitId, 24);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "hitId of struct Node: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeEnum(combinator, 28);
+      encoder0.encodeEnum(combinator, 24);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "combinator of struct Node: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32Array(childNodeIds, 32, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
+      encoder0.encodeStruct(hitTestBehavior, 32, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "hitTestBehavior of struct Node: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint32Array(childNodeIds, 40, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "childNodeIds of struct Node: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUnion(op, 40, true);
+      encoder0.encodeUnion(op, 48, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "op of struct Node: $e";
@@ -200,8 +201,8 @@ class Node extends bindings.Struct {
     return "Node("
            "contentTransform: $contentTransform" ", "
            "contentClip: $contentClip" ", "
-           "hitId: $hitId" ", "
            "combinator: $combinator" ", "
+           "hitTestBehavior: $hitTestBehavior" ", "
            "childNodeIds: $childNodeIds" ", "
            "op: $op" ")";
   }
@@ -210,8 +211,8 @@ class Node extends bindings.Struct {
     Map map = new Map();
     map["contentTransform"] = contentTransform;
     map["contentClip"] = contentClip;
-    map["hitId"] = hitId;
     map["combinator"] = combinator;
+    map["hitTestBehavior"] = hitTestBehavior;
     map["childNodeIds"] = childNodeIds;
     map["op"] = op;
     return map;

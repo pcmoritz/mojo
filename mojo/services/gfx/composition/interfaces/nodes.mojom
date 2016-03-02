@@ -55,6 +55,46 @@ import "mojo/services/gfx/composition/interfaces/hit_tests.mojom";
 // missing content for an earlier version of that content or for a placeholder
 // if not available.
 //
+// HIT TESTING
+//
+// Hit testing is the process of determining which nodes within a scene graph
+// should be responsible for handling events which occur within their visual
+// space on the screen.
+//
+// For example, when the user touches objects on a touch screen, the input
+// system asks the compositor to performs a hit test at the contact point to
+// find the nodes which represent the objects the user wants to interact with.
+// The result of the hit test is a list of nodes, in dispatch order, which
+// have asked to participate in handling events related to the contact point.
+//
+// Nodes may be opaque, translucent, or invisible to the hit testing
+// process depending on whether they prevent or allow targets visually
+// behind them from being hit and whether they can actually be hit,
+// as specified by |HitTestBehavior.visibility|.
+//
+// Nodes are added to the hit test result whenever one of their opaque children
+// is hit.  This is useful for scrolling containers which may need to intercept
+// certain gestures within the space of their children and therefore need to
+// be added to the hit test result themselves.
+//
+// Nodes can also request to prune hit testing for their children, which
+// prevents their children from being hit.
+//
+// Hit testing proceeds recursively in post-order traversal (the reverse of
+// the drawing order).  Intuitively, this means that the most specific
+// (deepest) nodes of the tree are tested before their ancestors.
+//
+// Starting from the root, the compositor transforms the point of interest
+// into the node's coordinate system, rejects the node if the point is
+// outside of the node's clip region, otherwise recursively tests the
+// node's children (those which were selected by the combinator rule)
+// until the first opaque target hit is found, then evaluates the node's
+// |HitTestBehavior| to determine whether the node was hit.  Nodes are
+// accumulated into a hit test result in the order in which they were
+// determined to have been hit.
+//
+// See |HitTestBehavior| for more details.
+//
 // INSTANCING
 //
 // The compositor allows nodes to be referenced and reused multiple times
@@ -128,14 +168,12 @@ struct Node {
   // If null, the node does not apply any clipping of its own.
   mojo.Rect? content_clip;
 
-  // The hit test id to report if anything within the node is hit.
-  // Use |kHitIdNone| if the node should not be hit tested.
-  //
-  // TODO(jeffbrown): This scheme is probably too naive.
-  uint32 hit_id = kHitIdNone;
-
   // The Combinator to apply when processing the children of this node.
   Combinator combinator = Combinator.MERGE;
+
+  // The hit testing behavior of the node.
+  // If null, the node is considered invisible for hit testing.
+  HitTestBehavior? hit_test_behavior;
 
   // The ids of the children of this node.
   // It is an error to specify a node id that does not refer to a valid

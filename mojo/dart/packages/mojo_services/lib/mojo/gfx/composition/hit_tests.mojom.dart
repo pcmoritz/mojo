@@ -9,23 +9,81 @@ import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
-const int kHitIdNone = 0;
 
 
 
-class Hit extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(40, 0)
+class HitTestBehaviorVisibility extends bindings.MojoEnum {
+  static const HitTestBehaviorVisibility opaque = const HitTestBehaviorVisibility._(0);
+  static const HitTestBehaviorVisibility translucent = const HitTestBehaviorVisibility._(1);
+  static const HitTestBehaviorVisibility invisible = const HitTestBehaviorVisibility._(2);
+
+  const HitTestBehaviorVisibility._(int v) : super(v);
+
+  static const Map<String, HitTestBehaviorVisibility> valuesMap = const {
+    "opaque": opaque,
+    "translucent": translucent,
+    "invisible": invisible,
+  };
+  static const List<HitTestBehaviorVisibility> values = const [
+    opaque,
+    translucent,
+    invisible,
   ];
-  scene_token_mojom.SceneToken sceneToken = null;
-  int sceneVersion = 0;
-  int nodeId = 0;
-  int hitId = 0;
-  geometry_mojom.Point intersection = null;
 
-  Hit() : super(kVersions.last.size);
+  static HitTestBehaviorVisibility valueOf(String name) => valuesMap[name];
 
-  static Hit deserialize(bindings.Message message) {
+  factory HitTestBehaviorVisibility(int v) {
+    switch (v) {
+      case 0:
+        return HitTestBehaviorVisibility.opaque;
+      case 1:
+        return HitTestBehaviorVisibility.translucent;
+      case 2:
+        return HitTestBehaviorVisibility.invisible;
+      default:
+        return null;
+    }
+  }
+
+  static HitTestBehaviorVisibility decode(bindings.Decoder decoder0, int offset) {
+    int v = decoder0.decodeUint32(offset);
+    HitTestBehaviorVisibility result = new HitTestBehaviorVisibility(v);
+    if (result == null) {
+      throw new bindings.MojoCodecError(
+          'Bad value $v for enum HitTestBehaviorVisibility.');
+    }
+    return result;
+  }
+
+  String toString() {
+    switch(this) {
+      case opaque:
+        return 'HitTestBehaviorVisibility.opaque';
+      case translucent:
+        return 'HitTestBehaviorVisibility.translucent';
+      case invisible:
+        return 'HitTestBehaviorVisibility.invisible';
+      default:
+        return null;
+    }
+  }
+
+  int toJson() => mojoEnumValue;
+}
+
+
+
+class HitTestBehavior extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  HitTestBehaviorVisibility visibility = new HitTestBehaviorVisibility(0);
+  bool prune = false;
+  geometry_mojom.Rect hitRect = null;
+
+  HitTestBehavior() : super(kVersions.last.size);
+
+  static HitTestBehavior deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -34,11 +92,11 @@ class Hit extends bindings.Struct {
     return result;
   }
 
-  static Hit decode(bindings.Decoder decoder0) {
+  static HitTestBehavior decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    Hit result = new Hit();
+    HitTestBehavior result = new HitTestBehavior();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -60,25 +118,20 @@ class Hit extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.sceneToken = scene_token_mojom.SceneToken.decode(decoder1);
+        result.visibility = HitTestBehaviorVisibility.decode(decoder0, 8);
+        if (result.visibility == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable HitTestBehaviorVisibility.');
+        }
     }
     if (mainDataHeader.version >= 0) {
       
-      result.sceneVersion = decoder0.decodeUint32(16);
+      result.prune = decoder0.decodeBool(12, 0);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.nodeId = decoder0.decodeUint32(20);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.hitId = decoder0.decodeUint32(24);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(32, false);
-      result.intersection = geometry_mojom.Point.decode(decoder1);
+      var decoder1 = decoder0.decodePointer(16, true);
+      result.hitRect = geometry_mojom.Rect.decode(decoder1);
     }
     return result;
   }
@@ -86,58 +139,40 @@ class Hit extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeStruct(sceneToken, 8, false);
+      encoder0.encodeEnum(visibility, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "sceneToken of struct Hit: $e";
+          "visibility of struct HitTestBehavior: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(sceneVersion, 16);
+      encoder0.encodeBool(prune, 12, 0);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "sceneVersion of struct Hit: $e";
+          "prune of struct HitTestBehavior: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(nodeId, 20);
+      encoder0.encodeStruct(hitRect, 16, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "nodeId of struct Hit: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(hitId, 24);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "hitId of struct Hit: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeStruct(intersection, 32, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "intersection of struct Hit: $e";
+          "hitRect of struct HitTestBehavior: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "Hit("
-           "sceneToken: $sceneToken" ", "
-           "sceneVersion: $sceneVersion" ", "
-           "nodeId: $nodeId" ", "
-           "hitId: $hitId" ", "
-           "intersection: $intersection" ")";
+    return "HitTestBehavior("
+           "visibility: $visibility" ", "
+           "prune: $prune" ", "
+           "hitRect: $hitRect" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["sceneToken"] = sceneToken;
-    map["sceneVersion"] = sceneVersion;
-    map["nodeId"] = nodeId;
-    map["hitId"] = hitId;
-    map["intersection"] = intersection;
+    map["visibility"] = visibility;
+    map["prune"] = prune;
+    map["hitRect"] = hitRect;
     return map;
   }
 }
@@ -149,7 +184,7 @@ class HitTestResult extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  List<Hit> hits = null;
+  SceneHit root = null;
 
   HitTestResult() : super(kVersions.last.size);
 
@@ -188,14 +223,103 @@ class HitTestResult extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
+      var decoder1 = decoder0.decodePointer(8, true);
+      result.root = SceneHit.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(root, 8, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "root of struct HitTestResult: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "HitTestResult("
+           "root: $root" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["root"] = root;
+    return map;
+  }
+}
+
+
+
+
+class SceneHit extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(32, 0)
+  ];
+  scene_token_mojom.SceneToken sceneToken = null;
+  int sceneVersion = 0;
+  List<Hit> hits = null;
+
+  SceneHit() : super(kVersions.last.size);
+
+  static SceneHit deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static SceneHit decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    SceneHit result = new SceneHit();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
       var decoder1 = decoder0.decodePointer(8, false);
+      result.sceneToken = scene_token_mojom.SceneToken.decode(decoder1);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.sceneVersion = decoder0.decodeUint32(16);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(24, false);
       {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        var si1 = decoder1.decodeDataHeaderForUnionArray(bindings.kUnspecifiedArrayLength);
         result.hits = new List<Hit>(si1.numElements);
         for (int i1 = 0; i1 < si1.numElements; ++i1) {
           
-          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-          result.hits[i1] = Hit.decode(decoder2);
+            result.hits[i1] = Hit.decode(decoder1, bindings.ArrayDataHeader.kHeaderSize + bindings.kUnionSize * i1);
+            if (result.hits[i1] == null) {
+              throw new bindings.MojoCodecError(
+                'Trying to decode null union for non-nullable Hit.');
+            }
         }
       }
     }
@@ -205,29 +329,136 @@ class HitTestResult extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
+      encoder0.encodeStruct(sceneToken, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "sceneToken of struct SceneHit: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint32(sceneVersion, 16);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "sceneVersion of struct SceneHit: $e";
+      rethrow;
+    }
+    try {
       if (hits == null) {
-        encoder0.encodeNullPointer(8, false);
+        encoder0.encodeNullPointer(24, false);
       } else {
-        var encoder1 = encoder0.encodePointerArray(hits.length, 8, bindings.kUnspecifiedArrayLength);
+        var encoder1 = encoder0.encodeUnionArray(hits.length, 24, bindings.kUnspecifiedArrayLength);
         for (int i0 = 0; i0 < hits.length; ++i0) {
-          encoder1.encodeStruct(hits[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
+          encoder1.encodeUnion(hits[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kUnionSize * i0, false);
         }
       }
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "hits of struct HitTestResult: $e";
+          "hits of struct SceneHit: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "HitTestResult("
+    return "SceneHit("
+           "sceneToken: $sceneToken" ", "
+           "sceneVersion: $sceneVersion" ", "
            "hits: $hits" ")";
   }
 
   Map toJson() {
     Map map = new Map();
+    map["sceneToken"] = sceneToken;
+    map["sceneVersion"] = sceneVersion;
     map["hits"] = hits;
+    return map;
+  }
+}
+
+
+
+
+class NodeHit extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  int nodeId = 0;
+  geometry_mojom.Point intersection = null;
+
+  NodeHit() : super(kVersions.last.size);
+
+  static NodeHit deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static NodeHit decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    NodeHit result = new NodeHit();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.nodeId = decoder0.decodeUint32(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(16, false);
+      result.intersection = geometry_mojom.Point.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(nodeId, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "nodeId of struct NodeHit: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeStruct(intersection, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "intersection of struct NodeHit: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "NodeHit("
+           "nodeId: $nodeId" ", "
+           "intersection: $intersection" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["nodeId"] = nodeId;
+    map["intersection"] = intersection;
     return map;
   }
 }
@@ -382,6 +613,113 @@ class HitTesterHitTestResponseParams extends bindings.Struct {
   }
 }
 
+
+
+
+
+enum HitTag {
+  scene,
+  node,
+  unknown
+}
+
+class Hit extends bindings.Union {
+  static final _tag_to_int = const {
+    HitTag.scene: 0,
+    HitTag.node: 1,
+  };
+
+  static final _int_to_tag = const {
+    0: HitTag.scene,
+    1: HitTag.node,
+  };
+
+  var _data;
+  HitTag _tag = HitTag.unknown;
+
+  HitTag get tag => _tag;
+  SceneHit get scene {
+    if (_tag != HitTag.scene) {
+      throw new bindings.UnsetUnionTagError(_tag, HitTag.scene);
+    }
+    return _data;
+  }
+
+  set scene(SceneHit value) {
+    _tag = HitTag.scene;
+    _data = value;
+  }
+  NodeHit get node {
+    if (_tag != HitTag.node) {
+      throw new bindings.UnsetUnionTagError(_tag, HitTag.node);
+    }
+    return _data;
+  }
+
+  set node(NodeHit value) {
+    _tag = HitTag.node;
+    _data = value;
+  }
+
+  static Hit decode(bindings.Decoder decoder0, int offset) {
+    int size = decoder0.decodeUint32(offset);
+    if (size == 0) {
+      return null;
+    }
+    Hit result = new Hit();
+
+    
+    HitTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    switch (tag) {
+      case HitTag.scene:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.scene = SceneHit.decode(decoder1);
+        break;
+      case HitTag.node:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.node = NodeHit.decode(decoder1);
+        break;
+      default:
+        throw new bindings.MojoCodecError("Bad union tag: $tag");
+    }
+
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder0, int offset) {
+    
+    encoder0.encodeUint32(16, offset);
+    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    switch (_tag) {
+      case HitTag.scene:
+        encoder0.encodeStruct(scene, offset + 8, false);
+        break;
+      case HitTag.node:
+        encoder0.encodeStruct(node, offset + 8, false);
+        break;
+      default:
+        throw new bindings.MojoCodecError("Bad union tag: $_tag");
+    }
+  }
+
+  String toString() {
+    String result = "Hit(";
+    switch (_tag) {
+      case HitTag.scene:
+        result += "scene";
+        break;
+      case HitTag.node:
+        result += "node";
+        break;
+      default:
+        result += "unknown";
+    }
+    result += ": $_data)";
+    return result;
+  }
+}
 
 
 
