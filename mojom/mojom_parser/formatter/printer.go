@@ -33,14 +33,14 @@ type printer struct {
 	// mojom file element.
 	buffer bytes.Buffer
 
-	// indentLevel is the current depth of indentation.
-	indentLevel int
+	// indentSize is the current size of the indentation in number of space runes.
+	indentSize int
 
 	// eolComment is the comment to be printed at the end of the current line.
 	eolComment *lexer.Token
 
-	// lineStarted is false if nothing has been written on the current line yet.
-	lineStarted bool
+	// lineLength is the number of runes that have been written to the current line.
+	lineLength int
 }
 
 // newPrinter is a constructor for printer.
@@ -76,9 +76,12 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 		p.nl()
 	}
 
-	if mojomFile.FinalComments != nil && len(mojomFile.FinalComments) > 0 {
-		p.nl()
-		p.writeCommentBlocks(mojomFile.FinalComments, true)
+	if mojomFile.FinalComments != nil {
+		finalComments := trimEmptyLines(mojomFile.FinalComments)
+		if len(finalComments) > 0 {
+			p.nl()
+			p.writeCommentBlocks(finalComments, true)
+		}
 	}
 }
 
@@ -124,7 +127,7 @@ func (p *printer) writeDeclaredObject(declaredObject mojom.DeclaredObject) {
 	if isNewBlock(declaredObject) {
 		p.nl()
 	}
-	p.writeAttributes(declaredObject.Attributes())
+	p.writeDeclaredObjectAttributes(declaredObject)
 	p.writeBeforeComments(declaredObject)
 	switch o := declaredObject.(type) {
 	case *mojom.MojomStruct:
@@ -175,8 +178,19 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 	if mojomMethod.DeclaredOrdinal() >= 0 {
 		p.writef("@%v", mojomMethod.DeclaredOrdinal())
 	}
+
+	totalParams := len(mojomMethod.Parameters.Fields)
+	if mojomMethod.ResponseParameters != nil {
+		totalParams += len(mojomMethod.ResponseParameters.Fields)
+	}
+
 	p.writeMethodParams(mojomMethod.Parameters)
 	if mojomMethod.ResponseParameters != nil {
+		// TODO(azani): Actually enforce a line length limit instead.
+		if totalParams > 2 {
+			p.nl()
+			p.write("   ")
+		}
 		p.write(" => ")
 		p.writeMethodParams(mojomMethod.ResponseParameters)
 	}
@@ -189,13 +203,29 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
 	p.write("(")
 	declaredObjects := params.GetDeclaredObjects()
+
+	// TODO(azani): Actually enforce a line length limit instead.
+	ownLine := len(declaredObjects) > 2
+	extraIndent := p.lineLength - p.indentSize
+	if ownLine {
+		p.indentSize += extraIndent
+	}
+
 	for i, param := range declaredObjects {
 		p.writeMethodParam(param.(*mojom.StructField))
 		if i < len(declaredObjects)-1 {
-			p.write(", ")
+			p.write(",")
+			if ownLine {
+				p.nl()
+			} else {
+				p.write(" ")
+			}
 		}
 	}
 
+	if ownLine {
+		p.indentSize -= extraIndent
+	}
 	p.write(")")
 }
 
@@ -289,6 +319,31 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 	p.decIndent()
 	p.nl()
 	p.write("};")
+}
+
+func (p *printer) writeDeclaredObjectAttributes(declaredObject mojom.DeclaredObject) {
+	switch declaredObject.(type) {
+	case *mojom.MojomStruct:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.MojomUnion:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.MojomEnum:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.UserDefinedConstant:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.MojomInterface:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.MojomMethod:
+		p.writeAttributes(declaredObject.Attributes())
+	case *mojom.StructField:
+		p.writeAttributesSingleLine(declaredObject.Attributes())
+	case *mojom.UnionField:
+		p.writeAttributesSingleLine(declaredObject.Attributes())
+	case *mojom.EnumValue:
+		p.writeAttributesSingleLine(declaredObject.Attributes())
+	default:
+		panic(fmt.Sprintf("writeDeclaredObjectAttributes cannot write %v.", declaredObject))
+	}
 }
 
 // See writeAttributesBase.
@@ -562,10 +617,11 @@ func (p *printer) write(s string) {
 	}
 
 	// We only print the indentation if the line is not empty.
-	if !p.lineStarted {
-		p.buffer.WriteString(strings.Repeat("  ", p.indentLevel))
-		p.lineStarted = true
+	if p.lineLength == 0 {
+		p.buffer.WriteString(strings.Repeat(" ", p.indentSize))
+		p.lineLength += p.indentSize
 	}
+	p.lineLength += len(s)
 	p.buffer.WriteString(s)
 }
 
@@ -579,18 +635,18 @@ func (p *printer) nl() {
 	}
 
 	p.buffer.WriteString("\n")
-	p.lineStarted = false
+	p.lineLength = 0
 }
 
 func (p *printer) incIndent() {
-	p.indentLevel += 1
+	p.indentSize += 2
 }
 
 func (p *printer) decIndent() {
-	if p.indentLevel == 0 {
+	p.indentSize -= 2
+	if p.indentSize < 0 {
 		panic("The printer is attempting to use negative indentation!")
 	}
-	p.indentLevel -= 1
 }
 
 // setEolComment sets the comment that is to be printed at the end of the current line.
@@ -653,6 +709,17 @@ func containsFinalComments(el mojom.MojomElement) bool {
 		}
 	}
 	return false
+}
+
+// trimEmptyLines trims out empty line comments at the end of a slice of comments.
+func trimEmptyLines(comments []lexer.Token) []lexer.Token {
+	lastNonEmpty := -1
+	for i, comment := range comments {
+		if comment.Kind != lexer.EmptyLine {
+			lastNonEmpty = i
+		}
+	}
+	return comments[:lastNonEmpty+1]
 }
 
 // Following is a utility to sort slices of |ImportedFile|s.
