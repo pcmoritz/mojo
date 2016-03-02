@@ -67,12 +67,9 @@ interface InterfaceFoo {  // Interface comment.
 	method3();
 	method4() => (Foo bar);
 	method5(int8 p1 /* p1 comment */, int16 p2);  // method comment
-	method6(int8 p1, int16 p2)
-	    => (int8 p1, int16 p2);
-	method7(int8 p1,
-          int16 p2,
-          int16 p3)
-	    => (int8 p1, int16 p2);
+	method6(WayTooLongAndReallyLongFactoryVisitoryFactory field1,
+	        WayTooLongAndReallyLongFactoryVisitoryFactory field2)
+	    => (int8 alpha);
 };
 
 // Final Comments.

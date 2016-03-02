@@ -39,13 +39,19 @@ type printer struct {
 	// eolComment is the comment to be printed at the end of the current line.
 	eolComment *lexer.Token
 
-	// lineLength is the number of runes that have been written to the current line.
-	lineLength int
+	// linePos is the number of runes that have been written to the current line.
+	linePos int
+
+	// maxLineLength is the maximum number of runes that should be printed on a line.
+	// A negative maxLineLength indicates no maximum line length should be enforced.
+	// This is currently only used to decide when to break up a method on different lines.
+	maxLineLength int
 }
 
 // newPrinter is a constructor for printer.
 func newPrinter() (p *printer) {
 	p = new(printer)
+	p.maxLineLength = 100
 	return
 }
 
@@ -174,20 +180,24 @@ func (p *printer) writeMojomInterface(mojomInterface *mojom.MojomInterface) {
 }
 
 func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
+	splitResponse := false
+	if p.maxLineLength > 0 {
+		scratch := newPrinter()
+		scratch.maxLineLength = -1
+		scratch.writeMojomMethod(mojomMethod)
+		if len(scratch.result())+p.lineLength() > p.maxLineLength {
+			splitResponse = true
+		}
+	}
+
 	p.write(mojomMethod.NameToken().Text)
 	if mojomMethod.DeclaredOrdinal() >= 0 {
 		p.writef("@%v", mojomMethod.DeclaredOrdinal())
 	}
 
-	totalParams := len(mojomMethod.Parameters.Fields)
-	if mojomMethod.ResponseParameters != nil {
-		totalParams += len(mojomMethod.ResponseParameters.Fields)
-	}
-
 	p.writeMethodParams(mojomMethod.Parameters)
 	if mojomMethod.ResponseParameters != nil {
-		// TODO(azani): Actually enforce a line length limit instead.
-		if totalParams > 2 {
+		if splitResponse {
 			p.nl()
 			p.write("   ")
 		}
@@ -201,12 +211,19 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 // writeMethodParams writes the pretty-printed method parameters represented by
 // a MojomStruct.
 func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
+	ownLine := false
+	if p.maxLineLength > 0 {
+		scratch := newPrinter()
+		scratch.maxLineLength = -1
+		scratch.writeMethodParams(params)
+		if len(scratch.result())+p.lineLength() > p.maxLineLength {
+			ownLine = true
+		}
+	}
 	p.write("(")
 	declaredObjects := params.GetDeclaredObjects()
 
-	// TODO(azani): Actually enforce a line length limit instead.
-	ownLine := len(declaredObjects) > 2
-	extraIndent := p.lineLength - p.indentSize
+	extraIndent := p.lineLength() - p.indentSize
 	if ownLine {
 		p.indentSize += extraIndent
 	}
@@ -617,11 +634,11 @@ func (p *printer) write(s string) {
 	}
 
 	// We only print the indentation if the line is not empty.
-	if p.lineLength == 0 {
+	if p.linePos == 0 {
 		p.buffer.WriteString(strings.Repeat(" ", p.indentSize))
-		p.lineLength += p.indentSize
+		p.linePos += p.indentSize
 	}
-	p.lineLength += len(s)
+	p.linePos += len(s)
 	p.buffer.WriteString(s)
 }
 
@@ -635,7 +652,7 @@ func (p *printer) nl() {
 	}
 
 	p.buffer.WriteString("\n")
-	p.lineLength = 0
+	p.linePos = 0
 }
 
 func (p *printer) incIndent() {
@@ -663,6 +680,17 @@ func (p *printer) setEolComment(comment lexer.Token) {
 	}
 
 	p.eolComment = &comment
+}
+
+// lineLength returns the length of the line so far. If nothing has been written
+// to the line yet, it returns the indent size.
+// The purpose of lineLenght is to answer the question: If I write something now
+// how far on the current line will it be written?
+func (p *printer) lineLength() int {
+	if p.linePos == 0 {
+		return p.indentSize
+	}
+	return p.linePos
 }
 
 // Standalone utilities that do not operate on the buffer.

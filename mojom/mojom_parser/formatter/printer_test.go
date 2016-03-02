@@ -397,5 +397,5 @@ func TestWriteMojomMethod(t *testing.T) {
 
 	p := getNewPrinter()
 	p.writeDeclaredObject(mojomMethod)
-	checkEq(t, "method_foo(int8 param1, int16 param2)\n    => (int32 rparam1, int64 rparam2);", p.result())
+	checkEq(t, "method_foo(int8 param1, int16 param2) => (int32 rparam1, int64 rparam2);", p.result())
 }
