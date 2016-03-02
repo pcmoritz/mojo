@@ -1813,8 +1813,6 @@ class MediaConsumerStub extends bindings.Stub {
         }
         break;
       case _MediaConsumer_flushName:
-        var params = _MediaConsumerFlushParams.deserialize(
-            message.payload);
         var response = _impl.flush(_MediaConsumerFlushResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {

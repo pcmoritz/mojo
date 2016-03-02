@@ -1693,8 +1693,6 @@ class MediaSourceStub extends bindings.Stub {
         }
         break;
       case _MediaSource_flushName:
-        var params = _MediaSourceFlushParams.deserialize(
-            message.payload);
         var response = _impl.flush(_MediaSourceFlushResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
