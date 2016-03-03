@@ -5,6 +5,7 @@
 #include "ui/ozone/platform/drm/gpu/drm_device.h"
 
 #include <fcntl.h>
+#include <i915_drm.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <xf86drm.h>
@@ -613,6 +614,44 @@ bool DrmDevice::SetGammaRamp(uint32_t crtc_id,
   TRACE_EVENT0("drm", "DrmDevice::SetGamma");
   return (drmModeCrtcSetGamma(file_.GetPlatformFile(), crtc_id, r.size(), &r[0],
                               &g[0], &b[0]) == 0);
+}
+
+bool DrmDevice::BufferHandleToFd(uint32_t handle, int* fd) {
+  int ret;
+
+  ret = drmPrimeHandleToFD(file_.GetPlatformFile(), handle, DRM_CLOEXEC, fd);
+  if (ret == -1)
+    return false;
+
+  return true;
+}
+
+bool DrmDevice::BufferFdToHandle(int fd, uint32_t* handle) {
+  int ret;
+
+  ret = drmPrimeFDToHandle(file_.GetPlatformFile(), fd, handle);
+  if (ret == -1)
+    return false;
+
+  return true;
+}
+
+bool DrmDevice::BufferHandleSetTiling(uint32_t handle,
+                                      uint32_t stride,
+                                      uint32_t tiling_mode) {
+  struct drm_i915_gem_set_tiling set_tiling;
+  int ret;
+
+  do {
+    set_tiling.handle = handle;
+    set_tiling.tiling_mode = tiling_mode;
+    set_tiling.stride = stride;
+
+    ret = drmIoctl(file_.GetPlatformFile(), DRM_IOCTL_I915_GEM_SET_TILING,
+                   &set_tiling);
+  } while (ret == -1 && (errno == EINTR || errno == EAGAIN));
+
+  return ret != -1;
 }
 
 }  // namespace ui

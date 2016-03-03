@@ -116,13 +116,13 @@ source_set("drm_common") {
 
   deps = [
     "//base",
-    "//skia",
     "//mojo/application",
     "//mojo/common",
     "//mojo/converters/geometry",
     "//mojo/converters/ozone_drm_gpu",
     "//mojo/services/ozone_drm_gpu/interfaces",
     "//mojo/services/ozone_drm_host/interfaces",
+    "//skia",
     "//ui/base",
     "//ui/display/types",
     "//ui/display/util",
@@ -154,10 +154,10 @@ if (ozone_platform_dri || ozone_platform_drm) {
       "//base",
       "//skia",
       "//ui/base",
-      "//ui/ozone:ozone_base",
       "//ui/events/ozone:events_ozone",
       "//ui/events/ozone:events_ozone_evdev",
       "//ui/events/ozone:events_ozone_layout",
+      "//ui/ozone:ozone_base",
     ]
   }
 }
@@ -196,6 +196,8 @@ if (ozone_platform_gbm) {
 
   source_set("gbm") {
     sources = [
+      "gpu/drm_dmabuf_pixmap.cc",
+      "gpu/drm_dmabuf_pixmap.h",
       "gpu/gbm_buffer.cc",
       "gpu/gbm_buffer.h",
       "gpu/gbm_buffer_base.cc",

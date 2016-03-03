@@ -10,6 +10,7 @@
 #include "third_party/khronos/EGL/egl.h"
 #include "ui/ozone/common/egl_util.h"
 #include "ui/ozone/platform/drm/gpu/drm_device_manager.h"
+#include "ui/ozone/platform/drm/gpu/drm_dmabuf_pixmap.h"
 #include "ui/ozone/platform/drm/gpu/drm_window.h"
 #include "ui/ozone/platform/drm/gpu/gbm_buffer.h"
 #include "ui/ozone/platform/drm/gpu/gbm_device.h"
@@ -128,6 +129,22 @@ scoped_refptr<ui::NativePixmap> GbmSurfaceFactory::CreateNativePixmap(
     return nullptr;
 
   return pixmap;
+}
+
+scoped_refptr<ui::NativePixmap> GbmSurfaceFactory::CreateNativePixmapFromHandle(
+    gfx::AcceleratedWidget widget,
+    gfx::Size size,
+    const gfx::NativePixmapHandle& handle) {
+  scoped_refptr<DrmDevice> drm =
+      drm_device_manager_->GetDrmDevice(widget).get();
+  DCHECK(drm);
+
+  scoped_refptr<VgemPixmap> pixmap(new VgemPixmap(drm));
+  pixmap->Initialize(base::ScopedFD(handle.fd.fd), size.width(), size.height(),
+                     handle.stride);
+
+  return scoped_refptr<VgemPixmapWrapper>(
+      new VgemPixmapWrapper(screen_manager_, pixmap));
 }
 
 bool GbmSurfaceFactory::CanShowPrimaryPlaneAsOverlay() {

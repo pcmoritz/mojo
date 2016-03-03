@@ -9,9 +9,11 @@
 #include "base/memory/scoped_ptr.h"
 #include "base/native_library.h"
 #include "ui/gfx/geometry/rect.h"
+#include "ui/gfx/native_pixmap_handle_ozone.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/gfx/overlay_transform.h"
 #include "ui/ozone/ozone_base_export.h"
+#include "ui/ozone/public/native_pixmap.h"
 
 namespace ui {
 
@@ -120,6 +122,13 @@ class OZONE_BASE_EXPORT SurfaceFactoryOzone {
       gfx::Size size,
       BufferFormat format,
       BufferUsage usage);
+
+  // Create a single native buffer from an existing handle. Takes ownership of
+  // |handle| and can be called on any thread.
+  virtual scoped_refptr<NativePixmap> CreateNativePixmapFromHandle(
+      gfx::AcceleratedWidget widget,
+      gfx::Size size,
+      const gfx::NativePixmapHandle& handle);
 
   // Returns true if overlays can be shown at z-index 0, replacing the main
   // surface. Combined with surfaceless extensions, it allows for an

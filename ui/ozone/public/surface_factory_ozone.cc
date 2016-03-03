@@ -52,7 +52,15 @@ scoped_refptr<ui::NativePixmap> SurfaceFactoryOzone::CreateNativePixmap(
     gfx::Size size,
     BufferFormat format,
     BufferUsage usage) {
-  return NULL;
+  return nullptr;
+}
+
+scoped_refptr<ui::NativePixmap>
+SurfaceFactoryOzone::CreateNativePixmapFromHandle(
+    gfx::AcceleratedWidget widget,
+    gfx::Size size,
+    const gfx::NativePixmapHandle& handle) {
+  return nullptr;
 }
 
 bool SurfaceFactoryOzone::CanShowPrimaryPlaneAsOverlay() {

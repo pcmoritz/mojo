@@ -178,6 +178,12 @@ class OZONE_EXPORT DrmDevice : public base::RefCountedThreadSafe<DrmDevice> {
 
   HardwareDisplayPlaneManager* plane_manager() { return plane_manager_.get(); }
 
+  bool BufferHandleToFd(uint32_t handle, int* fd);
+  bool BufferFdToHandle(int fd, uint32_t* handle);
+  bool BufferHandleSetTiling(uint32_t handle,
+                             uint32_t stride,
+                             uint32_t tiling_mode);
+
  protected:
   friend class base::RefCountedThreadSafe<DrmDevice>;
 

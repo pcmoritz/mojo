@@ -39,6 +39,10 @@ class GbmSurfaceFactory : public DrmSurfaceFactory {
       gfx::Size size,
       BufferFormat format,
       BufferUsage usage) override;
+  scoped_refptr<ui::NativePixmap> CreateNativePixmapFromHandle(
+      gfx::AcceleratedWidget widget,
+      gfx::Size size,
+      const gfx::NativePixmapHandle& handle) override;
   bool CanShowPrimaryPlaneAsOverlay() override;
   bool CanCreateNativePixmap(BufferUsage usage) override;
 
