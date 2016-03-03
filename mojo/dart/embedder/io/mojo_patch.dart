@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:nativewrappers';
+
 import 'dart:_mojo/application.dart';
 import 'dart:_mojo/bindings.dart';
 import 'dart:_mojo/core.dart';

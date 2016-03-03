@@ -12,6 +12,15 @@ namespace dart {
 
 class DartEmbedder {
  public:
+  static Dart_Handle GetDartType(const char* library_url,
+                                 const char* class_name);
+
+  static Dart_Handle NewDartExceptionWithMessage(const char* library_url,
+                                                 const char* error_type,
+                                                 const char* message);
+
+  static Dart_Handle NewInternalError(const char* message);
+
   // Returns the integer value of a Dart object. If the object is not
   // an integer value an API error is propagated.
   static int64_t GetIntegerValue(Dart_Handle value_obj);

@@ -5,11 +5,38 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "base/logging.h"
 #include "mojo/dart/embedder/common.h"
 #include "mojo/public/cpp/environment/logging.h"
 
 namespace mojo {
 namespace dart {
+
+Dart_Handle DartEmbedder::GetDartType(const char* library_url,
+                                      const char* class_name) {
+  return Dart_GetType(Dart_LookupLibrary(NewCString(library_url)),
+                      NewCString(class_name), 0, NULL);
+}
+
+Dart_Handle DartEmbedder::NewDartExceptionWithMessage(
+    const char* library_url,
+    const char* error_type,
+    const char* message) {
+  // Create a Dart Exception object with a message.
+  Dart_Handle type = GetDartType(library_url, error_type);
+  DCHECK(!Dart_IsError(type));
+  if (message != NULL) {
+    Dart_Handle args[1];
+    args[0] = NewCString(message);
+    return Dart_New(type, Dart_Null(), 1, args);
+  } else {
+    return Dart_New(type, Dart_Null(), 0, NULL);
+  }
+}
+
+Dart_Handle DartEmbedder::NewInternalError(const char* message) {
+  return NewDartExceptionWithMessage("dart:core", "_InternalError", message);
+}
 
 int64_t DartEmbedder::GetIntegerValue(Dart_Handle value_obj) {
   int64_t value = 0;

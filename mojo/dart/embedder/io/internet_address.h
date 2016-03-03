@@ -45,4 +45,3 @@ class InternetAddress {
 }  // namespace mojo
 
 #endif  // MOJO_DART_EMBEDDER_IO_INTERNET_ADDRESS_H_
-

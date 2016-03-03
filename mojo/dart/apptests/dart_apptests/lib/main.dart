@@ -8,6 +8,7 @@ import 'package:mojo_apptest/apptest.dart';
 import 'src/connect_to_loader_apptests.dart' as connect_to_loader_apptests;
 import 'src/echo_apptests.dart' as echo;
 import 'src/file_apptests.dart' as file;
+import 'src/filter_apptests.dart' as filter;
 import 'src/io_http_apptests.dart' as io_http;
 import 'src/io_internet_address_apptests.dart' as io_internet_address;
 import 'src/pingpong_apptests.dart' as pingpong;
@@ -20,6 +21,7 @@ main(List args, Object handleToken) {
     connect_to_loader_apptests.connectToLoaderApptests,
     echo.echoApptests,
     file.tests,
+    filter.tests,
     io_internet_address.tests,
     io_http.tests,
     pingpong.pingpongApptests,
