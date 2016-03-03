@@ -10,9 +10,8 @@ component("native_viewport") {
 
   deps = [
     "//base",
-    "//ui/gl",
-    "//mojo/environment:chromium",
     "//mojo/public/c/system",
     "//mojo/services/native_viewport/interfaces",
+    "//ui/gl",
   ]
 }
