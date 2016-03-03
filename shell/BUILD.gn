@@ -269,6 +269,7 @@ source_set("native_application_support") {
   sources = [
     "native_application_support.cc",
     "native_application_support.h",
+    "platform_handle_impl.cc",
   ]
 
   public_deps = [
@@ -280,6 +281,7 @@ source_set("native_application_support") {
     "//mojo/gles2:control_thunks",
     "//mojo/gles2:gles2",
     "//mojo/gles2:mgl",
+    "//mojo/public/platform/native:platform_handle_api",
   ]
 
   # This target has to include the public thunk headers, which generally

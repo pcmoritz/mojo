@@ -67,6 +67,7 @@ group("tests") {
     "//mojo/file_utils:file_utils_apptests",
     "//mojo/gles2:mgl_unittests",
     "//mojo/public/cpp/bindings/tests:versioning_apptests",
+    "//mojo/public/platform/native:tests",
     "//mojo/services/files/c:apptests",
     "//mojo/services/files/cpp:files_impl_apptests",
     "//mojo/services/log/cpp:log_client_apptests",

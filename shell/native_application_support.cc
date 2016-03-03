@@ -24,6 +24,7 @@
 #include "mojo/public/platform/native/mgl_onscreen_thunks.h"
 #include "mojo/public/platform/native/mgl_signal_sync_point_thunks.h"
 #include "mojo/public/platform/native/mgl_thunks.h"
+#include "mojo/public/platform/native/platform_handle_private_thunks.h"
 #include "mojo/public/platform/native/system_impl_private_thunks.h"
 #include "mojo/public/platform/native/system_thunks.h"
 
@@ -73,6 +74,10 @@ bool RunNativeApplication(
     LOG(ERROR) << "MojoSetSystemThunks not found";
     return false;
   }
+
+  // TODO(freiling): enforce the private nature of this API, somehow?
+  SetThunks(&MojoMakePlatformHandlePrivateThunks,
+            "MojoSetPlatformHandlePrivateThunks", app_library);
 
   // TODO(ncbray): enforce the private nature of this API, somehow?
   SetThunks(&MojoMakeSystemImplControlThunksPrivate,
