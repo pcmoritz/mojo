@@ -22,11 +22,11 @@ class FileReader : public Reader {
   // Reader implementation.
   Result Init(const GURL& gurl) override;
 
-  size_t Read(uint8* buffer, int bytes_to_read) override;
+  size_t Read(uint8_t* buffer, size_t bytes_to_read) override;
 
   int64_t GetPosition() const override;
 
-  int64_t SetPosition(int64 position) override;
+  int64_t SetPosition(int64_t position) override;
 
   size_t GetSize() const override;
 
@@ -36,7 +36,7 @@ class FileReader : public Reader {
   FileReader() {}
 
   FILE* file_;
-  int64 size_;
+  size_t size_;
 };
 
 }  // namespace media

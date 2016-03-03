@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "services/media/framework/parts/decoder.h"
+#include "services/media/framework_ffmpeg/ffmpeg_decoder.h"
 
 namespace mojo {
 namespace media {
@@ -10,7 +11,13 @@ namespace media {
 Result Decoder::Create(
     const StreamType& stream_type,
     std::shared_ptr<Decoder>* decoder_out) {
-  return Result::kUnsupportedOperation;
+  std::shared_ptr<Decoder> decoder;
+  Result result = FfmpegDecoder::Create(stream_type, &decoder);
+  if (result == Result::kOk) {
+    *decoder_out = decoder;
+  }
+
+  return result;
 }
 
 } // namespace media

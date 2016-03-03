@@ -40,7 +40,7 @@ Result FileReader::Init(const GURL& gurl) {
   return Result::kOk;
 }
 
-size_t FileReader::Read(uint8* buffer, int bytes_to_read) {
+size_t FileReader::Read(uint8_t* buffer, size_t bytes_to_read) {
   return fread(buffer, 1, bytes_to_read, file_);
 }
 
@@ -48,7 +48,7 @@ int64_t FileReader::GetPosition() const {
   return ftell(file_);
 }
 
-int64_t FileReader::SetPosition(int64 position) {
+int64_t FileReader::SetPosition(int64_t position) {
   if (fseek(file_, position, SEEK_SET) < 0) {
     return -1;
   }

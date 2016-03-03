@@ -914,6 +914,14 @@ config("no_chromium_code") {
 
   cflags += default_warning_flags
   cflags_cc += default_warning_flags_cc
+
+  if (is_clang) {
+    cflags += [
+      # TODO(dalesat): Remove once not broken by third party (ffmpeg).
+      # See https://github.com/domokit/mojo/issues/692.
+      "-Wno-constant-conversion",
+    ]
+  }
 }
 
 # rtti ------------------------------------------------------------------------

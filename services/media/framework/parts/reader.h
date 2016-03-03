@@ -27,14 +27,14 @@ class Reader {
 
   // Reads the given number of bytes into the buffer and returns the number of
   // bytes read. Returns -1 if the operation fails.
-  virtual size_t Read(uint8* buffer, int bytes_to_read) = 0;
+  virtual size_t Read(uint8_t* buffer, size_t bytes_to_read) = 0;
 
   // Gets the current position or -1 if the operation fails.
   virtual int64_t GetPosition() const = 0;
 
   // Seeks to the given position and returns it. Returns -1 if the operation
   // fails.
-  virtual int64_t SetPosition(int64 position) = 0;
+  virtual int64_t SetPosition(int64_t position) = 0;
 
   // Returns the file size. Returns -1 if the operation fails or the size isn't
   // known.

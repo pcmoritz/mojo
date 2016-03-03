@@ -26,10 +26,6 @@ class Decoder : public Transform {
 
   // Returns the type of the stream the decoder will produce.
   virtual std::unique_ptr<StreamType> output_stream_type() = 0;
-
- protected:
-  // Initializes the decoder. Called by Decoder::Create.
-  virtual Result Init(const StreamType& stream_type) = 0;
 };
 
 }  // namespace media
