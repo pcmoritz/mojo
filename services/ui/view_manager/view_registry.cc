@@ -459,8 +459,9 @@ void ViewRegistry::TransferOrUnregisterViewStub(
 void ViewRegistry::UnregisterViewStub(std::unique_ptr<ViewStub> view_stub) {
   DCHECK(view_stub);
 
-  if (view_stub->state())
-    UnregisterView(view_stub->state());
+  ViewState* view_state = view_stub->ReleaseView();
+  if (view_state)
+    UnregisterView(view_state);
 }
 
 void ViewRegistry::SetLayout(ViewStub* view_stub,
