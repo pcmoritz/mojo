@@ -8,4 +8,5 @@ important aspects.
 * [Mojo programs](programs.md)
 * [Mojo handles (objects)](handles.md)
 * [Message pipes](message_pipes.md)
-* [Mojom (the Mojo IDL)](mojom.md)
+* [Mojom IDL](mojom_idl.md)
+* [Mojom protocol](mojom_protocol.md)

@@ -11,7 +11,8 @@ of the meaning of the data or of the handles (other than their intrinsic
 properties).
 
 That said, Mojo provides a *standard* way of communicating over message pipes,
-namely via a standardized protocol together with [Mojom](mojom.md) IDL files.
+namely via a standardized protocol together with [Mojom IDL](mojom_idl.md)
+files.
 
 ## Messages
 
@@ -82,9 +83,9 @@ it). Of course, this requires that the protocol support this:
 * Message pipes must be used in a "directional" way: there must be fixed request
   and response directions or, equivalently, one endpoint belongs to the *client*
   and the other to the *server* (or *impl*). (Historical note: This is the case
-  for the current Mojom protocol, but not in previous versions.) The issue here
-  is that without this, the sender of the request messages may have to process
-  incoming request messages from its peer.
+  for the current [Mojom protocol](mojom_protocol.md), but not in previous
+  versions.) The issue here is that without this, the sender of the request
+  messages may have to process incoming request messages from its peer.
 * Request messages must have unique response messages. (In the Mojom protocol,
   request messages have optional unique responses. For messages without
   responses, one can just proceed immediately without waiting. However, without
