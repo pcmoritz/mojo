@@ -58,4 +58,5 @@ from subtle differences. Implementation status:
 | SecureSocket       | N/A                  | No          |
 | SecureServerSocket | N/A                  | No          |
 | Datagram           | mojo:network_service | No          |
-| File system        | mojo:files           | No          |
+| File system        | mojo:files           | Yes         |
+| Zlib Gzip Filter   | N/A                  | Yes         |
