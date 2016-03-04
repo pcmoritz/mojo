@@ -23,11 +23,18 @@ def main(args):
   with open(deps_path) as deps_contents:
     d = deps_contents.read()
   exec(d, scope)
+  env = os.environ
+  # Some hooks expect depot_tools to be in the PATH already so add the default
+  # location of depot_tools in a standard checkout to the environment the hooks
+  # run in.
+  default_depot_tools_path = os.path.abspath(os.path.join(gclient_path,
+      "depot_tools"))
+  env["PATH"] += os.pathsep + default_depot_tools_path
   for hook in scope["hooks"]:
     name = hook["name"]
     print "________ running '%s' in '%s'" % (" ".join(hook["action"]),
         gclient_path)
-    subprocess.check_call(hook["action"], cwd=gclient_path)
+    subprocess.check_call(hook["action"], cwd=gclient_path, env=env)
     print
   return 0
 
