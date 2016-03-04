@@ -159,18 +159,66 @@ language-appropriate style.
 
 ### Module statement
 
-**TODO(vtl)**
+The Mojom *module* statement is just a way of logically grouping Mojom
+declarations. For example:
+```mojom
+module my_module;
+```
+Mojom modules are similar to C++ namespaces (and the standard C++ code generator
+would put generated code into the `my_module` namespace), in that there is no
+implication that the file contains the entirety of the "module" definiton;
+multiple files may have the same module statement. (There is also no requirement
+that the module name have anything to do with the file path containing the Mojom
+file.)
+
+Mojom module names are hierarchical in that they can be composed of multiple
+parts separated by `.`. For example:
+```mojom
+module my_module.my_submodule;
+
+struct MyStruct {
+};
+```
+Name look-up is similar to C++: E.g., if the current module is
+`my_module.my_submodule` then `MyStruct`, `my_submodule.MyStruct`, and
+`my_module.my_submodule.MyStruct` all refer to the above struct, whereas if the
+current module is just `my_module` then only the latter two do.
 
 ### Import declarations
 
-**TODO(vtl)**
+An *import* declaration makes the declarations from another Mojom file available
+in the current Mojom file. Moreover, it operates transitively, in the sense that
+it also makes the imports of the imported file available, etc. The "argument" to
+the import statement is a path to a file. Tools that work with Mojom files are
+typically provided with a search path for importing files (just as a C++
+compiler can be provided with an "include path"), for the purposes of resolving
+these paths. (**TODO(vtl)**: This always includes the current Mojom file's path,
+right? Is the current path the first path that's searched?)
+
+For example:
+```mojom
+module my_module;
+
+import "path/to/another.mojom";
+import "path/to/yet/a/different.mojom";
+```
+This makes the contents of the two mentioned Mojom files available, together
+with whatever they import, transitively. (Note that names are resolved in the
+way described in the previous section.)
+
+Import cycles are not permitted (so, e.g., it would be an error if
+`path/to/another.mojom` imported the current Mojom file). However, it is
+entirely valid for Mojom files to be imported (transitively) multiple times
+(e.g., it is fine for `path/to/another.mojom` to also import
+`path/to/yet/a/different.mojom`).
 
 ### Struct declarations
 
-A Mojom struct declaration consists of a finite sequence of *field declaration*,
-each of which consists of a *type*, a *name*, and optionally a *default value*
-(if applicable for the given type). (If no default value is declared, then the
-default is the default value for the field type, typically 0, null, or similar.)
+A Mojom *struct* declaration consists of a finite sequence of *field
+declaration*, each of which consists of a *type*, a *name*, and optionally a
+*default value* (if applicable for the given type). (If no default value is
+declared, then the default is the default value for the field type, typically 0,
+null, or similar.)
 
 Additionally, a struct may contain enum and const declarations (**TODO(vtl)**:
 why not struct/union/interface declarations?). While the order of the field
