@@ -93,3 +93,6 @@ CopyFiles("sdk_build/data/cpp/Makefile", "")
 
 # Bring in the license and authors files.
 CopyFiles(["LICENSE", "AUTHORS"], "")
+
+# Put in the README.md for the SDK.
+WriteFile("README.md", ReadFile("sdk_build/data/cpp/README-sdk.md"))
