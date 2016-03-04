@@ -117,7 +117,8 @@ class PingPongApplication extends Application {
     connection.remoteServiceProvider.close();
 
     connection.provideService(PingPongService.serviceName,
-        (endpoint) => new PingPongServiceImpl(this, endpoint));
+        (endpoint) => new PingPongServiceImpl(this, endpoint),
+        description: PingPongServiceStub.serviceDescription);
   }
 }
 

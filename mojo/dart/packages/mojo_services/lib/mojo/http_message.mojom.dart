@@ -138,8 +138,6 @@ class HttpRequest extends bindings.Struct {
 }
 
 
-
-
 class HttpResponse extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -253,9 +251,6 @@ class HttpResponse extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
-
 
 
 

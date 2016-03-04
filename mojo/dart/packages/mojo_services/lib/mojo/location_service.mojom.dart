@@ -87,8 +87,6 @@ class _LocationServiceGetNextLocationParams extends bindings.Struct {
 }
 
 
-
-
 class LocationServiceGetNextLocationResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -161,9 +159,6 @@ class LocationServiceGetNextLocationResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _LocationService_getNextLocationName = 0;
   
 class LocationServiceUpdatePriority extends bindings.MojoEnum {
@@ -231,10 +226,6 @@ class LocationServiceUpdatePriority extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
-
 
 class _LocationServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

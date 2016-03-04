@@ -110,8 +110,6 @@ class _TcpServerSocketAcceptParams extends bindings.Struct {
 }
 
 
-
-
 class TcpServerSocketAcceptResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -199,12 +197,7 @@ class TcpServerSocketAcceptResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _TcpServerSocket_acceptName = 0;
-
-
 
 class _TcpServerSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

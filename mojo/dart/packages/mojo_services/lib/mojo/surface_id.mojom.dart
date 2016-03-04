@@ -95,6 +95,3 @@ class SurfaceId extends bindings.Struct {
 
 
 
-
-
-

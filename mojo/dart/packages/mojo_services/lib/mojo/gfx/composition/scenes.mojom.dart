@@ -205,8 +205,6 @@ class SceneUpdate extends bindings.Struct {
 }
 
 
-
-
 class SceneMetadata extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -293,8 +291,6 @@ class SceneMetadata extends bindings.Struct {
 }
 
 
-
-
 class _SceneSetListenerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -364,8 +360,6 @@ class _SceneSetListenerParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _SceneUpdateParams extends bindings.Struct {
@@ -438,8 +432,6 @@ class _SceneUpdateParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _ScenePublishParams extends bindings.Struct {
@@ -515,8 +507,6 @@ class _ScenePublishParams extends bindings.Struct {
 }
 
 
-
-
 class _SceneGetSchedulerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -586,8 +576,6 @@ class _SceneGetSchedulerParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _SceneListenerOnResourceUnavailableParams extends bindings.Struct {
@@ -662,8 +650,6 @@ class _SceneListenerOnResourceUnavailableParams extends bindings.Struct {
 }
 
 
-
-
 class SceneListenerOnResourceUnavailableResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -721,15 +707,10 @@ class SceneListenerOnResourceUnavailableResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Scene_setListenerName = 0;
 const int _Scene_updateName = 1;
 const int _Scene_publishName = 2;
 const int _Scene_getSchedulerName = 3;
-
-
 
 class _SceneServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -965,8 +946,6 @@ class SceneStub extends bindings.Stub {
 }
 
 const int _SceneListener_onResourceUnavailableName = 0;
-
-
 
 class _SceneListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

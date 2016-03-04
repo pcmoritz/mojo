@@ -98,8 +98,6 @@ class _MediaFactoryCreatePlayerParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaFactoryCreateSourceParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -215,8 +213,6 @@ class _MediaFactoryCreateSourceParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaFactoryCreateSinkParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -314,14 +310,9 @@ class _MediaFactoryCreateSinkParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaFactory_createPlayerName = 0;
 const int _MediaFactory_createSourceName = 1;
 const int _MediaFactory_createSinkName = 2;
-
-
 
 class _MediaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

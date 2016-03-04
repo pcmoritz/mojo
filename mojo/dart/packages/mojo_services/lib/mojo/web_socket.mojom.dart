@@ -149,8 +149,6 @@ class _WebSocketConnectParams extends bindings.Struct {
 }
 
 
-
-
 class _WebSocketSendParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -255,8 +253,6 @@ class _WebSocketSendParams extends bindings.Struct {
 }
 
 
-
-
 class _WebSocketFlowControlParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -327,8 +323,6 @@ class _WebSocketFlowControlParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _WebSocketCloseParams extends bindings.Struct {
@@ -415,8 +409,6 @@ class _WebSocketCloseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _WebSocketClientDidConnectParams extends bindings.Struct {
@@ -514,8 +506,6 @@ class _WebSocketClientDidConnectParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _WebSocketClientDidReceiveDataParams extends bindings.Struct {
@@ -622,8 +612,6 @@ class _WebSocketClientDidReceiveDataParams extends bindings.Struct {
 }
 
 
-
-
 class _WebSocketClientDidReceiveFlowControlParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -696,8 +684,6 @@ class _WebSocketClientDidReceiveFlowControlParams extends bindings.Struct {
 }
 
 
-
-
 class _WebSocketClientDidFailParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -768,8 +754,6 @@ class _WebSocketClientDidFailParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _WebSocketClientDidCloseParams extends bindings.Struct {
@@ -871,9 +855,6 @@ class _WebSocketClientDidCloseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _WebSocket_connectName = 0;
 const int _WebSocket_sendName = 1;
 const int _WebSocket_flowControlName = 2;
@@ -937,10 +918,6 @@ class WebSocketMessageType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
-
 
 class _WebSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1188,8 +1165,6 @@ const int _WebSocketClient_didReceiveDataName = 1;
 const int _WebSocketClient_didReceiveFlowControlName = 2;
 const int _WebSocketClient_didFailName = 3;
 const int _WebSocketClient_didCloseName = 4;
-
-
 
 class _WebSocketClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

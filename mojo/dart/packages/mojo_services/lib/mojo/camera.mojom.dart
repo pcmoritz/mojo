@@ -94,8 +94,6 @@ class Photo extends bindings.Struct {
 }
 
 
-
-
 class _CameraRollServiceUpdateParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -154,8 +152,6 @@ class _CameraRollServiceUpdateParams extends bindings.Struct {
 }
 
 
-
-
 class _CameraRollServiceGetCountParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -212,8 +208,6 @@ class _CameraRollServiceGetCountParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class CameraRollServiceGetCountResponseParams extends bindings.Struct {
@@ -288,8 +282,6 @@ class CameraRollServiceGetCountResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _CameraRollServiceGetPhotoParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -360,8 +352,6 @@ class _CameraRollServiceGetPhotoParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class CameraRollServiceGetPhotoResponseParams extends bindings.Struct {
@@ -436,8 +426,6 @@ class CameraRollServiceGetPhotoResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _CameraServiceGetLatestFrameParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -494,8 +482,6 @@ class _CameraServiceGetLatestFrameParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class CameraServiceGetLatestFrameResponseParams extends bindings.Struct {
@@ -568,14 +554,9 @@ class CameraServiceGetLatestFrameResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _CameraRollService_updateName = 0;
 const int _CameraRollService_getCountName = 1;
 const int _CameraRollService_getPhotoName = 2;
-
-
 
 class _CameraRollServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -874,8 +855,6 @@ class CameraRollServiceStub extends bindings.Stub {
 }
 
 const int _CameraService_getLatestFrameName = 0;
-
-
 
 class _CameraServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

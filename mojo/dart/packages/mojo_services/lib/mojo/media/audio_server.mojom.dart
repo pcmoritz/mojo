@@ -81,12 +81,7 @@ class _AudioServerCreateTrackParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _AudioServer_createTrackName = 0;
-
-
 
 class _AudioServerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

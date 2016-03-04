@@ -73,8 +73,6 @@ class LocationType extends bindings.Struct {
 }
 
 
-
-
 class Bounds extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -161,8 +159,6 @@ class Bounds extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ComponentRestrictions extends bindings.Struct {
@@ -293,8 +289,6 @@ class ComponentRestrictions extends bindings.Struct {
 }
 
 
-
-
 class Options extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -395,8 +389,6 @@ class Options extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Geometry extends bindings.Struct {
@@ -515,8 +507,6 @@ class Geometry extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Result extends bindings.Struct {
@@ -649,8 +639,6 @@ class Result extends bindings.Struct {
 }
 
 
-
-
 class Status extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -712,8 +700,6 @@ class Status extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _GeocoderAddressToLocationParams extends bindings.Struct {
@@ -801,8 +787,6 @@ class _GeocoderAddressToLocationParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class GeocoderAddressToLocationResponseParams extends bindings.Struct {
@@ -909,8 +893,6 @@ class GeocoderAddressToLocationResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _GeocoderLocationToAddressParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -997,8 +979,6 @@ class _GeocoderLocationToAddressParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class GeocoderLocationToAddressResponseParams extends bindings.Struct {
@@ -1104,13 +1084,8 @@ class GeocoderLocationToAddressResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Geocoder_addressToLocationName = 0;
 const int _Geocoder_locationToAddressName = 1;
-
-
 
 class _GeocoderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

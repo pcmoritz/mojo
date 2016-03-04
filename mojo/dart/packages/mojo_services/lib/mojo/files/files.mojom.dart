@@ -96,8 +96,6 @@ class _FilesOpenFileSystemParams extends bindings.Struct {
 }
 
 
-
-
 class FilesOpenFileSystemResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -173,12 +171,7 @@ class FilesOpenFileSystemResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Files_openFileSystemName = 0;
-
-
 
 class _FilesServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -96,8 +96,6 @@ class Contact extends bindings.Struct {
 }
 
 
-
-
 class _ContactsServiceGetCountParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -170,8 +168,6 @@ class _ContactsServiceGetCountParams extends bindings.Struct {
 }
 
 
-
-
 class ContactsServiceGetCountResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -242,8 +238,6 @@ class ContactsServiceGetCountResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ContactsServiceGetParams extends bindings.Struct {
@@ -346,8 +340,6 @@ class _ContactsServiceGetParams extends bindings.Struct {
 }
 
 
-
-
 class ContactsServiceGetResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -436,8 +428,6 @@ class ContactsServiceGetResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ContactsServiceGetEmailsParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -508,8 +498,6 @@ class _ContactsServiceGetEmailsParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ContactsServiceGetEmailsResponseParams extends bindings.Struct {
@@ -599,8 +587,6 @@ class ContactsServiceGetEmailsResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ContactsServiceGetPhotoParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -687,8 +673,6 @@ class _ContactsServiceGetPhotoParams extends bindings.Struct {
 }
 
 
-
-
 class ContactsServiceGetPhotoResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -760,15 +744,10 @@ class ContactsServiceGetPhotoResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ContactsService_getCountName = 0;
 const int _ContactsService_getName = 1;
 const int _ContactsService_getEmailsName = 2;
 const int _ContactsService_getPhotoName = 3;
-
-
 
 class _ContactsServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

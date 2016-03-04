@@ -10,9 +10,6 @@ import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as servic
 
 
 
-
-
-
 class _TcpConnectedSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);

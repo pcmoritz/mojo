@@ -96,8 +96,6 @@ class _HttpServerSetHandlerParams extends bindings.Struct {
 }
 
 
-
-
 class HttpServerSetHandlerResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -170,8 +168,6 @@ class HttpServerSetHandlerResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _HttpServerGetPortParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -228,8 +224,6 @@ class _HttpServerGetPortParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class HttpServerGetPortResponseParams extends bindings.Struct {
@@ -304,8 +298,6 @@ class HttpServerGetPortResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _HttpHandlerHandleRequestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -376,8 +368,6 @@ class _HttpHandlerHandleRequestParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class HttpHandlerHandleRequestResponseParams extends bindings.Struct {
@@ -451,13 +441,8 @@ class HttpHandlerHandleRequestResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _HttpServer_setHandlerName = 0;
 const int _HttpServer_getPortName = 1;
-
-
 
 class _HttpServerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -745,8 +730,6 @@ class HttpServerStub extends bindings.Stub {
 }
 
 const int _HttpHandler_handleRequestName = 0;
-
-
 
 class _HttpHandlerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

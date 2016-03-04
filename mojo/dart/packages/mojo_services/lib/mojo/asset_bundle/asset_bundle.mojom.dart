@@ -82,8 +82,6 @@ class _AssetBundleGetAsStreamParams extends bindings.Struct {
 }
 
 
-
-
 class AssetBundleGetAsStreamResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -153,8 +151,6 @@ class AssetBundleGetAsStreamResponseParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _AssetUnpackerUnpackZipStreamParams extends bindings.Struct {
@@ -240,12 +236,7 @@ class _AssetUnpackerUnpackZipStreamParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _AssetBundle_getAsStreamName = 0;
-
-
 
 class _AssetBundleServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -478,8 +469,6 @@ class AssetBundleStub extends bindings.Stub {
 }
 
 const int _AssetUnpacker_unpackZipStreamName = 0;
-
-
 
 class _AssetUnpackerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

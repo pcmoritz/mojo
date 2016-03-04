@@ -82,8 +82,6 @@ class _IcuDataMapParams extends bindings.Struct {
 }
 
 
-
-
 class IcuDataMapResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -154,12 +152,7 @@ class IcuDataMapResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _IcuData_mapName = 0;
-
-
 
 class _IcuDataServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

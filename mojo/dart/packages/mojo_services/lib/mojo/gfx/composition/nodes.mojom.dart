@@ -69,8 +69,6 @@ class NodeCombinator extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class Node extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(64, 0)
@@ -220,8 +218,6 @@ class Node extends bindings.Struct {
 }
 
 
-
-
 class RectNodeOp extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -308,8 +304,6 @@ class RectNodeOp extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ImageNodeOp extends bindings.Struct {
@@ -429,8 +423,6 @@ class ImageNodeOp extends bindings.Struct {
 }
 
 
-
-
 class SceneNodeOp extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -515,8 +507,6 @@ class SceneNodeOp extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class LayerNodeOp extends bindings.Struct {
@@ -605,8 +595,6 @@ class LayerNodeOp extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Color extends bindings.Struct {
@@ -723,8 +711,6 @@ class Color extends bindings.Struct {
 }
 
 
-
-
 class Blend extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -795,8 +781,6 @@ class Blend extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 
@@ -953,8 +937,5 @@ class NodeOp extends bindings.Union {
     return result;
   }
 }
-
-
-
 
 

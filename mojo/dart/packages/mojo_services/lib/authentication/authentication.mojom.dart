@@ -82,8 +82,6 @@ class _AuthenticationServiceSelectAccountParams extends bindings.Struct {
 }
 
 
-
-
 class AuthenticationServiceSelectAccountResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -168,8 +166,6 @@ class AuthenticationServiceSelectAccountResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _AuthenticationServiceGetOAuth2TokenParams extends bindings.Struct {
@@ -273,8 +269,6 @@ class _AuthenticationServiceGetOAuth2TokenParams extends bindings.Struct {
 }
 
 
-
-
 class AuthenticationServiceGetOAuth2TokenResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -361,8 +355,6 @@ class AuthenticationServiceGetOAuth2TokenResponseParams extends bindings.Struct 
 }
 
 
-
-
 class _AuthenticationServiceClearOAuth2TokenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -434,14 +426,9 @@ class _AuthenticationServiceClearOAuth2TokenParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _AuthenticationService_selectAccountName = 0;
 const int _AuthenticationService_getOAuth2TokenName = 1;
 const int _AuthenticationService_clearOAuth2TokenName = 2;
-
-
 
 class _AuthenticationServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

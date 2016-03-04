@@ -68,8 +68,6 @@ class _DeviceInfoGetDeviceTypeParams extends bindings.Struct {
 }
 
 
-
-
 class DeviceInfoGetDeviceTypeResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -144,9 +142,6 @@ class DeviceInfoGetDeviceTypeResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 const int _DeviceInfo_getDeviceTypeName = 0;
   
@@ -236,10 +231,6 @@ class DeviceInfoDeviceType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
-
 
 class _DeviceInfoServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -83,12 +83,7 @@ class _InputDispatcherDispatchEventParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _InputDispatcher_dispatchEventName = 0;
-
-
 
 class _InputDispatcherServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

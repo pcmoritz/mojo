@@ -111,8 +111,6 @@ class Error extends bindings.MojoEnum {
 
 
 
-
-
 class UtteranceCandidate extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -199,8 +197,6 @@ class UtteranceCandidate extends bindings.Struct {
 }
 
 
-
-
 class _SpeechRecognizerServiceListenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -257,8 +253,6 @@ class _SpeechRecognizerServiceListenParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class SpeechRecognizerServiceListenResponseParams extends bindings.Struct {
@@ -337,8 +331,6 @@ class SpeechRecognizerServiceListenResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _SpeechRecognizerServiceStopListeningParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -395,8 +387,6 @@ class _SpeechRecognizerServiceStopListeningParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 
@@ -521,13 +511,8 @@ class ResultOrError extends bindings.Union {
     return result;
   }
 }
-
-
-
 const int _SpeechRecognizerService_listenName = 0;
 const int _SpeechRecognizerService_stopListeningName = 1;
-
-
 
 class _SpeechRecognizerServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

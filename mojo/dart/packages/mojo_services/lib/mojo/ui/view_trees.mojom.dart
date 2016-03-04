@@ -85,8 +85,6 @@ class ViewTreeToken extends bindings.Struct {
 }
 
 
-
-
 class _ViewTreeGetTokenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -143,8 +141,6 @@ class _ViewTreeGetTokenParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ViewTreeGetTokenResponseParams extends bindings.Struct {
@@ -220,8 +216,6 @@ class ViewTreeGetTokenResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewTreeGetServiceProviderParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -293,8 +287,6 @@ class _ViewTreeGetServiceProviderParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewTreeRequestLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -351,8 +343,6 @@ class _ViewTreeRequestLayoutParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewTreeSetRootParams extends bindings.Struct {
@@ -439,8 +429,6 @@ class _ViewTreeSetRootParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewTreeResetRootParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -510,8 +498,6 @@ class _ViewTreeResetRootParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _ViewTreeLayoutRootParams extends bindings.Struct {
@@ -587,8 +573,6 @@ class _ViewTreeLayoutRootParams extends bindings.Struct {
 }
 
 
-
-
 class ViewTreeLayoutRootResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -662,8 +646,6 @@ class ViewTreeLayoutRootResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewTreeListenerOnLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -722,8 +704,6 @@ class _ViewTreeListenerOnLayoutParams extends bindings.Struct {
 }
 
 
-
-
 class ViewTreeListenerOnLayoutResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -780,8 +760,6 @@ class ViewTreeListenerOnLayoutResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewTreeListenerOnRootUnavailableParams extends bindings.Struct {
@@ -856,8 +834,6 @@ class _ViewTreeListenerOnRootUnavailableParams extends bindings.Struct {
 }
 
 
-
-
 class ViewTreeListenerOnRootUnavailableResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -915,17 +891,12 @@ class ViewTreeListenerOnRootUnavailableResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ViewTree_getTokenName = 0;
 const int _ViewTree_getServiceProviderName = 1;
 const int _ViewTree_requestLayoutName = 2;
 const int _ViewTree_setRootName = 3;
 const int _ViewTree_resetRootName = 4;
 const int _ViewTree_layoutRootName = 5;
-
-
 
 class _ViewTreeServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1271,8 +1242,6 @@ class ViewTreeStub extends bindings.Stub {
 
 const int _ViewTreeListener_onLayoutName = 0;
 const int _ViewTreeListener_onRootUnavailableName = 1;
-
-
 
 class _ViewTreeListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

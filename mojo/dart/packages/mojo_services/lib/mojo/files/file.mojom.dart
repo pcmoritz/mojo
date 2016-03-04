@@ -69,8 +69,6 @@ class _FileCloseParams extends bindings.Struct {
 }
 
 
-
-
 class FileCloseResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -145,8 +143,6 @@ class FileCloseResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileReadParams extends bindings.Struct {
@@ -253,8 +249,6 @@ class _FileReadParams extends bindings.Struct {
 }
 
 
-
-
 class FileReadResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -343,8 +337,6 @@ class FileReadResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileWriteParams extends bindings.Struct {
@@ -451,8 +443,6 @@ class _FileWriteParams extends bindings.Struct {
 }
 
 
-
-
 class FileWriteResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -541,8 +531,6 @@ class FileWriteResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileReadToStreamParams extends bindings.Struct {
@@ -659,8 +647,6 @@ class _FileReadToStreamParams extends bindings.Struct {
 }
 
 
-
-
 class FileReadToStreamResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -735,8 +721,6 @@ class FileReadToStreamResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileWriteFromStreamParams extends bindings.Struct {
@@ -840,8 +824,6 @@ class _FileWriteFromStreamParams extends bindings.Struct {
 }
 
 
-
-
 class FileWriteFromStreamResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -918,8 +900,6 @@ class FileWriteFromStreamResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileTellParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -976,8 +956,6 @@ class _FileTellParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileTellResponseParams extends bindings.Struct {
@@ -1070,8 +1048,6 @@ class FileTellResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileSeekParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -1160,8 +1136,6 @@ class _FileSeekParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileSeekResponseParams extends bindings.Struct {
@@ -1254,8 +1228,6 @@ class FileSeekResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileStatParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1312,8 +1284,6 @@ class _FileStatParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileStatResponseParams extends bindings.Struct {
@@ -1407,8 +1377,6 @@ class FileStatResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileTruncateParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1479,8 +1447,6 @@ class _FileTruncateParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileTruncateResponseParams extends bindings.Struct {
@@ -1557,8 +1523,6 @@ class FileTruncateResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileTouchParams extends bindings.Struct {
@@ -1649,8 +1613,6 @@ class _FileTouchParams extends bindings.Struct {
 }
 
 
-
-
 class FileTouchResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1727,8 +1689,6 @@ class FileTouchResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileDupParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1798,8 +1758,6 @@ class _FileDupParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class FileDupResponseParams extends bindings.Struct {
@@ -1876,8 +1834,6 @@ class FileDupResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _FileReopenParams extends bindings.Struct {
@@ -1964,8 +1920,6 @@ class _FileReopenParams extends bindings.Struct {
 }
 
 
-
-
 class FileReopenResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -2042,8 +1996,6 @@ class FileReopenResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileAsBufferParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -2100,8 +2052,6 @@ class _FileAsBufferParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileAsBufferResponseParams extends bindings.Struct {
@@ -2192,8 +2142,6 @@ class FileAsBufferResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _FileIoctlParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -2278,8 +2226,6 @@ class _FileIoctlParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileIoctlResponseParams extends bindings.Struct {
@@ -2371,9 +2317,6 @@ class FileIoctlResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _File_closeName = 0;
 const int _File_readName = 1;
 const int _File_writeName = 2;
@@ -2388,8 +2331,6 @@ const int _File_dupName = 10;
 const int _File_reopenName = 11;
 const int _File_asBufferName = 12;
 const int _File_ioctlName = 13;
-
-
 
 class _FileServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

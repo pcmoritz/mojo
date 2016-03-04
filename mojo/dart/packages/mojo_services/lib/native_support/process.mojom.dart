@@ -195,8 +195,6 @@ class _ProcessSpawnParams extends bindings.Struct {
 }
 
 
-
-
 class ProcessSpawnResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -271,8 +269,6 @@ class ProcessSpawnResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ProcessSpawnWithTerminalParams extends bindings.Struct {
@@ -432,8 +428,6 @@ class _ProcessSpawnWithTerminalParams extends bindings.Struct {
 }
 
 
-
-
 class ProcessSpawnWithTerminalResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -510,8 +504,6 @@ class ProcessSpawnWithTerminalResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ProcessControllerWaitParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -568,8 +560,6 @@ class _ProcessControllerWaitParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ProcessControllerWaitResponseParams extends bindings.Struct {
@@ -662,8 +652,6 @@ class ProcessControllerWaitResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ProcessControllerKillParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -734,8 +722,6 @@ class _ProcessControllerKillParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ProcessControllerKillResponseParams extends bindings.Struct {
@@ -813,13 +799,8 @@ class ProcessControllerKillResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Process_spawnName = 0;
 const int _Process_spawnWithTerminalName = 1;
-
-
 
 class _ProcessServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1120,8 +1101,6 @@ class ProcessStub extends bindings.Stub {
 
 const int _ProcessController_waitName = 0;
 const int _ProcessController_killName = 1;
-
-
 
 class _ProcessControllerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

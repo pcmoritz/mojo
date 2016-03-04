@@ -118,8 +118,6 @@ class MediaSourceStreamDescriptor extends bindings.Struct {
 }
 
 
-
-
 class MediaSourceStatus extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -211,8 +209,6 @@ class MediaSourceStatus extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceGetStreamsParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -269,8 +265,6 @@ class _MediaSourceGetStreamsParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSourceGetStreamsResponseParams extends bindings.Struct {
@@ -361,8 +355,6 @@ class MediaSourceGetStreamsResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceGetClockDispositionParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -419,8 +411,6 @@ class _MediaSourceGetClockDispositionParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSourceGetClockDispositionResponseParams extends bindings.Struct {
@@ -499,8 +489,6 @@ class MediaSourceGetClockDispositionResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceGetMasterClockParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -572,8 +560,6 @@ class _MediaSourceGetMasterClockParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceSetMasterClockParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -643,8 +629,6 @@ class _MediaSourceSetMasterClockParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _MediaSourceGetProducerParams extends bindings.Struct {
@@ -731,8 +715,6 @@ class _MediaSourceGetProducerParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceGetPullModeProducerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -817,8 +799,6 @@ class _MediaSourceGetPullModeProducerParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceGetStatusParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -889,8 +869,6 @@ class _MediaSourceGetStatusParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSourceGetStatusResponseParams extends bindings.Struct {
@@ -980,8 +958,6 @@ class MediaSourceGetStatusResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourcePrepareParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1038,8 +1014,6 @@ class _MediaSourcePrepareParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSourcePrepareResponseParams extends bindings.Struct {
@@ -1100,8 +1074,6 @@ class MediaSourcePrepareResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSourceFlushParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1158,8 +1130,6 @@ class _MediaSourceFlushParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSourceFlushResponseParams extends bindings.Struct {
@@ -1219,9 +1189,6 @@ class MediaSourceFlushResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaSource_getStreamsName = 0;
 const int _MediaSource_getClockDispositionName = 1;
 const int _MediaSource_getMasterClockName = 2;
@@ -1231,8 +1198,6 @@ const int _MediaSource_getPullModeProducerName = 5;
 const int _MediaSource_getStatusName = 6;
 const int _MediaSource_prepareName = 7;
 const int _MediaSource_flushName = 8;
-
-
 
 class _MediaSourceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

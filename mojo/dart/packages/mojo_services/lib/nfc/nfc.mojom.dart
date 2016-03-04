@@ -82,8 +82,6 @@ class NfcData extends bindings.Struct {
 }
 
 
-
-
 class _NfcTransmissionCancelParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -140,8 +138,6 @@ class _NfcTransmissionCancelParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NfcReceiverOnReceivedNfcDataParams extends bindings.Struct {
@@ -215,8 +211,6 @@ class _NfcReceiverOnReceivedNfcDataParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NfcTransmitOnNextConnectionParams extends bindings.Struct {
@@ -304,8 +298,6 @@ class _NfcTransmitOnNextConnectionParams extends bindings.Struct {
 }
 
 
-
-
 class NfcTransmitOnNextConnectionResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -378,8 +370,6 @@ class NfcTransmitOnNextConnectionResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _NfcRegisterParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -436,8 +426,6 @@ class _NfcRegisterParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NfcUnregisterParams extends bindings.Struct {
@@ -497,12 +485,7 @@ class _NfcUnregisterParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _NfcTransmission_cancelName = 0;
-
-
 
 class _NfcTransmissionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -690,8 +673,6 @@ class NfcTransmissionStub extends bindings.Stub {
 }
 
 const int _NfcReceiver_onReceivedNfcDataName = 0;
-
-
 
 class _NfcReceiverServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -884,8 +865,6 @@ class NfcReceiverStub extends bindings.Stub {
 const int _Nfc_transmitOnNextConnectionName = 0;
 const int _Nfc_registerName = 1;
 const int _Nfc_unregisterName = 2;
-
-
 
 class _NfcServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -96,8 +96,6 @@ class PrevWordInfo extends bindings.Struct {
 }
 
 
-
-
 class PredictionInfo extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -200,8 +198,6 @@ class PredictionInfo extends bindings.Struct {
 }
 
 
-
-
 class _PredictionServiceGetPredictionListParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -273,8 +269,6 @@ class _PredictionServiceGetPredictionListParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class PredictionServiceGetPredictionListResponseParams extends bindings.Struct {
@@ -365,12 +359,7 @@ class PredictionServiceGetPredictionListResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _PredictionService_getPredictionListName = 0;
-
-
 
 class _PredictionServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

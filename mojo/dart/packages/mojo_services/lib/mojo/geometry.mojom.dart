@@ -94,8 +94,6 @@ class Point extends bindings.Struct {
 }
 
 
-
-
 class PointF extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -182,8 +180,6 @@ class PointF extends bindings.Struct {
 }
 
 
-
-
 class Size extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -268,8 +264,6 @@ class Size extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Rect extends bindings.Struct {
@@ -386,8 +380,6 @@ class Rect extends bindings.Struct {
 }
 
 
-
-
 class RectF extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -500,8 +492,6 @@ class RectF extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class RRect extends bindings.Struct {
@@ -730,8 +720,6 @@ class RRect extends bindings.Struct {
 }
 
 
-
-
 class Transform extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -802,9 +790,6 @@ class Transform extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

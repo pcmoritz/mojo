@@ -68,8 +68,6 @@ class _VSyncProviderAwaitVSyncParams extends bindings.Struct {
 }
 
 
-
-
 class VSyncProviderAwaitVSyncResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -141,12 +139,7 @@ class VSyncProviderAwaitVSyncResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _VSyncProvider_awaitVSyncName = 0;
-
-
 
 class _VSyncProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

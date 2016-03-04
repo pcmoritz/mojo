@@ -186,6 +186,3 @@ class HttpResponse extends bindings.Struct {
 
 
 
-
-
-

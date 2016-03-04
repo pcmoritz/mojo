@@ -81,12 +81,7 @@ class _SharingServiceShareTextParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _SharingService_shareTextName = 0;
-
-
 
 class _SharingServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

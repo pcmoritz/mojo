@@ -102,8 +102,6 @@ class _HostResolverGetHostAddressesParams extends bindings.Struct {
 }
 
 
-
-
 class HostResolverGetHostAddressesResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -208,12 +206,7 @@ class HostResolverGetHostAddressesResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _HostResolver_getHostAddressesName = 0;
-
-
 
 class _HostResolverServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

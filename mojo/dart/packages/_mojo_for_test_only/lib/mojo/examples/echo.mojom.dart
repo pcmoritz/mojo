@@ -5,6 +5,7 @@
 library echo_mojom;
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -83,21 +84,6 @@ class _EchoEchoStringParams extends bindings.Struct {
   }
 }
 
-mojom_types.MojomStruct _echoEchoEchoStringParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'EchoEchoStringParams'
-      ..fullIdentifier = 'mojo.examples.Echo_EchoString_Params')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..stringType = (new mojom_types.StringType()
-            ..nullable = true
-          )),];
-}
-
 
 class EchoEchoStringResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
@@ -170,43 +156,14 @@ class EchoEchoStringResponseParams extends bindings.Struct {
   }
 }
 
-mojom_types.MojomStruct _echoEchoEchoStringResponseParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'EchoEchoStringResponseParams'
-      ..fullIdentifier = 'mojo.examples.Echo_EchoString_ResponseParams')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..stringType = (new mojom_types.StringType()
-            ..nullable = true
-          )),];
-}
-
-
 const int _Echo_echoStringName = 0;
 
-mojom_types.MojomInterface _echoEcho() {
-  return new mojom_types.MojomInterface()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'Echo'
-      ..fullIdentifier = 'mojo.examples.Echo')
-    ..serviceName_ = 'Echo'
-    ..methods = <int, mojom_types.MojomMethod>{
-      _Echo_echoStringName: new mojom_types.MojomMethod()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'EchoString')
-        ..ordinal = _Echo_echoStringName
-        ..responseParams = _echoEchoEchoStringResponseParams()
-        ..parameters = _echoEchoEchoStringParams(),
-    };
-}
-
 class _EchoServiceDescription implements service_describer.ServiceDescription {
-  dynamic getTopLevelInterface([Function responseFactory]) =>
-    responseFactory(_echoEcho());
+  dynamic getTopLevelInterface([Function responseFactory]){
+    var interfaceTypeKey = getRuntimeTypeInfo().servicesByName["mojo::examples::Echo"].topLevelInterface;
+    var userDefinedType = getAllMojomTypeDefinitions()[interfaceTypeKey];
+    return responseFactory(userDefinedType.interfaceType);
+  }
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
     responseFactory(getAllMojomTypeDefinitions()[typeKey]);
@@ -435,25 +392,24 @@ class EchoStub extends bindings.Stub {
 }
 
 
-Map<String, mojom_types.UserDefinedType> _initDescriptions() {
-  var map = new HashMap<String, mojom_types.UserDefinedType>();
-  map["echo_Echo_EchoString_Params__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _echoEchoEchoStringParams();
-  map["echo_Echo_EchoString_ResponseParams__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _echoEchoEchoStringResponseParams();
-  map["echo_Echo__"] =
-    new mojom_types.UserDefinedType()
-      ..interfaceType = _echoEcho();
-  return map;
-}
+mojom_types.RuntimeTypeInfo getRuntimeTypeInfo() => _runtimeTypeInfo ??
+    _initRuntimeTypeInfo();
 
-var _mojomDesc;
 Map<String, mojom_types.UserDefinedType> getAllMojomTypeDefinitions() {
-  if (_mojomDesc == null) {
-    _mojomDesc = _initDescriptions();
-  }
-  return _mojomDesc;
+  return getRuntimeTypeInfo().typeMap;
 }
 
+var _runtimeTypeInfo;
+mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
+  // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
+  // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
+  // file.
+  var serializedRuntimeTypeInfo = new Uint8List.fromList(const [24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,216,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,28,0,0,0,20,0,0,0,109,111,106,111,58,58,101,120,97,109,112,108,101,115,58,58,69,99,104,111,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,35,0,0,0,27,0,0,0,84,89,80,69,95,75,69,89,58,109,111,106,111,46,101,120,97,109,112,108,101,115,46,69,99,104,111,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,35,0,0,0,27,0,0,0,84,89,80,69,95,75,69,89,58,109,111,106,111,46,101,120,97,109,112,108,101,115,46,69,99,104,111,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,64,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,35,0,0,0,27,0,0,0,84,89,80,69,95,75,69,89,58,109,111,106,111,46,101,120,97,109,112,108,101,115,46,69,99,104,111,0,0,0,0,0,24,0,0,0,1,0,0,0,16,0,0,0,3,0,0,0,8,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,72,1,0,0,0,0,0,0,96,1,0,0,0,0,0,0,72,0,0,0,0,0,0,0,64,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,152,0,0,0,0,0,0,0,160,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,176,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,7,0,0,0,32,0,0,0,0,0,0,0,19,0,0,0,11,0,0,0,83,101,114,118,105,99,101,78,97,109,101,0,0,0,0,0,28,0,0,0,20,0,0,0,109,111,106,111,58,58,101,120,97,109,112,108,101,115,58,58,69,99,104,111,0,0,0,0,12,0,0,0,4,0,0,0,69,99,104,111,0,0,0,0,26,0,0,0,18,0,0,0,109,111,106,111,46,101,120,97,109,112,108,101,115,46,69,99,104,111,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,8,0,0,0,10,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,28,0,0,0,20,0,0,0,109,111,106,111,58,58,101,120,97,109,112,108,101,115,58,58,69,99,104,111,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,12,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,208,0,0,0,0,0,0,0,176,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,0,10,0,0,0,69,99,104,111,83,116,114,105,110,103,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,2,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,
+24,0,0,0,0,0,0,0,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,56,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,0,0,0,18,0,0,0,69,99,104,111,83,116,114,105,110,103,45,114,101,113,117,101,115,116,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,21,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,56,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,19,0,0,0,69,99,104,111,83,116,114,105,110,103,45,114,101,115,112,111,110,115,101,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,40,0,0,0,57,0,0,0,49,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,101,120,97,109,112,108,101,115,47,101,99,104,111,47,101,99,104,111,46,109,111,106,111,109,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]);
+
+  // Deserialize RuntimeTypeInfo
+  var bdata = new ByteData.view(serializedRuntimeTypeInfo.buffer);
+  var message = new bindings.Message(bdata, null, serializedRuntimeTypeInfo.length, 0);
+  _runtimeTypeInfo = mojom_types.RuntimeTypeInfo.deserialize(message);
+  return _runtimeTypeInfo;
+}

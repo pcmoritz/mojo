@@ -67,8 +67,6 @@ class NetAddressFamily extends bindings.MojoEnum {
 
 
 
-
-
 class NetAddressIPv4 extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -155,8 +153,6 @@ class NetAddressIPv4 extends bindings.Struct {
 }
 
 
-
-
 class NetAddressIPv6 extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -241,8 +237,6 @@ class NetAddressIPv6 extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class NetAddress extends bindings.Struct {
@@ -349,9 +343,6 @@ class NetAddress extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

@@ -67,8 +67,6 @@ class YuvColorSpace extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class Material extends bindings.MojoEnum {
   static const Material checkerboard = const Material._(1);
   static const Material debugBorder = const Material._(2);
@@ -183,8 +181,6 @@ class Material extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
 
 class SkXfermode extends bindings.MojoEnum {
   static const SkXfermode kClearMode = const SkXfermode._(0);
@@ -450,8 +446,6 @@ class SkXfermode extends bindings.MojoEnum {
 
 
 
-
-
 class Color extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -524,8 +518,6 @@ class Color extends bindings.Struct {
 }
 
 
-
-
 class CheckerboardQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -582,8 +574,6 @@ class CheckerboardQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class DebugBorderQuadState extends bindings.Struct {
@@ -644,8 +634,6 @@ class DebugBorderQuadState extends bindings.Struct {
 }
 
 
-
-
 class IoSurfaceContentQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -702,8 +690,6 @@ class IoSurfaceContentQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class RenderPassId extends bindings.Struct {
@@ -790,8 +776,6 @@ class RenderPassId extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class RenderPassQuadState extends bindings.Struct {
@@ -926,8 +910,6 @@ class RenderPassQuadState extends bindings.Struct {
 }
 
 
-
-
 class SolidColorQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -1015,8 +997,6 @@ class SolidColorQuadState extends bindings.Struct {
 }
 
 
-
-
 class SurfaceQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1088,8 +1068,6 @@ class SurfaceQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class TextureQuadState extends bindings.Struct {
@@ -1265,8 +1243,6 @@ class TextureQuadState extends bindings.Struct {
 }
 
 
-
-
 class TileQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -1397,8 +1373,6 @@ class TileQuadState extends bindings.Struct {
 }
 
 
-
-
 class StreamVideoQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1455,8 +1429,6 @@ class StreamVideoQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class YuvVideoQuadState extends bindings.Struct {
@@ -1604,8 +1576,6 @@ class YuvVideoQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Quad extends bindings.Struct {
@@ -1907,8 +1877,6 @@ class Quad extends bindings.Struct {
 }
 
 
-
-
 class SharedQuadState extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(56, 0)
@@ -2085,8 +2053,6 @@ class SharedQuadState extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Pass extends bindings.Struct {
@@ -2278,9 +2244,6 @@ class Pass extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

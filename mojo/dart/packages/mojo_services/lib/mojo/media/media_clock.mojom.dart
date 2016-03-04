@@ -90,11 +90,6 @@ class ClockDisposition extends bindings.MojoEnum {
 
 
 
-
-
-
-
-
 class _ClockServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);

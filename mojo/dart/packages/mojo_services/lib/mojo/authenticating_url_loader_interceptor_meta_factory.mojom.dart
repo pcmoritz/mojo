@@ -95,12 +95,7 @@ class _AuthenticatingUrlLoaderInterceptorMetaFactoryCreateUrlLoaderInterceptorFa
   }
 }
 
-
-
-
 const int _AuthenticatingUrlLoaderInterceptorMetaFactory_createUrlLoaderInterceptorFactoryName = 0;
-
-
 
 class _AuthenticatingUrlLoaderInterceptorMetaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

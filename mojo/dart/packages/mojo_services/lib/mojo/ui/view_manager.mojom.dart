@@ -124,8 +124,6 @@ class _ViewManagerCreateViewParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewManagerCreateViewTreeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -222,13 +220,8 @@ class _ViewManagerCreateViewTreeParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ViewManager_createViewName = 0;
 const int _ViewManager_createViewTreeName = 1;
-
-
 
 class _ViewManagerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -100,8 +100,6 @@ class ResourceFormat extends bindings.MojoEnum {
 
 
 
-
-
 class Mailbox extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -172,8 +170,6 @@ class Mailbox extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MailboxHolder extends bindings.Struct {
@@ -275,8 +271,6 @@ class MailboxHolder extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class TransferableResource extends bindings.Struct {
@@ -441,8 +435,6 @@ class TransferableResource extends bindings.Struct {
 }
 
 
-
-
 class ReturnedResource extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -555,8 +547,6 @@ class ReturnedResource extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Frame extends bindings.Struct {
@@ -677,8 +667,6 @@ class Frame extends bindings.Struct {
 }
 
 
-
-
 class _ResourceReturnerReturnResourcesParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -767,8 +755,6 @@ class _ResourceReturnerReturnResourcesParams extends bindings.Struct {
 }
 
 
-
-
 class _SurfaceGetIdNamespaceParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -825,8 +811,6 @@ class _SurfaceGetIdNamespaceParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class SurfaceGetIdNamespaceResponseParams extends bindings.Struct {
@@ -901,8 +885,6 @@ class SurfaceGetIdNamespaceResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _SurfaceSetResourceReturnerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -972,8 +954,6 @@ class _SurfaceSetResourceReturnerParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _SurfaceCreateSurfaceParams extends bindings.Struct {
@@ -1046,8 +1026,6 @@ class _SurfaceCreateSurfaceParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _SurfaceSubmitFrameParams extends bindings.Struct {
@@ -1137,8 +1115,6 @@ class _SurfaceSubmitFrameParams extends bindings.Struct {
 }
 
 
-
-
 class SurfaceSubmitFrameResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1195,8 +1171,6 @@ class SurfaceSubmitFrameResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _SurfaceDestroySurfaceParams extends bindings.Struct {
@@ -1270,12 +1244,7 @@ class _SurfaceDestroySurfaceParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ResourceReturner_returnResourcesName = 0;
-
-
 
 class _ResourceReturnerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1470,8 +1439,6 @@ const int _Surface_setResourceReturnerName = 1;
 const int _Surface_createSurfaceName = 2;
 const int _Surface_submitFrameName = 3;
 const int _Surface_destroySurfaceName = 4;
-
-
 
 class _SurfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

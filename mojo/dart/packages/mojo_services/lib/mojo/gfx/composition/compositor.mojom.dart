@@ -100,8 +100,6 @@ class _CompositorCreateSceneParams extends bindings.Struct {
 }
 
 
-
-
 class CompositorCreateSceneResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -173,8 +171,6 @@ class CompositorCreateSceneResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _CompositorCreateRendererParams extends bindings.Struct {
@@ -273,13 +269,8 @@ class _CompositorCreateRendererParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Compositor_createSceneName = 0;
 const int _Compositor_createRendererName = 1;
-
-
 
 class _CompositorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

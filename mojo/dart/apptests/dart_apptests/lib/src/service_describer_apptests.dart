@@ -13,8 +13,8 @@ import 'package:mojo/core.dart';
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart'
     as service_describer;
-import 'package:_mojo_for_test_only/test/echo_service.mojom.dart'
-    as echo_service;
+import 'package:_mojo_for_test_only/test/pingpong_service.mojom.dart'
+    as pingpong_service;
 
 // Tests that demonstrate that a service describer is able to obtain the same
 // mojom type information present in a service's service description.
@@ -22,44 +22,60 @@ import 'package:_mojo_for_test_only/test/echo_service.mojom.dart'
 // described by a mojo application without importing any of their mojom files.
 tests(Application application, String url) {
   group('Service Describer Apptests', () {
-    test('Echo Service Verification', () async {
-      var serviceDescriberProxy =
-          new service_describer.ServiceDescriberProxy.connectToService(
-              application, "mojo:dart_echo_with_service_describer");
+    test('PingPong Service Verification', () async {
+      var serviceDescriberProxy = new service_describer.ServiceDescriberProxy.
+          unbound();
+      serviceDescriberProxy.errorFuture.then((v) =>
+          fail('There was an error $v'));
+      application.connectToService("mojo:dart_pingpong", serviceDescriberProxy);
 
       var serviceDescriptionProxy =
           new service_describer.ServiceDescriptionProxy.unbound();
-      await serviceDescriberProxy.ptr
-          .describeService("test::EchoService", serviceDescriptionProxy);
+      serviceDescriptionProxy.errorFuture.then(
+          (v) => fail('There was an error $v'));
 
-      expect(serviceDescriptionProxy.impl, isNotNull);
-      expect(serviceDescriptionProxy.ptr, isNotNull);
+      serviceDescriberProxy.ptr.describeService(
+          "test::PingPongService", serviceDescriptionProxy);
 
       // Compare the service description obtained by the service describer and
-      // the expected description taken from the echo service import.
-      var sd = serviceDescriptionProxy.ptr;
-      var ed = echo_service.EchoServiceStub.serviceDescription;
+      // the expected description taken from the pingpong service import.
+      var serviceDescription = serviceDescriptionProxy.ptr;
+      var serviceDescription2 = pingpong_service.PingPongServiceStub.
+        serviceDescription;
 
       Function identity = (v) => v;
 
-      // Top-level Mojom Interfaces must match.
-      mojom_types.MojomInterface a =
-          (await sd.getTopLevelInterface()).mojomInterface;
-      mojom_types.MojomInterface b = ed.getTopLevelInterface(identity);
-      _compare(a, b);
 
-      String interfaceID = "echo_service_EchoService__";
-      mojom_types.MojomInterface c =
-          (await sd.getTypeDefinition(interfaceID)).type.interfaceType;
-      mojom_types.MojomInterface d =
-          ed.getTypeDefinition(interfaceID, identity).interfaceType;
-      _compare(a, c);
-      _compare(c, d);
+      // Top-level Mojom Interfaces must match.
+      mojom_types.MojomInterface interfaceA =
+          (await serviceDescriptionProxy.responseOrError(
+              serviceDescription.getTopLevelInterface())).mojomInterface;
+
+      mojom_types.MojomInterface interfaceB = serviceDescription2.
+          getTopLevelInterface(identity);
+      _compare(interfaceA, interfaceB);
+
+      // Get the type key for the type of the first parameter of the
+      // first method of the interface.
+      mojom_types.MojomMethod setClientMethod = interfaceA.methods[0];
+      mojom_types.StructField firstParam = setClientMethod.parameters.fields[0];
+      String typeKey = firstParam.type.typeReference.typeKey;
+
+      // Use getTypeDefinition() to get the type and check that it
+      // is named "PingPongClient".
+      mojom_types.MojomInterface pingPongClientInterface =
+         (await serviceDescriptionProxy.responseOrError(
+              serviceDescription.getTypeDefinition(typeKey))).type.
+             interfaceType;
+      expect(pingPongClientInterface.declData.shortName,
+          equals("PingPongClient"));
 
       // Check that the mojom type definitions match between mappings.
       // For simplicity, check in a shallow manner.
-      var actualDescriptions = (await sd.getAllTypeDefinitions()).definitions;
-      var expectedDescriptions = ed.getAllTypeDefinitions(identity);
+      var actualDescriptions = (await serviceDescriptionProxy.responseOrError(
+          serviceDescription.getAllTypeDefinitions())).definitions;
+      var expectedDescriptions = serviceDescription2.
+          getAllTypeDefinitions(identity);
       actualDescriptions.keys.forEach((String key) {
         var a = actualDescriptions[key];
         var e = expectedDescriptions[key];

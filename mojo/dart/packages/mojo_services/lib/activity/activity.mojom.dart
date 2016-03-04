@@ -67,8 +67,6 @@ class SystemUiVisibility extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class ScreenOrientation extends bindings.MojoEnum {
   static const ScreenOrientation unspecified = const ScreenOrientation._(0);
   static const ScreenOrientation landscape = const ScreenOrientation._(1);
@@ -135,8 +133,6 @@ class ScreenOrientation extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class HapticFeedbackType extends bindings.MojoEnum {
   static const HapticFeedbackType longPress = const HapticFeedbackType._(0);
   static const HapticFeedbackType virtualKey = const HapticFeedbackType._(1);
@@ -202,8 +198,6 @@ class HapticFeedbackType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
 
 class AuralFeedbackType extends bindings.MojoEnum {
   static const AuralFeedbackType click = const AuralFeedbackType._(0);
@@ -277,8 +271,6 @@ class AuralFeedbackType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
 
 
 
@@ -368,8 +360,6 @@ class StringExtra extends bindings.Struct {
 }
 
 
-
-
 class ComponentName extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -454,8 +444,6 @@ class ComponentName extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class Intent extends bindings.Struct {
@@ -619,8 +607,6 @@ class Intent extends bindings.Struct {
 }
 
 
-
-
 class TaskDescription extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -707,8 +693,6 @@ class TaskDescription extends bindings.Struct {
 }
 
 
-
-
 class _ActivityGetUserFeedbackParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -778,8 +762,6 @@ class _ActivityGetUserFeedbackParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _ActivityStartActivityParams extends bindings.Struct {
@@ -855,8 +837,6 @@ class _ActivityStartActivityParams extends bindings.Struct {
 }
 
 
-
-
 class _ActivityFinishCurrentActivityParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -913,8 +893,6 @@ class _ActivityFinishCurrentActivityParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ActivitySetTaskDescriptionParams extends bindings.Struct {
@@ -988,8 +966,6 @@ class _ActivitySetTaskDescriptionParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ActivitySetSystemUiVisibilityParams extends bindings.Struct {
@@ -1068,8 +1044,6 @@ class _ActivitySetSystemUiVisibilityParams extends bindings.Struct {
 }
 
 
-
-
 class _ActivitySetRequestedOrientationParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1146,8 +1120,6 @@ class _ActivitySetRequestedOrientationParams extends bindings.Struct {
 }
 
 
-
-
 class _PathServiceGetAppDataDirParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1204,8 +1176,6 @@ class _PathServiceGetAppDataDirParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class PathServiceGetAppDataDirResponseParams extends bindings.Struct {
@@ -1280,8 +1250,6 @@ class PathServiceGetAppDataDirResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _PathServiceGetFilesDirParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1338,8 +1306,6 @@ class _PathServiceGetFilesDirParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class PathServiceGetFilesDirResponseParams extends bindings.Struct {
@@ -1414,8 +1380,6 @@ class PathServiceGetFilesDirResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _PathServiceGetCacheDirParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1472,8 +1436,6 @@ class _PathServiceGetCacheDirParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class PathServiceGetCacheDirResponseParams extends bindings.Struct {
@@ -1546,8 +1508,6 @@ class PathServiceGetCacheDirResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _UserFeedbackPerformHapticFeedbackParams extends bindings.Struct {
@@ -1626,8 +1586,6 @@ class _UserFeedbackPerformHapticFeedbackParams extends bindings.Struct {
 }
 
 
-
-
 class _UserFeedbackPerformAuralFeedbackParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1703,17 +1661,12 @@ class _UserFeedbackPerformAuralFeedbackParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Activity_getUserFeedbackName = 0;
 const int _Activity_startActivityName = 1;
 const int _Activity_finishCurrentActivityName = 2;
 const int _Activity_setTaskDescriptionName = 3;
 const int _Activity_setSystemUiVisibilityName = 4;
 const int _Activity_setRequestedOrientationName = 5;
-
-
 
 class _ActivityServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1978,8 +1931,6 @@ class ActivityStub extends bindings.Stub {
 const int _PathService_getAppDataDirName = 0;
 const int _PathService_getFilesDirName = 1;
 const int _PathService_getCacheDirName = 2;
-
-
 
 class _PathServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -2318,8 +2269,6 @@ class PathServiceStub extends bindings.Stub {
 
 const int _UserFeedback_performHapticFeedbackName = 0;
 const int _UserFeedback_performAuralFeedbackName = 1;
-
-
 
 class _UserFeedbackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

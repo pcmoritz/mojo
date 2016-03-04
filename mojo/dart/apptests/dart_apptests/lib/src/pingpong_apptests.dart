@@ -116,6 +116,12 @@ pingpongApptests(Application application, String url) {
       await pingPongServiceProxy.close();
     });
 
+    // Note(rudominer) Per request from @zra in
+    // https://codereview.chromium.org/1753013002, temporarily disabling this
+    // test because we believe it may be causing flakiness in
+    // service_describer_apptests.dart which is listed immediately following
+    // this test in dart_apptests/lib/main.dart.
+    /*
     test('Quit', () async {
       var pingPongServiceProxy = new PingPongServiceProxy.unbound();
       application.connectToService(
@@ -123,5 +129,6 @@ pingpongApptests(Application application, String url) {
       pingPongServiceProxy.ptr.quit();
       await pingPongServiceProxy.close();
     });
+    */
   });
 }

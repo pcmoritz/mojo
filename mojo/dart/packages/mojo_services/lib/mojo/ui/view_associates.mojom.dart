@@ -133,8 +133,6 @@ class ViewAssociateInfo extends bindings.Struct {
 }
 
 
-
-
 class _ViewAssociateConnectParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -204,8 +202,6 @@ class _ViewAssociateConnectParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class ViewAssociateConnectResponseParams extends bindings.Struct {
@@ -279,8 +275,6 @@ class ViewAssociateConnectResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewAssociateConnectToViewServiceParams extends bindings.Struct {
@@ -381,8 +375,6 @@ class _ViewAssociateConnectToViewServiceParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewAssociateConnectToViewTreeServiceParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -480,14 +472,9 @@ class _ViewAssociateConnectToViewTreeServiceParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ViewAssociate_connectName = 0;
 const int _ViewAssociate_connectToViewServiceName = 1;
 const int _ViewAssociate_connectToViewTreeServiceName = 2;
-
-
 
 class _ViewAssociateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -752,8 +739,6 @@ class ViewAssociateStub extends bindings.Stub {
     return _cachedServiceDescription;
   }
 }
-
-
 
 
 class _ViewInspectorServiceDescription implements service_describer.ServiceDescription {

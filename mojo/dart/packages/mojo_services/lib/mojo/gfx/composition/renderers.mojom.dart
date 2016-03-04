@@ -115,8 +115,6 @@ class _RendererSetRootSceneParams extends bindings.Struct {
 }
 
 
-
-
 class _RendererGetHitTesterParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -187,13 +185,8 @@ class _RendererGetHitTesterParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Renderer_setRootSceneName = 0;
 const int _Renderer_getHitTesterName = 1;
-
-
 
 class _RendererServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

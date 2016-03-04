@@ -93,8 +93,6 @@ class EventType extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class EventFlags extends bindings.MojoEnum {
   static const EventFlags none = const EventFlags._(0);
   static const EventFlags capsLockDown = const EventFlags._(1);
@@ -224,8 +222,6 @@ class EventFlags extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class MouseEventFlags extends bindings.MojoEnum {
   static const MouseEventFlags isDoubleClick = const MouseEventFlags._(65536);
   static const MouseEventFlags isTripleClick = const MouseEventFlags._(131072);
@@ -285,8 +281,6 @@ class MouseEventFlags extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class PointerKind extends bindings.MojoEnum {
   static const PointerKind touch = const PointerKind._(0);
   static const PointerKind mouse = const PointerKind._(1);
@@ -338,9 +332,6 @@ class PointerKind extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
 
 
 

@@ -94,12 +94,7 @@ class _HttpServerDelegateOnConnectedParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _HttpServerDelegate_onConnectedName = 0;
-
-
 
 class _HttpServerDelegateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -97,8 +97,6 @@ class _TerminalConnectParams extends bindings.Struct {
 }
 
 
-
-
 class TerminalConnectResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -173,8 +171,6 @@ class TerminalConnectResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _TerminalConnectToClientParams extends bindings.Struct {
@@ -261,8 +257,6 @@ class _TerminalConnectToClientParams extends bindings.Struct {
 }
 
 
-
-
 class TerminalConnectToClientResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -339,8 +333,6 @@ class TerminalConnectToClientResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _TerminalGetSizeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -397,8 +389,6 @@ class _TerminalGetSizeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class TerminalGetSizeResponseParams extends bindings.Struct {
@@ -505,8 +495,6 @@ class TerminalGetSizeResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _TerminalSetSizeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -605,8 +593,6 @@ class _TerminalSetSizeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class TerminalSetSizeResponseParams extends bindings.Struct {
@@ -712,15 +698,10 @@ class TerminalSetSizeResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Terminal_connectName = 0;
 const int _Terminal_connectToClientName = 1;
 const int _Terminal_getSizeName = 2;
 const int _Terminal_setSizeName = 3;
-
-
 
 class _TerminalServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

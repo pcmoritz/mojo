@@ -5,6 +5,7 @@
 library math_calculator_mojom;
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/mojom_types.mojom.dart' as mojom_types;
@@ -67,14 +68,6 @@ class _CalculatorClearParams extends bindings.Struct {
     Map map = new Map();
     return map;
   }
-}
-
-mojom_types.MojomStruct _mathCalculatorCalculatorClearParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorClearParams'
-      ..fullIdentifier = 'math.Calculator_Clear_Params')
-    ..fields = <mojom_types.StructField>[];
 }
 
 
@@ -149,19 +142,6 @@ class CalculatorClearResponseParams extends bindings.Struct {
   }
 }
 
-mojom_types.MojomStruct _mathCalculatorCalculatorClearResponseParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorClearResponseParams'
-      ..fullIdentifier = 'math.Calculator_Clear_ResponseParams')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..simpleType = mojom_types.SimpleType.double),];
-}
-
 
 class _CalculatorAddParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
@@ -232,19 +212,6 @@ class _CalculatorAddParams extends bindings.Struct {
     map["value"] = value;
     return map;
   }
-}
-
-mojom_types.MojomStruct _mathCalculatorCalculatorAddParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorAddParams'
-      ..fullIdentifier = 'math.Calculator_Add_Params')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..simpleType = mojom_types.SimpleType.double),];
 }
 
 
@@ -319,19 +286,6 @@ class CalculatorAddResponseParams extends bindings.Struct {
   }
 }
 
-mojom_types.MojomStruct _mathCalculatorCalculatorAddResponseParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorAddResponseParams'
-      ..fullIdentifier = 'math.Calculator_Add_ResponseParams')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..simpleType = mojom_types.SimpleType.double),];
-}
-
 
 class _CalculatorMultiplyParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
@@ -402,19 +356,6 @@ class _CalculatorMultiplyParams extends bindings.Struct {
     map["value"] = value;
     return map;
   }
-}
-
-mojom_types.MojomStruct _mathCalculatorCalculatorMultiplyParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorMultiplyParams'
-      ..fullIdentifier = 'math.Calculator_Multiply_Params')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..simpleType = mojom_types.SimpleType.double),];
 }
 
 
@@ -489,61 +430,19 @@ class CalculatorMultiplyResponseParams extends bindings.Struct {
   }
 }
 
-mojom_types.MojomStruct _mathCalculatorCalculatorMultiplyResponseParams() {
-  return new mojom_types.MojomStruct()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'CalculatorMultiplyResponseParams'
-      ..fullIdentifier = 'math.Calculator_Multiply_ResponseParams')
-    ..fields = <mojom_types.StructField>[
-      new mojom_types.StructField()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Value')
-        ..type = (new mojom_types.Type()
-          ..simpleType = mojom_types.SimpleType.double),];
-}
-
-
 const int _Calculator_clearName = 0;
 const int _Calculator_addName = 1;
 const int _Calculator_multiplyName = 2;
 
-mojom_types.MojomInterface _mathCalculatorCalculator() {
-  return new mojom_types.MojomInterface()
-    ..declData = (new mojom_types.DeclarationData()
-      ..shortName = 'Calculator'
-      ..fullIdentifier = 'math.Calculator')
-    ..serviceName_ = 'Calculator'
-    ..methods = <int, mojom_types.MojomMethod>{
-      _Calculator_clearName: new mojom_types.MojomMethod()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Clear')
-        ..ordinal = _Calculator_clearName
-        ..responseParams = _mathCalculatorCalculatorClearResponseParams()
-        ..parameters = _mathCalculatorCalculatorClearParams(),
-      _Calculator_addName: new mojom_types.MojomMethod()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Add')
-        ..ordinal = _Calculator_addName
-        ..responseParams = _mathCalculatorCalculatorAddResponseParams()
-        ..parameters = _mathCalculatorCalculatorAddParams(),
-      _Calculator_multiplyName: new mojom_types.MojomMethod()
-        ..declData = (new mojom_types.DeclarationData()
-          ..shortName = 'Multiply')
-        ..ordinal = _Calculator_multiplyName
-        ..responseParams = _mathCalculatorCalculatorMultiplyResponseParams()
-        ..parameters = _mathCalculatorCalculatorMultiplyParams(),
-    };
-}
-
 class _CalculatorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
-    responseFactory(_mathCalculatorCalculator());
+      responseFactory(null);
 
   dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
-    responseFactory(getAllMojomTypeDefinitions()[typeKey]);
+      responseFactory(null);
 
   dynamic getAllTypeDefinitions([Function responseFactory]) =>
-    responseFactory(getAllMojomTypeDefinitions());
+      responseFactory(null);
 }
 
 abstract class Calculator {
@@ -877,37 +776,27 @@ class CalculatorStub extends bindings.Stub {
 }
 
 
-Map<String, mojom_types.UserDefinedType> _initDescriptions() {
-  var map = new HashMap<String, mojom_types.UserDefinedType>();
-  map["math_calculator_Calculator_Clear_Params__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorClearParams();
-  map["math_calculator_Calculator_Clear_ResponseParams__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorClearResponseParams();
-  map["math_calculator_Calculator_Add_Params__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorAddParams();
-  map["math_calculator_Calculator_Add_ResponseParams__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorAddResponseParams();
-  map["math_calculator_Calculator_Multiply_Params__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorMultiplyParams();
-  map["math_calculator_Calculator_Multiply_ResponseParams__"] =
-    new mojom_types.UserDefinedType()
-      ..structType = _mathCalculatorCalculatorMultiplyResponseParams();
-  map["math_calculator_Calculator__"] =
-    new mojom_types.UserDefinedType()
-      ..interfaceType = _mathCalculatorCalculator();
-  return map;
-}
+mojom_types.RuntimeTypeInfo getRuntimeTypeInfo() => _runtimeTypeInfo ??
+    _initRuntimeTypeInfo();
 
-var _mojomDesc;
 Map<String, mojom_types.UserDefinedType> getAllMojomTypeDefinitions() {
-  if (_mojomDesc == null) {
-    _mojomDesc = _initDescriptions();
-  }
-  return _mojomDesc;
+  return getRuntimeTypeInfo().typeMap;
 }
 
+var _runtimeTypeInfo;
+mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
+  // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
+  // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
+  // file.
+  var serializedRuntimeTypeInfo = new Uint8List.fromList(const [24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,32,0,0,0,24,0,0,0,84,89,80,69,95,75,69,89,58,109,97,116,104,46,67,97,108,99,117,108,97,116,111,114,24,0,0,0,1,0,0,0,16,0,0,0,3,0,0,0,8,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,248,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,64,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,0,10,0,0,0,67,97,108,99,117,108,97,116,111,114,0,0,0,0,0,0,23,0,0,0,15,0,0,0,109,97,116,104,46,67,97,108,99,117,108,97,116,111,114,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,7,0,0,0,10,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,20,0,0,0,3,0,0,0,1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,32,0,0,0,3,0,0,0,24,0,0,0,0,0,0,0,40,5,0,0,0,0,0,0,64,10,0,0,0,0,0,0,40,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,240,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,3,0,0,0,65,100,100,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,2,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,11,0,0,0,65,100,100,45,114,101,113,117,101,115,116,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,
+111,106,111,109,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,15,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,12,0,0,0,65,100,100,45,114,101,115,112,111,110,115,101,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,9,0,0,0,35,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,40,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,240,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,8,0,0,0,77,117,108,116,105,112,108,121,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,10,0,0,0,2,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,
+47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,0,16,0,0,0,77,117,108,116,105,112,108,121,45,114,101,113,117,101,115,116,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,10,0,0,0,20,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,240,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,56,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,0,0,0,17,0,0,0,77,117,108,116,105,112,108,121,45,114,101,115,112,111,110,115,101,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,
+118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,10,0,0,0,40,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,40,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,224,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,67,108,101,97,114,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,8,0,0,0,2,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,0,0,0,13,0,0,0,67,108,101,97,114,45,114,101,113,117,101,115,116,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,8,0,0,0,0,0,0,0,32,0,0,0,0,0,0,0,24,0,0,0,0,0,0,0,232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,0,0,0,14,0,0,0,67,108,101,97,114,45,114,101,115,112,111,110,115,101,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0,16,0,0,0,1,0,0,0,8,0,0,0,0,0,0,0,56,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,255,255,255,255,0,0,0,0,
+40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,5,0,0,0,118,97,108,117,101,0,0,0,24,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,8,0,0,0,23,0,0,0,92,0,0,0,84,0,0,0,47,104,111,109,101,47,114,117,100,111,109,105,110,101,114,47,109,111,106,111,47,115,114,99,47,109,111,106,111,47,112,117,98,108,105,99,47,105,110,116,101,114,102,97,99,101,115,47,98,105,110,100,105,110,103,115,47,116,101,115,116,115,47,109,97,116,104,95,99,97,108,99,117,108,97,116,111,114,46,109,111,106,111,109,0,0,0,0]);
+
+  // Deserialize RuntimeTypeInfo
+  var bdata = new ByteData.view(serializedRuntimeTypeInfo.buffer);
+  var message = new bindings.Message(bdata, null, serializedRuntimeTypeInfo.length, 0);
+  _runtimeTypeInfo = mojom_types.RuntimeTypeInfo.deserialize(message);
+  return _runtimeTypeInfo;
+}

@@ -171,8 +171,6 @@ class KeyData extends bindings.Struct {
 }
 
 
-
-
 class PointerData extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(56, 0)
@@ -403,8 +401,6 @@ class PointerData extends bindings.Struct {
 }
 
 
-
-
 class Event extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(40, 0)
@@ -541,9 +537,6 @@ class Event extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

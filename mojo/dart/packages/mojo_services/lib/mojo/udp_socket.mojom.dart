@@ -70,8 +70,6 @@ class _UdpSocketAllowAddressReuseParams extends bindings.Struct {
 }
 
 
-
-
 class UdpSocketAllowAddressReuseResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -145,8 +143,6 @@ class UdpSocketAllowAddressReuseResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UdpSocketBindParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -218,8 +214,6 @@ class _UdpSocketBindParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UdpSocketBindResponseParams extends bindings.Struct {
@@ -321,8 +315,6 @@ class UdpSocketBindResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UdpSocketConnectParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -394,8 +386,6 @@ class _UdpSocketConnectParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UdpSocketConnectResponseParams extends bindings.Struct {
@@ -497,8 +487,6 @@ class UdpSocketConnectResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UdpSocketSetSendBufferSizeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -569,8 +557,6 @@ class _UdpSocketSetSendBufferSizeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UdpSocketSetSendBufferSizeResponseParams extends bindings.Struct {
@@ -646,8 +632,6 @@ class UdpSocketSetSendBufferSizeResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UdpSocketSetReceiveBufferSizeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -718,8 +702,6 @@ class _UdpSocketSetReceiveBufferSizeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UdpSocketSetReceiveBufferSizeResponseParams extends bindings.Struct {
@@ -795,8 +777,6 @@ class UdpSocketSetReceiveBufferSizeResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UdpSocketNegotiateMaxPendingSendRequestsParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -867,8 +847,6 @@ class _UdpSocketNegotiateMaxPendingSendRequestsParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UdpSocketNegotiateMaxPendingSendRequestsResponseParams extends bindings.Struct {
@@ -943,8 +921,6 @@ class UdpSocketNegotiateMaxPendingSendRequestsResponseParams extends bindings.St
 }
 
 
-
-
 class _UdpSocketReceiveMoreParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1015,8 +991,6 @@ class _UdpSocketReceiveMoreParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _UdpSocketSendToParams extends bindings.Struct {
@@ -1106,8 +1080,6 @@ class _UdpSocketSendToParams extends bindings.Struct {
 }
 
 
-
-
 class UdpSocketSendToResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1179,8 +1151,6 @@ class UdpSocketSendToResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _UdpSocketReceiverOnReceivedParams extends bindings.Struct {
@@ -1284,9 +1254,6 @@ class _UdpSocketReceiverOnReceivedParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _UdpSocket_allowAddressReuseName = 0;
 const int _UdpSocket_bindName = 1;
 const int _UdpSocket_connectName = 2;
@@ -1295,8 +1262,6 @@ const int _UdpSocket_setReceiveBufferSizeName = 4;
 const int _UdpSocket_negotiateMaxPendingSendRequestsName = 5;
 const int _UdpSocket_receiveMoreName = 6;
 const int _UdpSocket_sendToName = 7;
-
-
 
 class _UdpSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1888,8 +1853,6 @@ class UdpSocketStub extends bindings.Stub {
 }
 
 const int _UdpSocketReceiver_onReceivedName = 0;
-
-
 
 class _UdpSocketReceiverServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

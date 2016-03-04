@@ -96,12 +96,7 @@ class _HttpServerFactoryCreateHttpServerParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _HttpServerFactory_createHttpServerName = 0;
-
-
 
 class _HttpServerFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

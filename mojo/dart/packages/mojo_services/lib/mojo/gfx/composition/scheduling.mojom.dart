@@ -124,8 +124,6 @@ class FrameInfo extends bindings.Struct {
 }
 
 
-
-
 class _SceneSchedulerScheduleFrameParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -182,8 +180,6 @@ class _SceneSchedulerScheduleFrameParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class SceneSchedulerScheduleFrameResponseParams extends bindings.Struct {
@@ -258,12 +254,7 @@ class SceneSchedulerScheduleFrameResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _SceneScheduler_scheduleFrameName = 0;
-
-
 
 class _SceneSchedulerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -100,8 +100,6 @@ class UrlLoaderStatus extends bindings.Struct {
 }
 
 
-
-
 class _UrlLoaderStartParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -172,8 +170,6 @@ class _UrlLoaderStartParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class UrlLoaderStartResponseParams extends bindings.Struct {
@@ -248,8 +244,6 @@ class UrlLoaderStartResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UrlLoaderFollowRedirectParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -306,8 +300,6 @@ class _UrlLoaderFollowRedirectParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UrlLoaderFollowRedirectResponseParams extends bindings.Struct {
@@ -382,8 +374,6 @@ class UrlLoaderFollowRedirectResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _UrlLoaderQueryStatusParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -440,8 +430,6 @@ class _UrlLoaderQueryStatusParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class UrlLoaderQueryStatusResponseParams extends bindings.Struct {
@@ -516,14 +504,9 @@ class UrlLoaderQueryStatusResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _UrlLoader_startName = 0;
 const int _UrlLoader_followRedirectName = 1;
 const int _UrlLoader_queryStatusName = 2;
-
-
 
 class _UrlLoaderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -92,8 +92,6 @@ class _NetworkServiceCreateUrlLoaderParams extends bindings.Struct {
 }
 
 
-
-
 class _NetworkServiceGetCookieStoreParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -165,8 +163,6 @@ class _NetworkServiceGetCookieStoreParams extends bindings.Struct {
 }
 
 
-
-
 class _NetworkServiceCreateWebSocketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -236,8 +232,6 @@ class _NetworkServiceCreateWebSocketParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _NetworkServiceCreateTcpBoundSocketParams extends bindings.Struct {
@@ -323,8 +317,6 @@ class _NetworkServiceCreateTcpBoundSocketParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class NetworkServiceCreateTcpBoundSocketResponseParams extends bindings.Struct {
@@ -413,8 +405,6 @@ class NetworkServiceCreateTcpBoundSocketResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NetworkServiceCreateTcpConnectedSocketParams extends bindings.Struct {
@@ -528,8 +518,6 @@ class _NetworkServiceCreateTcpConnectedSocketParams extends bindings.Struct {
 }
 
 
-
-
 class NetworkServiceCreateTcpConnectedSocketResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -618,8 +606,6 @@ class NetworkServiceCreateTcpConnectedSocketResponseParams extends bindings.Stru
 }
 
 
-
-
 class _NetworkServiceCreateUdpSocketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -689,8 +675,6 @@ class _NetworkServiceCreateUdpSocketParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _NetworkServiceCreateHttpServerParams extends bindings.Struct {
@@ -776,8 +760,6 @@ class _NetworkServiceCreateHttpServerParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class NetworkServiceCreateHttpServerResponseParams extends bindings.Struct {
@@ -868,8 +850,6 @@ class NetworkServiceCreateHttpServerResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _NetworkServiceRegisterUrlLoaderInterceptorParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -939,8 +919,6 @@ class _NetworkServiceRegisterUrlLoaderInterceptorParams extends bindings.Struct 
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _NetworkServiceCreateHostResolverParams extends bindings.Struct {
@@ -1013,9 +991,6 @@ class _NetworkServiceCreateHostResolverParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _NetworkService_createUrlLoaderName = 0;
 const int _NetworkService_getCookieStoreName = 1;
 const int _NetworkService_createWebSocketName = 2;
@@ -1025,8 +1000,6 @@ const int _NetworkService_createUdpSocketName = 5;
 const int _NetworkService_createHttpServerName = 6;
 const int _NetworkService_registerUrlLoaderInterceptorName = 7;
 const int _NetworkService_createHostResolverName = 8;
-
-
 
 class _NetworkServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

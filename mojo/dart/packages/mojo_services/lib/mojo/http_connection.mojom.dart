@@ -85,8 +85,6 @@ class _HttpConnectionSetSendBufferSizeParams extends bindings.Struct {
 }
 
 
-
-
 class HttpConnectionSetSendBufferSizeResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -160,8 +158,6 @@ class HttpConnectionSetSendBufferSizeResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _HttpConnectionSetReceiveBufferSizeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -232,8 +228,6 @@ class _HttpConnectionSetReceiveBufferSizeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class HttpConnectionSetReceiveBufferSizeResponseParams extends bindings.Struct {
@@ -309,8 +303,6 @@ class HttpConnectionSetReceiveBufferSizeResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _HttpConnectionDelegateOnReceivedRequestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -381,8 +373,6 @@ class _HttpConnectionDelegateOnReceivedRequestParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class HttpConnectionDelegateOnReceivedRequestResponseParams extends bindings.Struct {
@@ -457,8 +447,6 @@ class HttpConnectionDelegateOnReceivedRequestResponseParams extends bindings.Str
 }
 
 
-
-
 class _HttpConnectionDelegateOnReceivedWebSocketRequestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -529,8 +517,6 @@ class _HttpConnectionDelegateOnReceivedWebSocketRequestParams extends bindings.S
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams extends bindings.Struct {
@@ -629,13 +615,8 @@ class HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams extends bin
   }
 }
 
-
-
-
 const int _HttpConnection_setSendBufferSizeName = 0;
 const int _HttpConnection_setReceiveBufferSizeName = 1;
-
-
 
 class _HttpConnectionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -926,8 +907,6 @@ class HttpConnectionStub extends bindings.Stub {
 
 const int _HttpConnectionDelegate_onReceivedRequestName = 0;
 const int _HttpConnectionDelegate_onReceivedWebSocketRequestName = 1;
-
-
 
 class _HttpConnectionDelegateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

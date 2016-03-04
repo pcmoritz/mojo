@@ -82,8 +82,6 @@ class _InputConnectionSetListenerParams extends bindings.Struct {
 }
 
 
-
-
 class _InputListenerOnEventParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -157,8 +155,6 @@ class _InputListenerOnEventParams extends bindings.Struct {
 }
 
 
-
-
 class InputListenerOnEventResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -230,12 +226,7 @@ class InputListenerOnEventResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _InputConnection_setListenerName = 0;
-
-
 
 class _InputConnectionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -426,8 +417,6 @@ class InputConnectionStub extends bindings.Stub {
 }
 
 const int _InputListener_onEventName = 0;
-
-
 
 class _InputListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

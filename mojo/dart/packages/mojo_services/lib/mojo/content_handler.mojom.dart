@@ -96,12 +96,7 @@ class _ContentHandlerStartApplicationParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ContentHandler_startApplicationName = 0;
-
-
 
 class _ContentHandlerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

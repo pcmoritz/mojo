@@ -94,8 +94,6 @@ class _TraceProviderStartTracingParams extends bindings.Struct {
 }
 
 
-
-
 class _TraceProviderStopTracingParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -152,8 +150,6 @@ class _TraceProviderStopTracingParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _TraceRecorderRecordParams extends bindings.Struct {
@@ -226,8 +222,6 @@ class _TraceRecorderRecordParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _TraceCollectorStartParams extends bindings.Struct {
@@ -314,8 +308,6 @@ class _TraceCollectorStartParams extends bindings.Struct {
 }
 
 
-
-
 class _TraceCollectorStopAndFlushParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -373,13 +365,8 @@ class _TraceCollectorStopAndFlushParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _TraceProvider_startTracingName = 0;
 const int _TraceProvider_stopTracingName = 1;
-
-
 
 class _TraceProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -584,8 +571,6 @@ class TraceProviderStub extends bindings.Stub {
 
 const int _TraceRecorder_recordName = 0;
 
-
-
 class _TraceRecorderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);
@@ -776,8 +761,6 @@ class TraceRecorderStub extends bindings.Stub {
 
 const int _TraceCollector_startName = 0;
 const int _TraceCollector_stopAndFlushName = 1;
-
-
 
 class _TraceCollectorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

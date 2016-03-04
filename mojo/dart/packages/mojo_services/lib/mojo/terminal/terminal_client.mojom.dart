@@ -81,12 +81,7 @@ class _TerminalClientConnectToTerminalParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _TerminalClient_connectToTerminalName = 0;
-
-
 
 class _TerminalClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

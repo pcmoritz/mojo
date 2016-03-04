@@ -107,8 +107,6 @@ class MediaSinkStatus extends bindings.Struct {
 }
 
 
-
-
 class _MediaSinkGetClockDispositionParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -165,8 +163,6 @@ class _MediaSinkGetClockDispositionParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSinkGetClockDispositionResponseParams extends bindings.Struct {
@@ -245,8 +241,6 @@ class MediaSinkGetClockDispositionResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSinkGetMasterClockParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -316,8 +310,6 @@ class _MediaSinkGetMasterClockParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _MediaSinkSetMasterClockParams extends bindings.Struct {
@@ -391,8 +383,6 @@ class _MediaSinkSetMasterClockParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSinkGetConsumerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -462,8 +452,6 @@ class _MediaSinkGetConsumerParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _MediaSinkGetStatusParams extends bindings.Struct {
@@ -536,8 +524,6 @@ class _MediaSinkGetStatusParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaSinkGetStatusResponseParams extends bindings.Struct {
@@ -627,8 +613,6 @@ class MediaSinkGetStatusResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaSinkPlayParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -685,8 +669,6 @@ class _MediaSinkPlayParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaSinkPauseParams extends bindings.Struct {
@@ -746,9 +728,6 @@ class _MediaSinkPauseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaSink_getClockDispositionName = 0;
 const int _MediaSink_getMasterClockName = 1;
 const int _MediaSink_setMasterClockName = 2;
@@ -756,8 +735,6 @@ const int _MediaSink_getConsumerName = 3;
 const int _MediaSink_getStatusName = 4;
 const int _MediaSink_playName = 5;
 const int _MediaSink_pauseName = 6;
-
-
 
 class _MediaSinkServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

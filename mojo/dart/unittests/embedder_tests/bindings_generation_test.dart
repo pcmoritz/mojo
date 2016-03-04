@@ -410,13 +410,22 @@ testValidateMojomTypes() {
   testValidateInterfaceType();
 }
 
+// computeTypeKey encapsulates the algorithm for computing the type key
+// of a type given its fully-qualified name.
+//
+// TODO(rudominer) Delete this when we add accessors for Mojom types
+// in the Dart bindings.
+String computeTypeKey(String fullyQualifiedName) {
+  return "TYPE_KEY:" + fullyQualifiedName;
+}
+
 // Test that mojom type descriptors were generated correctly for validation's
 // BasicEnum.
 testValidateEnumType() {
   var testValidationDescriptor = validation.getAllMojomTypeDefinitions();
-  String enumID = "validation_test_interfaces_BasicEnum__";
   String shortName = "BasicEnum";
   String fullIdentifier = "mojo.test.BasicEnum";
+  String enumID = computeTypeKey(fullIdentifier);
   Map<String, int> labelMap = <String, int>{
     "A": 0,
     "B": 1,
@@ -454,12 +463,12 @@ testValidateEnumType() {
 // StructE.
 testValidateStructType() {
   var testValidationDescriptor = validation.getAllMojomTypeDefinitions();
-  String structID = "validation_test_interfaces_StructE__";
   String shortName = "StructE";
   String fullIdentifier = "mojo.test.StructE";
+  String structID = computeTypeKey(fullIdentifier);
   Map<int, String> expectedFields = <int, String>{
-    0: "StructD",
-    1: "DataPipeConsumer",
+    0: "struct_d",
+    1: "data_pipe_consumer",
   };
 
   // Extract the UserDefinedType from the descriptor using structID.
@@ -490,8 +499,8 @@ testValidateStructType() {
 
         // Type key, identifier, and expected reference id should match up.
         mojom_types.TypeReference tr = t.typeReference;
-        String expectedRefID = "validation_test_interfaces_StructD__";
-        Expect.equals(expectedRefID, tr.identifier);
+        String expectedRefID = computeTypeKey("mojo.test.StructD");
+        Expect.equals("StructD", tr.identifier);
         Expect.equals(expectedRefID, tr.typeKey);
         break;
       case 1: // This is a non-nullable DataPipeConsumer HandleType.
@@ -514,14 +523,14 @@ testValidateStructType() {
 // UnionB.
 testValidateUnionType() {
   var testValidationDescriptor = validation.getAllMojomTypeDefinitions();
-  String unionID = "validation_test_interfaces_UnionB__";
   String shortName = "UnionB";
   String fullIdentifier = "mojo.test.UnionB";
+  String unionID = computeTypeKey(fullIdentifier);
   Map<int, String> expectedFields = <int, String>{
-    0: "A",
-    1: "B",
-    2: "C",
-    3: "D",
+    0: "a",
+    1: "b",
+    2: "c",
+    3: "d",
   };
 
   // Extract the UserDefinedType from the descriptor using unionID.
@@ -538,8 +547,14 @@ testValidateUnionType() {
   // Now compare the fields to verify that the union fields match the expected
   // ones.
   Expect.equals(mu.fields.length, expectedFields.length);
+  // TODO(rudominer) Currently ordinal tags in enums are not being populated by
+  // the Mojom parser in mojom_types.mojom so for now we must assume that
+  // the ordinals are in sequential order (which they are in the .mojom
+  // file being used for this test.)
+  int nextOrdinal = 0;
   mu.fields.forEach((mojom_types.UnionField field) {
-    int ordinal = field.tag;
+    int ordinal = nextOrdinal;
+    nextOrdinal++;
 
     // Check that the declData is correct...
     Expect.isNotNull(field.declData);
@@ -572,10 +587,10 @@ testValidateUnionType() {
 // IncludingStruct, which contains a union imported from test_included_unions.
 testValidateTestStructWithImportType() {
   var testUnionsDescriptor = unions.getAllMojomTypeDefinitions();
-  String structID = "test_unions_IncludingStruct__";
   String shortName = "IncludingStruct";
   String fullIdentifier = "mojo.test.IncludingStruct";
-  Map<int, String> expectedFields = <int, String>{0: "A",};
+  String structID = computeTypeKey(fullIdentifier);
+  Map<int, String> expectedFields = <int, String>{0: "a",};
 
   // Extract the UserDefinedType from the descriptor using structID.
   mojom_types.UserDefinedType udt = testUnionsDescriptor[structID];
@@ -605,8 +620,8 @@ testValidateTestStructWithImportType() {
 
         // Type key, identifier, and expected reference id should match up.
         mojom_types.TypeReference tr = t.typeReference;
-        String expectedRefID = "test_included_unions_IncludedUnion__";
-        Expect.equals(expectedRefID, tr.identifier);
+        String expectedRefID = computeTypeKey("mojo.test.IncludedUnion");
+        Expect.equals("IncludedUnion", tr.identifier);
         Expect.equals(expectedRefID, tr.typeKey);
         break;
       default:
@@ -626,9 +641,9 @@ testValidateInterfaceType() {
   // };
 
   var testValidationDescriptor = validation.getAllMojomTypeDefinitions();
-  String interfaceID = "validation_test_interfaces_BoundsCheckTestInterface__";
   String shortName = "BoundsCheckTestInterface";
   String fullIdentifier = "mojo.test.BoundsCheckTestInterface";
+  String interfaceID = computeTypeKey(fullIdentifier);
   Map<int, String> methodMap = <int, String>{0: "Method0", 1: "Method1",};
 
   mojom_types.UserDefinedType udt = testValidationDescriptor[interfaceID];

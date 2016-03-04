@@ -116,8 +116,6 @@ class Error extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class Whence extends bindings.MojoEnum {
   static const Whence fromCurrent = const Whence._(0);
   static const Whence fromStart = const Whence._(1);
@@ -177,8 +175,6 @@ class Whence extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class FileType extends bindings.MojoEnum {
   static const FileType unknown = const FileType._(0);
   static const FileType regularFile = const FileType._(1);
@@ -237,8 +233,6 @@ class FileType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
 
 
 
@@ -328,8 +322,6 @@ class Timespec extends bindings.Struct {
 }
 
 
-
-
 class TimespecOrNow extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -415,8 +407,6 @@ class TimespecOrNow extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class FileInformation extends bindings.Struct {
@@ -539,8 +529,6 @@ class FileInformation extends bindings.Struct {
 }
 
 
-
-
 class DirectoryEntry extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -629,9 +617,6 @@ class DirectoryEntry extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

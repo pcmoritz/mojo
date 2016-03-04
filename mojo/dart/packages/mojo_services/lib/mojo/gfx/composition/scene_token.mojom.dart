@@ -81,6 +81,3 @@ class SceneToken extends bindings.Struct {
 
 
 
-
-
-

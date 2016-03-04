@@ -85,8 +85,6 @@ class ViewToken extends bindings.Struct {
 }
 
 
-
-
 class _ViewOwnerGetTokenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -143,8 +141,6 @@ class _ViewOwnerGetTokenParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ViewOwnerGetTokenResponseParams extends bindings.Struct {
@@ -220,8 +216,6 @@ class ViewOwnerGetTokenResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewGetTokenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -278,8 +272,6 @@ class _ViewGetTokenParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ViewGetTokenResponseParams extends bindings.Struct {
@@ -355,8 +347,6 @@ class ViewGetTokenResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewGetServiceProviderParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -426,8 +416,6 @@ class _ViewGetServiceProviderParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _ViewCreateSceneParams extends bindings.Struct {
@@ -501,8 +489,6 @@ class _ViewCreateSceneParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewRequestLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -559,8 +545,6 @@ class _ViewRequestLayoutParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewAddChildParams extends bindings.Struct {
@@ -647,8 +631,6 @@ class _ViewAddChildParams extends bindings.Struct {
 }
 
 
-
-
 class _ViewRemoveChildParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -731,8 +713,6 @@ class _ViewRemoveChildParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _ViewLayoutChildParams extends bindings.Struct {
@@ -822,8 +802,6 @@ class _ViewLayoutChildParams extends bindings.Struct {
 }
 
 
-
-
 class ViewLayoutChildResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -895,8 +873,6 @@ class ViewLayoutChildResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewListenerOnLayoutParams extends bindings.Struct {
@@ -986,8 +962,6 @@ class _ViewListenerOnLayoutParams extends bindings.Struct {
 }
 
 
-
-
 class ViewListenerOnLayoutResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1059,8 +1033,6 @@ class ViewListenerOnLayoutResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ViewListenerOnChildUnavailableParams extends bindings.Struct {
@@ -1135,8 +1107,6 @@ class _ViewListenerOnChildUnavailableParams extends bindings.Struct {
 }
 
 
-
-
 class ViewListenerOnChildUnavailableResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1194,12 +1164,7 @@ class ViewListenerOnChildUnavailableResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ViewOwner_getTokenName = 0;
-
-
 
 class _ViewOwnerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1435,8 +1400,6 @@ const int _View_requestLayoutName = 3;
 const int _View_addChildName = 4;
 const int _View_removeChildName = 5;
 const int _View_layoutChildName = 6;
-
-
 
 class _ViewServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1799,8 +1762,6 @@ class ViewStub extends bindings.Stub {
 
 const int _ViewListener_onLayoutName = 0;
 const int _ViewListener_onChildUnavailableName = 1;
-
-
 
 class _ViewListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

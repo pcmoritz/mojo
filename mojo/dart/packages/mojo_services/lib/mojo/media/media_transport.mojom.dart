@@ -84,8 +84,6 @@ class _MediaProducerConnectParams extends bindings.Struct {
 }
 
 
-
-
 class MediaProducerConnectResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -142,8 +140,6 @@ class MediaProducerConnectResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaProducerDisconnectParams extends bindings.Struct {
@@ -204,8 +200,6 @@ class _MediaProducerDisconnectParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaPullModeProducerGetBufferParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -262,8 +256,6 @@ class _MediaPullModeProducerGetBufferParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaPullModeProducerGetBufferResponseParams extends bindings.Struct {
@@ -335,8 +327,6 @@ class MediaPullModeProducerGetBufferResponseParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _MediaPullModeProducerPullPacketParams extends bindings.Struct {
@@ -412,8 +402,6 @@ class _MediaPullModeProducerPullPacketParams extends bindings.Struct {
 }
 
 
-
-
 class MediaPullModeProducerPullPacketResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -487,8 +475,6 @@ class MediaPullModeProducerPullPacketResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaPullModeProducerReleasePacketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -560,8 +546,6 @@ class _MediaPullModeProducerReleasePacketParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaConsumerSetBufferParams extends bindings.Struct {
@@ -648,8 +632,6 @@ class _MediaConsumerSetBufferParams extends bindings.Struct {
 }
 
 
-
-
 class MediaConsumerSetBufferResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -706,8 +688,6 @@ class MediaConsumerSetBufferResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaConsumerPushPacketParams extends bindings.Struct {
@@ -783,8 +763,6 @@ class _MediaConsumerPushPacketParams extends bindings.Struct {
 }
 
 
-
-
 class MediaConsumerPushPacketResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -841,8 +819,6 @@ class MediaConsumerPushPacketResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaConsumerFlushParams extends bindings.Struct {
@@ -903,8 +879,6 @@ class _MediaConsumerFlushParams extends bindings.Struct {
 }
 
 
-
-
 class MediaConsumerFlushResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -962,13 +936,8 @@ class MediaConsumerFlushResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaProducer_connectName = 0;
 const int _MediaProducer_disconnectName = 1;
-
-
 
 class _MediaProducerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1214,8 +1183,6 @@ class MediaProducerStub extends bindings.Stub {
 const int _MediaPullModeProducer_getBufferName = 0;
 const int _MediaPullModeProducer_pullPacketName = 1;
 const int _MediaPullModeProducer_releasePacketName = 2;
-
-
 
 class _MediaPullModeProducerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1519,8 +1486,6 @@ class MediaPullModeProducerStub extends bindings.Stub {
 const int _MediaConsumer_setBufferName = 0;
 const int _MediaConsumer_pushPacketName = 1;
 const int _MediaConsumer_flushName = 2;
-
-
 
 class _MediaConsumerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

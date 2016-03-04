@@ -70,8 +70,6 @@ class Target extends bindings.MojoEnum {
 
 
 
-
-
 class _NavigatorHostRequestNavigateParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -161,8 +159,6 @@ class _NavigatorHostRequestNavigateParams extends bindings.Struct {
 }
 
 
-
-
 class _NavigatorHostRequestNavigateHistoryParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -233,8 +229,6 @@ class _NavigatorHostRequestNavigateHistoryParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NavigatorHostDidNavigateLocallyParams extends bindings.Struct {
@@ -308,14 +302,9 @@ class _NavigatorHostDidNavigateLocallyParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _NavigatorHost_requestNavigateName = 0;
 const int _NavigatorHost_requestNavigateHistoryName = 1;
 const int _NavigatorHost_didNavigateLocallyName = 2;
-
-
 
 class _NavigatorHostServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -119,8 +119,6 @@ class MediaPlayerStatus extends bindings.Struct {
 }
 
 
-
-
 class _MediaPlayerPlayParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -179,8 +177,6 @@ class _MediaPlayerPlayParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaPlayerPauseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -237,8 +233,6 @@ class _MediaPlayerPauseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _MediaPlayerGetStatusParams extends bindings.Struct {
@@ -311,8 +305,6 @@ class _MediaPlayerGetStatusParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaPlayerGetStatusResponseParams extends bindings.Struct {
@@ -401,14 +393,9 @@ class MediaPlayerGetStatusResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaPlayer_playName = 0;
 const int _MediaPlayer_pauseName = 1;
 const int _MediaPlayer_getStatusName = 2;
-
-
 
 class _MediaPlayerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -138,8 +138,6 @@ class NotificationData extends bindings.Struct {
 }
 
 
-
-
 class _NotificationClientOnSelectedParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -198,8 +196,6 @@ class _NotificationClientOnSelectedParams extends bindings.Struct {
 }
 
 
-
-
 class _NotificationClientOnDismissedParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -256,8 +252,6 @@ class _NotificationClientOnDismissedParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NotificationUpdateParams extends bindings.Struct {
@@ -333,8 +327,6 @@ class _NotificationUpdateParams extends bindings.Struct {
 }
 
 
-
-
 class _NotificationCancelParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -391,8 +383,6 @@ class _NotificationCancelParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _NotificationServicePostParams extends bindings.Struct {
@@ -492,13 +482,8 @@ class _NotificationServicePostParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _NotificationClient_onSelectedName = 0;
 const int _NotificationClient_onDismissedName = 1;
-
-
 
 class _NotificationClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -699,8 +684,6 @@ class NotificationClientStub extends bindings.Stub {
 
 const int _Notification_updateName = 0;
 const int _Notification_cancelName = 1;
-
-
 
 class _NotificationServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -903,8 +886,6 @@ class NotificationStub extends bindings.Stub {
 }
 
 const int _NotificationService_postName = 0;
-
-
 
 class _NotificationServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

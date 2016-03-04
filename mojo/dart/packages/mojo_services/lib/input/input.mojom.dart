@@ -68,8 +68,6 @@ class _InputClientOnBackButtonParams extends bindings.Struct {
 }
 
 
-
-
 class InputClientOnBackButtonResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -126,8 +124,6 @@ class InputClientOnBackButtonResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _InputServiceSetClientParams extends bindings.Struct {
@@ -200,12 +196,7 @@ class _InputServiceSetClientParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _InputClient_onBackButtonName = 0;
-
-
 
 class _InputClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -434,8 +425,6 @@ class InputClientStub extends bindings.Stub {
 }
 
 const int _InputService_setClientName = 0;
-
-
 
 class _InputServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

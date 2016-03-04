@@ -85,8 +85,6 @@ class SceneResource extends bindings.Struct {
 }
 
 
-
-
 class MailboxTextureResource extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(40, 0)
@@ -198,8 +196,6 @@ class MailboxTextureResource extends bindings.Struct {
 }
 
 
-
-
 class _MailboxTextureCallbackOnMailboxTextureReleasedParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -256,8 +252,6 @@ class _MailboxTextureCallbackOnMailboxTextureReleasedParams extends bindings.Str
     return map;
   }
 }
-
-
 
 
 
@@ -364,12 +358,7 @@ class Resource extends bindings.Union {
     return result;
   }
 }
-
-
-
 const int _MailboxTextureCallback_onMailboxTextureReleasedName = 0;
-
-
 
 class _MailboxTextureCallbackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

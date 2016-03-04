@@ -82,8 +82,6 @@ class _CookieStoreGetParams extends bindings.Struct {
 }
 
 
-
-
 class CookieStoreGetResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -154,8 +152,6 @@ class CookieStoreGetResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _CookieStoreSetParams extends bindings.Struct {
@@ -244,8 +240,6 @@ class _CookieStoreSetParams extends bindings.Struct {
 }
 
 
-
-
 class CookieStoreSetResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -317,13 +311,8 @@ class CookieStoreSetResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _CookieStore_getName = 0;
 const int _CookieStore_setName = 1;
-
-
 
 class _CookieStoreServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

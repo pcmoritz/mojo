@@ -84,8 +84,6 @@ class _NativeViewportEventDispatcherOnEventParams extends bindings.Struct {
 }
 
 
-
-
 class NativeViewportEventDispatcherOnEventResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -143,12 +141,7 @@ class NativeViewportEventDispatcherOnEventResponseParams extends bindings.Struct
   }
 }
 
-
-
-
 const int _NativeViewportEventDispatcher_onEventName = 0;
-
-
 
 class _NativeViewportEventDispatcherServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

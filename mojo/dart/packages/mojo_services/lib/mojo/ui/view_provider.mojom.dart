@@ -108,12 +108,7 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ViewProvider_createViewName = 0;
-
-
 
 class _ViewProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

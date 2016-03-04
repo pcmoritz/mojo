@@ -98,8 +98,6 @@ class UrlLoaderInterceptorResponse extends bindings.Struct {
 }
 
 
-
-
 class _UrlLoaderInterceptorFactoryCreateParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -169,8 +167,6 @@ class _UrlLoaderInterceptorFactoryCreateParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _UrlLoaderInterceptorInterceptRequestParams extends bindings.Struct {
@@ -245,8 +241,6 @@ class _UrlLoaderInterceptorInterceptRequestParams extends bindings.Struct {
 }
 
 
-
-
 class UrlLoaderInterceptorInterceptRequestResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -319,8 +313,6 @@ class UrlLoaderInterceptorInterceptRequestResponseParams extends bindings.Struct
 }
 
 
-
-
 class _UrlLoaderInterceptorInterceptFollowRedirectParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -377,8 +369,6 @@ class _UrlLoaderInterceptorInterceptFollowRedirectParams extends bindings.Struct
     return map;
   }
 }
-
-
 
 
 class UrlLoaderInterceptorInterceptFollowRedirectResponseParams extends bindings.Struct {
@@ -453,8 +443,6 @@ class UrlLoaderInterceptorInterceptFollowRedirectResponseParams extends bindings
 }
 
 
-
-
 class _UrlLoaderInterceptorInterceptResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -525,8 +513,6 @@ class _UrlLoaderInterceptorInterceptResponseParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class UrlLoaderInterceptorInterceptResponseResponseParams extends bindings.Struct {
@@ -600,12 +586,7 @@ class UrlLoaderInterceptorInterceptResponseResponseParams extends bindings.Struc
   }
 }
 
-
-
-
 const int _UrlLoaderInterceptorFactory_createName = 0;
-
-
 
 class _UrlLoaderInterceptorFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -798,8 +779,6 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
 const int _UrlLoaderInterceptor_interceptRequestName = 0;
 const int _UrlLoaderInterceptor_interceptFollowRedirectName = 1;
 const int _UrlLoaderInterceptor_interceptResponseName = 2;
-
-
 
 class _UrlLoaderInterceptorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

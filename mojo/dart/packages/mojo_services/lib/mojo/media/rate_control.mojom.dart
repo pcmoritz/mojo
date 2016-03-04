@@ -124,8 +124,6 @@ class TimelineQuad extends bindings.Struct {
 }
 
 
-
-
 class TimelineTransform extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -229,8 +227,6 @@ class TimelineTransform extends bindings.Struct {
 }
 
 
-
-
 class _RateControlGetCurrentTransformParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -287,8 +283,6 @@ class _RateControlGetCurrentTransformParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class RateControlGetCurrentTransformResponseParams extends bindings.Struct {
@@ -364,8 +358,6 @@ class RateControlGetCurrentTransformResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _RateControlSetCurrentQuadParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -439,8 +431,6 @@ class _RateControlSetCurrentQuadParams extends bindings.Struct {
 }
 
 
-
-
 class _RateControlSetTargetTimelineIdParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -511,8 +501,6 @@ class _RateControlSetTargetTimelineIdParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _RateControlSetRateParams extends bindings.Struct {
@@ -599,8 +587,6 @@ class _RateControlSetRateParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _RateControlSetRateAtReferenceTimeParams extends bindings.Struct {
@@ -703,8 +689,6 @@ class _RateControlSetRateAtReferenceTimeParams extends bindings.Struct {
 }
 
 
-
-
 class _RateControlSetRateAtTargetTimeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -805,8 +789,6 @@ class _RateControlSetRateAtTargetTimeParams extends bindings.Struct {
 }
 
 
-
-
 class _RateControlCancelPendingChangesParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -864,9 +846,6 @@ class _RateControlCancelPendingChangesParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _RateControl_getCurrentTransformName = 0;
 const int _RateControl_setCurrentQuadName = 1;
 const int _RateControl_setTargetTimelineIdName = 2;
@@ -874,8 +853,6 @@ const int _RateControl_setRateName = 3;
 const int _RateControl_setRateAtReferenceTimeName = 4;
 const int _RateControl_setRateAtTargetTimeName = 5;
 const int _RateControl_cancelPendingChangesName = 6;
-
-
 
 class _RateControlServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

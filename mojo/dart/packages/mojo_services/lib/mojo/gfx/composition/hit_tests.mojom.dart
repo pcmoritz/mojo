@@ -71,8 +71,6 @@ class HitTestBehaviorVisibility extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class HitTestBehavior extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -178,8 +176,6 @@ class HitTestBehavior extends bindings.Struct {
 }
 
 
-
-
 class HitTestResult extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -251,8 +247,6 @@ class HitTestResult extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class SceneHit extends bindings.Struct {
@@ -375,8 +369,6 @@ class SceneHit extends bindings.Struct {
 }
 
 
-
-
 class NodeHit extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -464,8 +456,6 @@ class NodeHit extends bindings.Struct {
 }
 
 
-
-
 class _HitTesterHitTestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -539,8 +529,6 @@ class _HitTesterHitTestParams extends bindings.Struct {
 }
 
 
-
-
 class HitTesterHitTestResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -612,8 +600,6 @@ class HitTesterHitTestResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 
@@ -720,12 +706,7 @@ class Hit extends bindings.Union {
     return result;
   }
 }
-
-
-
 const int _HitTester_hitTestName = 0;
-
-
 
 class _HitTesterServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

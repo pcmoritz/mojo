@@ -54,8 +54,6 @@ class SubmitAction extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-
-
 class KeyboardType extends bindings.MojoEnum {
   static const KeyboardType text = const KeyboardType._(0);
   static const KeyboardType number = const KeyboardType._(1);
@@ -121,8 +119,6 @@ class KeyboardType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
 
 
 
@@ -240,8 +236,6 @@ class CompletionData extends bindings.Struct {
 }
 
 
-
-
 class CorrectionData extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -342,8 +336,6 @@ class CorrectionData extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardClientCommitCompletionParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -417,8 +409,6 @@ class _KeyboardClientCommitCompletionParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardClientCommitCorrectionParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -490,8 +480,6 @@ class _KeyboardClientCommitCorrectionParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardClientCommitTextParams extends bindings.Struct {
@@ -580,8 +568,6 @@ class _KeyboardClientCommitTextParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardClientDeleteSurroundingTextParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -666,8 +652,6 @@ class _KeyboardClientDeleteSurroundingTextParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardClientSetComposingRegionParams extends bindings.Struct {
@@ -756,8 +740,6 @@ class _KeyboardClientSetComposingRegionParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardClientSetComposingTextParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -842,8 +824,6 @@ class _KeyboardClientSetComposingTextParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardClientSetSelectionParams extends bindings.Struct {
@@ -932,8 +912,6 @@ class _KeyboardClientSetSelectionParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardClientSubmitParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1008,8 +986,6 @@ class _KeyboardClientSubmitParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardServiceShowParams extends bindings.Struct {
@@ -1100,8 +1076,6 @@ class _KeyboardServiceShowParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardServiceShowByRequestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1160,8 +1134,6 @@ class _KeyboardServiceShowByRequestParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardServiceHideParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1218,8 +1190,6 @@ class _KeyboardServiceHideParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardServiceSetTextParams extends bindings.Struct {
@@ -1292,8 +1262,6 @@ class _KeyboardServiceSetTextParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _KeyboardServiceSetSelectionParams extends bindings.Struct {
@@ -1382,8 +1350,6 @@ class _KeyboardServiceSetSelectionParams extends bindings.Struct {
 }
 
 
-
-
 class _KeyboardServiceFactoryCreateKeyboardServiceParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1467,9 +1433,6 @@ class _KeyboardServiceFactoryCreateKeyboardServiceParams extends bindings.Struct
   }
 }
 
-
-
-
 const int _KeyboardClient_commitCompletionName = 0;
 const int _KeyboardClient_commitCorrectionName = 1;
 const int _KeyboardClient_commitTextName = 2;
@@ -1478,8 +1441,6 @@ const int _KeyboardClient_setComposingRegionName = 4;
 const int _KeyboardClient_setComposingTextName = 5;
 const int _KeyboardClient_setSelectionName = 6;
 const int _KeyboardClient_submitName = 7;
-
-
 
 class _KeyboardClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1785,8 +1746,6 @@ const int _KeyboardService_hideName = 2;
 const int _KeyboardService_setTextName = 3;
 const int _KeyboardService_setSelectionName = 4;
 
-
-
 class _KeyboardServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);
@@ -2032,8 +1991,6 @@ class KeyboardServiceStub extends bindings.Stub {
 }
 
 const int _KeyboardServiceFactory_createKeyboardServiceName = 0;
-
-
 
 class _KeyboardServiceFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

@@ -109,12 +109,7 @@ class _ServiceRegistryAddServicesParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _ServiceRegistry_addServicesName = 0;
-
-
 
 class _ServiceRegistryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

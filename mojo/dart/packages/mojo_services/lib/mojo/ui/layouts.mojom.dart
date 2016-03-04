@@ -124,8 +124,6 @@ class BoxConstraints extends bindings.Struct {
 }
 
 
-
-
 class ViewLayoutParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -211,8 +209,6 @@ class ViewLayoutParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ViewLayoutInfo extends bindings.Struct {
@@ -303,8 +299,6 @@ class ViewLayoutInfo extends bindings.Struct {
 }
 
 
-
-
 class ViewLayoutResult extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -376,9 +370,6 @@ class ViewLayoutResult extends bindings.Struct {
     return map;
   }
 }
-
-
-
 
 
 

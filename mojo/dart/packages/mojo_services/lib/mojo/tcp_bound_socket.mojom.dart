@@ -85,8 +85,6 @@ class _TcpBoundSocketStartListeningParams extends bindings.Struct {
 }
 
 
-
-
 class TcpBoundSocketStartListeningResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -158,8 +156,6 @@ class TcpBoundSocketStartListeningResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _TcpBoundSocketConnectParams extends bindings.Struct {
@@ -273,8 +269,6 @@ class _TcpBoundSocketConnectParams extends bindings.Struct {
 }
 
 
-
-
 class TcpBoundSocketConnectResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -347,13 +341,8 @@ class TcpBoundSocketConnectResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _TcpBoundSocket_startListeningName = 0;
 const int _TcpBoundSocket_connectName = 1;
-
-
 
 class _TcpBoundSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

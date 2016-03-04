@@ -102,8 +102,6 @@ class AudioTrackDescriptor extends bindings.Struct {
 }
 
 
-
-
 class AudioTrackConfiguration extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -205,8 +203,6 @@ class AudioTrackConfiguration extends bindings.Struct {
 }
 
 
-
-
 class _AudioTrackDescribeParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -263,8 +259,6 @@ class _AudioTrackDescribeParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class AudioTrackDescribeResponseParams extends bindings.Struct {
@@ -338,8 +332,6 @@ class AudioTrackDescribeResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _AudioTrackConfigureParams extends bindings.Struct {
@@ -427,8 +419,6 @@ class _AudioTrackConfigureParams extends bindings.Struct {
 }
 
 
-
-
 class _AudioTrackGetRateControlParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -498,8 +488,6 @@ class _AudioTrackGetRateControlParams extends bindings.Struct {
         'Object containing handles cannot be encoded to JSON.');
   }
 }
-
-
 
 
 class _AudioTrackSetGainParams extends bindings.Struct {
@@ -573,15 +561,10 @@ class _AudioTrackSetGainParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _AudioTrack_describeName = 0;
 const int _AudioTrack_configureName = 1;
 const int _AudioTrack_getRateControlName = 2;
 const int _AudioTrack_setGainName = 3;
-
-
 
 class _AudioTrackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

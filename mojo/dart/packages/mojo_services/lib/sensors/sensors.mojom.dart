@@ -181,8 +181,6 @@ class SensorType extends bindings.MojoEnum {
 
 
 
-
-
 class SensorData extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
@@ -283,8 +281,6 @@ class SensorData extends bindings.Struct {
 }
 
 
-
-
 class _SensorListenerOnAccuracyChangedParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -355,8 +351,6 @@ class _SensorListenerOnAccuracyChangedParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _SensorListenerOnSensorChangedParams extends bindings.Struct {
@@ -430,8 +424,6 @@ class _SensorListenerOnSensorChangedParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _SensorServiceAddListenerParams extends bindings.Struct {
@@ -521,13 +513,8 @@ class _SensorServiceAddListenerParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _SensorListener_onAccuracyChangedName = 0;
 const int _SensorListener_onSensorChangedName = 1;
-
-
 
 class _SensorListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -733,8 +720,6 @@ class SensorListenerStub extends bindings.Stub {
 }
 
 const int _SensorService_addListenerName = 0;
-
-
 
 class _SensorServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

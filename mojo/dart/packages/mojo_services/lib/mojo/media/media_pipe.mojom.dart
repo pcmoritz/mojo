@@ -97,8 +97,6 @@ class MediaPacketRegion extends bindings.Struct {
 }
 
 
-
-
 class MediaPacket extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(48, 0)
@@ -247,8 +245,6 @@ class MediaPacket extends bindings.Struct {
 }
 
 
-
-
 class _MediaPipeSetBufferParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -333,8 +329,6 @@ class _MediaPipeSetBufferParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaPipeSendPacketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -406,8 +400,6 @@ class _MediaPipeSendPacketParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaPipeSendPacketResponseParams extends bindings.Struct {
@@ -486,8 +478,6 @@ class MediaPipeSendPacketResponseParams extends bindings.Struct {
 }
 
 
-
-
 class _MediaPipeFlushParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -544,8 +534,6 @@ class _MediaPipeFlushParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class MediaPipeFlushResponseParams extends bindings.Struct {
@@ -605,9 +593,6 @@ class MediaPipeFlushResponseParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _MediaPipe_setBufferName = 0;
 const int _MediaPipe_sendPacketName = 1;
 const int _MediaPipe_flushName = 2;
@@ -663,10 +648,6 @@ class MediaPipeSendResult extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
-
 
 class _MediaPipeServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>

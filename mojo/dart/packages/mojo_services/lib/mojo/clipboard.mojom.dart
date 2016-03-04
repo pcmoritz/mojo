@@ -86,8 +86,6 @@ class _ClipboardGetSequenceNumberParams extends bindings.Struct {
 }
 
 
-
-
 class ClipboardGetSequenceNumberResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -158,8 +156,6 @@ class ClipboardGetSequenceNumberResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ClipboardGetAvailableMimeTypesParams extends bindings.Struct {
@@ -236,8 +232,6 @@ class _ClipboardGetAvailableMimeTypesParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class ClipboardGetAvailableMimeTypesResponseParams extends bindings.Struct {
@@ -325,8 +319,6 @@ class ClipboardGetAvailableMimeTypesResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ClipboardReadMimeTypeParams extends bindings.Struct {
@@ -419,8 +411,6 @@ class _ClipboardReadMimeTypeParams extends bindings.Struct {
 }
 
 
-
-
 class ClipboardReadMimeTypeResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -491,8 +481,6 @@ class ClipboardReadMimeTypeResponseParams extends bindings.Struct {
     return map;
   }
 }
-
-
 
 
 class _ClipboardWriteClipboardDataParams extends bindings.Struct {
@@ -637,9 +625,6 @@ class _ClipboardWriteClipboardDataParams extends bindings.Struct {
   }
 }
 
-
-
-
 const int _Clipboard_getSequenceNumberName = 0;
 const int _Clipboard_getAvailableMimeTypesName = 1;
 const int _Clipboard_readMimeTypeName = 2;
@@ -703,10 +688,6 @@ class ClipboardType extends bindings.MojoEnum {
 
   int toJson() => mojoEnumValue;
 }
-
-
-
-
 
 class _ClipboardServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
