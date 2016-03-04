@@ -310,11 +310,19 @@ def presubmit_check(packages, affected_files):
     return global_check(packages, latest_mtime)
 
   updated_mojom_dart_files = []
+  deleted_mojom_files = []
+  deleted_mojom_dart_files = []
   packages_with_failures = []
   check_failure = False
 
   # Check for updated .mojom without updated .mojom.dart
   for mojom_file in mojoms:
+    if not os.path.exists(mojom_file):
+      # File no longer exists. We cannot calculate the path of the associated
+      # .mojom.dart file, skip.
+      deleted_mojom_files.append(os.path.relpath(mojom_file, start=SRC_DIR))
+      continue
+
     try:
       mojom = _load_mojom(mojom_file)
     except Exception:
@@ -339,10 +347,14 @@ def presubmit_check(packages, affected_files):
 
     if mojom_mtime > mojom_dart_mtime:
       check_failure = True
-      print("Package %s has old %s" % (package, mojom_dart_path))
+      if mojom_dart_mtime == 0:
+        print("Package %s is missing %s" % (package, mojom_dart_path))
+      else:
+        print("Package %s has old %s" % (package, mojom_dart_path))
       if not (package in packages_with_failures):
         packages_with_failures.append(package)
       continue
+
     # Remember that this .mojom.dart file was updated after the .mojom file.
     # This list is used to verify that all updated .mojom.dart files were
     # updated because their source .mojom file changed.
@@ -361,14 +373,21 @@ def presubmit_check(packages, affected_files):
     package = path_relative_to_packages.split(os.sep)[0]
     # Path relative to src.
     mojom_dart_path = os.path.relpath(mojom_dart_file, start=SRC_DIR)
+
     # If mojom_dart_path is not in updated_mojom_dart_files, a .mojom.dart
     # file was updated without updating the related .mojom file.
     if not (mojom_dart_path in updated_mojom_dart_files):
+      if not os.path.exists(mojom_dart_file):
+        deleted_mojom_dart_files.append(mojom_dart_path)
+        continue
       check_failure = True
       print("Package %s has new %s without updating source .mojom file." %
             (package, mojom_dart_path))
       if not (package in packages_with_failures):
         packages_with_failures.append(package)
+
+  # TODO(johnmccutchan): Fuzzy detection of a deleted .mojom file without a
+  # deleted .mojom.dart file.
 
   for package in packages_with_failures:
     _print_regenerate_message(package)
