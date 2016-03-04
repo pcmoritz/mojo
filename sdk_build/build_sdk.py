@@ -24,6 +24,17 @@ def _MakeDirs(*args, **kwargs):
     pass
 
 
+def _CopyHelper(source_file, dest_file):
+  """Copies |source_file| to |dest_file|. If |source_file| is user-executable,
+  it will set |dest_file|'s mode to 0755 (user: rwx, group/other: rx);
+  otherwise, it will set it to 0644 (user: rw, group/other: r)."""
+  shutil.copy(source_file, dest_file)
+  if os.stat(source_file).st_mode & 0100:
+    os.chmod(dest_file, 0755)
+  else:
+    os.chmod(dest_file, 0644)
+
+
 def _CopyDir(source_path, dest_path, **kwargs):
   """Copies directories from the source git repository (the current working
   directory should be the root of this repository) to the destination path.
@@ -39,7 +50,7 @@ def _CopyDir(source_path, dest_path, **kwargs):
     rel_path = source_file[len(source_path) + 1:]
     dest_file = os.path.join(dest_path, rel_path)
     _MakeDirs(os.path.dirname(dest_file))
-    shutil.copy(source_file, dest_file)
+    _CopyHelper(source_file, dest_file)
 
 
 def _CopyFiles(source_files, dest_path):
@@ -54,7 +65,7 @@ def _CopyFiles(source_files, dest_path):
     source_files = [source_files]
   _MakeDirs(dest_path)
   for source_file in source_files:
-    shutil.copy(source_file,
+    _CopyHelper(source_file,
                 os.path.join(dest_path, os.path.basename(source_file)))
 
 
@@ -105,6 +116,10 @@ def main():
 
   if not args.allow_dirty_tree and IsGitTreeDirty():
     FatalError("tree appears to be dirty")
+
+  # Set the umask, so that files/directories we create will be world- (and
+  # group-) readable (and executable, for directories).
+  os.umask(0022)
 
   try:
     os.mkdir(target_dir)
