@@ -252,6 +252,10 @@ func (f *MojomFile) AddConstant(declaredConst *UserDefinedConstant) DuplicateNam
 	return declaredConst.RegisterInScope(f.FileScope)
 }
 
+func (f *MojomFile) FileContents() string {
+	return f.fileContents
+}
+
 func (f *MojomFile) checkInit() {
 	if f.FileScope == nil {
 		panic("InitializeFileScope must be invoked first.")

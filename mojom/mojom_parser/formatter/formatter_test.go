@@ -49,6 +49,15 @@ enum FooEnum {
   // FooEnum Final Comment.
 };
 
+// no-format
+
+enum SomeWeirdFormat { VALUE1 = 10, VALUE2 = 20};
+
+
+
+
+// end-no-format
+
 // constant comment.
 const int8 foo_constant1 = 10;  // constant comment.
 const int8 foo_constant2 = -10;  // constant comment.

@@ -46,6 +46,18 @@ type printer struct {
 	// A negative maxLineLength indicates no maximum line length should be enforced.
 	// This is currently only used to decide when to break up a method on different lines.
 	maxLineLength int
+
+	// mojomFile is the file being printed.
+	mojomFile *mojom.MojomFile
+
+	// noFormat indicates we are in a block where formatting has been disabled.
+	noFormat bool
+
+	// token that begins a block where formatting has been disabled.
+	noFormatStart lexer.Token
+
+	// indentSize at the time noFormat is set.
+	noFormatStartIndent int
 }
 
 // newPrinter is a constructor for printer.
@@ -69,6 +81,7 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 		panic("A printer can only be used once!")
 	}
 	p.used = true
+	p.mojomFile = mojomFile
 
 	p.writeAttributes(mojomFile.Attributes)
 	p.writeModuleNamespace(mojomFile.ModuleNamespace)
@@ -89,6 +102,8 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 			p.writeCommentBlocks(finalComments, true)
 		}
 	}
+
+	p.eofNoFormat()
 }
 
 // writeModuleNamespace writes a mojom file's module statement and associated
@@ -571,6 +586,11 @@ func (p *printer) writeCommentBlocks(comments []lexer.Token, finalEol bool) {
 	for i, comment := range comments {
 		switch comment.Kind {
 		case lexer.SingleLineComment:
+			if comment.Text == "// no-format" {
+				p.startNoFormat(comment)
+			} else if comment.Text == "// end-no-format" {
+				p.endNoFormat(comment)
+			}
 			p.write(comment.Text)
 			if finalEol || i < len(comments)-1 {
 				p.nl()
@@ -635,11 +655,15 @@ func (p *printer) write(s string) {
 
 	// We only print the indentation if the line is not empty.
 	if p.linePos == 0 {
-		p.buffer.WriteString(strings.Repeat(" ", p.indentSize))
+		if !p.noFormat {
+			p.buffer.WriteString(strings.Repeat(" ", p.indentSize))
+		}
 		p.linePos += p.indentSize
 	}
 	p.linePos += len(s)
-	p.buffer.WriteString(s)
+	if !p.noFormat {
+		p.buffer.WriteString(s)
+	}
 }
 
 // nl writes a new line. Before writing the new line, nl writes the last
@@ -647,11 +671,15 @@ func (p *printer) write(s string) {
 func (p *printer) nl() {
 	// Before going to the next line, print the last comment on the line.
 	if p.eolComment != nil {
-		p.writef("  %s", p.eolComment.Text)
+		if !p.noFormat {
+			p.writef("  %s", p.eolComment.Text)
+		}
 		p.eolComment = nil
 	}
 
-	p.buffer.WriteString("\n")
+	if !p.noFormat {
+		p.buffer.WriteString("\n")
+	}
 	p.linePos = 0
 }
 
@@ -691,6 +719,45 @@ func (p *printer) lineLength() int {
 		return p.indentSize
 	}
 	return p.linePos
+}
+
+// startNoFormat disables writes to the buffer (future writes are discarded).
+func (p *printer) startNoFormat(startToken lexer.Token) {
+	if p.noFormat {
+		return
+	}
+
+	p.noFormat = true
+	p.noFormatStart = startToken
+	p.noFormatStartIndent = p.indentSize
+}
+
+// endNoFormat re-enables writes to the buffer and writes the source starting
+// at the beginning of p.startToken and ending right before endToken.
+func (p *printer) endNoFormat(endToken lexer.Token) {
+	if !p.noFormat {
+		return
+	}
+
+	fileContents := p.mojomFile.FileContents()
+	notFormatted := fileContents[p.noFormatStart.SourcePosBytes:endToken.SourcePosBytes]
+
+	// Remove any unformatted indentation right before the end of the unformatted block.
+	notFormatted = strings.TrimRight(notFormatted, " \t")
+	p.buffer.WriteString(strings.Repeat(" ", p.noFormatStartIndent))
+	p.buffer.WriteString(notFormatted)
+	p.noFormat = false
+}
+
+// eofNoFormat handles the case where formatting had been disabled but not
+// re-enabled. It writes everything after the formatting was ended.
+func (p *printer) eofNoFormat() {
+	if !p.noFormat {
+		return
+	}
+
+	fileContents := p.mojomFile.FileContents()
+	p.endNoFormat(lexer.Token{SourcePosBytes: len(fileContents)})
 }
 
 // Standalone utilities that do not operate on the buffer.
