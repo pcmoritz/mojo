@@ -25,18 +25,19 @@ To build the examples:
 
 ## Set up
 
-To generate code from Mojom files, one needs the Mojom tool. Running the
-following causes the binary to be downloaded:
+To get started quickly, just run the following:
+
+    $ mojo_sdk_setup/setup.sh
+
+This is equivalent to performing the steps below separately:
 
     $ mojo_sdk_setup/download_mojom_tool.sh
-
-The included Makefile uses clang. The following downloads a suitable version of
-clang:
-
     $ mojo_sdk_setup/download_clang.sh
 
-(One should be able to build using another compiler with sufficient C++11
-support.)
+The first downloads a binary for the Mojom tool, which is needed to generate
+code from Mojom files. The second downloads a suitable version of clang, which
+is needed by the included Makefile. (One should also be able to build using
+another compiler with sufficient C++11 support.)
 
 ## Building the examples
 

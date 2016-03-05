@@ -3,7 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-#FIXME
+"""Script for downloading a file from Google Cloud Storage."""
+
 
 import argparse
 import hashlib
@@ -18,7 +19,9 @@ def _FatalError(message):
 
 
 def _DownloadFile(source):
-  """FIXME"""
+  """Downloads |source| from Google Cloud Storage. |source| should be a path,
+  including the bucket name (e.g., if the full URL is gs://mojo/a/b/c.xyz,
+  |source| should be "mojo/a/b/c.xyz")."""
 
   try:
     conn = httplib.HTTPSConnection("storage.googleapis.com")
@@ -40,7 +43,7 @@ def main():
                       help="SHA-1 hash for the downloaded file")
   parser.add_argument("--executable", action="store_true",
                       help="make the downloaded file executable")
-  parser.add_argument("source", help="source path, including bucket name")
+  parser.add_argument("source", help="source path, including the bucket name")
   parser.add_argument("destination", help="destination path")
   args = parser.parse_args()
 
