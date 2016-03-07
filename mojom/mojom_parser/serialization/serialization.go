@@ -256,7 +256,7 @@ func translateMojomStruct(s *mojom.MojomStruct) mojom_types.MojomStruct {
 	mojomStruct.DeclData = translateDeclarationData(&s.DeclarationData)
 	mojomStruct.DeclData.ContainedDeclarations = translateContainedDeclarations(&s.NestedDeclarations)
 
-	for _, field := range s.Fields {
+	for _, field := range s.FieldsInOrdinalOrder() {
 		mojomStruct.Fields = append(mojomStruct.Fields, translateStructField(field))
 	}
 
@@ -611,8 +611,11 @@ func translateDeclarationData(d *mojom.DeclarationData) *mojom_types.Declaration
 	}
 
 	// declaration_order
-	// TODO(rudominer) DeclarationOrder is currently not populated.
-	declData.DeclarationOrder = -1
+	if d.LexicalPosition() < 0 {
+		declData.DeclarationOrder = -1
+	} else {
+		declData.DeclarationOrder = d.LexicalPosition()
+	}
 
 	// container_type_key
 	containingType := d.ContainingType()

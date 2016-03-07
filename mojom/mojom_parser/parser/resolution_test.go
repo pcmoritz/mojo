@@ -1045,7 +1045,7 @@ func TestSingleFileResolutionSuccess(t *testing.T) {
 
 		testFunc := func(descriptor *mojom.MojomDescriptor) error {
 			myStructType := descriptor.TypesByKey["TYPE_KEY:MyStruct"].(*mojom.MojomStruct)
-			aColorField := myStructType.Fields[0]
+			aColorField := myStructType.FieldsInLexicalOrder[0]
 			concreteValue := aColorField.DefaultValue.ResolvedConcreteValue().(*mojom.EnumValue)
 			key := concreteValue.ValueKey()
 			if key != "TYPE_KEY:Color.BLUE" {

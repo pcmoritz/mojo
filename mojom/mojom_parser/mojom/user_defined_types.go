@@ -331,8 +331,9 @@ type MojomStruct struct {
 
 	structType StructType
 
-	fieldsByName map[string]*StructField
-	Fields       []*StructField
+	fieldsByName         map[string]*StructField
+	FieldsInLexicalOrder []*StructField
+	fieldsInOrdinalOrder []*StructField
 
 	// Used to form an error message in case of a duplicate field name.
 	userFacingName string
@@ -341,7 +342,7 @@ type MojomStruct struct {
 func NewMojomStruct(declData DeclarationData) *MojomStruct {
 	mojomStruct := new(MojomStruct)
 	mojomStruct.fieldsByName = make(map[string]*StructField)
-	mojomStruct.Fields = make([]*StructField, 0)
+	mojomStruct.FieldsInLexicalOrder = make([]*StructField, 0)
 	mojomStruct.Init(declData, mojomStruct)
 	mojomStruct.userFacingName = mojomStruct.simpleName
 	return mojomStruct
@@ -409,9 +410,17 @@ func (s *MojomStruct) AddField(field *StructField) DuplicateNameError {
 		}
 	}
 	s.fieldsByName[field.simpleName] = field
-	s.Fields = append(s.Fields, field)
+	field.lexicalPosition = int32(len(s.FieldsInLexicalOrder))
+	s.FieldsInLexicalOrder = append(s.FieldsInLexicalOrder, field)
 	s.DeclaredObjects = append(s.DeclaredObjects, field)
 	return nil
+}
+
+func (s *MojomStruct) FieldsInOrdinalOrder() []*StructField {
+	if s.fieldsInOrdinalOrder == nil {
+		panic("The method ComputeFieldOrdinals() must be invoked first.")
+	}
+	return s.fieldsInOrdinalOrder
 }
 
 func (*MojomStruct) Kind() UserDefinedTypeKind {
@@ -426,10 +435,67 @@ func (MojomStruct) IsAssignmentCompatibleWith(value LiteralValue) bool {
 	return value.IsDefault()
 }
 
+var ErrOrdinalRange = errors.New("ordinal value out of range")
+var ErrOrdinalDuplicate = errors.New("duplicate ordinal value")
+
+type StructFieldOrdinalError struct {
+	Ord           int64        // The attemted ordinal
+	StructName    string       // The name of the struct in which the problem occurs.
+	Field         *StructField // The field with the attempted ordinal
+	ExistingField *StructField // Used if Err == ErrOrdinalDuplicate
+	Err           error        // the type of error (ErrOrdinalRange, ErrOrdinalDuplicate)
+}
+
+// StructFieldOrdinalError implements error.
+func (e *StructFieldOrdinalError) Error() string {
+	var message string
+	switch e.Err {
+	case ErrOrdinalRange:
+		message = fmt.Sprintf("Invalid ordinal for field %s: %d. "+
+			"A struct field ordinal must be a non-negative integer value "+
+			"less than the number of fields in the struct.",
+			e.Field.SimpleName(), e.Ord)
+	case ErrOrdinalDuplicate:
+		message = fmt.Sprintf("Invalid ordinal for field %s: %d. "+
+			"There is already a field in struct %s with that ordinal: %s.",
+			e.Field.SimpleName(), e.Ord, e.StructName,
+			e.ExistingField.SimpleName())
+	default:
+		panic(fmt.Sprintf("Unrecognized type of MethodOrdinalError %v", e.Err))
+	}
+	return UserErrorMessage(e.Field.OwningFile(), e.Field.NameToken(), message)
+}
+
 // This should be invoked some time after all of the fields have been added
 // to the struct.
-func (s *MojomStruct) ComputeFieldOrdinals() {
-	// TODO(rudominer) Implement MojomStruct.ComputeFieldOrdinals()
+func (s *MojomStruct) ComputeFieldOrdinals() error {
+	numFields := uint32(len(s.FieldsInLexicalOrder))
+	s.fieldsInOrdinalOrder = make([]*StructField, numFields)
+	nextOrdinal := uint32(0)
+	for _, field := range s.FieldsInLexicalOrder {
+		fieldOrdinal := nextOrdinal
+		if field.declaredOrdinal >= 0 {
+			if field.declaredOrdinal >= math.MaxUint32 {
+				return &StructFieldOrdinalError{Ord: field.declaredOrdinal,
+					StructName: s.SimpleName(), Field: field,
+					Err: ErrOrdinalRange}
+			}
+			fieldOrdinal = uint32(field.declaredOrdinal)
+		}
+		if fieldOrdinal >= numFields {
+			return &StructFieldOrdinalError{Ord: int64(fieldOrdinal),
+				StructName: s.SimpleName(), Field: field,
+				Err: ErrOrdinalRange}
+		}
+		if existingField := s.fieldsInOrdinalOrder[fieldOrdinal]; existingField != nil {
+			return &StructFieldOrdinalError{Ord: int64(fieldOrdinal),
+				StructName: s.SimpleName(), Field: field,
+				ExistingField: existingField, Err: ErrOrdinalDuplicate}
+		}
+		s.fieldsInOrdinalOrder[fieldOrdinal] = field
+		nextOrdinal = fieldOrdinal + 1
+	}
+	return nil
 }
 
 func (m MojomStruct) String() string {
@@ -437,7 +503,7 @@ func (m MojomStruct) String() string {
 	s += fmt.Sprintf("%s\n", m.UserDefinedTypeBase)
 	s += "     Fields\n"
 	s += "     ------\n"
-	for _, field := range m.Fields {
+	for _, field := range m.FieldsInLexicalOrder {
 		s += fmt.Sprintf("     %s\n", field)
 	}
 	s += "     Enums\n"
@@ -457,7 +523,7 @@ func (m MojomStruct) String() string {
 // is being used to represent the parameters to a method.
 func (s MojomStruct) ParameterString() string {
 	str := ""
-	for i, f := range s.Fields {
+	for i, f := range s.FieldsInLexicalOrder {
 		if i > 0 {
 			str += ", "
 		}
@@ -612,9 +678,6 @@ func (MojomInterface) Kind() UserDefinedTypeKind {
 func (MojomInterface) IsAssignmentCompatibleWith(value LiteralValue) bool {
 	return false
 }
-
-var ErrOrdinalRange = errors.New("ordinal value out of range")
-var ErrOrdinalDuplicate = errors.New("duplicate ordinal value")
 
 type MethodOrdinalError struct {
 	Ord            int64        // The attemted ordinal
@@ -1210,6 +1273,11 @@ type DeclarationData struct {
 	// We use int64 here because valid ordinals are uint32 and we want to
 	// be able to represent an unset value as -1.
 	declaredOrdinal int64
+
+	// The zero-based  position of this element within its containing
+	// lexical scope as it appears in the Mojom declaration, or -1
+	// if this is not set.
+	lexicalPosition int32
 }
 
 func DeclData(name string, owningFile *MojomFile, nameToken lexer.Token, attributes *Attributes) DeclarationData {
@@ -1219,7 +1287,7 @@ func DeclData(name string, owningFile *MojomFile, nameToken lexer.Token, attribu
 func DeclDataWithOrdinal(name string, owningFile *MojomFile, nameToken lexer.Token,
 	attributes *Attributes, declaredOrdinal int64) DeclarationData {
 	return DeclarationData{simpleName: name, owningFile: owningFile, nameToken: nameToken,
-		attributes: attributes, declaredOrdinal: declaredOrdinal}
+		attributes: attributes, declaredOrdinal: declaredOrdinal, lexicalPosition: -1}
 }
 
 func (d *DeclarationData) SimpleName() string {
@@ -1252,6 +1320,10 @@ func (d *DeclarationData) Attributes() *Attributes {
 
 func (d *DeclarationData) DeclaredOrdinal() int64 {
 	return d.declaredOrdinal
+}
+
+func (d *DeclarationData) LexicalPosition() int32 {
+	return d.lexicalPosition
 }
 
 func (d *DeclarationData) OwningFile() *MojomFile {

@@ -198,7 +198,7 @@ func TestSuccessfulParsing(t *testing.T) {
 	import "and.another.file";
 
 	struct Foo{
-		[happy=true] int32 x@4;
+		[happy=true] int32 x@0;
 	};`
 	{
 		expectedFile.AddImport(mojom.NewImportedFile("another.file", nil))
@@ -208,7 +208,7 @@ func TestSuccessfulParsing(t *testing.T) {
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
 		attributes := mojom.NewAttributes(lexer.Token{})
 		attributes.List = append(attributes.List, mojom.NewMojomAttribute("happy", nil, mojom.MakeBoolLiteralValue(true, nil)))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataAWithOrdinal("x", attributes, 4), mojom.SimpleTypeInt32, nil))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataAWithOrdinal("x", attributes, 0), mojom.SimpleTypeInt32, nil))
 		expectedFile.AddStruct(structFoo)
 	}
 	endTestCase()
@@ -224,10 +224,10 @@ func TestSuccessfulParsing(t *testing.T) {
 	import "and.another.file";
 
 	struct Foo{
-		int32 x@4 = 42;
+		int32 x@0 = 42;
 		[age=7, level="high"] string  y = "Howdy!";
 		string? z;
-		bool w@6 = false;
+		bool w@3 = false;
 	};`
 	{
 		expectedFile.AddImport(mojom.NewImportedFile("another.file", nil))
@@ -235,13 +235,13 @@ func TestSuccessfulParsing(t *testing.T) {
 
 		structFoo := mojom.NewMojomStruct(mojom.DeclTestData("Foo"))
 		structFoo.InitAsScope(mojom.NewTestFileScope("test.scope"))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("x", 4), mojom.SimpleTypeInt32, mojom.MakeInt8LiteralValue(42, nil)))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("x", 0), mojom.SimpleTypeInt32, mojom.MakeInt8LiteralValue(42, nil)))
 		attributes := mojom.NewAttributes(lexer.Token{})
 		attributes.List = append(attributes.List, mojom.NewMojomAttribute("age", nil, mojom.MakeInt8LiteralValue(7, nil)))
 		attributes.List = append(attributes.List, mojom.NewMojomAttribute("level", nil, mojom.MakeStringLiteralValue("high", nil)))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataA("y", attributes), mojom.BuiltInType("string"), mojom.MakeStringLiteralValue("Howdy!", nil)))
 		structFoo.AddField(mojom.NewStructField(mojom.DeclTestData("z"), mojom.BuiltInType("string?"), nil))
-		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("w", 6), mojom.BuiltInType("bool"), mojom.MakeBoolLiteralValue(false, nil)))
+		structFoo.AddField(mojom.NewStructField(mojom.DeclTestDataWithOrdinal("w", 3), mojom.BuiltInType("bool"), mojom.MakeBoolLiteralValue(false, nil)))
 		expectedFile.AddStruct(structFoo)
 	}
 	endTestCase()
@@ -512,6 +512,141 @@ func TestErrorParsing(t *testing.T) {
 	module mojom.test;
 	`
 	expectError("The module declaration must come before the import statements.")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: empty string
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@;
+	};
+
+	`
+	expectError("field \"x\": Invalid ordinal string following '@'")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: Not a number
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@happy;
+	};
+
+	`
+	expectError("field \"x\": Invalid ordinal string following '@'")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: Negative
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@-500;
+	};
+
+	`
+	expectError("field \"x\": Invalid ordinal string following '@'")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: too big for uint32)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@4294967295;
+	};
+
+	`
+	expectError("field \"x\": Invalid ordinal string following '@'")
+	expectError("4294967295")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: too big for uint64)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@999999999999999999999999999999999999999;
+	};
+
+	`
+	expectError("field \"x\": Invalid ordinal string following '@'")
+	expectError("999999999999999999999999999999999999999")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: too big for size of struct)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x;
+		int32 y@2;
+	};
+
+	`
+	expectError("Invalid ordinal for field y: 2.")
+	expectError("A struct field ordinal must be a non-negative integer value less than the number of fields in the struct.")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: implicit next value too big for size of struct)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x;
+		int32 y@2;
+		int32 z;
+	};
+
+	`
+	expectError("Invalid ordinal for field z: 3.")
+	expectError("A struct field ordinal must be a non-negative integer value less than the number of fields in the struct.")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: Duplicate explicit)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x@0;
+		int32 y;
+		int32 z@0;
+	};
+
+	`
+	expectError("Invalid ordinal for field z: 0.")
+	expectError("There is already a field in struct MyStruct with that ordinal: x")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid struct field ordinal: Duplicate implicit)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	struct MyStruct {
+		int32 x;
+		int32 y;
+		int32 z@1;
+	};
+
+	`
+	expectError("Invalid ordinal for field z: 1.")
+	expectError("There is already a field in struct MyStruct with that ordinal: y")
 	endTestCase()
 
 	////////////////////////////////////////////////////////////

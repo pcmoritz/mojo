@@ -66,7 +66,7 @@ func TestAttachComments(t *testing.T) {
 	// Sanity-check that we got the right method.
 	checkEq("Method1", method1.SimpleName())
 
-	inParam1 := method1.Parameters.Fields[0]
+	inParam1 := method1.Parameters.FieldsInLexicalOrder[0]
 	// Sanity-check that we got the right field.
 	checkEq("in_param1", inParam1.SimpleName())
 

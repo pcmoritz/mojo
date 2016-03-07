@@ -654,7 +654,10 @@ func (p *Parser) parseParamList(methodName string, isRequest bool) (paramStruct 
 	}
 
 	if p.OK() {
-		paramStruct.ComputeFieldOrdinals()
+		if err := paramStruct.ComputeFieldOrdinals(); err != nil {
+			p.err = err
+			return nil
+		}
 	}
 	return
 }
@@ -750,8 +753,12 @@ func (p *Parser) parseStructBody(mojomStruct *mojom.MojomStruct) bool {
 		}
 	}
 	if p.OK() {
-		mojomStruct.ComputeFieldOrdinals()
+		if err := mojomStruct.ComputeFieldOrdinals(); err != nil {
+			p.err = err
+			return false
+		}
 	}
+
 	return p.OK()
 }
 

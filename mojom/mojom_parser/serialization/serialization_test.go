@@ -71,9 +71,16 @@ func (test *singleFileTest) endTestCase() {
 	test.testCaseNum += 1
 }
 
-// newShortDeclData constructs a new DeclarationData with the given data.
+// newShortDeclDataO constructs a new DeclarationData with the given data.
 func (test *singleFileTest) newShortDeclData(shortName string) *mojom_types.DeclarationData {
 	declData := test.newContainedDeclData(shortName, "", nil)
+	declData.FullIdentifier = nil
+	return declData
+}
+
+// newShortDeclDataO constructs a new DeclarationData with the given data.
+func (test *singleFileTest) newShortDeclDataO(declarationOrder, declaredOrdinal int32, shortName string) *mojom_types.DeclarationData {
+	declData := test.newContainedDeclDataA(declarationOrder, declaredOrdinal, shortName, "", nil, nil)
 	declData.FullIdentifier = nil
 	return declData
 }
@@ -83,29 +90,42 @@ func (test *singleFileTest) newDeclData(shortName, fullIdentifier string) *mojom
 	return test.newContainedDeclData(shortName, fullIdentifier, nil)
 }
 
+// newDeclData constructs a new DeclarationData with the given data.
+func (test *singleFileTest) newDeclDataO(declarationOrder, declaredOrdinal int32, shortName, fullIdentifier string) *mojom_types.DeclarationData {
+	return test.newContainedDeclDataA(declarationOrder, declaredOrdinal, shortName, fullIdentifier, nil, nil)
+}
+
 // newDeclDataA constructs a new DeclarationData with the given data, including attributes.
 func (test *singleFileTest) newDeclDataA(shortName, fullIdentifier string,
 	attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
-	return test.newContainedDeclDataA(shortName, fullIdentifier, nil, attributes)
+	return test.newContainedDeclDataA(-1, -1, shortName, fullIdentifier, nil, attributes)
 }
 
 // newShortDeclDataA constructs a new DeclarationData with the given data, including attributes.
 func (test *singleFileTest) newShortDeclDataA(shortName string,
 	attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
-	declData := test.newContainedDeclDataA(shortName, "", nil, attributes)
+	declData := test.newContainedDeclDataA(-1, -1, shortName, "", nil, attributes)
+	declData.FullIdentifier = nil
+	return declData
+}
+
+// newShortDeclDataA constructs a new DeclarationData with the given data, including attributes.
+func (test *singleFileTest) newShortDeclDataAO(declarationOrder, declaredOrdinal int32, shortName string,
+	attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
+	declData := test.newContainedDeclDataA(declarationOrder, declaredOrdinal, shortName, "", nil, attributes)
 	declData.FullIdentifier = nil
 	return declData
 }
 
 // newContainedDeclData constructs a new DeclarationData with the given data.
 func (test *singleFileTest) newContainedDeclData(shortName, fullIdentifier string, containerTypeKey *string) *mojom_types.DeclarationData {
-	return test.newContainedDeclDataA(shortName, fullIdentifier, containerTypeKey, nil)
+	return test.newContainedDeclDataA(-1, -1, shortName, fullIdentifier, containerTypeKey, nil)
 }
 
 // newContainedDeclDataA constructs a new DeclarationData with the given data, including attributes.
-func (test *singleFileTest) newContainedDeclDataA(shortName, fullIdentifier string,
+func (test *singleFileTest) newContainedDeclDataA(declarationOrder, declaredOrdinal int32, shortName, fullIdentifier string,
 	containerTypeKey *string, attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
-	return newContainedDeclDataA(test.fileName(), shortName, fullIdentifier, containerTypeKey, attributes)
+	return newContainedDeclDataA(declarationOrder, declaredOrdinal, test.fileName(), shortName, fullIdentifier, containerTypeKey, attributes)
 }
 
 // newDeclData constructs a new DeclarationData with the given data.
@@ -113,19 +133,24 @@ func newDeclData(fileName, shortName, fullIdentifier string) *mojom_types.Declar
 	return newContainedDeclData(fileName, shortName, fullIdentifier, nil)
 }
 
+// newDeclData constructs a new DeclarationData with the given data.
+func newDeclDataO(declarationOrder, declaredOrdinal int32, fileName, shortName, fullIdentifier string) *mojom_types.DeclarationData {
+	return newContainedDeclDataA(declarationOrder, declaredOrdinal, fileName, shortName, fullIdentifier, nil, nil)
+}
+
 // newDeclDataA constructs a new DeclarationData with the given data, including attributes.
 func newDeclDataA(fileName, shortName, fullIdentifier string,
 	attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
-	return newContainedDeclDataA(fileName, shortName, fullIdentifier, nil, attributes)
+	return newContainedDeclDataA(-1, -1, fileName, shortName, fullIdentifier, nil, attributes)
 }
 
 // newContainedDeclData constructs a new DeclarationData with the given data.
 func newContainedDeclData(fileName, shortName, fullIdentifier string, containerTypeKey *string) *mojom_types.DeclarationData {
-	return newContainedDeclDataA(fileName, shortName, fullIdentifier, containerTypeKey, nil)
+	return newContainedDeclDataA(-1, -1, fileName, shortName, fullIdentifier, containerTypeKey, nil)
 }
 
 // newContainedDeclDataA constructs a new DeclarationData with the given data, including attributes.
-func newContainedDeclDataA(fileName, shortName, fullIdentifier string,
+func newContainedDeclDataA(declarationOrder, declaredOrdinal int32, fileName, shortName, fullIdentifier string,
 	containerTypeKey *string, attributes *[]mojom_types.Attribute) *mojom_types.DeclarationData {
 	var fullyQualifiedName *string
 	if fullIdentifier != "" {
@@ -135,8 +160,8 @@ func newContainedDeclDataA(fileName, shortName, fullIdentifier string,
 		Attributes:       attributes,
 		ShortName:        &shortName,
 		FullIdentifier:   fullyQualifiedName,
-		DeclaredOrdinal:  -1,
-		DeclarationOrder: -1,
+		DeclaredOrdinal:  declaredOrdinal,
+		DeclarationOrder: declarationOrder,
 		ContainerTypeKey: containerTypeKey,
 		SourceFileInfo: &mojom_types.SourceFileInfo{
 			FileName: fileName,
@@ -147,6 +172,112 @@ func newContainedDeclDataA(fileName, shortName, fullIdentifier string,
 // file is specified and the expected MojomFileGraph is specified using Go struct literals.
 func TestSingleFileSerialization(t *testing.T) {
 	test := singleFileTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: struct field ordinals
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	struct Foo{
+	  int32 x@2;
+	  int32 y@3;
+	  int32 z@0;
+	  int32 w@1;
+	};`
+
+		test.addTestCase("", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(2, 0, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(3, 1, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, 2, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, 3, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: struct field ordinals, some implicit
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	struct Foo{
+	  int32 x@2;
+	  int32 y;
+	  int32 z@0;
+	  int32 w;
+	};`
+
+		test.addTestCase("", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(2, 0, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, 2, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
 
 	////////////////////////////////////////////////////////////
 	// Test Case: array of int32
@@ -174,25 +305,25 @@ func TestSingleFileSerialization(t *testing.T) {
 			Fields: []mojom_types.StructField{
 				// field bar1 is not nullable and not fixed length
 				{
-					DeclData: test.newShortDeclData("bar1"),
+					DeclData: test.newShortDeclDataO(0, -1, "bar1"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
 						false, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
 				},
 				// field bar2 is not nullable and fixed length of 7
 				{
-					DeclData: test.newShortDeclData("bar2"),
+					DeclData: test.newShortDeclDataO(1, -1, "bar2"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
 						false, 7, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
 				},
 				// field bar3 is nullable and not fixed length
 				{
-					DeclData: test.newShortDeclData("bar3"),
+					DeclData: test.newShortDeclDataO(2, -1, "bar3"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
 						true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
 				},
 				// field bar4 is nullable and fixed length of 8
 				{
-					DeclData: test.newShortDeclData("bar4"),
+					DeclData: test.newShortDeclDataO(3, -1, "bar4"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
 						true, 8, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
 				},
@@ -228,7 +359,7 @@ func TestSingleFileSerialization(t *testing.T) {
 			Fields: []mojom_types.StructField{
 				// field bar1 is non-nullable with a non-nullable key.
 				{
-					DeclData: test.newShortDeclData("bar1"),
+					DeclData: test.newShortDeclDataO(0, -1, "bar1"),
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						false,
 						&mojom_types.TypeStringType{mojom_types.StringType{false}},
@@ -236,7 +367,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				},
 				// field bar2 is non-nullable with a nullable key.
 				{
-					DeclData: test.newShortDeclData("bar2"),
+					DeclData: test.newShortDeclDataO(1, -1, "bar2"),
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						false,
 						&mojom_types.TypeStringType{mojom_types.StringType{true}},
@@ -244,7 +375,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				},
 				// field bar3 is nullable with a non-nullable key.
 				{
-					DeclData: test.newShortDeclData("bar3"),
+					DeclData: test.newShortDeclDataO(2, -1, "bar3"),
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						true,
 						&mojom_types.TypeStringType{mojom_types.StringType{false}},
@@ -252,7 +383,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				},
 				// field bar4 is nullable with a nullable key.
 				{
-					DeclData: test.newShortDeclData("bar4"),
+					DeclData: test.newShortDeclDataO(3, -1, "bar4"),
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						true,
 						&mojom_types.TypeStringType{mojom_types.StringType{true}},
@@ -409,7 +540,7 @@ func TestSingleFileSerialization(t *testing.T) {
 			Fields: []mojom_types.StructField{
 				// field a_color
 				{
-					DeclData: test.newShortDeclData("a_color"),
+					DeclData: test.newShortDeclDataO(0, -1, "a_color"),
 					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 						false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
 					DefaultValue: &mojom_types.DefaultFieldValueValue{&mojom_types.ValueUserValueReference{
@@ -453,7 +584,7 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("EchoString-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
@@ -462,7 +593,7 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("EchoString-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
@@ -474,11 +605,11 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("DelayedEchoString-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 							mojom_types.StructField{
-								DeclData: test.newDeclData("millis", ""),
+								DeclData: test.newDeclDataO(1, -1, "millis", ""),
 								Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
 							},
 						},
@@ -487,7 +618,7 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("DelayedEchoString-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
@@ -531,7 +662,7 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("EchoString-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
@@ -540,7 +671,7 @@ func TestSingleFileSerialization(t *testing.T) {
 						DeclData: test.newDeclData("EchoString-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: test.newDeclData("value", ""),
+								DeclData: test.newDeclDataO(0, -1, "value", ""),
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
@@ -802,18 +933,18 @@ func TestSingleFileSerialization(t *testing.T) {
 			Fields: []mojom_types.StructField{
 				// field x
 				{
-					DeclData: test.newShortDeclData("x"),
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
 				},
 				// field y
 				{
-					DeclData:     test.newShortDeclDataA("y", &[]mojom_types.Attribute{{"min_version", &mojom_types.LiteralValueInt8Value{2}}}),
+					DeclData:     test.newShortDeclDataAO(1, -1, "y", &[]mojom_types.Attribute{{"min_version", &mojom_types.LiteralValueInt8Value{2}}}),
 					Type:         &mojom_types.TypeStringType{mojom_types.StringType{false}},
 					DefaultValue: &mojom_types.DefaultFieldValueValue{&mojom_types.ValueLiteralValue{&mojom_types.LiteralValueStringValue{"hello"}}},
 				},
 				// field z
 				{
-					DeclData: test.newShortDeclData("z"),
+					DeclData: test.newShortDeclDataO(2, -1, "z"),
 					Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 				},
 			},
@@ -1385,7 +1516,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1395,7 +1526,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1424,7 +1555,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1434,7 +1565,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1500,7 +1631,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1510,7 +1641,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1539,7 +1670,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1549,7 +1680,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1620,7 +1751,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1630,7 +1761,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1660,7 +1791,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1670,7 +1801,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1741,7 +1872,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1751,7 +1882,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameA(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameA(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameA(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("b.c.d.FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
@@ -1782,7 +1913,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			DeclData: newDeclData(test.fileNameB(), "FooB", "b.c.d.FooB"),
 			Fields: []mojom_types.StructField{
 				mojom_types.StructField{
-					DeclData: newDeclData(test.fileNameB(), "x", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameB(), "x", ""),
 					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 						false, false, stringPointer("Enum1"), stringPointer("TYPE_KEY:b.c.d.Enum1")}},
 				},
@@ -1799,7 +1930,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "x", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "x", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("a.b.c.FooA"), stringPointer("TYPE_KEY:a.b.c.FooA")}},
 							},
@@ -1809,12 +1940,12 @@ func TestRuntimeTypeInfo(t *testing.T) {
 						DeclData: newDeclData(test.fileNameB(), "DoIt-response", ""),
 						Fields: []mojom_types.StructField{
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "y", ""),
+								DeclData: newDeclDataO(0, -1, test.fileNameB(), "y", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									true, false, stringPointer("FooB"), stringPointer("TYPE_KEY:b.c.d.FooB")}},
 							},
 							mojom_types.StructField{
-								DeclData: newDeclData(test.fileNameB(), "z", ""),
+								DeclData: newDeclDataO(1, -1, test.fileNameB(), "z", ""),
 								Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 									false, false, stringPointer("Enum2"), stringPointer("TYPE_KEY:b.c.d.Enum2")}},
 							},
