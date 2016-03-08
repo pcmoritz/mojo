@@ -416,11 +416,11 @@ ssize_t MojoDescSendMsg(void* handle,
 
       result_value = MojoSystemImplWait(
           g_mojo_system, handle_value, signals_value, deadline_value,
-          signals_state_ptr ? &signals_state_value : NULL);
+          signals_state_ptr ? &signals_state_value : nullptr);
 
       {
         ScopedCopyLock copy_lock(nap);
-        if (signals_state_ptr != NULL) {
+        if (signals_state_ptr) {
           memcpy_volatile_out(signals_state_ptr, &signals_state_value,
                               sizeof(MojoHandleSignalsState));
         }
@@ -473,11 +473,11 @@ ssize_t MojoDescSendMsg(void* handle,
 
       result_value = MojoSystemImplWaitMany(
           g_mojo_system, handles, signals, num_handles_value, deadline_value,
-          result_index_ptr ? &result_index_value : NULL, signals_states);
+          result_index_ptr ? &result_index_value : nullptr, signals_states);
 
       {
         ScopedCopyLock copy_lock(nap);
-        if (result_index_ptr != NULL) {
+        if (result_index_ptr) {
           *result_index_ptr = result_index_value;
         }
         *result_ptr = result_value;
@@ -622,15 +622,15 @@ ssize_t MojoDescSendMsg(void* handle,
 
       result_value = MojoSystemImplReadMessage(
           g_mojo_system, message_pipe_handle_value, bytes,
-          num_bytes_ptr ? &num_bytes_value : NULL, handles,
-          num_handles_ptr ? &num_handles_value : NULL, flags_value);
+          num_bytes_ptr ? &num_bytes_value : nullptr, handles,
+          num_handles_ptr ? &num_handles_value : nullptr, flags_value);
 
       {
         ScopedCopyLock copy_lock(nap);
-        if (num_bytes_ptr != NULL) {
+        if (num_bytes_ptr) {
           *num_bytes_ptr = num_bytes_value;
         }
-        if (num_handles_ptr != NULL) {
+        if (num_handles_ptr) {
           *num_handles_ptr = num_handles_value;
         }
         *result_ptr = result_value;

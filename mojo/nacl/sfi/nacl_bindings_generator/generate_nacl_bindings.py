@@ -108,9 +108,9 @@ def GenerateLibMojo(functions, common_vars, out):
 
     with code.Indent():
       code << 'struct nacl_irt_mojo* irt_mojo = get_irt_mojo();'
-      code << 'if (irt_mojo == NULL)'
+      code << 'if (!irt_mojo)'
       with code.Indent():
-        code << 'return MOJO_RESULT_INTERNAL;'
+        code << 'abort();'
       code << 'return irt_mojo->%s(%s);' % (
           f.name, ', '.join([p.name for p in f.params]))
 
@@ -185,7 +185,7 @@ class ScalarOutputImpl(ParamImpl):
     name = self.param.name
     expr = '&%s_value' % name
     if self.param.is_optional:
-      expr = '%s_ptr ? %s : NULL' % (name, expr)
+      expr = '%s_ptr ? %s : nullptr' % (name, expr)
     return expr
 
   def CopyOut(self, code):
@@ -200,7 +200,7 @@ class ScalarOutputImpl(ParamImpl):
       copy_stmt = '*%s_ptr = %s_value;' % (name, name)
 
     if self.param.is_optional:
-      code << 'if (%s_ptr != NULL) {' % (name)
+      code << 'if (%s_ptr) {' % (name)
       with code.Indent():
         code << copy_stmt
       code << '}'
@@ -222,13 +222,13 @@ class ScalarInOutImpl(ParamImpl):
     name = self.param.name
     expr = '&%s_value' % name
     if self.param.is_optional:
-      expr = '%s_ptr ? %s : NULL' % (name, expr)
+      expr = '%s_ptr ? %s : nullptr' % (name, expr)
     return expr
 
   def CopyOut(self, code):
     name = self.param.name
     if self.param.is_optional:
-      code << 'if (%s_ptr != NULL) {' % (name)
+      code << 'if (%s_ptr) {' % (name)
       with code.Indent():
         code << '*%s_ptr = %s_value;' % (name, name)
       code << '}'
@@ -263,14 +263,14 @@ class PointerInOutImpl(ParamImpl):
     name = self.param.name
     expr = '&%s_value' % name
     if self.param.is_optional:
-      expr = '%s_ptr ? %s : NULL' % (name, expr)
+      expr = '%s_ptr ? %s : nullptr' % (name, expr)
     return expr
 
   def CopyOut(self, code):
     assert not self.param.is_optional
     name = self.param.name
     if self.param.is_optional:
-      code << 'if (%s_ptr != NULL) {' % (name)
+      code << 'if (%s_ptr) {' % (name)
       with code.Indent():
         code << 'CopyOutPointer(nap, %s_value, %s_ptr);' % (name, name)
       code << '}'
