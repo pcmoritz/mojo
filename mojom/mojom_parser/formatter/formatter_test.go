@@ -34,12 +34,12 @@ struct FooStruct {  // FooStruct comment.
   int16 field2 = 10;
   // Field3 comment.
 	// Field3 other comment.
-  int32 field3@10 = 10;
+  int32 field3@2 = 10;
 };
 
 struct FooUnion {
 	[Attr1=1] int8 field1;
-	int16 field2@5;
+	int16 field2@1;
 };
 
 enum FooEnum {
@@ -70,9 +70,9 @@ interface InterfaceFoo {  // Interface comment.
 	const int8 const_in_interface = 20;
 
   // Method 1 comment.
-  method1@5(int8 hello@10);
+  method1@5(int8 hello@0);
   // Method 2 comment.
-	method2([MinVersion=5] int8 hello) => (Foo bar@20);
+	method2([MinVersion=5] int8 hello) => (Foo bar@0);
 	method3();
 	method4() => (Foo bar);
 	method5(int8 p1 /* p1 comment */, int16 p2);  // method comment

@@ -63,7 +63,7 @@ type printer struct {
 // newPrinter is a constructor for printer.
 func newPrinter() (p *printer) {
 	p = new(printer)
-	p.maxLineLength = 100
+	p.maxLineLength = 80
 	return
 }
 
@@ -240,6 +240,22 @@ func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
 
 	extraIndent := p.lineLength() - p.indentSize
 	if ownLine {
+		// If we are printing every parameter on its own line, check to see if
+		// aligning the parameters to the right of the method name can be done.
+		for _, param := range declaredObjects {
+			scratch := newPrinter()
+			scratch.maxLineLength = -1
+			scratch.writeMethodParam(param.(*mojom.StructField))
+			// If any parameter would go beyond the maximum line length, start the
+			// list of parameters on the line after the method name and indented 4
+			// more than the method itself.
+			if len(scratch.result())+p.lineLength() > p.maxLineLength {
+				p.nl()
+				extraIndent = 4
+				break
+			}
+		}
+
 		p.indentSize += extraIndent
 	}
 
