@@ -66,6 +66,12 @@ tests = [
   {
     "test": "mojo:versioning_apptests",
   },
+  {
+    "test": "mojo:platform_handle_private_apptests",
+  },
+  {
+    "test": "mojo:image_pipe_apptests",
+  },
 ]
 
 if target_os == 'linux':
