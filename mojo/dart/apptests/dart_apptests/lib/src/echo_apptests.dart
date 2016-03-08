@@ -283,12 +283,5 @@ echoApptests(Application application, String url) {
 
       await differentEchoProxy.close();
     });
-
-    test('Quit application', () async {
-      var echoProxy =
-          new EchoServiceProxy.connectToService(application, "mojo:dart_echo");
-      echoProxy.ptr.quit();
-      await echoProxy.close();
-    });
   });
 }

@@ -68,8 +68,7 @@ class PingPongServiceImpl implements PingPongService {
       pingPongService.ptr.ping(i);
     }
     await completer.future;
-    pingPongService.ptr.quit();
-    pingPongService.close();
+    await pingPongService.close();
 
     return responseFactory(true);
   }
@@ -85,26 +84,23 @@ class PingPongServiceImpl implements PingPongService {
       pingPongService.ptr.ping(i);
     }
     await completer.future;
-    pingPongService.ptr.quit();
-    pingPongService.close();
+    await pingPongService.close();
 
     return responseFactory(true);
   }
 
   getPingPongService(PingPongServiceStub serviceStub) {
-    new PingPongServiceImpl.fromStub(serviceStub);
+    var targetServiceProxy = new PingPongServiceProxy.unbound();
+    _application.connectToService(
+        "mojo:dart_pingpong_target", targetServiceProxy);
+
+    // Pass along the interface request to another implementation of the
+    // service.
+    targetServiceProxy.ptr.getPingPongService(serviceStub);
+    targetServiceProxy.close();
   }
 
-  void quit() {
-    if (_pingPongClient != null) {
-      _pingPongClient.close();
-      _pingPongClient = null;
-    }
-    _stub.close().then((_) {
-      _stub = null;
-      _application.close();
-    });
-  }
+  void quit() {}
 }
 
 class PingPongApplication extends Application {

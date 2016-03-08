@@ -33,11 +33,7 @@ class EchoServiceImpl implements EchoService {
         new Duration(milliseconds: millis), () => responseFactory(value));
   }
 
-  void quit() {
-    _stub.close().then((_) {
-      _application.close();
-    });
-  }
+  void quit() {}
 }
 
 class EchoApplication extends Application {

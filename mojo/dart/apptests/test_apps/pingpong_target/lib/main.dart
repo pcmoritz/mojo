@@ -19,6 +19,10 @@ class PingPongServiceImpl implements PingPongService {
     _stub = new PingPongServiceStub.fromEndpoint(endpoint, this);
   }
 
+  PingPongServiceImpl.fromStub(this._stub) {
+    _stub.impl = this;
+  }
+
   void setClient(ProxyBase proxyBase) {
     assert(_pingPongClient == null);
     _pingPongClient = proxyBase;
@@ -32,15 +36,11 @@ class PingPongServiceImpl implements PingPongService {
   dynamic pingTargetService(
       Object service, int count, [Function responseFactory]) =>
       throw "Unimplemented";
-  void getPingPongService(Object service) => throw "Unimplemented";
-
-  void quit() {
-    if (_pingPongClient != null) {
-      _pingPongClient.close();
-      _pingPongClient = null;
-    }
-    _stub.close();
+  void getPingPongService(Object service) {
+    new PingPongServiceImpl.fromStub(service);
   }
+
+  void quit() {}
 }
 
 class PingPongApplication extends Application {
@@ -55,13 +55,6 @@ class PingPongApplication extends Application {
 
     // No services are required from the remote end.
     connection.remoteServiceProvider.close();
-
-    // Close the application when the first connection goes down.
-    connection.onError = ((_) {
-      connection.close().then((_) {
-        closeApplication();
-      });
-    });
   }
 
   Future closeApplication() async {
