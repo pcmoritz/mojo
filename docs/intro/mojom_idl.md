@@ -326,11 +326,57 @@ use of `foo`, perhaps the pattern of `CreateFoo1` is preferable, e.g.:
 
 ## Consts
 
-**TODO(vtl)**
+Mojom supports "constants" to be declared, mainly to provide a way of defining
+semantically significant values to be used in messages, structs, etc. For
+example:
+```mojom
+const int32 kZero = 0;
+const bool kVeryTrue = true;
+const double kMyDouble = 123.456;
+const string kMyString = "my string";
+
+enum MyEnum {
+  ZERO,
+  ONE,
+  TWO,
+};
+const MyEnum kMyEnumValue = TWO;
+```
+
+The type may be any non-reference type (including enum types; see above) or
+string. The value must be appropriate (e.g., in range) for the given type.
+(There is additional syntax for doubles and floats: `double.INFINITY`,
+`double.NEGATIVE_INFINITY`, `double.NAN`, and similarly for floats.)
+
+Const declarations may be made at the top level, or they may be nested within
+interface and struct declarations.
 
 ## Annotations
 
-**TODO(vtl)**
+Various elements in Mojom files may have (optional) *annotations*. These are
+lists of key-value pairs, containing "secondary" information. For example:
+```mojom
+[DartPackage="foobar",
+ JavaPackage="com.example.mojo.foobar"]
+module foobar;
+```
+This is an annotation attached to the `module` keyword with two key-value pairs
+(one to be used by the Dart language generator and the other by the Java
+language generator, respectively).
+
+Apart from language-specific annotations, one noteworthy annotation is the
+`ServiceName` annotation (for interfaces):
+```mojom
+[ServiceName="foobar.MyInterface"]
+interface MyInterface {
+  // ...
+};
+```
+This is indicates the standard name to use in conjunction with
+`mojo.ServiceProvider.ConnectToService()` (**TODO**(vtl): need a reference for
+that).
+
+Annotations are also used for *versioning*, but we will not discuss that here.
 
 ## See also
 
