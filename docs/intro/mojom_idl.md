@@ -1,17 +1,79 @@
 # Mojom IDL
 
 The Mojom IDL (interface definition language) is primarily used to describe
-*interfaces* to be used on [message pipes](message_pipes.md). Below, we describe
-practical aspects of the Mojom language. Elsewhere, we describe the [Mojom
-protocol](mojom_protocol.md). (**TODO(vtl)**: Also, serialization format?
-Versioning?)
+*interfaces* to be used on [message pipes](message_pipes.md). Below, we give a
+brief overview of some practical aspects of the Mojom language (for more
+details, see the [Mojom language](../mojom_lang/mojom_lang.md). Elsewhere, we
+describe the [Mojom protocol](mojom_protocol.md). (**TODO(vtl)**: Also,
+serialization format? Versioning?)
 
 Text files written in Mojom IDL are given the `.mojom` extension by convention
-(and are usually referred to as Mojom/mojom/`.mojom` files). The Mojom bindings
-generator (**TODO(vtl)**: link?) may be used to generate code in a variety of
-languages (including C++, Dart, and Go) from a Mojom file. Such generated code
-"implements" the things specified in the Mojom file, in a way that's appropriate
-for the particular target language.
+(and are usually referred to as Mojom/mojom/`.mojom` files). Mojom IDL permits
+C++-style comments: single-line comments starting with `//` or multi-line
+comments enclosed by `/* ... */`.
+
+The Mojom bindings generator (**TODO(vtl)**: link?) may be used to generate code
+in a variety of languages (including C++, Dart, and Go) from a Mojom file. Such
+generated code "implements" the things specified in the Mojom file, in a way
+that's appropriate for the particular target language.
+
+## Modules and imports
+
+A Mojom file begins with an optional *module* declaration, which acts like a C++
+namespace declaration (applying to the entire file). It is then followed by zero
+or more *import* statements, which make the contents of the imported files (and,
+transitively, their imports) available in the current file. For example:
+```mojom
+module my_module.my_submodule;
+
+import "path/to/another.mojom";
+import "path/to/yet/a/different.mojom";
+```
+
+### Name resolution
+
+Name resolution is basically C++-like (with `.` instead of `::`): Within
+`my_module.my_submodule`, an unnested declaration of a name `Foo` declares
+something with "full" name `my_module.my_submodule.Foo`. A *use* of a name `Foo`
+could either refer to one of the "full" names: `my_module.my_submodule.Foo`,
+`my_module.Foo`, or `Foo` (searched in that order).
+
+Nested declarations act in the expected way. E.g., if `Foo` is a struct
+containing an enum declaration of `Bar`, then `Foo.Bar` (or
+`my_submodule.Foo.Bar`, or `my_module.my_submodule.Foo.Bar`) can be used to
+refer to that enum outside of `Foo`.
+
+### Names and ordinals
+
+Generally, at a binary (as opposed to source) level, names in Mojom are not
+important (except in that they must not collide). Names may be changed without
+affecting binary compatibility.
+
+Instead, what's important are *ordinals*, which apply to struct fields
+(including message request/response parameters) and interface messages. Often,
+these are left implicit, in which case ordinals are assigned consecutively
+starting from 0. (Obviously, with implicit declaration, the order of declaration
+of struct fields, etc. is important.) Ordinals may also be assigned explicitly,
+using the notation `@123` (for example). (This allows struct fields, etc. to be
+re-ordered in a Mojom file without breaking binary compatibility.
+
+Though ordinals are important for evolving Mojom files in a backwards-compatible
+way, we will not discuss them in this introduction.
+
+### Naming style
+
+Though names are not important, various code generators expect names in a
+certain *style*, in order to transform them into a style more appropriate for a
+given target language:
+* `StudlyCaps` (a.k.a. `CapitalizedCamelCase`) for: (struct, interface, union,
+  and enum) type names and message (a.k.a. function or method) names;
+* `unix_hacker_style` for field names (in structs and unions) and "parameter"
+  names;
+* `ALL_CAPS_UNIX_HACKER_STYLE` for enum value names; and
+* `kStudlyCaps` for const names.
+
+Following this style is highly recommended (and may be required as a practical
+matter).
 
 ## Interfaces
 
@@ -68,234 +130,208 @@ struct MyStruct {
   string b;
 };
 ```
-We will discuss in greater detail how structs are declared later.
+Structs (and interfaces) may also contain enum and const declarations, which
+we will discuss below.
 
-### Names in Mojom
+## Types
 
-Names in Mojom are not important. Except in affecting compatibility at the level
-of source code (when generating bindings), names in a Mojom file may be changed
-arbitrarily without any effect on the "meaning" of the Mojom file (subject to
-basic language requirements, e.g., avoiding collisions with keywords and other
-names). E.g., the following is completely equivalent to the interface discussed
-above:
+### Non-reference (simple and enum) types
+
+We have seen some simple types above, namely `int32`, `uint32`, and `bool`. A
+complete list of *simple* types is:
+* `bool`: boolean values;
+* `int8`, `int16`, `int32`, `int64`: signed 2's-complement integers of the given
+  size;
+* `uint8`, `uint16`, `uint32`, `uint64`: unsigned integers of the given size;
+  and
+* `float`, `double`: single- and double-precision IEEE floating-point numbers.
+
+Additionally, there are *enum* types, which are user-defined. Internally, enums
+are signed 2's complement 32-bit integers, so their values are restricted to
+that range. For example:
 ```mojom
-interface Something {
-  One(int32 an_integer, string a_string);
-  Two() => (bool a_boolean, uint32 an_unsigned);
-  Three() => ();
-};
-```
-The `Something` interface is compatible at a binary level with `MyInterface`. A
-client using the `Something` interface may communicate with a server
-implementing the `MyInterface` with no issues, and vice versa.
-
-The reason for this is that elements (messages, parameters, struct members,
-etc.) are actually identified by *ordinal* value. They may be specified
-explicitly (using `@123` notation; see below). If they are not specified
-explicitly, they are automatically assigned. (The ordinal values for each
-interface/struct/etc. must assign distinct values for each item, in a
-consecutive range starting at 0.)
-
-Explicitly assigning ordinals allows Mojom files to be rearranged "physically"
-without changing their meaning. E.g., perhaps one would write:
-```mojom
-interface MyInterface {
-  Bar@1() => (bool x@0, uint32 y@1);
-  Baz@2() => ();
-
-  // Please don't use this in new code!
-  FooDeprecated@0(int32 a@0, string b@1);
-};
-```
-
-Ordinals also tie into the versioning scheme (**TODO(vtl)**: link?), which
-allows Mojom files to be evolved in a backwards-compatible way. We will not
-discuss this matter further here.
-
-**TODO(vtl)**: Maybe mention exceptions to this in attributes (e.g.,
-`ServiceName`).
-
-## Mojom files
-
-A Mojom file consists of, in order:
-* an optional *module* declaration;
-* zero or more *import* statements (the order of these is not important); and
-* zero or more declarations of *struct*s, *interface*s, *union*s, *enum*s, or
-  *const*s (the order of these is not important).
-(These are all described further below.)
-
-Additionally, C/C++-style comments are supported (i.e., single-line comments
-starting with `//` or multi-line comments of the form `/* ... */`).
-
-As stated above, the order of struct/interface/union/enum/const declarations is
-not important. This is required to allow "cyclic" structures to be defined.
-Nonetheless, whenever possible, one should declare things before they are
-"used". For example, the following is valid but not recommended:
-```mojom
-// NOT recommended.
-
-const MyEnum kMyConst = kMyOtherConst;
-const MyEnum kMyOtherConst = A_VALUE;
-
 enum MyEnum {
-  A_VALUE,
-  ANOTHER_VALUE,
+  ONE_VALUE = 1,
+  ANOTHER_VALUE = -5,
+  THIRD_VALUE,  // Implicit value of -5 + 1 = -4.
+  A_DUPLICATE_VALUE = THIRD_VALUE,
 };
 ```
-
-### Naming style
-
-There is a standard style for naming things:
-* `StudlyCaps` (a.k.a. `CapitalizedCamelCase`) for: (struct, interface, union,
-  and enum) type names and message (a.k.a. function or method) names;
-* `unix_hacker_style` for field names (in structs and unions) and "parameter"
-  names;
-* `ALL_CAPS_UNIX_HACKER_STYLE` for enum value names; and
-* `kStudlyCaps` for const names.
-
-Following this style is highly recommended, since code generators for various
-languages will expect this style, in order to transform the names into a more
-language-appropriate style.
-
-### Module statement
-
-The Mojom *module* statement is just a way of logically grouping Mojom
-declarations. For example:
+Such an enum type may be used in a struct. For example:
 ```mojom
-module my_module;
+struct AStruct {
+  MyEnum x;
+  double y;
+};
 ```
-Mojom modules are similar to C++ namespaces (and the standard C++ code generator
-would put generated code into the `my_module` namespace), in that there is no
-implication that the file contains the entirety of the "module" definiton;
-multiple files may have the same module statement. (There is also no requirement
-that the module name have anything to do with the file path containing the Mojom
-file.)
+(As previously mentioned, an enum declaration may be nested inside a struct or
+interface declaration.)
 
-Mojom module names are hierarchical in that they can be composed of multiple
-parts separated by `.`. For example:
+Together, the simple and enum types comprise the *non-reference* types. The
+remaining types the *reference* types: *pointer* types and *handle* types.
+Unlike the non-reference types, the reference types all have some notion of
+"null".
+
+### Pointer types
+
+A struct is itself a pointer type, and can be used as a member of another struct
+(or as a request/response parameter, for that matter). For example:
 ```mojom
-module my_module.my_submodule;
-
 struct MyStruct {
+  int32 a;
+  string b;
+};
+
+struct MySecondStruct {
+  MyStruct x;
+  MyStruct? y;
 };
 ```
-Name look-up is similar to C++: E.g., if the current module is
-`my_module.my_submodule` then `MyStruct`, `my_submodule.MyStruct`, and
-`my_module.my_submodule.MyStruct` all refer to the above struct, whereas if the
-current module is just `my_module` then only the latter two do.
+Here, `x` is a *non-nullable* (i.e., required) field of `MySecondStruct`,
+whereas `y` is *nullable* (i.e., optional).
 
-### Import declarations
-
-An *import* declaration makes the declarations from another Mojom file available
-in the current Mojom file. Moreover, it operates transitively, in the sense that
-it also makes the imports of the imported file available, etc. The "argument" to
-the import statement is a path to a file. Tools that work with Mojom files are
-typically provided with a search path for importing files (just as a C++
-compiler can be provided with an "include path"), for the purposes of resolving
-these paths. (**TODO(vtl)**: This always includes the current Mojom file's path,
-right? Is the current path the first path that's searched?)
-
-For example:
-```mojom
-module my_module;
-
-import "path/to/another.mojom";
-import "path/to/yet/a/different.mojom";
-```
-This makes the contents of the two mentioned Mojom files available, together
-with whatever they import, transitively. (Note that names are resolved in the
-way described in the previous section.)
-
-Import cycles are not permitted (so, e.g., it would be an error if
-`path/to/another.mojom` imported the current Mojom file). However, it is
-entirely valid for Mojom files to be imported (transitively) multiple times
-(e.g., it is fine for `path/to/another.mojom` to also import
-`path/to/yet/a/different.mojom`).
-
-### Struct declarations
-
-A Mojom *struct* declaration consists of a finite sequence of *field
-declaration*, each of which consists of a *type*, a *name*, and optionally a
-*default value* (if applicable for the given type). (If no default value is
-declared, then the default is the default value for the field type, typically 0,
-null, or similar.)
-
-Additionally, a struct may contain enum and const declarations (**TODO(vtl)**:
-why not struct/union/interface declarations?). While the order of the field
-declarations (with respect to one another) is important, the ordering of the
-enum/const declarations (with respect to both the field declarations and other
-enum/const declarations) is not. (But as before, we recommend declaring things
-before "use".)
-
-Here is an example with these elements:
-```mojom
-struct Foo {
-  const int8 kSomeConstant = 123;
-
-  enum MyEnum {
-    A_VALUE,
-    ANOTHER_VALUE
-  };
-
-  int8 first_field = kSomeConstant;
-  uint32 second_field = 123;
-  MyEnum etc_etc = A_VALUE;
-  float a;    // Default value is 0.
-  string? b;  // Default value is null.
-};
-```
-(Note that `kSomeConstant` may be referred to as `Foo.kSomeConstant` and,
-similarly, `MyEnum` as `Foo.MyEnum`. This is required outside of the `Foo`
-declaration.)
-
-### Interface declarations
-
-**TODO(vtl)**
-
-### Union declarations
-
-**TODO(vtl)**
-
-### Enum declarations
-
-**TODO(vtl)**
-
-### Const declarations
-
-**TODO(vtl)**
-
-**TODO(vtl)**: Write/(re)organize the sections below.
-
-## Data types
-
-### Primitive types
-
-#### Standard types
-
-#### Enum types
-
-### "Pointer" types
-
-#### Nullability
-
-#### Strings
-
-#### Maps
-
-#### Structs
-
-#### Arrays
+A complete list of pointer types is:
+* structs: structs, as discussed above;
+* `string`/`string?`: Unicode strings;
+* `array<Type>`/`array<Type>?`: variable-size arrays (a.k.a. vectors or lists)
+  of type "Type" (which may be any type);
+* `array<Type, n>`/`array<Type, n>?`: fixed-size arrays of type "Type" and size
+  "n";
+* `map<KeyType, ValueType>`/`map<KeyType, ValueType>?`: maps (a.k.a.
+  dictionaries) of key type "KeyType" (which may be any non-reference type or
+  `string`) and value type "ValueType" (which may be any type); and
+* unions: see below.
 
 #### Unions
+
+*Unions* are "tagged unions". Union declarations look like struct declarations,
+but with different meaning. For example:
+```mojom
+union MyUnion {
+  int32 a;
+  int32 b;
+  string c;
+};
+```
+An element of type `MyUnion` must contain either an `int32` (called `a`), an
+`int32` (called `b`), *or* a string called `c`. (Like for structs, `MyUnion z`
+indicates a non-nullable instance, and `MyUnion?` indicates a nullable instance;
+in the nullable case, `z` may either be null or it must contain one of `a`, `b`,
+or `c`.)
 
 ### Handle types
 
 #### Raw handle types
 
+There are the "raw" *handle* types corresponding to different [Mojo
+handle](handles.md) types, with mostly self-explanatory names: `handle` (any
+kind of Mojo handle), `handle<message_pipe>`, `handle<data_pipe_consumer>`,
+`handle<data_pipe_producer>`, and `handle<shared_buffer>`. These are used to
+indicate that a given message or struct contains the indicated type of Mojo
+handle (recall that messages sent on [Mojo message pipes](message_pipes.md) may
+contain handles in addition to simple data).
+
+Like the pointer types, these may also be nullable (e.g., `handle?`,
+`handle<message_pipe>?`, etc.), where "null" indicates that no handle is to be
+sent (and may be realized, e.g., as the invalid Mojo handle).
+
 #### Interface types
+
+We have already seen *interface* type declarations. In a message (or struct), it
+is just a message pipe (endpoint) handle. However, it promises that the *peer*
+implements the given interface. For example:
+```mojom
+interface MyFirstInterface {
+  Foo() => ();
+};
+
+interface MySecondInterface {
+  Bar(MyFirstInterface x);
+  Baz(MyFirstInterface& y);  // Interface request! See below.
+};
+```
+Here, a receiver of a `Bar` message is promised a message pipe handle on which
+it can send (request) messages from `MyFirstInterface` (and then possibly
+receive responses). I.e., on receiving a `Bar` message, it may then send `Foo`
+message on `x` (and then receive the response to `Foo`).
+
+Like other handle types, instances may be non-nullable or nullable (e.g.,
+`MyFirstInterface?`).
 
 #### Interface request types
 
-## Annotations
+*Interface request* types are very much like interface types, and also arise
+from interface type declarations. They are annotated by a trailing `&`: e.g.,
+`MyFirstInterface&` (or `MyFirstInterface&?` for the nullable version).
+
+In a message (or struct), an interface request is also just a message pipe
+handle. However, it is a promise/"request" that the given message pipe handle
+implement the given interface (in contrast with the peer implementing it).
+
+In the above example, the receiver of `Baz` also gets a message pipe handle.
+However, the receiver is expected to implement `MyFirstInterface` on it (or pass
+it to someone else who will do so). I.e., `Foo` may be *received* on `y` (and
+then the response sent on it).
 
 ## Pipelining
+
+We saw above that Mojom allows both "interfaces" and "interface requests" to be
+sent in messages. Consider the following interface:
+```mojom
+interface Foo {
+  // ...
+};
+
+interface FooFactory {
+  CreateFoo1() => (Foo foo);
+  CreateFoo2(Foo& foo_request);
+};
+```
+
+`CreateFoo1` and `CreateFoo2` are functionally very similar: in both cases, the
+sender will (eventually) be able to send `Foo` messages on some message pipe
+handle. However, there are some important differences.
+
+In the case of `CreateFoo1`, the sender is only able to do so upon receiving the
+response to `CreateFoo1`, since the message pipe handle to which `Foo` messages
+can be written is contained in the response message to `CreateFoo1`.
+
+For `CreateFoo2`, the operation is somewhat different. Before sending
+`CreateFoo2`, the sender creates a message pipe. This consists of two message
+pipe handles (for peer endpoints), which we'll call `foo` and `foo_request` (the
+latter of which will be sent in the `CreateFoo2` message). Since message pipes
+are asynchronous and buffered, the sender can start writing `Foo` messages to
+`foo` at any time, possibly even before `CreateFoo2` is sent! I.e., it can use
+`foo` without waiting for a response message. This is referred to as
+*pipelining*.
+
+Pipelining is typically more efficient, since it eliminates eliminating the need
+to wait for a response, and it is often more natural, since receiving the
+response often entails returning to the message loop. Thus this is generally the
+preferred pattern for "factories" as in the above example.
+
+The main caveat is that with pipelining, there is no flow control. The sender of
+`CreateFoo2` has no indication of when `foo` is actually "ready", though even in
+the case of `CreateFoo1` there is no real promise that the `foo` in the response
+is actually "ready". (This is perhaps an indication that flow control should be
+done on `Foo`, e.g., by having its messages have responses.)
+
+Relatedly, with pipelining, there is limited opportunity to send back
+information regarding `foo`. (E.g., the preferred method of signalling error is
+to simply close `foo_request`.) So if additional information is *needed* to make
+use of `foo`, perhaps the pattern of `CreateFoo1` is preferable, e.g.:
+```mojom
+  CreateFoo() => (Foo foo, NeededInfo info);
+```
+
+## Consts
+
+**TODO(vtl)**
+
+## Annotations
+
+**TODO(vtl)**
+
+## See also
+
+**TODO(vtl)**
