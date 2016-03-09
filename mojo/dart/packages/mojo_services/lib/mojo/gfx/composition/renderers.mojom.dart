@@ -115,6 +115,64 @@ class _RendererSetRootSceneParams extends bindings.Struct {
 }
 
 
+class _RendererResetRootSceneParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _RendererResetRootSceneParams() : super(kVersions.last.size);
+
+  static _RendererResetRootSceneParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _RendererResetRootSceneParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _RendererResetRootSceneParams result = new _RendererResetRootSceneParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_RendererResetRootSceneParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
 class _RendererGetHitTesterParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -186,7 +244,8 @@ class _RendererGetHitTesterParams extends bindings.Struct {
 }
 
 const int _Renderer_setRootSceneName = 0;
-const int _Renderer_getHitTesterName = 1;
+const int _Renderer_resetRootSceneName = 1;
+const int _Renderer_getHitTesterName = 2;
 
 class _RendererServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -202,6 +261,7 @@ class _RendererServiceDescription implements service_describer.ServiceDescriptio
 abstract class Renderer {
   static const String serviceName = null;
   void setRootScene(scene_token_mojom.SceneToken sceneToken, int sceneVersion, geometry_mojom.Rect viewport);
+  void resetRootScene();
   void getHitTester(Object hitTester);
 }
 
@@ -254,6 +314,14 @@ class _RendererProxyCalls implements Renderer {
       params.sceneVersion = sceneVersion;
       params.viewport = viewport;
       _proxyImpl.sendMessage(params, _Renderer_setRootSceneName);
+    }
+    void resetRootScene() {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _RendererResetRootSceneParams();
+      _proxyImpl.sendMessage(params, _Renderer_resetRootSceneName);
     }
     void getHitTester(Object hitTester) {
       if (!_proxyImpl.isBound) {
@@ -358,6 +426,9 @@ class RendererStub extends bindings.Stub {
         var params = _RendererSetRootSceneParams.deserialize(
             message.payload);
         _impl.setRootScene(params.sceneToken, params.sceneVersion, params.viewport);
+        break;
+      case _Renderer_resetRootSceneName:
+        _impl.resetRootScene();
         break;
       case _Renderer_getHitTesterName:
         var params = _RendererGetHitTesterParams.deserialize(

@@ -50,6 +50,12 @@ class ViewTreeState {
     return view_tree_listener_.get();
   }
 
+  // The view tree's renderer.
+  mojo::gfx::composition::Renderer* renderer() const { return renderer_.get(); }
+  void set_renderer(mojo::gfx::composition::RendererPtr renderer) {
+    renderer_ = renderer.Pass();
+  }
+
   // Gets the root of the view tree, or null if there is no root.
   ViewStub* root() const { return root_.get(); }
 
@@ -81,6 +87,8 @@ class ViewTreeState {
 
   std::unique_ptr<ViewTreeImpl> impl_;
   mojo::Binding<mojo::ui::ViewTree> view_tree_binding_;
+
+  mojo::gfx::composition::RendererPtr renderer_;
 
   std::unique_ptr<ViewStub> root_;
   bool layout_request_pending_ = false;

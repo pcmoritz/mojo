@@ -53,6 +53,10 @@ class RendererState {
                     uint32_t version,
                     const mojo::Rect& viewport);
 
+  // Resets the root scene and clears the current frame and cached dependencies.
+  // If different, invalidates the snapshot and returns true.
+  bool ResetRootScene();
+
   // The currently composited frame, may be null if none.
   const std::shared_ptr<RenderFrame>& frame() { return frame_; }
 

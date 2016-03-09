@@ -180,8 +180,8 @@ void GpuRasterizer::Draw() {
   if (!ganesh_surface_ ||
       ganesh_surface_->surface()->width() != viewport.width() ||
       ganesh_surface_->surface()->height() != viewport.height()) {
-    glViewport(viewport.x(), viewport.y(), viewport.width(), viewport.height());
     glResizeCHROMIUM(viewport.width(), viewport.height(), 1.0f);
+    glViewport(viewport.x(), viewport.y(), viewport.width(), viewport.height());
     stale_surface = true;
   }
 

@@ -18,13 +18,21 @@ bool RendererState::SetRootScene(SceneState* scene,
                                  uint32_t version,
                                  const mojo::Rect& viewport) {
   DCHECK(scene);
-  DCHECK(version);
 
   if (root_scene_ != scene || root_scene_version_ != version ||
       !root_scene_viewport_.Equals(viewport)) {
     root_scene_ = scene;
     root_scene_version_ = version;
     root_scene_viewport_ = viewport;
+    SetSnapshot(nullptr);
+    return true;
+  }
+  return false;
+}
+
+bool RendererState::ResetRootScene() {
+  if (root_scene_) {
+    root_scene_ = nullptr;
     SetSnapshot(nullptr);
     return true;
   }

@@ -26,6 +26,8 @@ class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
   void GetToken(const GetTokenCallback& callback) override;
   void GetServiceProvider(
       mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) override;
+  void SetRenderer(mojo::InterfaceHandle<mojo::gfx::composition::Renderer>
+                       renderer) override;
   void RequestLayout() override;
   void SetRoot(
       uint32_t root_key,

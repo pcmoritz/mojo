@@ -35,6 +35,7 @@ class RendererImpl : public mojo::gfx::composition::Renderer,
   void SetRootScene(mojo::gfx::composition::SceneTokenPtr scene_token,
                     uint32 scene_version,
                     mojo::RectPtr viewport) override;
+  void ResetRootScene() override;
   void GetHitTester(mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
                         hit_tester_request) override;
 

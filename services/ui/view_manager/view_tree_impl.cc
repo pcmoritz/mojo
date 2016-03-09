@@ -24,6 +24,12 @@ void ViewTreeImpl::GetServiceProvider(
   service_provider_bindings_.AddBinding(this, service_provider.Pass());
 }
 
+void ViewTreeImpl::SetRenderer(
+    mojo::InterfaceHandle<mojo::gfx::composition::Renderer> renderer) {
+  registry_->SetRenderer(
+      state_, mojo::gfx::composition::RendererPtr::Create(std::move(renderer)));
+}
+
 void ViewTreeImpl::RequestLayout() {
   registry_->RequestLayout(state_);
 }

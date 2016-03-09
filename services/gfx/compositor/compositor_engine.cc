@@ -256,6 +256,17 @@ void CompositorEngine::SetRootScene(
   }
 }
 
+void CompositorEngine::ResetRootScene(RendererState* renderer_state) {
+  DCHECK(IsRendererStateRegisteredDebug(renderer_state));
+  DVLOG(1) << "ResetRootScene: renderer=" << renderer_state;
+
+  // Update the root.
+  if (renderer_state->ResetRootScene()) {
+    ScheduleFrameForRenderer(renderer_state,
+                             Scheduler::SchedulingMode::kSnapshot);
+  }
+}
+
 void CompositorEngine::HitTest(
     RendererState* renderer_state,
     mojo::PointPtr point,

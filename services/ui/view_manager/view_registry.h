@@ -100,6 +100,11 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   // VIEW TREE REQUESTS
 
+  // Sets the view tree's renderer.
+  // Destroys |tree_state| if an error occurs.
+  void SetRenderer(ViewTreeState* tree_state,
+                   mojo::gfx::composition::RendererPtr renderer);
+
   // Requests layout.
   // Destroys |tree_state| if an error occurs.
   void RequestLayout(ViewTreeState* tree_state);
@@ -173,10 +178,16 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   void OnSceneCreated(base::WeakPtr<ViewState> view_state_weak,
                       mojo::gfx::composition::SceneTokenPtr scene_token);
 
+  // RENDERING
+
+  void UpdateViewTreeRootScene(ViewTreeState* view_tree);
+  void OnRendererDied(ViewTreeState* view_tree);
+
   // SIGNALING
 
   void SendChildUnavailable(ViewState* parent_state, uint32_t child_key);
   void SendRootUnavailable(ViewTreeState* tree_state, uint32_t root_key);
+  void SendRendererDied(ViewTreeState* tree_state);
 
   bool IsViewStateRegisteredDebug(ViewState* view_state) {
     return view_state && FindView(view_state->view_token()->value);

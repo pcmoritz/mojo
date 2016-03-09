@@ -33,6 +33,10 @@ void RendererImpl::SetRootScene(
                         viewport.Pass());
 }
 
+void RendererImpl::ResetRootScene() {
+  engine_->ResetRootScene(state_);
+}
+
 void RendererImpl::HitTest(mojo::PointPtr point,
                            const HitTestCallback& callback) {
   engine_->HitTest(state_, point.Pass(), callback);

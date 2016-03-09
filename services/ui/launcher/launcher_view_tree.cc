@@ -11,11 +11,6 @@
 
 namespace launcher {
 
-constexpr uint32_t kViewSceneResourceId = 1;
-constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
-constexpr uint32_t kViewNodeId = 1;
-constexpr uint32_t kFallbackNodeId = 2;
-
 LauncherViewTree::LauncherViewTree(
     mojo::gfx::composition::Compositor* compositor,
     mojo::ui::ViewManager* view_manager,
@@ -27,24 +22,7 @@ LauncherViewTree::LauncherViewTree(
       context_provider_(context_provider.Pass()),
       viewport_metrics_(viewport_metrics.Pass()),
       shutdown_callback_(shutdown_callback),
-      scene_listener_binding_(this),
       view_tree_listener_binding_(this) {
-  // Create the renderer.
-  compositor_->CreateRenderer(context_provider_.Pass(), GetProxy(&renderer_),
-                              "Launcher");
-  renderer_.set_connection_error_handler(base::Bind(
-      &LauncherViewTree::OnRendererConnectionError, base::Unretained(this)));
-
-  // Create the root scene.
-  compositor_->CreateScene(
-      mojo::GetProxy(&scene_), "Launcher",
-      base::Bind(&LauncherViewTree::OnSceneRegistered, base::Unretained(this)));
-  mojo::gfx::composition::SceneListenerPtr scene_listener;
-  scene_listener_binding_.Bind(mojo::GetProxy(&scene_listener));
-  scene_->SetListener(scene_listener.Pass());
-  scene_.set_connection_error_handler(base::Bind(
-      &LauncherViewTree::OnSceneConnectionError, base::Unretained(this)));
-
   // Register the view tree.
   mojo::ui::ViewTreeListenerPtr view_tree_listener;
   view_tree_listener_binding_.Bind(mojo::GetProxy(&view_tree_listener));
@@ -61,6 +39,12 @@ LauncherViewTree::LauncherViewTree(
   input_dispatcher_.set_connection_error_handler(
       base::Bind(&LauncherViewTree::OnInputDispatcherConnectionError,
                  base::Unretained(this)));
+
+  // Attach the renderer.
+  mojo::gfx::composition::RendererPtr renderer;
+  compositor_->CreateRenderer(context_provider_.Pass(), GetProxy(&renderer),
+                              "Launcher");
+  view_tree_->SetRenderer(renderer.Pass());
 }
 
 LauncherViewTree::~LauncherViewTree() {}
@@ -80,22 +64,11 @@ void LauncherViewTree::SetViewportMetrics(
     mojo::ViewportMetricsPtr viewport_metrics) {
   viewport_metrics_ = viewport_metrics.Pass();
   view_tree_->RequestLayout();
-  SetRootScene();
 }
 
 void LauncherViewTree::DispatchEvent(mojo::EventPtr event) {
   if (input_dispatcher_)
     input_dispatcher_->DispatchEvent(event.Pass());
-}
-
-void LauncherViewTree::OnRendererConnectionError() {
-  LOG(ERROR) << "Renderer connection error.";
-  Shutdown();
-}
-
-void LauncherViewTree::OnSceneConnectionError() {
-  LOG(ERROR) << "Scene connection error.";
-  Shutdown();
 }
 
 void LauncherViewTree::OnViewTreeConnectionError() {
@@ -110,19 +83,6 @@ void LauncherViewTree::OnInputDispatcherConnectionError() {
   input_dispatcher_.reset();
 }
 
-void LauncherViewTree::OnSceneRegistered(
-    mojo::gfx::composition::SceneTokenPtr scene_token) {
-  DVLOG(1) << "OnSceneRegistered: scene_token=" << scene_token;
-  scene_token_ = scene_token.Pass();
-  SetRootScene();
-}
-
-void LauncherViewTree::OnResourceUnavailable(
-    uint32_t resource_id,
-    const OnResourceUnavailableCallback& callback) {
-  LOG(ERROR) << "Resource lost: resource_id=" << resource_id;
-}
-
 void LauncherViewTree::OnLayout(const OnLayoutCallback& callback) {
   LayoutRoot();
   callback.Run();
@@ -135,6 +95,12 @@ void LauncherViewTree::OnRootUnavailable(
     LOG(ERROR) << "Root view terminated unexpectedly.";
     Shutdown();
   }
+  callback.Run();
+}
+
+void LauncherViewTree::OnRendererDied(const OnRendererDiedCallback& callback) {
+  LOG(ERROR) << "Renderer died unexpectedly.";
+  Shutdown();
   callback.Run();
 }
 
@@ -165,67 +131,6 @@ void LauncherViewTree::OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info) {
            << ", scene_token.value=" << info->scene_token->value;
 
   root_layout_info_ = info.Pass();
-  PublishFrame();
-}
-
-void LauncherViewTree::SetRootScene() {
-  if (scene_token_) {
-    mojo::Rect viewport;
-    viewport.width = viewport_metrics_->size->width;
-    viewport.height = viewport_metrics_->size->height;
-    scene_version_++;
-    renderer_->SetRootScene(scene_token_.Clone(), scene_version_,
-                            viewport.Clone());
-    PublishFrame();
-  }
-}
-
-void LauncherViewTree::PublishFrame() {
-  mojo::Rect bounds;
-  bounds.width = viewport_metrics_->size->width;
-  bounds.height = viewport_metrics_->size->height;
-
-  auto update = mojo::gfx::composition::SceneUpdate::New();
-
-  if (root_layout_info_) {
-    auto view_resource = mojo::gfx::composition::Resource::New();
-    view_resource->set_scene(mojo::gfx::composition::SceneResource::New());
-    view_resource->get_scene()->scene_token =
-        root_layout_info_->scene_token.Clone();
-    update->resources.insert(kViewSceneResourceId, view_resource.Pass());
-
-    auto view_node = mojo::gfx::composition::Node::New();
-    view_node->op = mojo::gfx::composition::NodeOp::New();
-    view_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
-    view_node->op->get_scene()->scene_resource_id = kViewSceneResourceId;
-    update->nodes.insert(kViewNodeId, view_node.Pass());
-  } else {
-    update->resources.insert(kViewSceneResourceId, nullptr);
-    update->nodes.insert(kViewNodeId, nullptr);
-  }
-
-  auto fallback_node = mojo::gfx::composition::Node::New();
-  fallback_node->op = mojo::gfx::composition::NodeOp::New();
-  fallback_node->op->set_rect(mojo::gfx::composition::RectNodeOp::New());
-  fallback_node->op->get_rect()->content_rect = bounds.Clone();
-  fallback_node->op->get_rect()->color = mojo::gfx::composition::Color::New();
-  fallback_node->op->get_rect()->color->red = 255;
-  fallback_node->op->get_rect()->color->alpha = 255;
-  update->nodes.insert(kFallbackNodeId, fallback_node.Pass());
-
-  auto root_node = mojo::gfx::composition::Node::New();
-  root_node->combinator = mojo::gfx::composition::Node::Combinator::FALLBACK;
-  if (root_layout_info_) {
-    root_node->child_node_ids.push_back(kViewNodeId);
-  }
-  root_node->child_node_ids.push_back(kFallbackNodeId);
-  update->nodes.insert(kRootNodeId, root_node.Pass());
-
-  auto metadata = mojo::gfx::composition::SceneMetadata::New();
-  metadata->version = scene_version_;
-
-  scene_->Update(update.Pass());
-  scene_->Publish(metadata.Pass());
 }
 
 void LauncherViewTree::Shutdown() {

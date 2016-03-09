@@ -67,6 +67,10 @@ class CompositorEngine {
                     uint32 scene_version,
                     mojo::RectPtr viewport);
 
+  // Resets the root scene.
+  // Destroys |renderer_state| if an error occurs.
+  void ResetRootScene(RendererState* renderer_state);
+
   // Performs a hit test.
   void HitTest(
       RendererState* renderer_state,

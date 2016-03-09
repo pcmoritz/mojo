@@ -50,7 +50,10 @@ class ViewStub {
   bool is_pending() const { return !state_ && !unavailable_; }
 
   // Returns true if the view is linked into a tree or parent.
-  bool is_linked() const { return tree_ && parent_; }
+  bool is_linked() const { return tree_ || parent_; }
+
+  // Returns true if the view is linked into a tree and has no parent.
+  bool is_root_of_tree() const { return tree_ && !parent_; }
 
   // Gets the view tree to which this view belongs, or null if none.
   ViewTreeState* tree() const { return tree_; }

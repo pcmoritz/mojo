@@ -278,6 +278,21 @@ void ViewRegistry::ConnectToViewService(
                                         service_name, client_handle.Pass());
 }
 
+void ViewRegistry::SetRenderer(ViewTreeState* tree_state,
+                               mojo::gfx::composition::RendererPtr renderer) {
+  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
+  DVLOG(1) << "SetRenderer";
+
+  if (renderer) {
+    renderer.set_connection_error_handler(
+        base::Bind(&ViewRegistry::OnRendererDied, base::Unretained(this),
+                   base::Unretained(tree_state)));
+  }
+
+  tree_state->set_renderer(renderer.Pass());
+  UpdateViewTreeRootScene(tree_state);
+}
+
 void ViewRegistry::RequestLayout(ViewTreeState* tree_state) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
   DVLOG(1) << "RequestLayout: tree=" << tree_state;
@@ -305,6 +320,7 @@ void ViewRegistry::SetRoot(
   // Set the root to a stub, pending resolution of the view owner.
   tree_state->LinkRoot(root_key, std::unique_ptr<ViewStub>(new ViewStub(
                                      this, root_view_owner.Pass())));
+  UpdateViewTreeRootScene(tree_state);
 
   // Schedule layout of the tree on behalf of its newly added root.
   // We don't need to schedule layout of the root until the tree provides
@@ -330,6 +346,7 @@ void ViewRegistry::ResetRoot(ViewTreeState* tree_state,
   // Unlink the root from its tree.
   TransferOrUnregisterViewStub(tree_state->UnlinkRoot(),
                                transferred_view_owner_request.Pass());
+  UpdateViewTreeRootScene(tree_state);
 
   // Note: We don't need to schedule layout for the root since it will retain
   // its old layout parameters.  And there's no need to tell the tree
@@ -668,6 +685,9 @@ void ViewRegistry::OnViewLayoutResult(base::WeakPtr<ViewState> view_state_weak,
     }
   }
 
+  if (view_state->view_stub()->is_root_of_tree() && size_changed)
+    UpdateViewTreeRootScene(view_state->view_stub()->tree());
+
   IssueNextViewLayoutRequest(view_state);
 }
 
@@ -682,6 +702,40 @@ void ViewRegistry::OnViewTreeLayoutResult(
     tree_state->set_layout_request_issued(false);
     IssueNextViewTreeLayoutRequest(tree_state);
   }
+}
+
+void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
+  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
+  DVLOG(1) << "UpdateViewTreeRootScene: tree_state=" << tree_state;
+
+  if (!tree_state->renderer())
+    return;
+
+  if (tree_state->root()) {
+    ViewState* root_state = tree_state->root()->state();
+    if (root_state && root_state->scene_token() &&
+        root_state->layout_result()) {
+      // TODO(jeffbrown): Take the scene version from the layout parameters
+      // once we've figured out that part of the layout protocol.
+      mojo::Rect viewport;
+      viewport.width = root_state->layout_result()->size->width;
+      viewport.height = root_state->layout_result()->size->height;
+      tree_state->renderer()->SetRootScene(
+          tree_state->root()->state()->scene_token()->Clone(),
+          mojo::gfx::composition::kSceneVersionNone, viewport.Clone());
+      return;
+    }
+  }
+
+  tree_state->renderer()->ResetRootScene();
+}
+
+void ViewRegistry::OnRendererDied(ViewTreeState* tree_state) {
+  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
+  DVLOG(1) << "UpdateViewTreeRootScene: tree_state=" << tree_state;
+
+  tree_state->set_renderer(nullptr);
+  SendRendererDied(tree_state);
 }
 
 void ViewRegistry::SendChildUnavailable(ViewState* parent_state,
@@ -704,6 +758,15 @@ void ViewRegistry::SendRootUnavailable(ViewTreeState* tree_state,
            << ", root_key=" << root_key;
   tree_state->view_tree_listener()->OnRootUnavailable(
       root_key, base::Bind(&base::DoNothing));
+}
+
+void ViewRegistry::SendRendererDied(ViewTreeState* tree_state) {
+  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
+
+  // TODO: Detect ANRs
+  DVLOG(1) << "SendRendererDied: tree_state=" << tree_state;
+  tree_state->view_tree_listener()->OnRendererDied(
+      base::Bind(&base::DoNothing));
 }
 
 }  // namespace view_manager

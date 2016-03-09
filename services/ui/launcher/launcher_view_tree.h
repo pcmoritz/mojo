@@ -15,8 +15,7 @@
 
 namespace launcher {
 
-class LauncherViewTree : public mojo::ui::ViewTreeListener,
-                         public mojo::gfx::composition::SceneListener {
+class LauncherViewTree : public mojo::ui::ViewTreeListener {
  public:
   LauncherViewTree(mojo::gfx::composition::Compositor* compositor,
                    mojo::ui::ViewManager* view_manager,
@@ -31,29 +30,17 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener,
   void DispatchEvent(mojo::EventPtr event);
 
  private:
-  // |SceneListener|:
-  void OnResourceUnavailable(
-      uint32_t resource_id,
-      const OnResourceUnavailableCallback& callback) override;
-
   // |ViewTree|:
   void OnLayout(const OnLayoutCallback& callback) override;
   void OnRootUnavailable(uint32_t root_key,
                          const OnRootUnavailableCallback& callback) override;
+  void OnRendererDied(const OnRendererDiedCallback& callback) override;
 
-  void OnRendererConnectionError();
-  void OnSceneConnectionError();
   void OnViewTreeConnectionError();
   void OnInputDispatcherConnectionError();
 
-  void OnSceneRegistered(mojo::gfx::composition::SceneTokenPtr scene_token);
-
   void LayoutRoot();
   void OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info);
-
-  void SetRootScene();
-
-  void PublishFrame();
 
   void Shutdown();
 
@@ -64,14 +51,9 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener,
   mojo::ViewportMetricsPtr viewport_metrics_;
   base::Closure shutdown_callback_;
 
-  mojo::Binding<mojo::gfx::composition::SceneListener> scene_listener_binding_;
   mojo::Binding<mojo::ui::ViewTreeListener> view_tree_listener_binding_;
 
-  mojo::gfx::composition::ScenePtr scene_;
-  mojo::gfx::composition::SceneTokenPtr scene_token_;
-  uint32_t scene_version_ = 1u;
-
-  mojo::gfx::composition::RendererPtr renderer_;
+  ;
   mojo::ui::ViewTreePtr view_tree_;
   mojo::ui::InputDispatcherPtr input_dispatcher_;
 
