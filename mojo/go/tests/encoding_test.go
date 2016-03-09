@@ -172,7 +172,7 @@ func TestStructs(t *testing.T) {
 			s1: map[string]system.Handle{s1: handle},
 			s2: map[string]system.Handle{s2: handle},
 		},
-  }
+	}
 	check(t, value, &test_structs.MapValueTypes{})
 
 	value = &test_structs.BitArrayValues{
@@ -193,4 +193,37 @@ func TestStructs(t *testing.T) {
 		},
 	}
 	check(t, value, &test_structs.BitArrayValues{})
+}
+
+func TestDeterministicEncoding(t *testing.T) {
+	s1 := "hello, world!"
+	s2 := "world, hello!"
+	value := &test_structs.MapKeyTypes{
+		F0:  map[bool]bool{false: true, true: false},
+		F1:  map[int8]int8{15: -45, -42: 50},
+		F2:  map[uint8]uint8{15: 45, 42: 50},
+		F3:  map[int16]int16{-15: 45, -42: 50},
+		F4:  map[uint16]uint16{15: 45, 42: 50},
+		F5:  map[int32]int32{15: -45, 42: 50},
+		F6:  map[uint32]uint32{15: 45, 42: 50},
+		F7:  map[int64]int64{15: 45, 42: -50},
+		F8:  map[uint64]uint64{15: 45, 42: 50},
+		F9:  map[float32]float32{1.5: 2.5, 3.5: 1e-9},
+		F10: map[float64]float64{1.5: 2.5, 3.5: 1e-9},
+		F11: map[string]string{s1: s2, s2: s1},
+	}
+	encoder := bindings.NewEncoder()
+	encoder.SetDeterministic(true)
+	value.Encode(encoder)
+	bytes, _, _ := encoder.Data()
+
+	for i := 0; i < 10; i++ {
+		encoder := bindings.NewEncoder()
+		encoder.SetDeterministic(true)
+		value.Encode(encoder)
+		bytes2, _, _ := encoder.Data()
+		if !reflect.DeepEqual(bytes, bytes2) {
+			t.Fatalf("\nbytes=%v\n, bytes2=%v", bytes, bytes2)
+		}
+	}
 }
