@@ -22,6 +22,39 @@ SceneContent::SceneContent(const SceneLabel& label,
 
 SceneContent::~SceneContent() {}
 
+void SceneContent::RecordPicture(const Snapshot* snapshot,
+                                 SkCanvas* canvas) const {
+  const NodeDef* root = GetRootNodeIfExists();
+  if (root)
+    root->RecordPicture(this, snapshot, canvas);
+}
+
+bool SceneContent::HitTest(
+    const Snapshot* snapshot,
+    const SkPoint& scene_point,
+    const SkMatrix& global_to_scene_transform,
+    mojo::gfx::composition::SceneHitPtr* out_scene_hit) const {
+  DCHECK(snapshot);
+  DCHECK(out_scene_hit);
+
+  const NodeDef* root = GetRootNodeIfExists();
+  if (!root)
+    return false;
+
+  mojo::Array<mojo::gfx::composition::HitPtr> hits;
+  bool opaque = root->HitTest(this, snapshot, scene_point,
+                              global_to_scene_transform, &hits);
+  if (hits.size()) {
+    auto scene_hit = mojo::gfx::composition::SceneHit::New();
+    scene_hit->scene_token = mojo::gfx::composition::SceneToken::New();
+    scene_hit->scene_token->value = label_.token();
+    scene_hit->scene_version = version_;
+    scene_hit->hits = hits.Pass();
+    *out_scene_hit = scene_hit.Pass();
+  }
+  return opaque;
+}
+
 const ResourceDef* SceneContent::GetResource(
     uint32_t resource_id,
     ResourceDef::Type resource_type) const {

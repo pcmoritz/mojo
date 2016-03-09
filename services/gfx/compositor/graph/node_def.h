@@ -14,6 +14,8 @@
 #include "services/gfx/compositor/graph/snapshot.h"
 
 class SkCanvas;
+struct SkPoint;
+class SkMatrix;
 
 namespace compositor {
 
@@ -35,12 +37,16 @@ class NodeDef : public base::RefCounted<NodeDef> {
   NodeDef(uint32_t node_id,
           mojo::TransformPtr content_transform,
           mojo::RectPtr content_clip,
+          mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
           Combinator combinator,
           const std::vector<uint32_t>& child_node_ids);
 
   uint32_t node_id() const { return node_id_; }
   const mojo::Transform* content_transform() const {
     return content_transform_.get();
+  }
+  const mojo::gfx::composition::HitTestBehavior* hit_test_behavior() const {
+    return hit_test_behavior_.get();
   }
   const mojo::Rect* content_clip() const { return content_clip_.get(); }
   Combinator combinator() const { return combinator_; }
@@ -68,6 +74,18 @@ class NodeDef : public base::RefCounted<NodeDef> {
                      const Snapshot* snapshot,
                      SkCanvas* canvas) const;
 
+  // Performs a hit test at the specified point.
+  // The |point| is the hit tested point in the parent's coordinate space.
+  // The |global_to_parent_transform| is the accumulated transform from the
+  // global coordinate space to the parent's coordinate space.
+  // Adds hit information for the node to |hits|.
+  // Returns true if the search was terminated by an opaque hit.
+  bool HitTest(const SceneContent* content,
+               const Snapshot* snapshot,
+               const SkPoint& parent_point,
+               const SkMatrix& global_to_parent_transform,
+               mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
+
  protected:
   friend class base::RefCounted<NodeDef>;
   virtual ~NodeDef();
@@ -85,10 +103,24 @@ class NodeDef : public base::RefCounted<NodeDef> {
                                   const Snapshot* snapshot,
                                   SkCanvas* canvas) const;
 
+  virtual bool HitTestInner(
+      const SceneContent* content,
+      const Snapshot* snapshot,
+      const SkPoint& local_point,
+      const SkMatrix& global_to_local_transform,
+      mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
+
  private:
+  bool HitTestSelf(const SceneContent* content,
+                   const Snapshot* snapshot,
+                   const SkPoint& local_point,
+                   const SkMatrix& global_to_local_transform,
+                   mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
+
   uint32_t const node_id_;
   mojo::TransformPtr const content_transform_;
   mojo::RectPtr const content_clip_;
+  mojo::gfx::composition::HitTestBehaviorPtr const hit_test_behavior_;
   Combinator const combinator_;
   std::vector<uint32_t> const child_node_ids_;
 
@@ -103,6 +135,7 @@ class RectNodeDef : public NodeDef {
   RectNodeDef(uint32_t node_id,
               mojo::TransformPtr content_transform,
               mojo::RectPtr content_clip,
+              mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
               Combinator combinator,
               const std::vector<uint32_t>& child_node_ids,
               const mojo::Rect& content_rect,
@@ -133,6 +166,7 @@ class ImageNodeDef : public NodeDef {
   ImageNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
                mojo::RectPtr content_clip,
+               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
                const mojo::Rect& content_rect,
@@ -171,6 +205,7 @@ class SceneNodeDef : public NodeDef {
   SceneNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
                mojo::RectPtr content_clip,
+               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
                uint32_t scene_resource_id,
@@ -191,6 +226,13 @@ class SceneNodeDef : public NodeDef {
                           const Snapshot* snapshot,
                           SkCanvas* canvas) const override;
 
+  bool HitTestInner(
+      const SceneContent* content,
+      const Snapshot* snapshot,
+      const SkPoint& local_point,
+      const SkMatrix& global_to_local_transform,
+      mojo::Array<mojo::gfx::composition::HitPtr>* hits) const override;
+
  private:
   uint32_t const scene_resource_id_;
   uint32_t const scene_version_;
@@ -206,6 +248,7 @@ class LayerNodeDef : public NodeDef {
   LayerNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
                mojo::RectPtr content_clip,
+               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
                const mojo::Size& size,

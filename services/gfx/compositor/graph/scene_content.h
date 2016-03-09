@@ -11,10 +11,15 @@
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
+#include "mojo/services/gfx/composition/interfaces/hit_tests.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "services/gfx/compositor/graph/node_def.h"
 #include "services/gfx/compositor/graph/resource_def.h"
 #include "services/gfx/compositor/graph/scene_label.h"
+
+class SkCanvas;
+struct SkPoint;
+class SkMatrix;
 
 namespace compositor {
 
@@ -48,6 +53,20 @@ class SceneContent : public base::RefCounted<SceneContent> {
 
   // Gets the version of the scene represented by this object.
   uint32_t version() const { return version_; }
+
+  // Called to record drawing commands from a snapshot.
+  void RecordPicture(const Snapshot* snapshot, SkCanvas* canvas) const;
+
+  // Performs a hit test at the specified point.
+  // The |scene_point| is the hit tested point in the scene's coordinate space.
+  // The |global_to_scene_transform| is the accumulated transform from the
+  // global coordinate space to the scene's coordinate space.
+  // Provides hit information for the scene in |out_scene_hit| if any.
+  // Returns true if the search was terminated by an opaque hit.
+  bool HitTest(const Snapshot* snapshot,
+               const SkPoint& scene_point,
+               const SkMatrix& global_to_scene_transform,
+               mojo::gfx::composition::SceneHitPtr* out_scene_hit) const;
 
   // Gets the requested resource, never null because it must be present.
   const ResourceDef* GetResource(uint32_t resource_id,

@@ -276,8 +276,13 @@ void CompositorEngine::HitTest(
   DCHECK(point);
   DVLOG(1) << "HitTest: renderer=" << renderer_state << ", point=" << point;
 
-  // TODO(jeffbrown): hit tests on scenes
   auto result = mojo::gfx::composition::HitTestResult::New();
+
+  if (renderer_state->visible_snapshot()) {
+    DCHECK(!renderer_state->visible_snapshot()->is_blocked());
+    renderer_state->visible_snapshot()->HitTest(*point, result.get());
+  }
+
   callback.Run(result.Pass());
 }
 

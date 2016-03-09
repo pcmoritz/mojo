@@ -41,7 +41,8 @@ struct HitTestBehavior {
   // The default is opaque.
   Visibility visibility = Visibility.OPAQUE;
 
-  // When set to true, prevents a node's children from being hit tested.
+  // When set to true, prevents a node's children or reference scenes from
+  // being hit tested.
   bool prune = false;
 
   // The rectangle within the node's content space to test for hits.
@@ -97,11 +98,16 @@ struct SceneHit {
   array<Hit> hits;
 };
 
-// Describes the point of intersection of a hit test with a node.
+// Describes the intersection of a hit test with a node.
 struct NodeHit {
   // The node id of the node which was hit.
   uint32 node_id;
 
-  // The coordinates of the hit within the node's content space.
-  mojo.Point intersection;
+  // The transformation from the global coordinate system of the scene graph
+  // to the local coordinate system of the node's content space at the time
+  // the hit test was performed.
+  //
+  // To obtain the point of intersection of the hit test within the node's
+  // content space, multiply this transformation matrix by the hit test point.
+  mojo.Transform transform;
 };

@@ -240,8 +240,8 @@ std::ostream& operator<<(std::ostream& os,
 
 std::ostream& operator<<(std::ostream& os,
                          const mojo::gfx::composition::NodeHit& value) {
-  return os << "{node_id=" << value.node_id
-            << ", intersection=" << value.intersection << "}";
+  return os << "{node_id=" << value.node_id << ", transform=" << value.transform
+            << "}";
 }
 
 }  // namespace composition

@@ -13,6 +13,7 @@
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
 #include "mojo/services/geometry/interfaces/geometry.mojom.h"
+#include "mojo/services/gfx/composition/interfaces/hit_tests.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 
 namespace compositor {
@@ -68,6 +69,11 @@ class Snapshot : public base::RefCounted<Snapshot> {
   std::shared_ptr<RenderFrame> CreateFrame(
       const mojo::Rect& viewport,
       const mojo::gfx::composition::FrameInfo& frame_info) const;
+
+  // Performs a hit test at the specified point, populating the result.
+  // Only valid if |!is_blocked()|.
+  void HitTest(const mojo::Point& point,
+               mojo::gfx::composition::HitTestResult* result) const;
 
   // Returns true if the specified node was blocked from rendering.
   // Only valid if |!is_blocked()|.

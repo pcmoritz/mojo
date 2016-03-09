@@ -223,6 +223,8 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
   mojo::TransformPtr content_transform = node_decl->content_transform.Pass();
   mojo::RectPtr content_clip = node_decl->content_clip.Pass();
+  mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior =
+      node_decl->hit_test_behavior.Pass();
   const mojo::gfx::composition::Node::Combinator combinator =
       node_decl->combinator;
   const std::vector<uint32_t>& child_node_ids =
@@ -230,7 +232,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
   if (!node_decl->op) {
     return new NodeDef(node_id, content_transform.Pass(), content_clip.Pass(),
-                       combinator, child_node_ids);
+                       hit_test_behavior.Pass(), combinator, child_node_ids);
   }
 
   if (node_decl->op->is_rect()) {
@@ -241,8 +243,8 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     const mojo::Rect& content_rect = *rect_node_decl->content_rect;
     const mojo::gfx::composition::Color& color = *rect_node_decl->color;
     return new RectNodeDef(node_id, content_transform.Pass(),
-                           content_clip.Pass(), combinator, child_node_ids,
-                           content_rect, color);
+                           content_clip.Pass(), hit_test_behavior.Pass(),
+                           combinator, child_node_ids, content_rect, color);
   }
 
   if (node_decl->op->is_image()) {
@@ -254,9 +256,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     const uint32 image_resource_id = image_node_decl->image_resource_id;
     mojo::gfx::composition::BlendPtr blend = image_node_decl->blend.Pass();
     return new ImageNodeDef(node_id, content_transform.Pass(),
-                            content_clip.Pass(), combinator, child_node_ids,
-                            content_rect, image_rect.Pass(), image_resource_id,
-                            blend.Pass());
+                            content_clip.Pass(), hit_test_behavior.Pass(),
+                            combinator, child_node_ids, content_rect,
+                            image_rect.Pass(), image_resource_id, blend.Pass());
   }
 
   if (node_decl->op->is_scene()) {
@@ -265,8 +267,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     const uint32_t scene_resource_id = scene_node_decl->scene_resource_id;
     const uint32_t scene_version = scene_node_decl->scene_version;
     return new SceneNodeDef(node_id, content_transform.Pass(),
-                            content_clip.Pass(), combinator, child_node_ids,
-                            scene_resource_id, scene_version);
+                            content_clip.Pass(), hit_test_behavior.Pass(),
+                            combinator, child_node_ids, scene_resource_id,
+                            scene_version);
   }
 
   if (node_decl->op->is_layer()) {
@@ -276,8 +279,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     const mojo::Size& layer_size = *layer_node_decl->layer_size;
     mojo::gfx::composition::BlendPtr blend = layer_node_decl->blend.Pass();
     return new LayerNodeDef(node_id, content_transform.Pass(),
-                            content_clip.Pass(), combinator, child_node_ids,
-                            layer_size, blend.Pass());
+                            content_clip.Pass(), hit_test_behavior.Pass(),
+                            combinator, child_node_ids, layer_size,
+                            blend.Pass());
   }
 
   err << "Unsupported node op type: node_id=" << node_id

@@ -15,7 +15,9 @@
 #include "services/gfx/compositor/render/render_image.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
+#include "third_party/skia/include/core/SkMatrix.h"
 #include "third_party/skia/include/core/SkPaint.h"
+#include "third_party/skia/include/core/SkPoint.h"
 #include "third_party/skia/include/core/SkRect.h"
 
 namespace compositor {
@@ -29,16 +31,23 @@ void SetPaintForBlend(SkPaint* paint, mojo::gfx::composition::Blend* blend) {
   if (blend)
     paint->setAlpha(blend->alpha);
 }
+
+bool Contains(const SkRect& bounds, const SkPoint& point) {
+  return point.x() >= bounds.left() && point.x() < bounds.right() &&
+         point.y() >= bounds.top() && point.y() < bounds.bottom();
+}
 }  // namespace
 
 NodeDef::NodeDef(uint32_t node_id,
                  mojo::TransformPtr content_transform,
                  mojo::RectPtr content_clip,
+                 mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                  Combinator combinator,
                  const std::vector<uint32_t>& child_node_ids)
     : node_id_(node_id),
       content_transform_(content_transform.Pass()),
       content_clip_(content_clip.Pass()),
+      hit_test_behavior_(hit_test_behavior.Pass()),
       combinator_(combinator),
       child_node_ids_(child_node_ids) {}
 
@@ -222,16 +231,116 @@ void NodeDef::RecordPictureInner(const SceneContent* content,
       });
 }
 
-RectNodeDef::RectNodeDef(uint32_t node_id,
-                         mojo::TransformPtr content_transform,
-                         mojo::RectPtr content_clip,
-                         Combinator combinator,
-                         const std::vector<uint32_t>& child_node_ids,
-                         const mojo::Rect& content_rect,
-                         const mojo::gfx::composition::Color& color)
+bool NodeDef::HitTest(const SceneContent* content,
+                      const Snapshot* snapshot,
+                      const SkPoint& parent_point,
+                      const SkMatrix& global_to_parent_transform,
+                      mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(hits);
+
+  // TODO(jeffbrown): These calculations should probably be happening using
+  // a 4x4 matrix instead.
+  SkPoint local_point = parent_point;
+  SkMatrix global_to_local_transform = global_to_parent_transform;
+  if (content_transform_) {
+    // TODO(jeffbrown): Cache the inverse transform.
+    // Defer matrix multiplications using a matrix stack.
+    SkMatrix inverse_transform;
+    if (!content_transform_.To<SkMatrix>().invert(&inverse_transform)) {
+      // Matrix is singular!
+      // Return [0,0,0][0,0,0][0,0,1] (all zeroes except last component).
+      // This causes all points to be mapped to (0,0) when transformed.
+      inverse_transform.setScale(0.f, 0.f);
+    }
+    inverse_transform.mapXY(parent_point.x(), parent_point.y(), &local_point);
+    global_to_local_transform.preConcat(inverse_transform);
+  }
+
+  if (content_clip_ && !Contains(content_clip_->To<SkRect>(), local_point))
+    return false;
+
+  bool opaque_children = false;
+  if (!hit_test_behavior_ || !hit_test_behavior_->prune) {
+    opaque_children = HitTestInner(content, snapshot, local_point,
+                                   global_to_local_transform, hits);
+  }
+
+  return HitTestSelf(content, snapshot, local_point, global_to_local_transform,
+                     hits) ||
+         opaque_children;
+}
+
+bool NodeDef::HitTestInner(
+    const SceneContent* content,
+    const Snapshot* snapshot,
+    const SkPoint& local_point,
+    const SkMatrix& global_to_local_transform,
+    mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(hits);
+
+  // TODO(jeffbrown): Implement a more efficient way to traverse children in
+  // reverse order.
+  std::vector<const NodeDef*> children;
+  TraverseSnapshottedChildren(
+      content, snapshot, [this, &children](const NodeDef* child_node) -> bool {
+        children.push_back(child_node);
+        return true;
+      });
+
+  for (auto it = children.crbegin(); it != children.crend(); ++it) {
+    if ((*it)->HitTest(content, snapshot, local_point,
+                       global_to_local_transform, hits))
+      return true;  // opaque child covering siblings
+  }
+  return false;
+}
+
+bool NodeDef::HitTestSelf(
+    const SceneContent* content,
+    const Snapshot* snapshot,
+    const SkPoint& local_point,
+    const SkMatrix& global_to_local_transform,
+    mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(hits);
+
+  if (!hit_test_behavior_ ||
+      hit_test_behavior_->visibility ==
+          mojo::gfx::composition::HitTestBehavior::Visibility::INVISIBLE)
+    return false;
+
+  if (hit_test_behavior_->hit_rect &&
+      !Contains(hit_test_behavior_->hit_rect->To<SkRect>(), local_point))
+    return false;
+
+  auto hit = mojo::gfx::composition::Hit::New();
+  hit->set_node(mojo::gfx::composition::NodeHit::New());
+  hit->get_node()->node_id = node_id_;
+  hit->get_node()->transform =
+      mojo::ConvertTo<mojo::TransformPtr>(global_to_local_transform);
+  hits->push_back(hit.Pass());
+  return hit_test_behavior_->visibility ==
+         mojo::gfx::composition::HitTestBehavior::Visibility::OPAQUE;
+}
+
+RectNodeDef::RectNodeDef(
+    uint32_t node_id,
+    mojo::TransformPtr content_transform,
+    mojo::RectPtr content_clip,
+    mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+    Combinator combinator,
+    const std::vector<uint32_t>& child_node_ids,
+    const mojo::Rect& content_rect,
+    const mojo::gfx::composition::Color& color)
     : NodeDef(node_id,
               content_transform.Pass(),
               content_clip.Pass(),
+              hit_test_behavior.Pass(),
               combinator,
               child_node_ids),
       content_rect_(content_rect),
@@ -253,18 +362,21 @@ void RectNodeDef::RecordPictureInner(const SceneContent* content,
   NodeDef::RecordPictureInner(content, snapshot, canvas);
 }
 
-ImageNodeDef::ImageNodeDef(uint32_t node_id,
-                           mojo::TransformPtr content_transform,
-                           mojo::RectPtr content_clip,
-                           Combinator combinator,
-                           const std::vector<uint32_t>& child_node_ids,
-                           const mojo::Rect& content_rect,
-                           mojo::RectPtr image_rect,
-                           uint32 image_resource_id,
-                           mojo::gfx::composition::BlendPtr blend)
+ImageNodeDef::ImageNodeDef(
+    uint32_t node_id,
+    mojo::TransformPtr content_transform,
+    mojo::RectPtr content_clip,
+    mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+    Combinator combinator,
+    const std::vector<uint32_t>& child_node_ids,
+    const mojo::Rect& content_rect,
+    mojo::RectPtr image_rect,
+    uint32 image_resource_id,
+    mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
               content_transform.Pass(),
               content_clip.Pass(),
+              hit_test_behavior.Pass(),
               combinator,
               child_node_ids),
       content_rect_(content_rect),
@@ -306,16 +418,19 @@ void ImageNodeDef::RecordPictureInner(const SceneContent* content,
   NodeDef::RecordPictureInner(content, snapshot, canvas);
 }
 
-SceneNodeDef::SceneNodeDef(uint32_t node_id,
-                           mojo::TransformPtr content_transform,
-                           mojo::RectPtr content_clip,
-                           Combinator combinator,
-                           const std::vector<uint32_t>& child_node_ids,
-                           uint32_t scene_resource_id,
-                           uint32_t scene_version)
+SceneNodeDef::SceneNodeDef(
+    uint32_t node_id,
+    mojo::TransformPtr content_transform,
+    mojo::RectPtr content_clip,
+    mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+    Combinator combinator,
+    const std::vector<uint32_t>& child_node_ids,
+    uint32_t scene_resource_id,
+    uint32_t scene_version)
     : NodeDef(node_id,
               content_transform.Pass(),
               content_clip.Pass(),
+              hit_test_behavior.Pass(),
               combinator,
               child_node_ids),
       scene_resource_id_(scene_resource_id),
@@ -368,24 +483,53 @@ void SceneNodeDef::RecordPictureInner(const SceneContent* content,
   const SceneContent* resolved_content =
       snapshot->GetResolvedSceneContent(this);
   DCHECK(resolved_content);
-
-  const NodeDef* root_node = resolved_content->GetRootNodeIfExists();
-  DCHECK(root_node);  // must have a root otherwise would have been blocked
-  root_node->RecordPicture(resolved_content, snapshot, canvas);
+  resolved_content->RecordPicture(snapshot, canvas);
 
   NodeDef::RecordPictureInner(content, snapshot, canvas);
 }
 
-LayerNodeDef::LayerNodeDef(uint32_t node_id,
-                           mojo::TransformPtr content_transform,
-                           mojo::RectPtr content_clip,
-                           Combinator combinator,
-                           const std::vector<uint32_t>& child_node_ids,
-                           const mojo::Size& size,
-                           mojo::gfx::composition::BlendPtr blend)
+bool SceneNodeDef::HitTestInner(
+    const SceneContent* content,
+    const Snapshot* snapshot,
+    const SkPoint& local_point,
+    const SkMatrix& global_to_local_transform,
+    mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
+  DCHECK(content);
+  DCHECK(snapshot);
+  DCHECK(hits);
+
+  if (NodeDef::HitTestInner(content, snapshot, local_point,
+                            global_to_local_transform, hits))
+    return true;  // opaque child covering referenced scene
+
+  const SceneContent* resolved_content =
+      snapshot->GetResolvedSceneContent(this);
+  DCHECK(resolved_content);
+
+  mojo::gfx::composition::SceneHitPtr scene_hit;
+  bool opaque = resolved_content->HitTest(
+      snapshot, local_point, global_to_local_transform, &scene_hit);
+  if (scene_hit) {
+    auto hit = mojo::gfx::composition::Hit::New();
+    hit->set_scene(scene_hit.Pass());
+    hits->push_back(hit.Pass());
+  }
+  return opaque;
+}
+
+LayerNodeDef::LayerNodeDef(
+    uint32_t node_id,
+    mojo::TransformPtr content_transform,
+    mojo::RectPtr content_clip,
+    mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+    Combinator combinator,
+    const std::vector<uint32_t>& child_node_ids,
+    const mojo::Size& size,
+    mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
               content_transform.Pass(),
               content_clip.Pass(),
+              hit_test_behavior.Pass(),
               combinator,
               child_node_ids),
       size_(size),

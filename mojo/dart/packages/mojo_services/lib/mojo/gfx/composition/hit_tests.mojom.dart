@@ -374,7 +374,7 @@ class NodeHit extends bindings.Struct {
     const bindings.StructDataHeader(24, 0)
   ];
   int nodeId = 0;
-  geometry_mojom.Point intersection = null;
+  geometry_mojom.Transform transform = null;
 
   NodeHit() : super(kVersions.last.size);
 
@@ -418,7 +418,7 @@ class NodeHit extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(16, false);
-      result.intersection = geometry_mojom.Point.decode(decoder1);
+      result.transform = geometry_mojom.Transform.decode(decoder1);
     }
     return result;
   }
@@ -433,10 +433,10 @@ class NodeHit extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeStruct(intersection, 16, false);
+      encoder0.encodeStruct(transform, 16, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "intersection of struct NodeHit: $e";
+          "transform of struct NodeHit: $e";
       rethrow;
     }
   }
@@ -444,13 +444,13 @@ class NodeHit extends bindings.Struct {
   String toString() {
     return "NodeHit("
            "nodeId: $nodeId" ", "
-           "intersection: $intersection" ")";
+           "transform: $transform" ")";
   }
 
   Map toJson() {
     Map map = new Map();
     map["nodeId"] = nodeId;
-    map["intersection"] = intersection;
+    map["transform"] = transform;
     return map;
   }
 }
