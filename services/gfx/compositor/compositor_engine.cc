@@ -104,6 +104,7 @@ void CompositorEngine::CreateRenderer(
     const mojo::String& label) {
   DCHECK(context_provider);
   uint32_t renderer_id = next_renderer_id_++;
+  CHECK(renderer_id);
 
   // Create the state and bind implementation to it.
   RendererState* renderer_state =
@@ -309,8 +310,8 @@ void CompositorEngine::InvalidateScene(SceneState* scene_state) {
   DVLOG(2) << "InvalidateScene: scene=" << scene_state;
 
   for (auto& renderer : renderers_) {
-    if (renderer->snapshot() &&
-        renderer->snapshot()->InvalidateScene(scene_state->scene_def())) {
+    if (renderer->current_snapshot() &&
+        renderer->current_snapshot()->HasDependency(scene_state->scene_def())) {
       ScheduleFrameForRenderer(renderer, Scheduler::SchedulingMode::kSnapshot);
     }
   }
@@ -365,7 +366,8 @@ void CompositorEngine::SnapshotRenderer(
   if (VLOG_IS_ON(2)) {
     std::ostringstream block_log;
     SnapshotRendererInner(renderer_state, frame_info, &block_log);
-    if (!renderer_state->frame()) {
+    if (!renderer_state->current_snapshot() ||
+        renderer_state->current_snapshot()->is_blocked()) {
       DVLOG(2) << "Rendering completely blocked: " << block_log.str();
     } else if (!block_log.str().empty()) {
       DVLOG(2) << "Rendering partially blocked: " << block_log.str();
@@ -374,6 +376,13 @@ void CompositorEngine::SnapshotRenderer(
     }
   } else {
     SnapshotRendererInner(renderer_state, frame_info, nullptr);
+  }
+
+  if (renderer_state->current_snapshot() &&
+      !renderer_state->current_snapshot()->is_blocked()) {
+    renderer_state->output()->SubmitFrame(
+        renderer_state->current_snapshot()->CreateFrame(
+            renderer_state->root_scene_viewport(), frame_info));
   }
 }
 
@@ -390,11 +399,7 @@ void CompositorEngine::SnapshotRendererInner(
 
   SnapshotBuilder builder(block_log);
   renderer_state->SetSnapshot(
-      builder.Build(renderer_state->root_scene()->scene_def(),
-                    renderer_state->root_scene_viewport(), frame_info));
-
-  if (renderer_state->frame())
-    renderer_state->output()->SubmitFrame(renderer_state->frame());
+      builder.Build(renderer_state->root_scene()->scene_def()));
 }
 
 void CompositorEngine::ScheduleFrameForRenderer(

@@ -26,20 +26,23 @@ class RenderFrame;
 // Describes a single frame snapshot of the scene graph, sufficient for
 // rendering and hit testing.  When the snapshot is made, all predicated and
 // blocked scene nodes are evaluated to produce a final description of
-// the frame along with its dependencies.
+// the content of the frame along with its dependencies.
 //
 // The snapshot holds a list of dependencies for the scenes whose state was
-// originally used to produce it.  The snapshot must be invalidated whenever
-// any of these scenes change.  Note that the snapshot will contain a list
-// of dependencies even in the case where a frame could not be produced,
-// in which case the dependencies express the set of scenes which, if updated,
+// originally used to produce it so that the snapshot can be invalidated
+// whenever one of these scenes changes.  Note that the snapshot will contain
+// a list of dependencies even when rendering is blocked, in which case
+// the dependencies express the set of scenes which, if updated,
 // might allow composition to be unblocked and make progress on a subsequent
 // frame.
 //
 // Snapshot objects are not thread-safe since they have direct references to
 // the scene graph definition.  However, the snapshot's frame is thread-safe
 // and is intended to be sent to the backend rasterizer.
-class Snapshot {
+//
+// Once fully constructed, instances of this class are immutable and
+// reference counted so they may be bound to scene references in other scenes.
+class Snapshot : public base::RefCounted<Snapshot> {
  public:
   // Describes the result of a snapshot operation.
   enum class Disposition {
@@ -48,48 +51,42 @@ class Snapshot {
     kCycle,    // The node was blocked due to a cycle, must unwind fully.
   };
 
-  ~Snapshot();
+  // Returns true if the snapshot is blocked from rendering.
+  bool is_blocked() const { return disposition_ == Disposition::kBlocked; }
 
-  // Returns true if the snapshot is valid.
-  bool valid() const { return valid_; }
+  // Gets the root scene content for the snapshot, or null if blocked.
+  const SceneContent* root_scene_content() const {
+    return root_scene_content_.get();
+  }
 
-  // Gets the frame produced from this snapshot, or null if none.
-  //
-  // This is always null if |valid()| is false but it may be null even
-  // when |valid()| is true if composition was blocked and unable to produce
-  // a frame during the snapshot operation.
-  const std::shared_ptr<RenderFrame>& frame() const { return frame_; }
+  // Returns true if the snapshot has a dependency on content from the
+  // specified scene.
+  bool HasDependency(const SceneDef* scene) const;
 
-  // Unconditionally marks the snapshot as invalid.
-  //
-  // Returns true if the snapshot became invalid as a result of this operation,
-  // or false if it was already invalid.
-  bool Invalidate();
-
-  // Invalidates the snapshot if it has a dependency on the specified scene.
-  // When this occurs, the entire list of dependencies is flushed (we no longer
-  // need them) in case the scene in question or its contents are about to
-  // be destroyed.
-  //
-  // Returns true if the snapshot became invalid as a result of this operation,
-  // or false if it was already invalid.
-  bool InvalidateScene(const SceneDef* scene_def);
+  // Creates a frame for rendering.
+  // Only valid if |!is_blocked()|.
+  std::shared_ptr<RenderFrame> CreateFrame(
+      const mojo::Rect& viewport,
+      const mojo::gfx::composition::FrameInfo& frame_info) const;
 
   // Returns true if the specified node was blocked from rendering.
-  // Only meaningful while the snapshot is valid.
-  bool IsBlocked(const NodeDef* node) const;
+  // Only valid if |!is_blocked()|.
+  bool IsNodeBlocked(const NodeDef* node) const;
 
   // Gets the scene content which was resolved by following a scene node link.
-  // Only meaningful while the snapshot is valid.
+  // Only valid if |!is_blocked()|.
   const SceneContent* GetResolvedSceneContent(
       const SceneNodeDef* scene_node) const;
 
  private:
+  friend class base::RefCounted<Snapshot>;
   friend class SnapshotBuilder;
 
   Snapshot();
+  ~Snapshot();
 
-  void ClearContent();
+  // Disposition of the snapshot as a whole.
+  Disposition disposition_;
 
   // Just the set of dependent scene tokens.  Used for invalidation.
   std::unordered_set<uint32_t> dependencies_;
@@ -106,12 +103,6 @@ class Snapshot {
 
   // Node states, true if snapshotted successfully, false if blocked.
   std::unordered_map<const NodeDef*, Disposition> node_dispositions_;
-
-  // A frame ready to be rendered.
-  std::shared_ptr<RenderFrame> frame_;
-
-  // True if the snapshot is still valid.
-  bool valid_ = true;
 
   DISALLOW_COPY_AND_ASSIGN(Snapshot);
 };
@@ -138,10 +129,7 @@ class SnapshotBuilder {
                                       const SceneContent* referrer_content);
 
   // Builds a snapshot rooted at the specified scene.
-  std::unique_ptr<Snapshot> Build(
-      const SceneDef* root_scene,
-      const mojo::Rect& viewport,
-      const mojo::gfx::composition::FrameInfo& frame_info);
+  scoped_refptr<const Snapshot> Build(const SceneDef* root_scene);
 
  private:
   // Snapshots the root scene of a renderer.
@@ -157,7 +145,7 @@ class SnapshotBuilder {
       const SceneContent* content);
 
   std::ostream* const block_log_;
-  std::unique_ptr<Snapshot> snapshot_;
+  scoped_refptr<Snapshot> snapshot_;
   const SceneContent* cycle_ = nullptr;  // point where a cycle was detected
 
   DISALLOW_COPY_AND_ASSIGN(SnapshotBuilder);

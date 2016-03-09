@@ -144,7 +144,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
       for (uint32_t child_node_id : child_node_ids_) {
         const NodeDef* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
-        DCHECK(!snapshot->IsBlocked(child_node));
+        DCHECK(!snapshot->IsNodeBlocked(child_node));
         if (!func(child_node))
           return;
       }
@@ -156,7 +156,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
       for (uint32_t child_node_id : child_node_ids_) {
         const NodeDef* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
-        if (!snapshot->IsBlocked(child_node) && !func(child_node))
+        if (!snapshot->IsNodeBlocked(child_node) && !func(child_node))
           return;
       }
       return;
@@ -169,7 +169,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
       for (uint32_t child_node_id : child_node_ids_) {
         const NodeDef* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
-        if (!snapshot->IsBlocked(child_node)) {
+        if (!snapshot->IsNodeBlocked(child_node)) {
           func(child_node);  // don't care about the result because we
           return;            // always stop after the first one
         }

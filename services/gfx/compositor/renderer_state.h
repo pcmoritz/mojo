@@ -18,8 +18,6 @@
 
 namespace compositor {
 
-class Snapshot;
-
 // Describes the state of a particular renderer.
 // This object is owned by the CompositorEngine that created it.
 class RendererState {
@@ -47,31 +45,31 @@ class RendererState {
   uint32_t root_scene_version() { return root_scene_version_; }
   const mojo::Rect& root_scene_viewport() { return root_scene_viewport_; }
 
-  // Sets the root scene and clears the current frame and cached dependencies.
-  // If different, invalidates the snapshot and returns true.
+  // Sets the root scene.
+  // If a change occurred, clears the current snapshot and returns true.
   bool SetRootScene(SceneState* scene,
                     uint32_t version,
                     const mojo::Rect& viewport);
 
-  // Resets the root scene and clears the current frame and cached dependencies.
-  // If different, invalidates the snapshot and returns true.
+  // Resets the root scene.
+  // If a change occurred, clears the current snapshot and returns true.
   bool ResetRootScene();
 
-  // The currently composited frame, may be null if none.
-  const std::shared_ptr<RenderFrame>& frame() { return frame_; }
+  // The currently visible frame, or null if none.
+  scoped_refptr<const Snapshot> visible_snapshot() const {
+    return visible_snapshot_;
+  }
 
-  // The current scene graph snapshot, may be null if none.
-  const std::unique_ptr<Snapshot>& snapshot() { return snapshot_; }
+  // The most recent snapshot (which may be blocked from rendering), or
+  // null if none.
+  scoped_refptr<const Snapshot> current_snapshot() const {
+    return current_snapshot_;
+  }
 
-  // Returns true if the renderer has a snapshot and it is valid.
-  // This implies that |frame()| is also non-null.
-  bool valid() { return snapshot_ && snapshot_->valid(); }
-
-  // Sets the snapshot, or null if none.
-  // If the snapshot is valid, updates |frame()| to point to the snapshot's
-  // new frame, otherwise leaves it alone.
-  // Returns true if the snapshot is valid.
-  bool SetSnapshot(std::unique_ptr<Snapshot> snapshot);
+  // Sets the current snapshot, or null if none.
+  // Always updates |current_snapshot()|.
+  // If the snapshot is not blocked, also updates |visible_snapshot()|.
+  void SetSnapshot(const scoped_refptr<const Snapshot>& snapshot);
 
   const std::string& label() { return label_; }
   std::string FormattedLabel();
@@ -88,8 +86,8 @@ class RendererState {
   uint32_t root_scene_version_ = mojo::gfx::composition::kSceneVersionNone;
   mojo::Rect root_scene_viewport_;
 
-  std::shared_ptr<RenderFrame> frame_;
-  std::unique_ptr<Snapshot> snapshot_;
+  scoped_refptr<const Snapshot> visible_snapshot_;
+  scoped_refptr<const Snapshot> current_snapshot_;
 
   base::WeakPtrFactory<RendererState> weak_factory_;
 

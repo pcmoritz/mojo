@@ -39,14 +39,10 @@ bool RendererState::ResetRootScene() {
   return false;
 }
 
-bool RendererState::SetSnapshot(std::unique_ptr<Snapshot> snapshot) {
-  snapshot_ = std::move(snapshot);
-  if (snapshot_ && snapshot_->valid()) {
-    frame_ = snapshot_->frame();
-    DCHECK(frame_);
-    return true;
-  }
-  return false;
+void RendererState::SetSnapshot(const scoped_refptr<const Snapshot>& snapshot) {
+  current_snapshot_ = snapshot;
+  if (current_snapshot_ && !current_snapshot_->is_blocked())
+    visible_snapshot_ = current_snapshot_;
 }
 
 std::string RendererState::FormattedLabel() {

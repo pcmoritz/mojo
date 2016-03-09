@@ -17,33 +17,32 @@ Snapshot::Snapshot() {}
 
 Snapshot::~Snapshot() {}
 
-bool Snapshot::Invalidate() {
-  if (valid_) {
-    valid_ = false;
-    dependencies_.clear();
-    ClearContent();
-    return true;
-  }
-  return false;
+bool Snapshot::HasDependency(const SceneDef* scene) const {
+  return dependencies_.find(scene->label().token()) != dependencies_.end();
 }
 
-bool Snapshot::InvalidateScene(const SceneDef* scene_def) {
-  DCHECK(scene_def);
-  return valid_ &&
-         dependencies_.find(scene_def->label().token()) !=
-             dependencies_.end() &&
-         Invalidate();
+std::shared_ptr<RenderFrame> Snapshot::CreateFrame(
+    const mojo::Rect& viewport,
+    const mojo::gfx::composition::FrameInfo& frame_info) const {
+  DCHECK(!is_blocked());
+
+  SkRect sk_viewport =
+      SkRect::MakeXYWH(viewport.x, viewport.y, viewport.width, viewport.height);
+  SkPictureRecorder recorder;
+  recorder.beginRecording(sk_viewport);
+
+  const NodeDef* root_node = root_scene_content_->GetRootNodeIfExists();
+  DCHECK(root_node);  // otherwise would have failed to snapshot
+  root_node->RecordPicture(root_scene_content_.get(), this,
+                           recorder.getRecordingCanvas());
+
+  return RenderFrame::Create(skia::AdoptRef(recorder.endRecordingAsPicture()),
+                             sk_viewport, frame_info);
 }
 
-void Snapshot::ClearContent() {
-  root_scene_content_ = nullptr;
-  resolved_scene_contents_.clear();
-  node_dispositions_.clear();
-  frame_.reset();
-}
+bool Snapshot::IsNodeBlocked(const NodeDef* node) const {
+  DCHECK(!is_blocked());
 
-bool Snapshot::IsBlocked(const NodeDef* node) const {
-  DCHECK(valid_);
   auto it = node_dispositions_.find(node);
   DCHECK(it != node_dispositions_.end());
   DCHECK(it->second == Disposition::kSuccess ||
@@ -53,7 +52,8 @@ bool Snapshot::IsBlocked(const NodeDef* node) const {
 
 const SceneContent* Snapshot::GetResolvedSceneContent(
     const SceneNodeDef* scene_node) const {
-  DCHECK(valid_);
+  DCHECK(!is_blocked());
+
   auto it = resolved_scene_contents_.find(scene_node);
   DCHECK(it != resolved_scene_contents_.end());
   return it->second.get();
@@ -195,33 +195,18 @@ Snapshot::Disposition SnapshotBuilder::SnapshotRenderer(const SceneDef* scene) {
   return SnapshotRootAndDetectCycles(root, content);
 }
 
-std::unique_ptr<Snapshot> SnapshotBuilder::Build(
-    const SceneDef* root_scene,
-    const mojo::Rect& viewport,
-    const mojo::gfx::composition::FrameInfo& frame_info) {
+scoped_refptr<const Snapshot> SnapshotBuilder::Build(
+    const SceneDef* root_scene) {
   DCHECK(snapshot_);
   DCHECK(root_scene);
 
-  Snapshot::Disposition disposition = SnapshotRenderer(root_scene);
+  snapshot_->disposition_ = SnapshotRenderer(root_scene);
   DCHECK(!cycle_);  // must have properly unwound any cycles by now
 
-  if (disposition == Snapshot::Disposition::kSuccess) {
-    SkRect sk_viewport = SkRect::MakeXYWH(viewport.x, viewport.y,
-                                          viewport.width, viewport.height);
-    SkPictureRecorder recorder;
-    recorder.beginRecording(sk_viewport);
-
-    const NodeDef* root_node =
-        snapshot_->root_scene_content_->GetRootNodeIfExists();
-    DCHECK(root_node);  // otherwise would have failed to snapshot
-    root_node->RecordPicture(snapshot_->root_scene_content_.get(),
-                             snapshot_.get(), recorder.getRecordingCanvas());
-
-    snapshot_->frame_ =
-        RenderFrame::Create(skia::AdoptRef(recorder.endRecordingAsPicture()),
-                            sk_viewport, frame_info);
-  } else {
-    snapshot_->ClearContent();
+  if (snapshot_->is_blocked()) {
+    snapshot_->root_scene_content_ = nullptr;
+    snapshot_->resolved_scene_contents_.clear();
+    snapshot_->node_dispositions_.clear();
   }
   return std::move(snapshot_);
 }
