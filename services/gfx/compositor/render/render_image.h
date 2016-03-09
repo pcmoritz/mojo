@@ -14,6 +14,7 @@
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
 #include "base/task_runner.h"
+#include "mojo/services/gfx/composition/interfaces/resources.mojom.h"
 #include "skia/ext/refptr.h"
 #include "third_party/skia/include/core/SkImage.h"
 
@@ -45,6 +46,7 @@ class RenderImage {
       GLuint sync_point,
       uint32_t width,
       uint32_t height,
+      mojo::gfx::composition::MailboxTextureResource::Origin origin,
       const scoped_refptr<base::TaskRunner>& task_runner,
       const base::Closure& release_task);
 

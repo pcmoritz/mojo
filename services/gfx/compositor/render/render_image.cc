@@ -33,8 +33,13 @@ class RenderImage::Generator : public mojo::skia::MailboxTextureImageGenerator {
             const GLbyte mailbox_name[GL_MAILBOX_SIZE_CHROMIUM],
             GLuint sync_point,
             uint32_t width,
-            uint32_t height)
-      : MailboxTextureImageGenerator(mailbox_name, sync_point, width, height),
+            uint32_t height,
+            GrSurfaceOrigin origin)
+      : MailboxTextureImageGenerator(mailbox_name,
+                                     sync_point,
+                                     width,
+                                     height,
+                                     origin),
         releaser_(releaser) {
     DCHECK(releaser_);
   }
@@ -59,12 +64,17 @@ std::shared_ptr<RenderImage> RenderImage::CreateFromMailboxTexture(
     GLuint sync_point,
     uint32_t width,
     uint32_t height,
+    mojo::gfx::composition::MailboxTextureResource::Origin origin,
     const scoped_refptr<base::TaskRunner>& task_runner,
     const base::Closure& release_task) {
   std::shared_ptr<Releaser> releaser =
       std::make_shared<Releaser>(task_runner, release_task);
   skia::RefPtr<SkImage> image = skia::AdoptRef(SkImage::NewFromGenerator(
-      new Generator(releaser, mailbox_name, sync_point, width, height)));
+      new Generator(releaser, mailbox_name, sync_point, width, height,
+                    origin == mojo::gfx::composition::MailboxTextureResource::
+                                  Origin::BOTTOM_LEFT
+                        ? kBottomLeft_GrSurfaceOrigin
+                        : kTopLeft_GrSurfaceOrigin)));
   if (!image)
     return nullptr;
 

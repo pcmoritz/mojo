@@ -85,12 +85,65 @@ class SceneResource extends bindings.Struct {
 }
 
 
+class MailboxTextureResourceOrigin extends bindings.MojoEnum {
+  static const MailboxTextureResourceOrigin topLeft = const MailboxTextureResourceOrigin._(0);
+  static const MailboxTextureResourceOrigin bottomLeft = const MailboxTextureResourceOrigin._(1);
+
+  const MailboxTextureResourceOrigin._(int v) : super(v);
+
+  static const Map<String, MailboxTextureResourceOrigin> valuesMap = const {
+    "topLeft": topLeft,
+    "bottomLeft": bottomLeft,
+  };
+  static const List<MailboxTextureResourceOrigin> values = const [
+    topLeft,
+    bottomLeft,
+  ];
+
+  static MailboxTextureResourceOrigin valueOf(String name) => valuesMap[name];
+
+  factory MailboxTextureResourceOrigin(int v) {
+    switch (v) {
+      case 0:
+        return MailboxTextureResourceOrigin.topLeft;
+      case 1:
+        return MailboxTextureResourceOrigin.bottomLeft;
+      default:
+        return null;
+    }
+  }
+
+  static MailboxTextureResourceOrigin decode(bindings.Decoder decoder0, int offset) {
+    int v = decoder0.decodeUint32(offset);
+    MailboxTextureResourceOrigin result = new MailboxTextureResourceOrigin(v);
+    if (result == null) {
+      throw new bindings.MojoCodecError(
+          'Bad value $v for enum MailboxTextureResourceOrigin.');
+    }
+    return result;
+  }
+
+  String toString() {
+    switch(this) {
+      case topLeft:
+        return 'MailboxTextureResourceOrigin.topLeft';
+      case bottomLeft:
+        return 'MailboxTextureResourceOrigin.bottomLeft';
+      default:
+        return null;
+    }
+  }
+
+  int toJson() => mojoEnumValue;
+}
+
 class MailboxTextureResource extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(40, 0)
   ];
   List<int> mailboxName = null;
   int syncPoint = 0;
+  MailboxTextureResourceOrigin origin = new MailboxTextureResourceOrigin(0);
   geometry_mojom.Size size = null;
   Object callback = null;
 
@@ -139,6 +192,14 @@ class MailboxTextureResource extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
+        result.origin = MailboxTextureResourceOrigin.decode(decoder0, 20);
+        if (result.origin == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable MailboxTextureResourceOrigin.');
+        }
+    }
+    if (mainDataHeader.version >= 0) {
+      
       var decoder1 = decoder0.decodePointer(24, false);
       result.size = geometry_mojom.Size.decode(decoder1);
     }
@@ -166,6 +227,13 @@ class MailboxTextureResource extends bindings.Struct {
       rethrow;
     }
     try {
+      encoder0.encodeEnum(origin, 20);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "origin of struct MailboxTextureResource: $e";
+      rethrow;
+    }
+    try {
       encoder0.encodeStruct(size, 24, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
@@ -185,6 +253,7 @@ class MailboxTextureResource extends bindings.Struct {
     return "MailboxTextureResource("
            "mailboxName: $mailboxName" ", "
            "syncPoint: $syncPoint" ", "
+           "origin: $origin" ", "
            "size: $size" ", "
            "callback: $callback" ")";
   }

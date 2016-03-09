@@ -45,7 +45,8 @@ std::unique_ptr<mojo::GLTexture> GLRenderer::GetTexture(
 }
 
 mojo::gfx::composition::ResourcePtr GLRenderer::BindTextureResource(
-    std::unique_ptr<GLTexture> texture) {
+    std::unique_ptr<GLTexture> texture,
+    mojo::gfx::composition::MailboxTextureResource::Origin origin) {
   if (!gl_context_)
     return nullptr;
 
@@ -67,6 +68,7 @@ mojo::gfx::composition::ResourcePtr GLRenderer::BindTextureResource(
          sizeof(mailbox));
   resource->get_mailbox_texture()->sync_point = sync_point;
   resource->get_mailbox_texture()->size = texture->size().Clone();
+  resource->get_mailbox_texture()->origin = origin;
   resource->get_mailbox_texture()->callback =
       (new GLTextureReleaser(
            weak_factory_.GetWeakPtr(),

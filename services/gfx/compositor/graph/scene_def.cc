@@ -193,9 +193,11 @@ scoped_refptr<const ResourceDef> SceneDef::CreateResource(
     const GLbyte* const mailbox_name = reinterpret_cast<GLbyte*>(
         mailbox_texture_resource_decl->mailbox_name.data());
     const GLuint sync_point = mailbox_texture_resource_decl->sync_point;
+    const mojo::gfx::composition::MailboxTextureResource::Origin origin =
+        mailbox_texture_resource_decl->origin;
 
     std::shared_ptr<RenderImage> image = RenderImage::CreateFromMailboxTexture(
-        mailbox_name, sync_point, width, height,
+        mailbox_name, sync_point, width, height, origin,
         base::MessageLoop::current()->task_runner(),
         base::Bind(
             &ReleaseMailboxTexture,

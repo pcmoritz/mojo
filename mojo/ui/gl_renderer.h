@@ -47,7 +47,9 @@ class GLRenderer {
   // The caller should add the resource to its scene.
   // Returns a nullptr if the GLContext was destroyed.
   mojo::gfx::composition::ResourcePtr BindTextureResource(
-      std::unique_ptr<GLTexture> texture);
+      std::unique_ptr<GLTexture> texture,
+      mojo::gfx::composition::MailboxTextureResource::Origin origin =
+          mojo::gfx::composition::MailboxTextureResource::Origin::BOTTOM_LEFT);
 
   // Allocates a GL texture, binds it to a framebuffer, invokes the
   // provided function, then returns the resulting resource.

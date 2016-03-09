@@ -38,7 +38,9 @@ mojo::gfx::composition::ResourcePtr GaneshRenderer::DrawSurface(
     texture = texture_surface.TakeTexture();
   }
 
-  return gl_renderer_.BindTextureResource(std::move(texture));
+  return gl_renderer_.BindTextureResource(
+      std::move(texture),
+      mojo::gfx::composition::MailboxTextureResource::Origin::TOP_LEFT);
 }
 
 static void RunCanvasCallback(

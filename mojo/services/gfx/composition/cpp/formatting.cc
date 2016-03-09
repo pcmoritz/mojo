@@ -80,7 +80,20 @@ std::ostream& operator<<(
     std::ostream& os,
     const mojo::gfx::composition::MailboxTextureResource& value) {
   return os << "{sync_point=" << value.sync_point << ", size=" << value.size
-            << "}";
+            << ", origin=" << &value.origin << "}";
+}
+
+std::ostream& operator<<(
+    std::ostream& os,
+    const mojo::gfx::composition::MailboxTextureResource::Origin* value) {
+  switch (*value) {
+    case mojo::gfx::composition::MailboxTextureResource::Origin::TOP_LEFT:
+      return os << "TOP_LEFT";
+    case mojo::gfx::composition::MailboxTextureResource::Origin::BOTTOM_LEFT:
+      return os << "BOTTOM_LEFT";
+    default:
+      return os << "???";
+  }
 }
 
 std::ostream& operator<<(std::ostream& os,

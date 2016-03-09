@@ -163,10 +163,6 @@ void SpinningCubeView::OnDraw(
   auto root_node = mojo::gfx::composition::Node::New();
   root_node->content_transform = mojo::Transform::New();
   mojo::SetIdentityTransform(root_node->content_transform.get());
-  // TODO(jeffbrown): Figure out why spinning cube is drawing upside down.
-  // Other GL based programs don't seem to have this problem.
-  root_node->content_transform->matrix[5] = -1;  // flip image vertically
-  root_node->content_transform->matrix[7] = size_.height;
   root_node->op = mojo::gfx::composition::NodeOp::New();
   root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
   root_node->op->get_image()->content_rect = bounds.Clone();
