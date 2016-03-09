@@ -317,9 +317,20 @@ func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []string
 		var values0 []MojomFile
-		for key0, value0 := range s.Files {
-			keys0 = append(keys0, key0)
-			values0 = append(values0, value0)
+		if encoder.Deterministic() {
+			for key0, _ := range s.Files {
+				keys0 = append(keys0, key0)
+			}
+			bindings.SortMapKeys(&keys0)
+			values0 = make([]MojomFile, len(keys0))
+			for i, key := range keys0 {
+				values0[i] = s.Files[key]
+			}
+		} else {
+			for key0, value0 := range s.Files {
+				keys0 = append(keys0, key0)
+				values0 = append(values0, value0)
+			}
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err
@@ -362,9 +373,20 @@ func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []string
 		var values0 []mojom_types.UserDefinedType
-		for key0, value0 := range s.ResolvedTypes {
-			keys0 = append(keys0, key0)
-			values0 = append(values0, value0)
+		if encoder.Deterministic() {
+			for key0, _ := range s.ResolvedTypes {
+				keys0 = append(keys0, key0)
+			}
+			bindings.SortMapKeys(&keys0)
+			values0 = make([]mojom_types.UserDefinedType, len(keys0))
+			for i, key := range keys0 {
+				values0[i] = s.ResolvedTypes[key]
+			}
+		} else {
+			for key0, value0 := range s.ResolvedTypes {
+				keys0 = append(keys0, key0)
+				values0 = append(values0, value0)
+			}
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err
@@ -407,9 +429,20 @@ func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []string
 		var values0 []mojom_types.UserDefinedValue
-		for key0, value0 := range s.ResolvedValues {
-			keys0 = append(keys0, key0)
-			values0 = append(values0, value0)
+		if encoder.Deterministic() {
+			for key0, _ := range s.ResolvedValues {
+				keys0 = append(keys0, key0)
+			}
+			bindings.SortMapKeys(&keys0)
+			values0 = make([]mojom_types.UserDefinedValue, len(keys0))
+			for i, key := range keys0 {
+				values0[i] = s.ResolvedValues[key]
+			}
+		} else {
+			for key0, value0 := range s.ResolvedValues {
+				keys0 = append(keys0, key0)
+				values0 = append(values0, value0)
+			}
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err

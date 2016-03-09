@@ -1009,6 +1009,19 @@ func TestSingleFileSerialization(t *testing.T) {
 			continue
 		}
 
+		// Serialize again and check for consistency.
+		bytes2, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		if err != nil {
+			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		if !reflect.DeepEqual(bytes, bytes2) {
+			t.Errorf("Inconsistent serialization for %s:\nbytes=%v\nbytes2=%v\n",
+				c.fileName, bytes, bytes2)
+			continue
+		}
+
 		// Deserialize
 		decoder := bindings.NewDecoder(bytes, nil)
 		fileGraph := mojom_files.MojomFileGraph{}

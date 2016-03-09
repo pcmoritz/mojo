@@ -52,6 +52,7 @@ func serialize(d *mojom.MojomDescriptor, debug,
 		debugString = myfmt.Sprintf("%#v", fileGraph)
 	}
 	encoder := bindings.NewEncoder()
+	encoder.SetDeterministic(true)
 	fileGraph.Encode(encoder)
 	bytes, _, err = encoder.Data()
 
@@ -207,6 +208,7 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 	// SerializedRuntimeTypeInfo
 	if emitSerializedRuntimeTypeInfo {
 		encoder := bindings.NewEncoder()
+		encoder.SetDeterministic(true)
 		typeInfo.Encode(encoder)
 		bytes, _, err := encoder.Data()
 		if err != nil {

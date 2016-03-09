@@ -34,7 +34,6 @@ const (
 )
 
 
-
 type BuiltinConstantValue int32
 
 const (
@@ -45,7 +44,6 @@ const (
 	BuiltinConstantValue_FloatNegativeInfinity = BuiltinConstantValue_FloatInfinity + 1;
 	BuiltinConstantValue_FloatNan = BuiltinConstantValue_FloatNegativeInfinity + 1;
 )
-
 
 
 type HandleType_Kind int32
@@ -59,10 +57,10 @@ const (
 )
 
 
-
 type StringType struct {
 	Nullable bool
 }
+
 
 func (s *StringType) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(8, 0)
@@ -111,12 +109,11 @@ func (s *StringType) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type HandleType struct {
 	Nullable bool
 	Kind HandleType_Kind
 }
+
 
 func (s *HandleType) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(8, 0)
@@ -175,13 +172,12 @@ func (s *HandleType) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type ArrayType struct {
 	Nullable bool
 	FixedLength int32
 	ElementType Type
 }
+
 
 func (s *ArrayType) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(24, 0)
@@ -256,13 +252,12 @@ func (s *ArrayType) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MapType struct {
 	Nullable bool
 	KeyType Type
 	ValueType Type
 }
+
 
 func (s *MapType) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(40, 0)
@@ -343,14 +338,13 @@ func (s *MapType) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type TypeReference struct {
 	Nullable bool
 	IsInterfaceRequest bool
 	Identifier *string
 	TypeKey *string
 }
+
 
 func (s *TypeReference) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(24, 0)
@@ -461,14 +455,13 @@ func (s *TypeReference) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type StructField struct {
 	DeclData *DeclarationData
 	Type Type
 	DefaultValue DefaultFieldValue
 	Offset int32
 }
+
 
 func (s *StructField) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(48, 0)
@@ -571,10 +564,9 @@ func (s *StructField) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type DefaultKeyword struct {
 }
+
 
 func (s *DefaultKeyword) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(0, 0)
@@ -613,13 +605,12 @@ func (s *DefaultKeyword) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type StructVersion struct {
 	VersionNumber uint32
 	NumFields uint32
 	NumBytes uint32
 }
+
 
 func (s *StructVersion) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -688,13 +679,12 @@ func (s *StructVersion) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MojomStruct struct {
 	DeclData *DeclarationData
 	Fields []StructField
 	VersionInfo *[]StructVersion
 }
+
 
 func (s *MojomStruct) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(24, 0)
@@ -854,13 +844,12 @@ func (s *MojomStruct) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type UnionField struct {
 	DeclData *DeclarationData
 	Type Type
 	Tag uint32
 }
+
 
 func (s *UnionField) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(32, 0)
@@ -949,12 +938,11 @@ func (s *UnionField) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MojomUnion struct {
 	DeclData *DeclarationData
 	Fields []UnionField
 }
+
 
 func (s *MojomUnion) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -1063,14 +1051,13 @@ func (s *MojomUnion) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type EnumValue struct {
 	DeclData *DeclarationData
 	EnumTypeKey string
 	InitializerValue Value
 	IntValue int32
 }
+
 
 func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(40, 0)
@@ -1178,12 +1165,11 @@ func (s *EnumValue) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MojomEnum struct {
 	DeclData *DeclarationData
 	Values []EnumValue
 }
+
 
 func (s *MojomEnum) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -1292,14 +1278,13 @@ func (s *MojomEnum) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MojomMethod struct {
 	DeclData *DeclarationData
 	Parameters MojomStruct
 	ResponseParams *MojomStruct
 	Ordinal uint32
 }
+
 
 func (s *MojomMethod) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(32, 0)
@@ -1415,13 +1400,12 @@ func (s *MojomMethod) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type MojomInterface struct {
 	DeclData *DeclarationData
 	ServiceName *string
 	Methods map[uint32]MojomMethod
 }
+
 
 func (s *MojomInterface) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(24, 0)
@@ -1452,9 +1436,20 @@ func (s *MojomInterface) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []uint32
 		var values0 []MojomMethod
-		for key0, value0 := range s.Methods {
+		if encoder.Deterministic() {
+		  for key0, _ := range s.Methods {
+			keys0 = append(keys0, key0)
+		  }
+		  bindings.SortMapKeys(&keys0)
+		  values0 = make([]MojomMethod, len(keys0))
+		  for i, key := range keys0 {
+		    values0[i] = s.Methods[key]
+		  }
+		} else {
+		  for key0, value0 := range s.Methods {
 			keys0 = append(keys0, key0)
 			values0 = append(values0, value0)
+		  }
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err
@@ -1637,13 +1632,12 @@ func (s *MojomInterface) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type UserValueReference struct {
 	Identifier string
 	ValueKey *string
 	ResolvedConcreteValue Value
 }
+
 
 func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(32, 0)
@@ -1743,13 +1737,12 @@ func (s *UserValueReference) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type DeclaredConstant struct {
 	DeclData DeclarationData
 	Type Type
 	Value Value
 }
+
 
 func (s *DeclaredConstant) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(40, 0)
@@ -1839,12 +1832,11 @@ func (s *DeclaredConstant) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type Attribute struct {
 	Key string
 	Value LiteralValue
 }
+
 
 func (s *Attribute) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(24, 0)
@@ -1920,8 +1912,6 @@ func (s *Attribute) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type DeclarationData struct {
 	Attributes *[]Attribute
 	MinVersion int32
@@ -1933,6 +1923,7 @@ type DeclarationData struct {
 	ContainedDeclarations *ContainedDeclarations
 	ContainerTypeKey *string
 }
+
 
 func (s *DeclarationData) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(64, 0)
@@ -2178,13 +2169,12 @@ func (s *DeclarationData) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type SourceFileInfo struct {
 	FileName string
 	LineNumber uint32
 	ColumnNumber uint32
 }
+
 
 func (s *SourceFileInfo) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -2264,12 +2254,11 @@ func (s *SourceFileInfo) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type ContainedDeclarations struct {
 	Enums *[]string
 	Constants *[]string
 }
+
 
 func (s *ContainedDeclarations) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -2414,12 +2403,11 @@ func (s *ContainedDeclarations) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type ServiceTypeInfo struct {
 	TopLevelInterface string
 	CompleteTypeSet []string
 }
+
 
 func (s *ServiceTypeInfo) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -2527,12 +2515,11 @@ func (s *ServiceTypeInfo) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type RuntimeTypeInfo struct {
 	ServicesByName map[string]ServiceTypeInfo
 	TypeMap map[string]UserDefinedType
 }
+
 
 func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
@@ -2543,9 +2530,20 @@ func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []string
 		var values0 []ServiceTypeInfo
-		for key0, value0 := range s.ServicesByName {
+		if encoder.Deterministic() {
+		  for key0, _ := range s.ServicesByName {
+			keys0 = append(keys0, key0)
+		  }
+		  bindings.SortMapKeys(&keys0)
+		  values0 = make([]ServiceTypeInfo, len(keys0))
+		  for i, key := range keys0 {
+		    values0[i] = s.ServicesByName[key]
+		  }
+		} else {
+		  for key0, value0 := range s.ServicesByName {
 			keys0 = append(keys0, key0)
 			values0 = append(values0, value0)
+		  }
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err
@@ -2588,9 +2586,20 @@ func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
 	{
 		var keys0 []string
 		var values0 []UserDefinedType
-		for key0, value0 := range s.TypeMap {
+		if encoder.Deterministic() {
+		  for key0, _ := range s.TypeMap {
+			keys0 = append(keys0, key0)
+		  }
+		  bindings.SortMapKeys(&keys0)
+		  values0 = make([]UserDefinedType, len(keys0))
+		  for i, key := range keys0 {
+		    values0[i] = s.TypeMap[key]
+		  }
+		} else {
+		  for key0, value0 := range s.TypeMap {
 			keys0 = append(keys0, key0)
 			values0 = append(values0, value0)
+		  }
 		}
 		if err := encoder.WritePointer(); err != nil {
 			return err
@@ -2844,14 +2853,14 @@ func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-
-
 type Type interface {
 	Tag() uint32
 	Interface() interface{}
 	__Reflect(__TypeReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __TypeReflect struct {
 	SimpleType SimpleType
@@ -2956,6 +2965,8 @@ func (u *TypeSimpleType) decodeInternal(decoder *bindings.Decoder) error {
 	return nil
 }
 
+
+
 type TypeStringType struct { Value StringType }
 func (u *TypeStringType) Tag() uint32 { return 1 }
 func (u *TypeStringType) Interface() interface{} { return u.Value }
@@ -2989,6 +3000,8 @@ func (u *TypeStringType) decodeInternal(decoder *bindings.Decoder) error {
 	
 	return nil
 }
+
+
 
 type TypeArrayType struct { Value ArrayType }
 func (u *TypeArrayType) Tag() uint32 { return 2 }
@@ -3024,6 +3037,8 @@ func (u *TypeArrayType) decodeInternal(decoder *bindings.Decoder) error {
 	return nil
 }
 
+
+
 type TypeMapType struct { Value MapType }
 func (u *TypeMapType) Tag() uint32 { return 3 }
 func (u *TypeMapType) Interface() interface{} { return u.Value }
@@ -3058,6 +3073,8 @@ func (u *TypeMapType) decodeInternal(decoder *bindings.Decoder) error {
 	return nil
 }
 
+
+
 type TypeHandleType struct { Value HandleType }
 func (u *TypeHandleType) Tag() uint32 { return 4 }
 func (u *TypeHandleType) Interface() interface{} { return u.Value }
@@ -3091,6 +3108,8 @@ func (u *TypeHandleType) decodeInternal(decoder *bindings.Decoder) error {
 	
 	return nil
 }
+
+
 
 type TypeTypeReference struct { Value TypeReference }
 func (u *TypeTypeReference) Tag() uint32 { return 5 }
@@ -3135,6 +3154,8 @@ type UserDefinedType interface {
 	__Reflect(__UserDefinedTypeReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __UserDefinedTypeReflect struct {
 	EnumType MojomEnum
@@ -3232,6 +3253,8 @@ func (u *UserDefinedTypeEnumType) decodeInternal(decoder *bindings.Decoder) erro
 	return nil
 }
 
+
+
 type UserDefinedTypeStructType struct { Value MojomStruct }
 func (u *UserDefinedTypeStructType) Tag() uint32 { return 1 }
 func (u *UserDefinedTypeStructType) Interface() interface{} { return u.Value }
@@ -3266,6 +3289,8 @@ func (u *UserDefinedTypeStructType) decodeInternal(decoder *bindings.Decoder) er
 	return nil
 }
 
+
+
 type UserDefinedTypeUnionType struct { Value MojomUnion }
 func (u *UserDefinedTypeUnionType) Tag() uint32 { return 2 }
 func (u *UserDefinedTypeUnionType) Interface() interface{} { return u.Value }
@@ -3299,6 +3324,8 @@ func (u *UserDefinedTypeUnionType) decodeInternal(decoder *bindings.Decoder) err
 	
 	return nil
 }
+
+
 
 type UserDefinedTypeInterfaceType struct { Value MojomInterface }
 func (u *UserDefinedTypeInterfaceType) Tag() uint32 { return 3 }
@@ -3343,6 +3370,8 @@ type DefaultFieldValue interface {
 	__Reflect(__DefaultFieldValueReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __DefaultFieldValueReflect struct {
 	Value Value
@@ -3440,6 +3469,8 @@ func (u *DefaultFieldValueValue) decodeInternal(decoder *bindings.Decoder) error
 	return nil
 }
 
+
+
 type DefaultFieldValueDefaultKeyword struct { Value DefaultKeyword }
 func (u *DefaultFieldValueDefaultKeyword) Tag() uint32 { return 1 }
 func (u *DefaultFieldValueDefaultKeyword) Interface() interface{} { return u.Value }
@@ -3483,6 +3514,8 @@ type Value interface {
 	__Reflect(__ValueReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __ValueReflect struct {
 	LiteralValue LiteralValue
@@ -3588,6 +3621,8 @@ func (u *ValueLiteralValue) decodeInternal(decoder *bindings.Decoder) error {
 	return nil
 }
 
+
+
 type ValueUserValueReference struct { Value UserValueReference }
 func (u *ValueUserValueReference) Tag() uint32 { return 1 }
 func (u *ValueUserValueReference) Interface() interface{} { return u.Value }
@@ -3621,6 +3656,8 @@ func (u *ValueUserValueReference) decodeInternal(decoder *bindings.Decoder) erro
 	
 	return nil
 }
+
+
 
 type ValueBuiltinValue struct { Value BuiltinConstantValue }
 func (u *ValueBuiltinValue) Tag() uint32 { return 2 }
@@ -3656,6 +3693,8 @@ type LiteralValue interface {
 	__Reflect(__LiteralValueReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __LiteralValueReflect struct {
 	BoolValue bool
@@ -3808,6 +3847,8 @@ func (u *LiteralValueBoolValue) decodeInternal(decoder *bindings.Decoder) error 
 	return nil
 }
 
+
+
 type LiteralValueDoubleValue struct { Value float64 }
 func (u *LiteralValueDoubleValue) Tag() uint32 { return 1 }
 func (u *LiteralValueDoubleValue) Interface() interface{} { return u.Value }
@@ -3832,6 +3873,8 @@ func (u *LiteralValueDoubleValue) decodeInternal(decoder *bindings.Decoder) erro
 	
 	return nil
 }
+
+
 
 type LiteralValueFloatValue struct { Value float32 }
 func (u *LiteralValueFloatValue) Tag() uint32 { return 2 }
@@ -3858,6 +3901,8 @@ func (u *LiteralValueFloatValue) decodeInternal(decoder *bindings.Decoder) error
 	return nil
 }
 
+
+
 type LiteralValueInt8Value struct { Value int8 }
 func (u *LiteralValueInt8Value) Tag() uint32 { return 3 }
 func (u *LiteralValueInt8Value) Interface() interface{} { return u.Value }
@@ -3882,6 +3927,8 @@ func (u *LiteralValueInt8Value) decodeInternal(decoder *bindings.Decoder) error 
 	
 	return nil
 }
+
+
 
 type LiteralValueInt16Value struct { Value int16 }
 func (u *LiteralValueInt16Value) Tag() uint32 { return 4 }
@@ -3908,6 +3955,8 @@ func (u *LiteralValueInt16Value) decodeInternal(decoder *bindings.Decoder) error
 	return nil
 }
 
+
+
 type LiteralValueInt32Value struct { Value int32 }
 func (u *LiteralValueInt32Value) Tag() uint32 { return 5 }
 func (u *LiteralValueInt32Value) Interface() interface{} { return u.Value }
@@ -3933,6 +3982,8 @@ func (u *LiteralValueInt32Value) decodeInternal(decoder *bindings.Decoder) error
 	return nil
 }
 
+
+
 type LiteralValueInt64Value struct { Value int64 }
 func (u *LiteralValueInt64Value) Tag() uint32 { return 6 }
 func (u *LiteralValueInt64Value) Interface() interface{} { return u.Value }
@@ -3957,6 +4008,8 @@ func (u *LiteralValueInt64Value) decodeInternal(decoder *bindings.Decoder) error
 	
 	return nil
 }
+
+
 
 type LiteralValueStringValue struct { Value string }
 func (u *LiteralValueStringValue) Tag() uint32 { return 7 }
@@ -3994,6 +4047,8 @@ func (u *LiteralValueStringValue) decodeInternal(decoder *bindings.Decoder) erro
 	return nil
 }
 
+
+
 type LiteralValueUint8Value struct { Value uint8 }
 func (u *LiteralValueUint8Value) Tag() uint32 { return 8 }
 func (u *LiteralValueUint8Value) Interface() interface{} { return u.Value }
@@ -4018,6 +4073,8 @@ func (u *LiteralValueUint8Value) decodeInternal(decoder *bindings.Decoder) error
 	
 	return nil
 }
+
+
 
 type LiteralValueUint16Value struct { Value uint16 }
 func (u *LiteralValueUint16Value) Tag() uint32 { return 9 }
@@ -4044,6 +4101,8 @@ func (u *LiteralValueUint16Value) decodeInternal(decoder *bindings.Decoder) erro
 	return nil
 }
 
+
+
 type LiteralValueUint32Value struct { Value uint32 }
 func (u *LiteralValueUint32Value) Tag() uint32 { return 10 }
 func (u *LiteralValueUint32Value) Interface() interface{} { return u.Value }
@@ -4068,6 +4127,8 @@ func (u *LiteralValueUint32Value) decodeInternal(decoder *bindings.Decoder) erro
 	
 	return nil
 }
+
+
 
 type LiteralValueUint64Value struct { Value uint64 }
 func (u *LiteralValueUint64Value) Tag() uint32 { return 11 }
@@ -4103,6 +4164,8 @@ type UserDefinedValue interface {
 	__Reflect(__UserDefinedValueReflect)
 	Encode(encoder *bindings.Encoder) error
 }
+
+
 
 type __UserDefinedValueReflect struct {
 	EnumValue EnumValue
@@ -4183,6 +4246,8 @@ func (u *UserDefinedValueEnumValue) decodeInternal(decoder *bindings.Decoder) er
 	
 	return nil
 }
+
+
 
 type UserDefinedValueDeclaredConstant struct { Value DeclaredConstant }
 func (u *UserDefinedValueDeclaredConstant) Tag() uint32 { return 1 }
