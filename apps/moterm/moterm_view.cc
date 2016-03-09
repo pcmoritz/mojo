@@ -239,6 +239,7 @@ void MotermView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
   update->resources.insert(kMotermImageResourceId, moterm_resource.Pass());
 
   auto root_node = mojo::gfx::composition::Node::New();
+  root_node->hit_test_behavior = mojo::gfx::composition::HitTestBehavior::New();
   root_node->op = mojo::gfx::composition::NodeOp::New();
   root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
   root_node->op->get_image()->content_rect = bounds.Clone();

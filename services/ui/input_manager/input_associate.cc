@@ -8,9 +8,19 @@
 
 #include "base/bind.h"
 #include "base/logging.h"
-#include "mojo/public/cpp/bindings/interface_request.h"
+#include "mojo/services/ui/views/cpp/formatting.h"
 
 namespace input_manager {
+namespace {
+std::ostream& operator<<(std::ostream& os, const mojo::Event& value) {
+  os << "{action=" << value.action;
+  if (value.pointer_data)
+    os << ", x=" << value.pointer_data->x << ", y=" << value.pointer_data->y;
+  if (value.key_data)
+    os << ", key_code=" << value.key_data->key_code;
+  return os << "}";
+}
+}  // namespace
 
 InputAssociate::InputAssociate() {}
 
@@ -20,6 +30,11 @@ void InputAssociate::Connect(
     mojo::InterfaceHandle<mojo::ui::ViewInspector> inspector,
     const ConnectCallback& callback) {
   DCHECK(inspector);  // checked by mojom
+
+  input_connections_by_view_token_.clear();
+  input_dispatchers_by_view_tree_token_.clear();
+  inspector_ = new mojo::ui::ViewInspectorClient(
+      mojo::ui::ViewInspectorPtr::Create(std::move(inspector)));
 
   auto info = mojo::ui::ViewAssociateInfo::New();
   info->view_service_names.push_back(mojo::ui::InputConnection::Name_);
@@ -34,8 +49,8 @@ void InputAssociate::ConnectToViewService(
   DCHECK(view_token);  // checked by mojom
 
   if (service_name == mojo::ui::InputConnection::Name_) {
-    input_connections_.AddBinding(
-        new InputConnectionImpl(this, view_token.Pass()),
+    CreateInputConnection(
+        view_token.Pass(),
         mojo::MakeRequest<mojo::ui::InputConnection>(client_handle.Pass()));
   }
 }
@@ -47,60 +62,78 @@ void InputAssociate::ConnectToViewTreeService(
   DCHECK(view_tree_token);  // checked by mojom
 
   if (service_name == mojo::ui::InputDispatcher::Name_) {
-    input_dispatchers_.AddBinding(
-        new InputDispatcherImpl(this, view_tree_token.Pass()),
+    CreateInputDispatcher(
+        view_tree_token.Pass(),
         mojo::MakeRequest<mojo::ui::InputDispatcher>(client_handle.Pass()));
   }
 }
 
-void InputAssociate::SetListener(
-    mojo::ui::ViewToken* view_token,
-    mojo::InterfaceHandle<mojo::ui::InputListener> listener) {
-  // TODO(jeffbrown): This simple hack just hooks up the first listener
-  // ever seen.
-  if (!listener_)
-    listener_ = mojo::ui::InputListenerPtr::Create(std::move(listener));
+void InputAssociate::CreateInputConnection(
+    mojo::ui::ViewTokenPtr view_token,
+    mojo::InterfaceRequest<mojo::ui::InputConnection> request) {
+  DCHECK(view_token);
+  DCHECK(request.is_pending());
+  DVLOG(1) << "CreateInputConnection: view_token=" << view_token;
+
+  const uint32_t view_token_value = view_token->value;
+  input_connections_by_view_token_.emplace(
+      view_token_value,
+      std::unique_ptr<InputConnectionImpl>(
+          new InputConnectionImpl(this, view_token.Pass(), request.Pass())));
 }
 
-void InputAssociate::DispatchEvent(mojo::ui::ViewTreeToken* view_tree_token,
-                                   mojo::EventPtr event) {
-  if (listener_)
-    listener_->OnEvent(
-        event.Pass(),
-        base::Bind(&InputAssociate::OnEventFinished, base::Unretained(this)));
+void InputAssociate::OnInputConnectionDied(InputConnectionImpl* connection) {
+  DCHECK(connection);
+  auto it =
+      input_connections_by_view_token_.find(connection->view_token()->value);
+  DCHECK(it != input_connections_by_view_token_.end());
+  DCHECK(it->second.get() == connection);
+  DVLOG(1) << "OnInputConnectionDied: view_token=" << connection->view_token();
+
+  input_connections_by_view_token_.erase(it);
 }
 
-void InputAssociate::OnEventFinished(bool handled) {
-  // TODO: detect ANRs
+void InputAssociate::CreateInputDispatcher(
+    mojo::ui::ViewTreeTokenPtr view_tree_token,
+    mojo::InterfaceRequest<mojo::ui::InputDispatcher> request) {
+  DCHECK(view_tree_token);
+  DCHECK(request.is_pending());
+  DVLOG(1) << "CreateInputDispatcher: view_tree_token=" << view_tree_token;
+
+  const uint32_t view_tree_token_value = view_tree_token->value;
+  input_dispatchers_by_view_tree_token_.emplace(
+      view_tree_token_value,
+      std::unique_ptr<InputDispatcherImpl>(new InputDispatcherImpl(
+          this, view_tree_token.Pass(), request.Pass())));
 }
 
-InputAssociate::InputConnectionImpl::InputConnectionImpl(
-    InputAssociate* associate,
-    mojo::ui::ViewTokenPtr view_token)
-    : associate_(associate), view_token_(view_token.Pass()) {
-  DCHECK(associate_);
-  DCHECK(view_token_);
+void InputAssociate::OnInputDispatcherDied(InputDispatcherImpl* dispatcher) {
+  DCHECK(dispatcher);
+  DVLOG(1) << "OnInputDispatcherDied: view_tree_token="
+           << dispatcher->view_tree_token();
+
+  auto it = input_dispatchers_by_view_tree_token_.find(
+      dispatcher->view_tree_token()->value);
+  DCHECK(it != input_dispatchers_by_view_tree_token_.end());
+  DCHECK(it->second.get() == dispatcher);
+
+  input_dispatchers_by_view_tree_token_.erase(it);
 }
 
-InputAssociate::InputConnectionImpl::~InputConnectionImpl() {}
+void InputAssociate::DeliverEvent(const mojo::ui::ViewToken* view_token,
+                                  mojo::EventPtr event) {
+  DCHECK(view_token);
+  DCHECK(event);
+  DVLOG(1) << "DeliverEvent: view_token=" << *view_token
+           << ", event=" << *event;
 
-void InputAssociate::InputConnectionImpl::SetListener(
-    mojo::InterfaceHandle<mojo::ui::InputListener> listener) {
-  associate_->SetListener(view_token_.get(), std::move(listener));
-}
+  auto it = input_connections_by_view_token_.find(view_token->value);
+  if (it == input_connections_by_view_token_.end()) {
+    DVLOG(1) << "DeliverEvent: dropped because there was no input connection";
+    return;
+  }
 
-InputAssociate::InputDispatcherImpl::InputDispatcherImpl(
-    InputAssociate* associate,
-    mojo::ui::ViewTreeTokenPtr view_tree_token)
-    : associate_(associate), view_tree_token_(view_tree_token.Pass()) {
-  DCHECK(associate_);
-  DCHECK(view_tree_token_);
-}
-
-InputAssociate::InputDispatcherImpl::~InputDispatcherImpl() {}
-
-void InputAssociate::InputDispatcherImpl::DispatchEvent(mojo::EventPtr event) {
-  associate_->DispatchEvent(view_tree_token_.get(), event.Pass());
+  it->second->DeliverEvent(event.Pass());
 }
 
 }  // namespace input_manager

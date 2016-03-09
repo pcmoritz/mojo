@@ -163,6 +163,7 @@ void SpinningCubeView::OnDraw(
   auto root_node = mojo::gfx::composition::Node::New();
   root_node->content_transform = mojo::Transform::New();
   mojo::SetIdentityTransform(root_node->content_transform.get());
+  root_node->hit_test_behavior = mojo::gfx::composition::HitTestBehavior::New();
   root_node->op = mojo::gfx::composition::NodeOp::New();
   root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
   root_node->op->get_image()->content_rect = bounds.Clone();

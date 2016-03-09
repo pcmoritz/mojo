@@ -26,4 +26,22 @@ void SetTranslationTransform(Transform* transform, float x, float y, float z) {
   transform->matrix[11] = z;
 }
 
+Point TransformPoint(const Transform& transform, const Point& point) {
+  // TODO(jeffbrown): If w is 0, then the point should be at infinity.
+  // Also, we should perhaps be using PointF here rather than Point.
+  float w = transform.matrix[12] * point.x + transform.matrix[13] * point.y +
+            transform.matrix[15];
+  if (!w)
+    w = 1.f / w;
+
+  Point result;
+  result.x = (transform.matrix[0] * point.x + transform.matrix[1] * point.y +
+              transform.matrix[3]) *
+             w;
+  result.y = (transform.matrix[4] * point.x + transform.matrix[5] * point.y +
+              transform.matrix[7]) *
+             w;
+  return result;
+}
+
 }  // namespace mojo

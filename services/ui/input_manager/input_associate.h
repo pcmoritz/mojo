@@ -5,13 +5,18 @@
 #ifndef SERVICES_UI_INPUT_MANAGER_INPUT_ASSOCIATE_IMPL_H_
 #define SERVICES_UI_INPUT_MANAGER_INPUT_ASSOCIATE_IMPL_H_
 
+#include <memory>
+#include <unordered_map>
+
 #include "base/macros.h"
-#include "mojo/common/strong_binding_set.h"
-#include "mojo/services/ui/input/interfaces/input_connection.mojom.h"
-#include "mojo/services/ui/input/interfaces/input_dispatcher.mojom.h"
 #include "mojo/services/ui/views/interfaces/view_associates.mojom.h"
+#include "mojo/ui/associates/view_inspector_client.h"
+#include "services/ui/input_manager/input_connection_impl.h"
+#include "services/ui/input_manager/input_dispatcher_impl.h"
 
 namespace input_manager {
+
+class ViewTreeHitTester;
 
 // InputManager's ViewAssociate interface implementation.
 class InputAssociate : public mojo::ui::ViewAssociate {
@@ -19,41 +24,9 @@ class InputAssociate : public mojo::ui::ViewAssociate {
   InputAssociate();
   ~InputAssociate() override;
 
- private:
-  // InputConnection implementation.
-  // Binds incoming requests to the relevant view token.
-  class InputConnectionImpl : public mojo::ui::InputConnection {
-   public:
-    InputConnectionImpl(InputAssociate* associate,
-                        mojo::ui::ViewTokenPtr view_token);
-    ~InputConnectionImpl() override;
-
-   private:
-    void SetListener(
-        mojo::InterfaceHandle<mojo::ui::InputListener> listener) override;
-
-    InputAssociate* const associate_;
-    mojo::ui::ViewTokenPtr view_token_;
-
-    DISALLOW_COPY_AND_ASSIGN(InputConnectionImpl);
-  };
-
-  // InputDispatcher implementation.
-  // Binds incoming requests to the relevant view token.
-  class InputDispatcherImpl : public mojo::ui::InputDispatcher {
-   public:
-    InputDispatcherImpl(InputAssociate* associate,
-                        mojo::ui::ViewTreeTokenPtr view_tree_token);
-    ~InputDispatcherImpl() override;
-
-   private:
-    void DispatchEvent(mojo::EventPtr event) override;
-
-    InputAssociate* const associate_;
-    mojo::ui::ViewTreeTokenPtr view_tree_token_;
-
-    DISALLOW_COPY_AND_ASSIGN(InputDispatcherImpl);
-  };
+  const scoped_refptr<mojo::ui::ViewInspectorClient>& inspector() {
+    return inspector_;
+  }
 
   // |ViewAssociate|:
   void Connect(mojo::InterfaceHandle<mojo::ui::ViewInspector> inspector,
@@ -67,19 +40,27 @@ class InputAssociate : public mojo::ui::ViewAssociate {
       const mojo::String& service_name,
       mojo::ScopedMessagePipeHandle client_handle) override;
 
-  // Incoming service calls.
-  void SetListener(mojo::ui::ViewToken* view_token,
-                   mojo::InterfaceHandle<mojo::ui::InputListener> listener);
-  void DispatchEvent(mojo::ui::ViewTreeToken* view_tree_token,
-                     mojo::EventPtr event);
+  // Delivers an event to a view.
+  void DeliverEvent(const mojo::ui::ViewToken* view_token,
+                    mojo::EventPtr event);
 
   // Callbacks.
-  void OnEventFinished(bool handled);
+  void OnInputConnectionDied(InputConnectionImpl* connection);
+  void OnInputDispatcherDied(InputDispatcherImpl* dispatcher);
 
-  mojo::StrongBindingSet<mojo::ui::InputConnection> input_connections_;
-  mojo::StrongBindingSet<mojo::ui::InputDispatcher> input_dispatchers_;
+ private:
+  void CreateInputConnection(
+      mojo::ui::ViewTokenPtr view_token,
+      mojo::InterfaceRequest<mojo::ui::InputConnection> request);
+  void CreateInputDispatcher(
+      mojo::ui::ViewTreeTokenPtr view_tree_token,
+      mojo::InterfaceRequest<mojo::ui::InputDispatcher> request);
 
-  mojo::ui::InputListenerPtr listener_;
+  scoped_refptr<mojo::ui::ViewInspectorClient> inspector_;
+  std::unordered_map<uint32_t, std::unique_ptr<InputConnectionImpl>>
+      input_connections_by_view_token_;
+  std::unordered_map<uint32_t, std::unique_ptr<InputDispatcherImpl>>
+      input_dispatchers_by_view_tree_token_;
 
   DISALLOW_COPY_AND_ASSIGN(InputAssociate);
 };

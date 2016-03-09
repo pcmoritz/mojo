@@ -186,6 +186,8 @@ class PDFDocumentView : public mojo::ui::GaneshView,
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
     auto root_node = mojo::gfx::composition::Node::New();
+    root_node->hit_test_behavior =
+        mojo::gfx::composition::HitTestBehavior::New();
     root_node->op = mojo::gfx::composition::NodeOp::New();
     root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
     root_node->op->get_image()->content_rect = bounds.Clone();
