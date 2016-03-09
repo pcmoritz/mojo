@@ -16,17 +16,7 @@ MojoHandle g_mojo_handle = MOJO_HANDLE_INVALID;
 bool g_running_translator = false;
 
 const struct nacl_irt_mojo kIrtMojo = {
-    MojoCreateSharedBuffer,
-    MojoDuplicateBufferHandle,
-    MojoMapBuffer,
-    MojoUnmapBuffer,
-    MojoCreateDataPipe,
-    MojoWriteData,
-    MojoBeginWriteData,
-    MojoEndWriteData,
-    MojoReadData,
-    MojoBeginReadData,
-    MojoEndReadData,
+    nacl::MojoGetInitialHandle,
     MojoGetTimeTicksNow,
     MojoClose,
     MojoWait,
@@ -34,7 +24,18 @@ const struct nacl_irt_mojo kIrtMojo = {
     MojoCreateMessagePipe,
     MojoWriteMessage,
     MojoReadMessage,
-    nacl::MojoGetInitialHandle,
+    MojoCreateDataPipe,
+    MojoWriteData,
+    MojoBeginWriteData,
+    MojoEndWriteData,
+    MojoReadData,
+    MojoBeginReadData,
+    MojoEndReadData,
+    MojoCreateSharedBuffer,
+    MojoDuplicateBufferHandle,
+    MojoGetBufferInformation,
+    MojoMapBuffer,
+    MojoUnmapBuffer,
 };
 
 const struct nacl_irt_mgl kIrtMGL = {

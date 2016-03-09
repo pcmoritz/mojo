@@ -277,6 +277,7 @@ class PointerInOutImpl(ParamImpl):
     else:
       code << 'CopyOutPointer(nap, %s_value, %s_ptr);' % (name, name)
 
+
 class ArrayImpl(ParamImpl):
   def DeclareVars(self, code):
     code << '%s %s;' % (self.param.param_type, self.param.name)
@@ -312,6 +313,24 @@ class ExtensibleStructInputImpl(ParamImpl):
     return self.param.name
 
 
+# We can handle extensible out structs just like we handle output arrays, except
+# that the (input buffer) size is always in bytes.
+class ExtensibleStructOutputImpl(ParamImpl):
+  def DeclareVars(self, code):
+    code << '%s %s;' % (self.param.param_type, self.param.name)
+
+  def ConvertParam(self):
+    p = self.param
+    return ('ConvertArray(nap, params[%d], %s, %s, %s, &%s)' %
+            (p.uid + 1, p.size + '_value', '1', CBool(p.is_optional), p.name))
+
+  def CallParam(self):
+    return self.param.name
+
+  def IsArray(self):
+    return True
+
+
 def ImplForParam(p):
   if p.IsScalar():
     if p.is_output:
@@ -338,6 +357,8 @@ def ImplForParam(p):
   elif p.is_struct:
     if p.is_input and not p.is_output and p.is_extensible:
       return ExtensibleStructInputImpl(p)
+    if p.is_output and not p.is_input and p.is_extensible:
+      return ExtensibleStructOutputImpl(p)
     if not p.is_input and p.is_output and not p.is_extensible:
       return ScalarOutputImpl(p)
   assert False, p.name

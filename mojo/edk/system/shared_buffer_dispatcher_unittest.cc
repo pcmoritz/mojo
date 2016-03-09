@@ -184,16 +184,19 @@ TEST_F(SharedBufferDispatcherTest, CreateAndMapBuffer) {
 }
 
 TEST_F(SharedBufferDispatcherTest, DuplicateBufferHandle) {
+  const uint64_t kSize = 100u;
+
   MojoResult result = MOJO_RESULT_INTERNAL;
   auto dispatcher1 = SharedBufferDispatcher::Create(
-      platform_support(), SharedBufferDispatcher::kDefaultCreateOptions, 100,
+      platform_support(), SharedBufferDispatcher::kDefaultCreateOptions, kSize,
       &result);
   EXPECT_EQ(MOJO_RESULT_OK, result);
 
   // Map and write something.
   std::unique_ptr<PlatformSharedBufferMapping> mapping;
-  EXPECT_EQ(MOJO_RESULT_OK, dispatcher1->MapBuffer(
-                                0, 100, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
+  EXPECT_EQ(
+      MOJO_RESULT_OK,
+      dispatcher1->MapBuffer(0u, kSize, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
   static_cast<char*>(mapping->GetBase())[0] = 'x';
   mapping.reset();
 
@@ -206,9 +209,19 @@ TEST_F(SharedBufferDispatcherTest, DuplicateBufferHandle) {
 
   EXPECT_EQ(MOJO_RESULT_OK, dispatcher1->Close());
 
+  // Make sure that |dispatcher2| still reports the right information.
+  MojoBufferInformation info = {};
+  EXPECT_EQ(MOJO_RESULT_OK,
+            dispatcher2->GetBufferInformation(
+                MakeUserPointer(&info), static_cast<uint32_t>(sizeof(info))));
+  EXPECT_EQ(sizeof(MojoBufferInformation), info.struct_size);
+  EXPECT_EQ(MOJO_BUFFER_INFORMATION_FLAG_NONE, info.flags);
+  EXPECT_EQ(kSize, info.num_bytes);
+
   // Map |dispatcher2| and read something.
-  EXPECT_EQ(MOJO_RESULT_OK, dispatcher2->MapBuffer(
-                                0, 100, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
+  EXPECT_EQ(
+      MOJO_RESULT_OK,
+      dispatcher2->MapBuffer(0u, kSize, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
   EXPECT_EQ('x', static_cast<char*>(mapping->GetBase())[0]);
 
   EXPECT_EQ(MOJO_RESULT_OK, dispatcher2->Close());

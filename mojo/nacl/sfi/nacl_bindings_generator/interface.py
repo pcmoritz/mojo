@@ -9,33 +9,53 @@ import interface_dsl
 def MakeInterface():
   mojo = interface_dsl.Interface()
 
-  f = mojo.Func('MojoCreateSharedBuffer', 'MojoResult')
+  # This function is not provided by the Mojo system APIs, but instead allows
+  # trusted code to provide a handle for use by untrusted code. See the
+  # implementation in mojo_syscall.cc.tmpl.
+  f = mojo.Func('_MojoGetInitialHandle', 'MojoResult')
+  f.Param('handle').Out('MojoHandle')
+
+  f = mojo.Func('MojoGetTimeTicksNow', 'MojoTimeTicks')
+
+  f = mojo.Func('MojoClose', 'MojoResult')
+  f.Param('handle').In('MojoHandle')
+
+  f = mojo.Func('MojoWait', 'MojoResult')
+  f.Param('handle').In('MojoHandle')
+  f.Param('signals').In('MojoHandleSignals')
+  f.Param('deadline').In('MojoDeadline')
+  f.Param('signals_state').OutFixedStruct('MojoHandleSignalsState').Optional()
+
+  f = mojo.Func('MojoWaitMany', 'MojoResult')
+  f.Param('handles').InArray('MojoHandle', 'num_handles')
+  f.Param('signals').InArray('MojoHandleSignals', 'num_handles')
+  f.Param('num_handles').In('uint32_t')
+  f.Param('deadline').In('MojoDeadline')
+  f.Param('result_index').Out('uint32_t').Optional()
+  p = f.Param('signals_states')
+  p.OutFixedStructArray('MojoHandleSignalsState', 'num_handles').Optional()
+
+  f = mojo.Func('MojoCreateMessagePipe', 'MojoResult')
   p = f.Param('options')
-  p.InExtensibleStruct('MojoCreateSharedBufferOptions').Optional()
-  f.Param('num_bytes').In('uint64_t')
-  f.Param('shared_buffer_handle').Out('MojoHandle')
+  p.InExtensibleStruct('MojoCreateMessagePipeOptions').Optional()
+  f.Param('message_pipe_handle0').Out('MojoHandle')
+  f.Param('message_pipe_handle1').Out('MojoHandle')
 
-  f = mojo.Func('MojoDuplicateBufferHandle', 'MojoResult')
-  f.Param('buffer_handle').In('MojoHandle')
-  p = f.Param('options')
-  p.InExtensibleStruct('MojoDuplicateBufferHandleOptions').Optional()
-  f.Param('new_buffer_handle').Out('MojoHandle')
+  f = mojo.Func('MojoWriteMessage', 'MojoResult')
+  f.Param('message_pipe_handle').In('MojoHandle')
+  f.Param('bytes').InArray('void', 'num_bytes').Optional()
+  f.Param('num_bytes').In('uint32_t')
+  f.Param('handles').InArray('MojoHandle', 'num_handles').Optional()
+  f.Param('num_handles').In('uint32_t')
+  f.Param('flags').In('MojoWriteMessageFlags')
 
-  f = mojo.Func('MojoMapBuffer', 'MojoResult')
-  f.Param('buffer_handle').In('MojoHandle')
-  f.Param('offset').In('uint64_t')
-  f.Param('num_bytes').In('uint64_t')
-  f.Param('buffer').Out('void*')
-  f.Param('flags').In('MojoMapBufferFlags')
-  # TODO(ncbray): support mmaping.
-  # https://code.google.com/p/chromium/issues/detail?id=401761
-  f.IsBrokenInNaCl()
-
-  f = mojo.Func('MojoUnmapBuffer', 'MojoResult')
-  f.Param('buffer').In('void*')
-  # TODO(ncbray): support mmaping.
-  # https://code.google.com/p/chromium/issues/detail?id=401761
-  f.IsBrokenInNaCl()
+  f = mojo.Func('MojoReadMessage', 'MojoResult')
+  f.Param('message_pipe_handle').In('MojoHandle')
+  f.Param('bytes').OutArray('void', 'num_bytes').Optional()
+  f.Param('num_bytes').InOut('uint32_t').Optional()
+  f.Param('handles').OutArray('MojoHandle', 'num_handles').Optional()
+  f.Param('num_handles').InOut('uint32_t').Optional()
+  f.Param('flags').In('MojoReadMessageFlags')
 
   f = mojo.Func('MojoCreateDataPipe', 'MojoResult')
   p = f.Param('options')
@@ -81,53 +101,39 @@ def MakeInterface():
   f.Param('data_pipe_consumer_handle').In('MojoHandle')
   f.Param('num_bytes_read').In('uint32_t')
 
-  f = mojo.Func('MojoGetTimeTicksNow', 'MojoTimeTicks')
-
-  f = mojo.Func('MojoClose', 'MojoResult')
-  f.Param('handle').In('MojoHandle')
-
-  f = mojo.Func('MojoWait', 'MojoResult')
-  f.Param('handle').In('MojoHandle')
-  f.Param('signals').In('MojoHandleSignals')
-  f.Param('deadline').In('MojoDeadline')
-  f.Param('signals_state').OutFixedStruct('MojoHandleSignalsState').Optional()
-
-  f = mojo.Func('MojoWaitMany', 'MojoResult')
-  f.Param('handles').InArray('MojoHandle', 'num_handles')
-  f.Param('signals').InArray('MojoHandleSignals', 'num_handles')
-  f.Param('num_handles').In('uint32_t')
-  f.Param('deadline').In('MojoDeadline')
-  f.Param('result_index').Out('uint32_t').Optional()
-  p = f.Param('signals_states')
-  p.OutFixedStructArray('MojoHandleSignalsState', 'num_handles').Optional()
-
-  f = mojo.Func('MojoCreateMessagePipe', 'MojoResult')
+  f = mojo.Func('MojoCreateSharedBuffer', 'MojoResult')
   p = f.Param('options')
-  p.InExtensibleStruct('MojoCreateMessagePipeOptions').Optional()
-  f.Param('message_pipe_handle0').Out('MojoHandle')
-  f.Param('message_pipe_handle1').Out('MojoHandle')
+  p.InExtensibleStruct('MojoCreateSharedBufferOptions').Optional()
+  f.Param('num_bytes').In('uint64_t')
+  f.Param('shared_buffer_handle').Out('MojoHandle')
 
-  f = mojo.Func('MojoWriteMessage', 'MojoResult')
-  f.Param('message_pipe_handle').In('MojoHandle')
-  f.Param('bytes').InArray('void', 'num_bytes').Optional()
-  f.Param('num_bytes').In('uint32_t')
-  f.Param('handles').InArray('MojoHandle', 'num_handles').Optional()
-  f.Param('num_handles').In('uint32_t')
-  f.Param('flags').In('MojoWriteMessageFlags')
+  f = mojo.Func('MojoDuplicateBufferHandle', 'MojoResult')
+  f.Param('buffer_handle').In('MojoHandle')
+  p = f.Param('options')
+  p.InExtensibleStruct('MojoDuplicateBufferHandleOptions').Optional()
+  f.Param('new_buffer_handle').Out('MojoHandle')
 
-  f = mojo.Func('MojoReadMessage', 'MojoResult')
-  f.Param('message_pipe_handle').In('MojoHandle')
-  f.Param('bytes').OutArray('void', 'num_bytes').Optional()
-  f.Param('num_bytes').InOut('uint32_t').Optional()
-  f.Param('handles').OutArray('MojoHandle', 'num_handles').Optional()
-  f.Param('num_handles').InOut('uint32_t').Optional()
-  f.Param('flags').In('MojoReadMessageFlags')
+  f = mojo.Func('MojoGetBufferInformation', 'MojoResult')
+  f.Param('buffer_handle').In('MojoHandle')
+  p = f.Param('info')
+  p.OutExtensibleStruct('MojoBufferInformation', 'info_num_bytes')
+  f.Param('info_num_bytes').In('uint32_t')
 
-  # This function is not provided by the Mojo system APIs, but instead allows
-  # trusted code to provide a handle for use by untrusted code. See the
-  # implementation in mojo_syscall.cc.tmpl.
-  f = mojo.Func('_MojoGetInitialHandle', 'MojoResult')
-  f.Param('handle').Out('MojoHandle')
+  f = mojo.Func('MojoMapBuffer', 'MojoResult')
+  f.Param('buffer_handle').In('MojoHandle')
+  f.Param('offset').In('uint64_t')
+  f.Param('num_bytes').In('uint64_t')
+  f.Param('buffer').Out('void*')
+  f.Param('flags').In('MojoMapBufferFlags')
+  # TODO(ncbray): support mmaping.
+  # https://code.google.com/p/chromium/issues/detail?id=401761
+  f.IsBrokenInNaCl()
+
+  f = mojo.Func('MojoUnmapBuffer', 'MojoResult')
+  f.Param('buffer').In('void*')
+  # TODO(ncbray): support mmaping.
+  # https://code.google.com/p/chromium/issues/detail?id=401761
+  f.IsBrokenInNaCl()
 
   mojo.Finalize()
 

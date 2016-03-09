@@ -48,295 +48,35 @@ ssize_t MojoDescSendMsg(void* handle,
   uint32_t msg_type = params[0];
   switch (msg_type) {
     case 0: {
-      if (num_params != 5) {
+      if (num_params != 3) {
         return -1;
       }
-      const struct MojoCreateSharedBufferOptions* options;
-      uint64_t num_bytes_value;
-      MojoHandle volatile* shared_buffer_handle_ptr;
-      MojoHandle shared_buffer_handle_value;
+      MojoHandle volatile* handle_ptr;
+      MojoHandle handle_value;
       MojoResult volatile* result_ptr;
       MojoResult result_value;
       {
         ScopedCopyLock copy_lock(nap);
-        if (!ConvertExtensibleStructInput(nap, params[1], true, &options)) {
+        if (!ConvertScalarInOut(nap, params[1], false, &handle_value,
+                                &handle_ptr)) {
           return -1;
         }
-        if (!ConvertScalarInput(nap, params[2], &num_bytes_value)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[3], false,
-                                &shared_buffer_handle_value,
-                                &shared_buffer_handle_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
+        if (!ConvertScalarOutput(nap, params[2], false, &result_ptr)) {
           return -1;
         }
       }
 
-      result_value = MojoSystemImplCreateSharedBuffer(
-          g_mojo_system, options, num_bytes_value, &shared_buffer_handle_value);
+      result_value = _MojoGetInitialHandle(&handle_value);
 
       {
         ScopedCopyLock copy_lock(nap);
-        *shared_buffer_handle_ptr = shared_buffer_handle_value;
+        *handle_ptr = handle_value;
         *result_ptr = result_value;
       }
 
       return 0;
     }
     case 1: {
-      if (num_params != 5) {
-        return -1;
-      }
-      MojoHandle buffer_handle_value;
-      const struct MojoDuplicateBufferHandleOptions* options;
-      MojoHandle volatile* new_buffer_handle_ptr;
-      MojoHandle new_buffer_handle_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInput(nap, params[1], &buffer_handle_value)) {
-          return -1;
-        }
-        if (!ConvertExtensibleStructInput(nap, params[2], true, &options)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[3], false, &new_buffer_handle_value,
-                                &new_buffer_handle_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
-          return -1;
-        }
-      }
-
-      result_value = MojoSystemImplDuplicateBufferHandle(
-          g_mojo_system, buffer_handle_value, options,
-          &new_buffer_handle_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *new_buffer_handle_ptr = new_buffer_handle_value;
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 2:
-      fprintf(stderr, "MojoMapBuffer not implemented\n");
-      return -1;
-    case 3:
-      fprintf(stderr, "MojoUnmapBuffer not implemented\n");
-      return -1;
-    case 4: {
-      if (num_params != 5) {
-        return -1;
-      }
-      const struct MojoCreateDataPipeOptions* options;
-      MojoHandle volatile* data_pipe_producer_handle_ptr;
-      MojoHandle data_pipe_producer_handle_value;
-      MojoHandle volatile* data_pipe_consumer_handle_ptr;
-      MojoHandle data_pipe_consumer_handle_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertExtensibleStructInput(nap, params[1], true, &options)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[2], false,
-                                &data_pipe_producer_handle_value,
-                                &data_pipe_producer_handle_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[3], false,
-                                &data_pipe_consumer_handle_value,
-                                &data_pipe_consumer_handle_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
-          return -1;
-        }
-      }
-
-      result_value = MojoSystemImplCreateDataPipe(
-          g_mojo_system, options, &data_pipe_producer_handle_value,
-          &data_pipe_consumer_handle_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *data_pipe_producer_handle_ptr = data_pipe_producer_handle_value;
-        *data_pipe_consumer_handle_ptr = data_pipe_consumer_handle_value;
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 5: {
-      if (num_params != 6) {
-        return -1;
-      }
-      MojoHandle data_pipe_producer_handle_value;
-      const void* elements;
-      uint32_t volatile* num_bytes_ptr;
-      uint32_t num_bytes_value;
-      MojoWriteDataFlags flags_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInput(nap, params[1],
-                                &data_pipe_producer_handle_value)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[3], false, &num_bytes_value,
-                                &num_bytes_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarInput(nap, params[4], &flags_value)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[5], false, &result_ptr)) {
-          return -1;
-        }
-        if (!ConvertArray(nap, params[2], num_bytes_value, 1, false,
-                          &elements)) {
-          return -1;
-        }
-      }
-
-      result_value = MojoSystemImplWriteData(
-          g_mojo_system, data_pipe_producer_handle_value, elements,
-          &num_bytes_value, flags_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *num_bytes_ptr = num_bytes_value;
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 6:
-      fprintf(stderr, "MojoBeginWriteData not implemented\n");
-      return -1;
-    case 7: {
-      if (num_params != 4) {
-        return -1;
-      }
-      MojoHandle data_pipe_producer_handle_value;
-      uint32_t num_bytes_written_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInput(nap, params[1],
-                                &data_pipe_producer_handle_value)) {
-          return -1;
-        }
-        if (!ConvertScalarInput(nap, params[2], &num_bytes_written_value)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[3], false, &result_ptr)) {
-          return -1;
-        }
-      }
-
-      result_value = MojoSystemImplEndWriteData(g_mojo_system,
-                                                data_pipe_producer_handle_value,
-                                                num_bytes_written_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 8: {
-      if (num_params != 6) {
-        return -1;
-      }
-      MojoHandle data_pipe_consumer_handle_value;
-      void* elements;
-      uint32_t volatile* num_bytes_ptr;
-      uint32_t num_bytes_value;
-      MojoReadDataFlags flags_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInput(nap, params[1],
-                                &data_pipe_consumer_handle_value)) {
-          return -1;
-        }
-        if (!ConvertScalarInOut(nap, params[3], false, &num_bytes_value,
-                                &num_bytes_ptr)) {
-          return -1;
-        }
-        if (!ConvertScalarInput(nap, params[4], &flags_value)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[5], false, &result_ptr)) {
-          return -1;
-        }
-        if (!ConvertArray(nap, params[2], num_bytes_value, 1, false,
-                          &elements)) {
-          return -1;
-        }
-      }
-
-      result_value =
-          MojoSystemImplReadData(g_mojo_system, data_pipe_consumer_handle_value,
-                                 elements, &num_bytes_value, flags_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *num_bytes_ptr = num_bytes_value;
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 9:
-      fprintf(stderr, "MojoBeginReadData not implemented\n");
-      return -1;
-    case 10: {
-      if (num_params != 4) {
-        return -1;
-      }
-      MojoHandle data_pipe_consumer_handle_value;
-      uint32_t num_bytes_read_value;
-      MojoResult volatile* result_ptr;
-      MojoResult result_value;
-      {
-        ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInput(nap, params[1],
-                                &data_pipe_consumer_handle_value)) {
-          return -1;
-        }
-        if (!ConvertScalarInput(nap, params[2], &num_bytes_read_value)) {
-          return -1;
-        }
-        if (!ConvertScalarOutput(nap, params[3], false, &result_ptr)) {
-          return -1;
-        }
-      }
-
-      result_value = MojoSystemImplEndReadData(
-          g_mojo_system, data_pipe_consumer_handle_value, num_bytes_read_value);
-
-      {
-        ScopedCopyLock copy_lock(nap);
-        *result_ptr = result_value;
-      }
-
-      return 0;
-    }
-    case 11: {
       if (num_params != 2) {
         return -1;
       }
@@ -358,7 +98,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 12: {
+    case 2: {
       if (num_params != 3) {
         return -1;
       }
@@ -384,7 +124,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 13: {
+    case 3: {
       if (num_params != 6) {
         return -1;
       }
@@ -429,7 +169,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 14: {
+    case 4: {
       if (num_params != 8) {
         return -1;
       }
@@ -485,7 +225,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 15: {
+    case 5: {
       if (num_params != 5) {
         return -1;
       }
@@ -529,7 +269,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 16: {
+    case 6: {
       if (num_params != 8) {
         return -1;
       }
@@ -578,7 +318,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 17: {
+    case 7: {
       if (num_params != 8) {
         return -1;
       }
@@ -638,35 +378,331 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 18: {
-      if (num_params != 3) {
+    case 8: {
+      if (num_params != 5) {
         return -1;
       }
-      MojoHandle volatile* handle_ptr;
-      MojoHandle handle_value;
+      const struct MojoCreateDataPipeOptions* options;
+      MojoHandle volatile* data_pipe_producer_handle_ptr;
+      MojoHandle data_pipe_producer_handle_value;
+      MojoHandle volatile* data_pipe_consumer_handle_ptr;
+      MojoHandle data_pipe_consumer_handle_value;
       MojoResult volatile* result_ptr;
       MojoResult result_value;
       {
         ScopedCopyLock copy_lock(nap);
-        if (!ConvertScalarInOut(nap, params[1], false, &handle_value,
-                                &handle_ptr)) {
+        if (!ConvertExtensibleStructInput(nap, params[1], true, &options)) {
           return -1;
         }
-        if (!ConvertScalarOutput(nap, params[2], false, &result_ptr)) {
+        if (!ConvertScalarInOut(nap, params[2], false,
+                                &data_pipe_producer_handle_value,
+                                &data_pipe_producer_handle_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarInOut(nap, params[3], false,
+                                &data_pipe_consumer_handle_value,
+                                &data_pipe_consumer_handle_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
           return -1;
         }
       }
 
-      result_value = _MojoGetInitialHandle(&handle_value);
+      result_value = MojoSystemImplCreateDataPipe(
+          g_mojo_system, options, &data_pipe_producer_handle_value,
+          &data_pipe_consumer_handle_value);
 
       {
         ScopedCopyLock copy_lock(nap);
-        *handle_ptr = handle_value;
+        *data_pipe_producer_handle_ptr = data_pipe_producer_handle_value;
+        *data_pipe_consumer_handle_ptr = data_pipe_consumer_handle_value;
         *result_ptr = result_value;
       }
 
       return 0;
     }
+    case 9: {
+      if (num_params != 6) {
+        return -1;
+      }
+      MojoHandle data_pipe_producer_handle_value;
+      const void* elements;
+      uint32_t volatile* num_bytes_ptr;
+      uint32_t num_bytes_value;
+      MojoWriteDataFlags flags_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_producer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInOut(nap, params[3], false, &num_bytes_value,
+                                &num_bytes_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[4], &flags_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[5], false, &result_ptr)) {
+          return -1;
+        }
+        if (!ConvertArray(nap, params[2], num_bytes_value, 1, false,
+                          &elements)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplWriteData(
+          g_mojo_system, data_pipe_producer_handle_value, elements,
+          &num_bytes_value, flags_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *num_bytes_ptr = num_bytes_value;
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 10:
+      fprintf(stderr, "MojoBeginWriteData not implemented\n");
+      return -1;
+    case 11: {
+      if (num_params != 4) {
+        return -1;
+      }
+      MojoHandle data_pipe_producer_handle_value;
+      uint32_t num_bytes_written_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_producer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[2], &num_bytes_written_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[3], false, &result_ptr)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplEndWriteData(g_mojo_system,
+                                                data_pipe_producer_handle_value,
+                                                num_bytes_written_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 12: {
+      if (num_params != 6) {
+        return -1;
+      }
+      MojoHandle data_pipe_consumer_handle_value;
+      void* elements;
+      uint32_t volatile* num_bytes_ptr;
+      uint32_t num_bytes_value;
+      MojoReadDataFlags flags_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_consumer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInOut(nap, params[3], false, &num_bytes_value,
+                                &num_bytes_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[4], &flags_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[5], false, &result_ptr)) {
+          return -1;
+        }
+        if (!ConvertArray(nap, params[2], num_bytes_value, 1, false,
+                          &elements)) {
+          return -1;
+        }
+      }
+
+      result_value =
+          MojoSystemImplReadData(g_mojo_system, data_pipe_consumer_handle_value,
+                                 elements, &num_bytes_value, flags_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *num_bytes_ptr = num_bytes_value;
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 13:
+      fprintf(stderr, "MojoBeginReadData not implemented\n");
+      return -1;
+    case 14: {
+      if (num_params != 4) {
+        return -1;
+      }
+      MojoHandle data_pipe_consumer_handle_value;
+      uint32_t num_bytes_read_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_consumer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[2], &num_bytes_read_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[3], false, &result_ptr)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplEndReadData(
+          g_mojo_system, data_pipe_consumer_handle_value, num_bytes_read_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 15: {
+      if (num_params != 5) {
+        return -1;
+      }
+      const struct MojoCreateSharedBufferOptions* options;
+      uint64_t num_bytes_value;
+      MojoHandle volatile* shared_buffer_handle_ptr;
+      MojoHandle shared_buffer_handle_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertExtensibleStructInput(nap, params[1], true, &options)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[2], &num_bytes_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInOut(nap, params[3], false,
+                                &shared_buffer_handle_value,
+                                &shared_buffer_handle_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplCreateSharedBuffer(
+          g_mojo_system, options, num_bytes_value, &shared_buffer_handle_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *shared_buffer_handle_ptr = shared_buffer_handle_value;
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 16: {
+      if (num_params != 5) {
+        return -1;
+      }
+      MojoHandle buffer_handle_value;
+      const struct MojoDuplicateBufferHandleOptions* options;
+      MojoHandle volatile* new_buffer_handle_ptr;
+      MojoHandle new_buffer_handle_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1], &buffer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertExtensibleStructInput(nap, params[2], true, &options)) {
+          return -1;
+        }
+        if (!ConvertScalarInOut(nap, params[3], false, &new_buffer_handle_value,
+                                &new_buffer_handle_ptr)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplDuplicateBufferHandle(
+          g_mojo_system, buffer_handle_value, options,
+          &new_buffer_handle_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *new_buffer_handle_ptr = new_buffer_handle_value;
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 17: {
+      if (num_params != 5) {
+        return -1;
+      }
+      MojoHandle buffer_handle_value;
+      struct MojoBufferInformation* info;
+      uint32_t info_num_bytes_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1], &buffer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[3], &info_num_bytes_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
+          return -1;
+        }
+        if (!ConvertArray(nap, params[2], info_num_bytes_value, 1, false,
+                          &info)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplGetBufferInformation(
+          g_mojo_system, buffer_handle_value, info, info_num_bytes_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 18:
+      fprintf(stderr, "MojoMapBuffer not implemented\n");
+      return -1;
+    case 19:
+      fprintf(stderr, "MojoUnmapBuffer not implemented\n");
+      return -1;
   }
 
   return -1;

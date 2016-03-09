@@ -119,6 +119,18 @@ class Param(object):
     self.is_output = True
     return self
 
+  # Out extensible structs have an input size indicating the buffer size. On
+  # success, the size actually written is indicated in the struct.
+  def OutExtensibleStruct(self, ty, size):
+    self.base_type = ty
+    self.param_type = 'struct ' + ty + '*'
+    self.size = size
+    self.is_array = False
+    self.is_output = True
+    self.is_struct = True
+    self.is_extensible = True
+    return self
+
   # The size of the struct is fixed by the API, it cannot be extended.
   def OutFixedStruct(self, ty):
     self.base_type = ty
