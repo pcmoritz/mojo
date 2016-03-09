@@ -88,13 +88,13 @@ source_set("ganesh") {
   ]
 }
 
-mojo_native_application("unittests") {
-  output_name = "ui_unittests"
+mojo_native_application("apptests") {
+  output_name = "ui_apptests"
 
   testonly = true
 
   sources = [
-    "gl_renderer_unittest.cc",
+    "gl_renderer_apptest.cc",
   ]
 
   deps = [
