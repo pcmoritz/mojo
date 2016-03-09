@@ -74,6 +74,7 @@ group("tests") {
     "//mojo/services/log/cpp:log_client_apptests",
     "//mojo/tools:message_generator",
     "//mojo/ui:apptests",
+    "//mojo/ui/associates:apptests",
   ]
 
   if (mojo_use_prebuilt_network_service) {
