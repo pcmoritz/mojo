@@ -37,7 +37,30 @@ ViewTreeState::ViewTreeState(
                  base::Unretained(this), "ViewTreeListener connection closed"));
 }
 
-ViewTreeState::~ViewTreeState() {}
+ViewTreeState::~ViewTreeState() {
+  ClearHitTesterCallbacks(false /*renderer_changed*/);
+}
+
+void ViewTreeState::SetRenderer(mojo::gfx::composition::RendererPtr renderer) {
+  renderer_ = renderer.Pass();
+  ClearHitTesterCallbacks(true /*renderer_changed*/);
+}
+
+void ViewTreeState::RequestHitTester(
+    mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
+        hit_tester_request,
+    const mojo::ui::ViewInspector::GetHitTesterCallback& callback) {
+  DCHECK(hit_tester_request.is_pending());
+  if (renderer_)
+    renderer_->GetHitTester(hit_tester_request.Pass());
+  pending_hit_tester_callbacks_.push_back(callback);
+}
+
+void ViewTreeState::ClearHitTesterCallbacks(bool renderer_changed) {
+  for (const auto& callback : pending_hit_tester_callbacks_)
+    callback.Run(renderer_changed);
+  pending_hit_tester_callbacks_.clear();
+}
 
 void ViewTreeState::LinkRoot(uint32_t key, std::unique_ptr<ViewStub> root) {
   DCHECK(!root_);

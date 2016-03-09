@@ -52,9 +52,7 @@ class ViewTreeState {
 
   // The view tree's renderer.
   mojo::gfx::composition::Renderer* renderer() const { return renderer_.get(); }
-  void set_renderer(mojo::gfx::composition::RendererPtr renderer) {
-    renderer_ = renderer.Pass();
-  }
+  void SetRenderer(mojo::gfx::composition::RendererPtr renderer);
 
   // Gets the root of the view tree, or null if there is no root.
   ViewStub* root() const { return root_.get(); }
@@ -75,10 +73,20 @@ class ViewTreeState {
   bool layout_request_issued() const { return layout_request_issued_; }
   void set_layout_request_issued(bool value) { layout_request_issued_ = value; }
 
+  // Starts tracking a hit tester request.
+  // The request will be satisfied by the current renderer if possible.
+  // The callback will be invoked when the renderer changes.
+  void RequestHitTester(
+      mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
+          hit_tester_request,
+      const mojo::ui::ViewInspector::GetHitTesterCallback& callback);
+
   const std::string& label() const { return label_; }
   const std::string& FormattedLabel() const;
 
  private:
+  void ClearHitTesterCallbacks(bool renderer_changed);
+
   mojo::ui::ViewTreeTokenPtr view_tree_token_;
   mojo::ui::ViewTreeListenerPtr view_tree_listener_;
 
@@ -93,6 +101,9 @@ class ViewTreeState {
   std::unique_ptr<ViewStub> root_;
   bool layout_request_pending_ = false;
   bool layout_request_issued_ = false;
+
+  std::vector<mojo::ui::ViewInspector::GetHitTesterCallback>
+      pending_hit_tester_callbacks_;
 
   base::WeakPtrFactory<ViewTreeState> weak_factory_;  // must be last
 

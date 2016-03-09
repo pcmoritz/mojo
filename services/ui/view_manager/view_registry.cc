@@ -67,7 +67,7 @@ void ViewRegistry::CreateView(
   view_state->BindOwner(view_owner_request.Pass());
 
   // Add to registry and return token.
-  views_by_token_.insert({view_state->view_token()->value, view_state});
+  views_by_token_.emplace(view_state->view_token()->value, view_state);
   DVLOG(1) << "CreateView: view=" << view_state;
 }
 
@@ -93,6 +93,8 @@ void ViewRegistry::UnregisterView(ViewState* view_state) {
     UnregisterViewStub(std::move(child));
 
   // Remove from registry.
+  if (view_state->scene_token())
+    views_by_scene_token_.erase(view_state->scene_token()->value);
   views_by_token_.erase(view_state->view_token()->value);
   delete view_state;
 }
@@ -117,8 +119,8 @@ void ViewRegistry::CreateViewTree(
                         view_tree_listener.Pass(), sanitized_label);
 
   // Add to registry.
-  view_trees_by_token_.insert(
-      {tree_state->view_tree_token()->value, tree_state});
+  view_trees_by_token_.emplace(tree_state->view_tree_token()->value,
+                               tree_state);
   DVLOG(1) << "CreateViewTree: tree=" << tree_state;
 }
 
@@ -163,6 +165,10 @@ void ViewRegistry::OnSceneCreated(
   ViewState* view_state = view_state_weak.get();
   if (view_state) {
     DVLOG(1) << "OnSceneCreated: scene_token=" << scene_token;
+
+    if (view_state->scene_token())
+      views_by_scene_token_.erase(view_state->scene_token()->value);
+    views_by_scene_token_.emplace(scene_token->value, view_state);
 
     view_state->set_scene_token(scene_token.Pass());
     view_state->set_scene_changed_since_last_report(true);
@@ -289,7 +295,7 @@ void ViewRegistry::SetRenderer(ViewTreeState* tree_state,
                    base::Unretained(tree_state)));
   }
 
-  tree_state->set_renderer(renderer.Pass());
+  tree_state->SetRenderer(renderer.Pass());
   UpdateViewTreeRootScene(tree_state);
 }
 
@@ -395,6 +401,46 @@ void ViewRegistry::ConnectToViewTreeService(
   associate_table_.ConnectToViewTreeService(
       tree_state->view_tree_token()->Clone(), service_name,
       client_handle.Pass());
+}
+
+void ViewRegistry::GetHitTester(
+    mojo::ui::ViewTreeTokenPtr view_tree_token,
+    mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
+        hit_tester_request,
+    const GetHitTesterCallback& callback) {
+  DCHECK(view_tree_token);
+  DCHECK(hit_tester_request.is_pending());
+  DVLOG(1) << "GetHitTester: tree=" << view_tree_token;
+
+  ViewTreeState* view_tree = FindViewTree(view_tree_token->value);
+  if (!view_tree) {
+    callback.Run(false);
+    return;
+  }
+
+  view_tree->RequestHitTester(hit_tester_request.Pass(), callback);
+}
+
+void ViewRegistry::ResolveScenes(
+    mojo::Array<mojo::gfx::composition::SceneTokenPtr> scene_tokens,
+    const ResolveScenesCallback& callback) {
+  DCHECK(scene_tokens);
+
+  mojo::Array<mojo::ui::ViewTokenPtr> result;
+  result.resize(scene_tokens.size());
+
+  size_t index = 0;
+  for (const auto& scene_token : scene_tokens.storage()) {
+    DCHECK(scene_token);
+    auto it = views_by_scene_token_.find(scene_token->value);
+    if (it != views_by_scene_token_.end())
+      result[index] = it->second->view_token()->Clone();
+    index++;
+  }
+
+  DVLOG(1) << "ResolveScenes: scene_tokens=" << scene_tokens
+           << ", result=" << result;
+  callback.Run(result.Pass());
 }
 
 ViewState* ViewRegistry::FindView(uint32_t view_token_value) {
@@ -734,7 +780,7 @@ void ViewRegistry::OnRendererDied(ViewTreeState* tree_state) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
   DVLOG(1) << "UpdateViewTreeRootScene: tree_state=" << tree_state;
 
-  tree_state->set_renderer(nullptr);
+  tree_state->SetRenderer(nullptr);
   SendRendererDied(tree_state);
 }
 

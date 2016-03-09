@@ -136,6 +136,17 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   // Called when one of the view tree pipes is closed remotely.
   void OnViewTreeDied(ViewTreeState* tree_state, const std::string& reason);
 
+  // VIEW INSPECTOR REQUESTS
+
+  void GetHitTester(mojo::ui::ViewTreeTokenPtr view_tree_token,
+                    mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
+                        hit_tester_request,
+                    const GetHitTesterCallback& callback) override;
+
+  void ResolveScenes(
+      mojo::Array<mojo::gfx::composition::SceneTokenPtr> scene_tokens,
+      const ResolveScenesCallback& callback) override;
+
  private:
   // LIFETIME
 
@@ -203,6 +214,7 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   uint32_t next_view_token_value_ = 1u;
   uint32_t next_view_tree_token_value_ = 1u;
   std::unordered_map<uint32_t, ViewState*> views_by_token_;
+  std::unordered_map<uint32_t, ViewState*> views_by_scene_token_;
   std::unordered_map<uint32_t, ViewTreeState*> view_trees_by_token_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewRegistry);

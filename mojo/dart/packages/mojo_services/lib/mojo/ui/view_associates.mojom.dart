@@ -8,6 +8,7 @@ import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
+import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
 import 'package:mojo_services/mojo/ui/views.mojom.dart' as views_mojom;
 import 'package:mojo_services/mojo/ui/view_trees.mojom.dart' as view_trees_mojom;
 
@@ -472,6 +473,339 @@ class _ViewAssociateConnectToViewTreeServiceParams extends bindings.Struct {
   }
 }
 
+
+class _ViewInspectorGetHitTesterParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  view_trees_mojom.ViewTreeToken viewTreeToken = null;
+  Object hitTester = null;
+
+  _ViewInspectorGetHitTesterParams() : super(kVersions.last.size);
+
+  static _ViewInspectorGetHitTesterParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewInspectorGetHitTesterParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewInspectorGetHitTesterParams result = new _ViewInspectorGetHitTesterParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      result.viewTreeToken = view_trees_mojom.ViewTreeToken.decode(decoder1);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.hitTester = decoder0.decodeInterfaceRequest(16, false, hit_tests_mojom.HitTesterStub.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(viewTreeToken, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "viewTreeToken of struct _ViewInspectorGetHitTesterParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterfaceRequest(hitTester, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "hitTester of struct _ViewInspectorGetHitTesterParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewInspectorGetHitTesterParams("
+           "viewTreeToken: $viewTreeToken" ", "
+           "hitTester: $hitTester" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
+class ViewInspectorGetHitTesterResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  bool rendererChanged = false;
+
+  ViewInspectorGetHitTesterResponseParams() : super(kVersions.last.size);
+
+  static ViewInspectorGetHitTesterResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewInspectorGetHitTesterResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewInspectorGetHitTesterResponseParams result = new ViewInspectorGetHitTesterResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.rendererChanged = decoder0.decodeBool(8, 0);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeBool(rendererChanged, 8, 0);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "rendererChanged of struct ViewInspectorGetHitTesterResponseParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "ViewInspectorGetHitTesterResponseParams("
+           "rendererChanged: $rendererChanged" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["rendererChanged"] = rendererChanged;
+    return map;
+  }
+}
+
+
+class _ViewInspectorResolveScenesParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  List<scene_token_mojom.SceneToken> sceneTokens = null;
+
+  _ViewInspectorResolveScenesParams() : super(kVersions.last.size);
+
+  static _ViewInspectorResolveScenesParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewInspectorResolveScenesParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewInspectorResolveScenesParams result = new _ViewInspectorResolveScenesParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      {
+        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        result.sceneTokens = new List<scene_token_mojom.SceneToken>(si1.numElements);
+        for (int i1 = 0; i1 < si1.numElements; ++i1) {
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
+          result.sceneTokens[i1] = scene_token_mojom.SceneToken.decode(decoder2);
+        }
+      }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      if (sceneTokens == null) {
+        encoder0.encodeNullPointer(8, false);
+      } else {
+        var encoder1 = encoder0.encodePointerArray(sceneTokens.length, 8, bindings.kUnspecifiedArrayLength);
+        for (int i0 = 0; i0 < sceneTokens.length; ++i0) {
+          encoder1.encodeStruct(sceneTokens[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
+        }
+      }
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "sceneTokens of struct _ViewInspectorResolveScenesParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewInspectorResolveScenesParams("
+           "sceneTokens: $sceneTokens" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["sceneTokens"] = sceneTokens;
+    return map;
+  }
+}
+
+
+class ViewInspectorResolveScenesResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  List<views_mojom.ViewToken> viewTokens = null;
+
+  ViewInspectorResolveScenesResponseParams() : super(kVersions.last.size);
+
+  static ViewInspectorResolveScenesResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewInspectorResolveScenesResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewInspectorResolveScenesResponseParams result = new ViewInspectorResolveScenesResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      {
+        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        result.viewTokens = new List<views_mojom.ViewToken>(si1.numElements);
+        for (int i1 = 0; i1 < si1.numElements; ++i1) {
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, true);
+          result.viewTokens[i1] = views_mojom.ViewToken.decode(decoder2);
+        }
+      }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      if (viewTokens == null) {
+        encoder0.encodeNullPointer(8, false);
+      } else {
+        var encoder1 = encoder0.encodePointerArray(viewTokens.length, 8, bindings.kUnspecifiedArrayLength);
+        for (int i0 = 0; i0 < viewTokens.length; ++i0) {
+          encoder1.encodeStruct(viewTokens[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, true);
+        }
+      }
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "viewTokens of struct ViewInspectorResolveScenesResponseParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "ViewInspectorResolveScenesResponseParams("
+           "viewTokens: $viewTokens" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["viewTokens"] = viewTokens;
+    return map;
+  }
+}
+
 const int _ViewAssociate_connectName = 0;
 const int _ViewAssociate_connectToViewServiceName = 1;
 const int _ViewAssociate_connectToViewTreeServiceName = 2;
@@ -740,6 +1074,8 @@ class ViewAssociateStub extends bindings.Stub {
   }
 }
 
+const int _ViewInspector_getHitTesterName = 0;
+const int _ViewInspector_resolveScenesName = 1;
 
 class _ViewInspectorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -754,6 +1090,8 @@ class _ViewInspectorServiceDescription implements service_describer.ServiceDescr
 
 abstract class ViewInspector {
   static const String serviceName = null;
+  dynamic getHitTester(view_trees_mojom.ViewTreeToken viewTreeToken,Object hitTester,[Function responseFactory = null]);
+  dynamic resolveScenes(List<scene_token_mojom.SceneToken> sceneTokens,[Function responseFactory = null]);
 }
 
 
@@ -777,6 +1115,46 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
+      case _ViewInspector_getHitTesterName:
+        var r = ViewInspectorGetHitTesterResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      case _ViewInspector_resolveScenesName:
+        var r = ViewInspectorResolveScenesResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
       default:
         proxyError("Unexpected message type: ${message.header.type}");
         close(immediate: true);
@@ -792,7 +1170,28 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
 
 
 class _ViewInspectorProxyCalls implements ViewInspector {
-  _ViewInspectorProxyCalls(_ViewInspectorProxyImpl _);
+  _ViewInspectorProxyImpl _proxyImpl;
+
+  _ViewInspectorProxyCalls(this._proxyImpl);
+    dynamic getHitTester(view_trees_mojom.ViewTreeToken viewTreeToken,Object hitTester,[Function responseFactory = null]) {
+      var params = new _ViewInspectorGetHitTesterParams();
+      params.viewTreeToken = viewTreeToken;
+      params.hitTester = hitTester;
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _ViewInspector_getHitTesterName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    dynamic resolveScenes(List<scene_token_mojom.SceneToken> sceneTokens,[Function responseFactory = null]) {
+      var params = new _ViewInspectorResolveScenesParams();
+      params.sceneTokens = sceneTokens;
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _ViewInspector_resolveScenesName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
 }
 
 
@@ -874,6 +1273,16 @@ class ViewInspectorStub extends bindings.Stub {
   }
 
 
+  ViewInspectorGetHitTesterResponseParams _ViewInspectorGetHitTesterResponseParamsFactory(bool rendererChanged) {
+    var mojo_factory_result = new ViewInspectorGetHitTesterResponseParams();
+    mojo_factory_result.rendererChanged = rendererChanged;
+    return mojo_factory_result;
+  }
+  ViewInspectorResolveScenesResponseParams _ViewInspectorResolveScenesResponseParamsFactory(List<views_mojom.ViewToken> viewTokens) {
+    var mojo_factory_result = new ViewInspectorResolveScenesResponseParams();
+    mojo_factory_result.viewTokens = viewTokens;
+    return mojo_factory_result;
+  }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
     if (bindings.ControlMessageHandler.isControlMessage(message)) {
@@ -883,6 +1292,50 @@ class ViewInspectorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
+      case _ViewInspector_getHitTesterName:
+        var params = _ViewInspectorGetHitTesterParams.deserialize(
+            message.payload);
+        var response = _impl.getHitTester(params.viewTreeToken,params.hitTester,_ViewInspectorGetHitTesterResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _ViewInspector_getHitTesterName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _ViewInspector_getHitTesterName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _ViewInspector_resolveScenesName:
+        var params = _ViewInspectorResolveScenesParams.deserialize(
+            message.payload);
+        var response = _impl.resolveScenes(params.sceneTokens,_ViewInspectorResolveScenesResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _ViewInspector_resolveScenesName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _ViewInspector_resolveScenesName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
       default:
         throw new bindings.MojoCodecError("Unexpected message name");
         break;
