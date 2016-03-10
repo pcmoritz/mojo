@@ -197,17 +197,18 @@ instance, this command serves a dart Mojo app from the source at
 mojo/devtools/common/mojo_run https://core.mojoapps.io/examples/dart/device_info/lib/main.dart [--android]
 ```
 
-Some applications are meant to be run embedded in a **window manager**. To run
-these, you can pass the app url using the `--embed` flag. This will run the
-window manager and pass the given url to it:
+Some applications implement ViewProvider and are run embedded in a view. To run
+these, you can pass the app url using the `--embed` flag:
 
 ```sh
-mojo/devtools/common/mojo_run --embed https://core.mojoapps.io/ganesh_app.mojo [--android]
+mojo/devtools/common/mojo_run --embed mojo:moterm_example_app [--android]
 ```
 
-By default, `mojo_run` uses mojo:kiosk_wm as the window
-manager. You can pass a different window manager url using the
-`--window-manager` flag to override this.
+which is a shorthand for:
+
+```sh
+mojo/devtools/common/mojo_run "mojo:launcher mojo:moterm_example_app"
+```
 
 For additional information on `mojo_run` refer to the built-in help and the
 [documentation](mojo/devtools/common/docs/mojo_run.md).

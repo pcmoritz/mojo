@@ -16,16 +16,12 @@ binary:
 mojo_run --shell-path path/to/shell/binary APP_URL
 ```
 
-Some applications are meant to be run embedded in a **window manager**. To run
-these, you can pass the app url using the `--embed` flag. This will run the
-window manager and pass the given url to it:
+Some applications implement ViewProvider and are run embedded in a view. To run
+these, you can pass the app url using the `--embed` flag:
 
 ```sh
 mojo_run --embed APP_URL [--android]
 ```
-
-By default, `mojo_run` uses mojo:kiosk_wm as the window manager. You can pass a
-different window manager url using the `--window-manager` flag to override this.
 
 ## Running multiple instances simultaneously
 

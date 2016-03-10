@@ -30,9 +30,8 @@ text/html,mojo:html_viewer,application/javascript,mojo:js_content_handler
 # Port on which the mojo:debugger http server will be available on the host
 # machine.
 _MOJO_DEBUGGER_PORT = 7777
-_DEFAULT_WM = 'mojo:kiosk_wm'
+_LAUNCHER = 'mojo:launcher'
 
-_WM_URL = 'mojo:window_manager'
 _DEBUGGER_URL = 'https://core.mojoapps.io/debugger.mojo'
 
 
@@ -58,10 +57,6 @@ def main():
 
   parser.add_argument('--embed', type=str,
                       help='Url to be embedded in the window manager.')
-  parser.add_argument('--window-manager', default=_DEFAULT_WM,
-                      help='Window manager app to be mapped as '
-                      'mojo:window_manager. By default it is ' +
-                      _DEFAULT_WM)
   parser.add_argument('--debugger', action="store_true",
                       help='Run debugger.mojo along with the app.')
 
@@ -74,12 +69,8 @@ def main():
     print e
     return 1
 
-  shell_args = shell_arguments.append_to_argument(shell_args, '--url-mappings=',
-                                                  '%s=%s' % (_WM_URL,
-                                                  script_args.window_manager))
-
   if script_args.embed:
-    shell_args.append('%s %s' % (script_args.window_manager, script_args.embed))
+    shell_args.append('%s %s' % (_LAUNCHER, script_args.embed))
 
   if script_args.debugger:
     if script_args.verbose:
