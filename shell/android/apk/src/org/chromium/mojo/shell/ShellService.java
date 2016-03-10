@@ -58,8 +58,6 @@ public class ShellService extends Service {
     private static final String MOJO_SHELL_CHILD_EXECUTABLE = "mojo_shell_child";
     // Path to the default origin of mojo: apps.
     private static final String DEFAULT_ORIGIN = "https://core.mojoapps.io/";
-    // Name of the default window manager.
-    private static final String DEFAULT_WM = "mojo:kiosk_wm";
     // Binder to this service.
     private final ShellBinder mBinder = new ShellBinder();
     // A guard flag for calling nativeInit() only once.
