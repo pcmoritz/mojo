@@ -5,7 +5,11 @@
 package serialization
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"mojo/public/go/bindings"
 	"mojom/mojom_parser/generated/mojom_files"
 	"mojom/mojom_parser/generated/mojom_types"
@@ -2022,14 +2026,10 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		fileGraph.Decode(decoder)
 
 		// Deserialize  RuntimeTypeInfo A
-		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo, nil)
-		runtimeTypeInfoA := mojom_types.RuntimeTypeInfo{}
-		runtimeTypeInfoA.Decode(decoder)
+		runtimeTypeInfoA := deserializeRuntimeTypeInfo(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo)
 
 		// Deserialize  RuntimeTypeInfo B
-		decoder = bindings.NewDecoder(*fileGraph.Files[fileNameB].SerializedRuntimeTypeInfo, nil)
-		runtimeTypeInfoB := mojom_types.RuntimeTypeInfo{}
-		runtimeTypeInfoB.Decode(decoder)
+		runtimeTypeInfoB := deserializeRuntimeTypeInfo(*fileGraph.Files[fileNameB].SerializedRuntimeTypeInfo)
 
 		// Compare A
 		if err := compareTwoGoObjects(c.expectedRuntimeTypeInfoA, &runtimeTypeInfoA); err != nil {
@@ -2041,6 +2041,28 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			t.Errorf("case %d B:\n%s", i, err.Error())
 		}
 	}
+}
+
+func deserializeRuntimeTypeInfo(base64String string) mojom_types.RuntimeTypeInfo {
+	compressedBytes, err := base64.StdEncoding.DecodeString(base64String)
+	if err != nil {
+		panic(fmt.Sprintf("Error while unencoding runtimeTypeInfo: %s", err.Error()))
+	}
+	reader, err2 := gzip.NewReader(bytes.NewBuffer(compressedBytes))
+	if err2 != nil {
+		panic(fmt.Sprintf("Error while decompressing runtimeTypeInfo: %s", err.Error()))
+	}
+	uncompressedBytes, err3 := ioutil.ReadAll(reader)
+	if err3 != nil {
+		panic(fmt.Sprintf("Error while decompressing runtimeTypeInfo: %s", err2.Error()))
+	}
+	if err = reader.Close(); err != nil {
+		panic(fmt.Sprintf("Error while decompressing runtimeTypeInfo: %s", err.Error()))
+	}
+	decoder := bindings.NewDecoder(uncompressedBytes, nil)
+	runtimeTypeInfo := mojom_types.RuntimeTypeInfo{}
+	runtimeTypeInfo.Decode(decoder)
+	return runtimeTypeInfo
 }
 
 // compareTwoGoObjects compares |expected| and |actual| and returns a non-nil

@@ -24,7 +24,7 @@ type MojomFile struct {
 	Attributes                *[]mojom_types.Attribute
 	Imports                   *[]string
 	DeclaredMojomObjects      KeysByType
-	SerializedRuntimeTypeInfo *[]uint8
+	SerializedRuntimeTypeInfo *string
 }
 
 func (s *MojomFile) Encode(encoder *bindings.Encoder) error {
@@ -105,13 +105,7 @@ func (s *MojomFile) Encode(encoder *bindings.Encoder) error {
 		if err := encoder.WritePointer(); err != nil {
 			return err
 		}
-		encoder.StartArray(uint32(len((*s.SerializedRuntimeTypeInfo))), 8)
-		for _, elem0 := range *s.SerializedRuntimeTypeInfo {
-			if err := encoder.WriteUint8(elem0); err != nil {
-				return err
-			}
-		}
-		if err := encoder.Finish(); err != nil {
+		if err := encoder.WriteString((*s.SerializedRuntimeTypeInfo)); err != nil {
 			return err
 		}
 	}
@@ -278,22 +272,12 @@ func (s *MojomFile) Decode(decoder *bindings.Decoder) error {
 		if pointer0 == 0 {
 			s.SerializedRuntimeTypeInfo = nil
 		} else {
-			s.SerializedRuntimeTypeInfo = new([]uint8)
-			len0, err := decoder.StartArray(8)
+			s.SerializedRuntimeTypeInfo = new(string)
+			value0, err := decoder.ReadString()
 			if err != nil {
 				return err
 			}
-			(*s.SerializedRuntimeTypeInfo) = make([]uint8, len0)
-			for i0 := uint32(0); i0 < len0; i0++ {
-				value1, err := decoder.ReadUint8()
-				if err != nil {
-					return err
-				}
-				(*s.SerializedRuntimeTypeInfo)[i0] = value1
-			}
-			if err := decoder.Finish(); err != nil {
-				return err
-			}
+			(*s.SerializedRuntimeTypeInfo) = value0
 		}
 	}
 	if err := decoder.Finish(); err != nil {

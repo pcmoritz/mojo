@@ -5,6 +5,9 @@
 package serialization
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/base64"
 	"fmt"
 	"mojo/public/go/bindings"
 	"mojom/mojom_parser/generated/mojom_files"
@@ -210,11 +213,23 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 		encoder := bindings.NewEncoder()
 		encoder.SetDeterministic(true)
 		typeInfo.Encode(encoder)
-		bytes, _, err := encoder.Data()
+		byteSlice, _, err := encoder.Data()
 		if err != nil {
 			panic(fmt.Sprintf("Error while serializing runtimeTypeInfo: %s", err.Error()))
 		}
-		file.SerializedRuntimeTypeInfo = &bytes
+		var compressedBytes bytes.Buffer
+		gzipWriter, _ := gzip.NewWriterLevel(&compressedBytes, gzip.BestCompression)
+		_, err = gzipWriter.Write(byteSlice)
+		if err != nil {
+			panic(fmt.Sprintf("Error while gzipping runtimeTypeInfo: %s", err.Error()))
+		}
+		err = gzipWriter.Close()
+		if err != nil {
+			panic(fmt.Sprintf("Error while gzipping runtimeTypeInfo: %s", err.Error()))
+		}
+		byteSlice = compressedBytes.Bytes()
+		encoded := base64.StdEncoding.EncodeToString(byteSlice)
+		file.SerializedRuntimeTypeInfo = &encoded
 	}
 
 	return
