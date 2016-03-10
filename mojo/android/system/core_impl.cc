@@ -14,7 +14,11 @@
 #include "base/message_loop/message_loop.h"
 #include "jni/CoreImpl_jni.h"
 #include "mojo/public/c/environment/async_waiter.h"
-#include "mojo/public/c/system/core.h"
+#include "mojo/public/c/system/buffer.h"
+#include "mojo/public/c/system/data_pipe.h"
+#include "mojo/public/c/system/functions.h"
+#include "mojo/public/c/system/message_pipe.h"
+#include "mojo/public/c/system/types.h"
 #include "mojo/public/cpp/environment/environment.h"
 
 namespace {
