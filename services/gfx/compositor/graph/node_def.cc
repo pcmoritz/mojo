@@ -40,7 +40,7 @@ bool Contains(const SkRect& bounds, const SkPoint& point) {
 
 NodeDef::NodeDef(uint32_t node_id,
                  mojo::TransformPtr content_transform,
-                 mojo::RectPtr content_clip,
+                 mojo::RectFPtr content_clip,
                  mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                  Combinator combinator,
                  const std::vector<uint32_t>& child_node_ids)
@@ -331,11 +331,11 @@ bool NodeDef::HitTestSelf(
 RectNodeDef::RectNodeDef(
     uint32_t node_id,
     mojo::TransformPtr content_transform,
-    mojo::RectPtr content_clip,
+    mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
     const std::vector<uint32_t>& child_node_ids,
-    const mojo::Rect& content_rect,
+    const mojo::RectF& content_rect,
     const mojo::gfx::composition::Color& color)
     : NodeDef(node_id,
               content_transform.Pass(),
@@ -365,12 +365,12 @@ void RectNodeDef::RecordPictureInner(const SceneContent* content,
 ImageNodeDef::ImageNodeDef(
     uint32_t node_id,
     mojo::TransformPtr content_transform,
-    mojo::RectPtr content_clip,
+    mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
     const std::vector<uint32_t>& child_node_ids,
-    const mojo::Rect& content_rect,
-    mojo::RectPtr image_rect,
+    const mojo::RectF& content_rect,
+    mojo::RectFPtr image_rect,
     uint32 image_resource_id,
     mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
@@ -421,7 +421,7 @@ void ImageNodeDef::RecordPictureInner(const SceneContent* content,
 SceneNodeDef::SceneNodeDef(
     uint32_t node_id,
     mojo::TransformPtr content_transform,
-    mojo::RectPtr content_clip,
+    mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
     const std::vector<uint32_t>& child_node_ids,
@@ -520,11 +520,11 @@ bool SceneNodeDef::HitTestInner(
 LayerNodeDef::LayerNodeDef(
     uint32_t node_id,
     mojo::TransformPtr content_transform,
-    mojo::RectPtr content_clip,
+    mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
     const std::vector<uint32_t>& child_node_ids,
-    const mojo::Size& size,
+    const mojo::RectF& layer_rect,
     mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
               content_transform.Pass(),
@@ -532,7 +532,7 @@ LayerNodeDef::LayerNodeDef(
               hit_test_behavior.Pass(),
               combinator,
               child_node_ids),
-      size_(size),
+      layer_rect_(layer_rect),
       blend_(blend.Pass()) {}
 
 LayerNodeDef::~LayerNodeDef() {}
@@ -547,7 +547,7 @@ void LayerNodeDef::RecordPictureInner(const SceneContent* content,
   SkPaint paint;
   SetPaintForBlend(&paint, blend_.get());
 
-  canvas->saveLayer(SkRect::MakeWH(size_.width, size_.height), &paint);
+  canvas->saveLayer(layer_rect_.To<SkRect>(), &paint);
   NodeDef::RecordPictureInner(content, snapshot, canvas);
   canvas->restore();
 }

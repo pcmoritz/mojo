@@ -53,7 +53,7 @@ class PNGView : public mojo::ui::GaneshView {
   }
 
   void UpdateScene() {
-    mojo::Rect bounds;
+    mojo::RectF bounds;
     bounds.width = size_.width;
     bounds.height = size_.height;
 

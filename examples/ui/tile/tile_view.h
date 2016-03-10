@@ -32,7 +32,7 @@ class TileView : public mojo::ui::BaseView {
     bool layout_pending;
     mojo::ui::ViewLayoutParamsPtr layout_params;
     mojo::ui::ViewLayoutInfoPtr layout_info;
-    mojo::Rect layout_bounds;
+    mojo::RectF layout_bounds;
   };
 
   // |BaseView|:

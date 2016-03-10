@@ -763,12 +763,12 @@ void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
         root_state->layout_result()) {
       // TODO(jeffbrown): Take the scene version from the layout parameters
       // once we've figured out that part of the layout protocol.
-      mojo::Rect viewport;
-      viewport.width = root_state->layout_result()->size->width;
-      viewport.height = root_state->layout_result()->size->height;
+      auto viewport = mojo::Rect::New();
+      viewport->width = root_state->layout_result()->size->width;
+      viewport->height = root_state->layout_result()->size->height;
       tree_state->renderer()->SetRootScene(
           tree_state->root()->state()->scene_token()->Clone(),
-          mojo::gfx::composition::kSceneVersionNone, viewport.Clone());
+          mojo::gfx::composition::kSceneVersionNone, viewport.Pass());
       return;
     }
   }

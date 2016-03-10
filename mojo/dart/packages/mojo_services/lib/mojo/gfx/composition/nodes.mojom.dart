@@ -74,7 +74,7 @@ class Node extends bindings.Struct {
     const bindings.StructDataHeader(64, 0)
   ];
   geometry_mojom.Transform contentTransform = null;
-  geometry_mojom.Rect contentClip = null;
+  geometry_mojom.RectF contentClip = null;
   NodeCombinator combinator = new NodeCombinator(0);
   hit_tests_mojom.HitTestBehavior hitTestBehavior = null;
   List<int> childNodeIds = null;
@@ -123,7 +123,7 @@ class Node extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(16, true);
-      result.contentClip = geometry_mojom.Rect.decode(decoder1);
+      result.contentClip = geometry_mojom.RectF.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -222,7 +222,7 @@ class RectNodeOp extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  geometry_mojom.Rect contentRect = null;
+  geometry_mojom.RectF contentRect = null;
   Color color = null;
 
   RectNodeOp() : super(kVersions.last.size);
@@ -263,7 +263,7 @@ class RectNodeOp extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.contentRect = geometry_mojom.Rect.decode(decoder1);
+      result.contentRect = geometry_mojom.RectF.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -310,8 +310,8 @@ class ImageNodeOp extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(40, 0)
   ];
-  geometry_mojom.Rect contentRect = null;
-  geometry_mojom.Rect imageRect = null;
+  geometry_mojom.RectF contentRect = null;
+  geometry_mojom.RectF imageRect = null;
   int imageResourceId = 0;
   Blend blend = null;
 
@@ -353,12 +353,12 @@ class ImageNodeOp extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.contentRect = geometry_mojom.Rect.decode(decoder1);
+      result.contentRect = geometry_mojom.RectF.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(16, true);
-      result.imageRect = geometry_mojom.Rect.decode(decoder1);
+      result.imageRect = geometry_mojom.RectF.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -513,7 +513,7 @@ class LayerNodeOp extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  geometry_mojom.Size layerSize = null;
+  geometry_mojom.RectF layerRect = null;
   Blend blend = null;
 
   LayerNodeOp() : super(kVersions.last.size);
@@ -554,7 +554,7 @@ class LayerNodeOp extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.layerSize = geometry_mojom.Size.decode(decoder1);
+      result.layerRect = geometry_mojom.RectF.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -567,10 +567,10 @@ class LayerNodeOp extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeStruct(layerSize, 8, false);
+      encoder0.encodeStruct(layerRect, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "layerSize of struct LayerNodeOp: $e";
+          "layerRect of struct LayerNodeOp: $e";
       rethrow;
     }
     try {
@@ -584,13 +584,13 @@ class LayerNodeOp extends bindings.Struct {
 
   String toString() {
     return "LayerNodeOp("
-           "layerSize: $layerSize" ", "
+           "layerRect: $layerRect" ", "
            "blend: $blend" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["layerSize"] = layerSize;
+    map["layerRect"] = layerRect;
     map["blend"] = blend;
     return map;
   }

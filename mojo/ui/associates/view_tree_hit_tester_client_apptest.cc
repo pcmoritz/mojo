@@ -38,7 +38,7 @@ class ViewTreeHitTesterClientTest : public mojo::test::ApplicationTestBase {
   }
 
  protected:
-  void HitTest(mojo::PointPtr point,
+  void HitTest(mojo::PointFPtr point,
                scoped_ptr<mojo::ui::ResolvedHits>* resolved_hits) {
     base::RunLoop loop;
     view_tree_hit_tester_client_->HitTest(
@@ -60,7 +60,7 @@ class ViewTreeHitTesterClientTest : public mojo::test::ApplicationTestBase {
 
 TEST_F(ViewTreeHitTesterClientTest, NoHitTester) {
   scoped_ptr<mojo::ui::ResolvedHits> resolved_hits;
-  HitTest(MakePoint(0, 0), &resolved_hits);
+  HitTest(MakePointF(0.f, 0.f), &resolved_hits);
   EXPECT_EQ(nullptr, resolved_hits.get());
 }
 
@@ -77,10 +77,10 @@ TEST_F(ViewTreeHitTesterClientTest, HaveHitTester) {
 
   // Simple hit test with the first hit tester.
   hit_tester.SetNextResult(
-      MakePoint(2, 5),
+      MakePointF(2.f, 5.f),
       MakeSimpleHitTestResult(scene_token_1.Clone(), transform_111.Clone()));
   scoped_ptr<mojo::ui::ResolvedHits> resolved_hits;
-  HitTest(MakePoint(2, 5), &resolved_hits);
+  HitTest(MakePointF(2.f, 5.f), &resolved_hits);
   ASSERT_NE(nullptr, resolved_hits.get());
   EXPECT_NE(nullptr, resolved_hits->result());
   EXPECT_EQ(1u, resolved_hits->map().size());
@@ -93,9 +93,9 @@ TEST_F(ViewTreeHitTesterClientTest, HaveHitTester) {
 
   // Do it again, should reuse the same hit tester.
   hit_tester.SetNextResult(
-      MakePoint(3, 4),
+      MakePointF(3.f, 4.f),
       MakeSimpleHitTestResult(scene_token_1.Clone(), transform_222.Clone()));
-  HitTest(MakePoint(3, 4), &resolved_hits);
+  HitTest(MakePointF(3.f, 4.f), &resolved_hits);
   ASSERT_NE(nullptr, resolved_hits.get());
   EXPECT_NE(nullptr, resolved_hits->result());
   EXPECT_EQ(1u, resolved_hits->map().size());
@@ -118,9 +118,9 @@ TEST_F(ViewTreeHitTesterClientTest, HaveHitTester) {
 
   // Try to use the new hit tester.
   hit_tester_2.SetNextResult(
-      MakePoint(7, 8),
+      MakePointF(7.f, 8.f),
       MakeSimpleHitTestResult(scene_token_1.Clone(), transform_333.Clone()));
-  HitTest(MakePoint(7, 8), &resolved_hits);
+  HitTest(MakePointF(7.f, 8.f), &resolved_hits);
   ASSERT_NE(nullptr, resolved_hits.get());
   EXPECT_NE(nullptr, resolved_hits->result());
   EXPECT_EQ(1u, resolved_hits->map().size());
@@ -141,7 +141,7 @@ TEST_F(ViewTreeHitTesterClientTest, HaveHitTester) {
   }
 
   // Hit testing should not work anymore.
-  HitTest(MakePoint(0, 0), &resolved_hits);
+  HitTest(MakePointF(0.f, 0.f), &resolved_hits);
   EXPECT_EQ(nullptr, resolved_hits.get());
 }
 

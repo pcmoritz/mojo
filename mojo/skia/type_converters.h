@@ -14,30 +14,48 @@
 namespace mojo {
 
 template <>
-struct TypeConverter<SkPoint, mojo::Point> {
-  static SkPoint Convert(const mojo::Point& input);
+struct TypeConverter<SkIPoint, mojo::Point> {
+  static SkIPoint Convert(const mojo::Point& input);
 };
 template <>
-struct TypeConverter<mojo::Point, SkPoint> {
-  static mojo::Point Convert(const SkPoint& input);
-};
-
-template <>
-struct TypeConverter<SkRect, mojo::Rect> {
-  static SkRect Convert(const mojo::Rect& input);
-};
-template <>
-struct TypeConverter<mojo::Rect, SkRect> {
-  static mojo::Rect Convert(const SkRect& input);
+struct TypeConverter<mojo::Point, SkIPoint> {
+  static mojo::Point Convert(const SkIPoint& input);
 };
 
 template <>
-struct TypeConverter<SkRRect, mojo::RRect> {
-  static SkRRect Convert(const mojo::RRect& input);
+struct TypeConverter<SkPoint, mojo::PointF> {
+  static SkPoint Convert(const mojo::PointF& input);
 };
 template <>
-struct TypeConverter<mojo::RRect, SkRRect> {
-  static mojo::RRect Convert(const SkRRect& input);
+struct TypeConverter<mojo::PointF, SkPoint> {
+  static mojo::PointF Convert(const SkPoint& input);
+};
+
+template <>
+struct TypeConverter<SkIRect, mojo::Rect> {
+  static SkIRect Convert(const mojo::Rect& input);
+};
+template <>
+struct TypeConverter<mojo::Rect, SkIRect> {
+  static mojo::Rect Convert(const SkIRect& input);
+};
+
+template <>
+struct TypeConverter<SkRect, mojo::RectF> {
+  static SkRect Convert(const mojo::RectF& input);
+};
+template <>
+struct TypeConverter<mojo::RectF, SkRect> {
+  static mojo::RectF Convert(const SkRect& input);
+};
+
+template <>
+struct TypeConverter<SkRRect, mojo::RRectF> {
+  static SkRRect Convert(const mojo::RRectF& input);
+};
+template <>
+struct TypeConverter<mojo::RRectF, SkRRect> {
+  static mojo::RRectF Convert(const SkRRect& input);
 };
 
 // Note: This transformation is lossy since Transform is 4x4 whereas

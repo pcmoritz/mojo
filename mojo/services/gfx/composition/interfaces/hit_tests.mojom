@@ -49,7 +49,7 @@ struct HitTestBehavior {
   // If null, the node's entire clip region is tested for hits.
   //
   // TODO(jeffbrown): Support more complex hit test regions and masks.
-  mojo.Rect? hit_rect;
+  mojo.RectF? hit_rect;
 };
 
 // A hit testing service for scene graphs.
@@ -58,7 +58,7 @@ interface HitTester {
   //
   // TODO(jeffbrown): Specify a presentation timestamp to allow for
   // hit-tests of geometry as it appeared to the user in the recent past.
-  HitTest(mojo.Point point) => (HitTestResult result);
+  HitTest(mojo.PointF point) => (HitTestResult result);
 };
 
 // The result of a hit test operation.

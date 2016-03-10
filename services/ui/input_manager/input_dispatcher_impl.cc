@@ -17,7 +17,7 @@ namespace {
 void TransformEvent(const mojo::Transform& transform, mojo::Event* event) {
   if (!event->pointer_data)
     return;
-  mojo::Point point;
+  mojo::PointF point;
   point.x = event->pointer_data->x;
   point.y = event->pointer_data->y;
   point = TransformPoint(transform, point);
@@ -62,7 +62,7 @@ void InputDispatcherImpl::ProcessNextEvent() {
     const mojo::Event* event = pending_events_.front().get();
     if (event->action == mojo::EventType::POINTER_DOWN) {
       DCHECK(event->pointer_data);
-      auto point = mojo::Point::New();
+      auto point = mojo::PointF::New();
       point->x = event->pointer_data->x;
       point->y = event->pointer_data->y;
       DVLOG(1) << "HitTest: point=" << point;

@@ -29,15 +29,16 @@ std::shared_ptr<RenderFrame> Snapshot::CreateFrame(
   DCHECK(!is_blocked());
   DCHECK(root_scene_content_);
 
-  SkRect sk_viewport = viewport.To<SkRect>();
+  SkIRect sk_viewport = viewport.To<SkIRect>();
+
   SkPictureRecorder recorder;
-  recorder.beginRecording(sk_viewport);
+  recorder.beginRecording(SkRect::Make(sk_viewport));
   root_scene_content_->RecordPicture(this, recorder.getRecordingCanvas());
   return RenderFrame::Create(skia::AdoptRef(recorder.endRecordingAsPicture()),
                              sk_viewport, frame_info);
 }
 
-void Snapshot::HitTest(const mojo::Point& point,
+void Snapshot::HitTest(const mojo::PointF& point,
                        mojo::gfx::composition::HitTestResult* result) const {
   DCHECK(result);
   DCHECK(!is_blocked());

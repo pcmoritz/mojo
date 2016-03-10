@@ -12,7 +12,7 @@
 namespace compositor {
 
 RenderFrame::RenderFrame(const skia::RefPtr<SkPicture>& picture,
-                         const SkRect& viewport,
+                         const SkIRect& viewport,
                          const mojo::gfx::composition::FrameInfo& frame_info)
     : picture_(picture), viewport_(viewport), frame_info_(frame_info) {
   DCHECK(picture_);

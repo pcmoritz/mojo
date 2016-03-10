@@ -40,7 +40,7 @@ void ShapesView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
 }
 
 void ShapesView::UpdateScene() {
-  mojo::Rect bounds;
+  mojo::RectF bounds;
   bounds.width = size_.width;
   bounds.height = size_.height;
 

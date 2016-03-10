@@ -24,7 +24,7 @@ interface Renderer {
   // Use |kSceneVersionNone| to request the most recently published
   // version of the scene if synchronization is unimportant.
   //
-  // The |viewport| specifies the portion of the scene to render.
+  // The |viewport| specifies the portion of the scene to render in pixels.
   //
   // It is an error to create a renderer with an invalid |scene_token|
   // or |size|; the connection will be closed.

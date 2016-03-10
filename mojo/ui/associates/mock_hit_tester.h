@@ -20,14 +20,14 @@ class MockHitTester : public mojo::gfx::composition::HitTester {
   ~MockHitTester() override;
 
   // Sets the next hit test result.
-  void SetNextResult(mojo::PointPtr point,
+  void SetNextResult(mojo::PointFPtr point,
                      mojo::gfx::composition::HitTestResultPtr result);
 
   // |HitTester|
-  void HitTest(mojo::PointPtr point, const HitTestCallback& callback) override;
+  void HitTest(mojo::PointFPtr point, const HitTestCallback& callback) override;
 
  private:
-  mojo::PointPtr point_;
+  mojo::PointFPtr point_;
   mojo::gfx::composition::HitTestResultPtr result_;
 
   DISALLOW_COPY_AND_ASSIGN(MockHitTester);

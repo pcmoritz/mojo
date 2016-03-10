@@ -77,7 +77,7 @@ class HitTestBehavior extends bindings.Struct {
   ];
   HitTestBehaviorVisibility visibility = new HitTestBehaviorVisibility(0);
   bool prune = false;
-  geometry_mojom.Rect hitRect = null;
+  geometry_mojom.RectF hitRect = null;
 
   HitTestBehavior() : super(kVersions.last.size);
 
@@ -129,7 +129,7 @@ class HitTestBehavior extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(16, true);
-      result.hitRect = geometry_mojom.Rect.decode(decoder1);
+      result.hitRect = geometry_mojom.RectF.decode(decoder1);
     }
     return result;
   }
@@ -460,7 +460,7 @@ class _HitTesterHitTestParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  geometry_mojom.Point point = null;
+  geometry_mojom.PointF point = null;
 
   _HitTesterHitTestParams() : super(kVersions.last.size);
 
@@ -500,7 +500,7 @@ class _HitTesterHitTestParams extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.point = geometry_mojom.Point.decode(decoder1);
+      result.point = geometry_mojom.PointF.decode(decoder1);
     }
     return result;
   }
@@ -721,7 +721,7 @@ class _HitTesterServiceDescription implements service_describer.ServiceDescripti
 
 abstract class HitTester {
   static const String serviceName = null;
-  dynamic hitTest(geometry_mojom.Point point,[Function responseFactory = null]);
+  dynamic hitTest(geometry_mojom.PointF point,[Function responseFactory = null]);
 }
 
 
@@ -783,7 +783,7 @@ class _HitTesterProxyCalls implements HitTester {
   _HitTesterProxyImpl _proxyImpl;
 
   _HitTesterProxyCalls(this._proxyImpl);
-    dynamic hitTest(geometry_mojom.Point point,[Function responseFactory = null]) {
+    dynamic hitTest(geometry_mojom.PointF point,[Function responseFactory = null]) {
       var params = new _HitTesterHitTestParams();
       params.point = point;
       return _proxyImpl.sendMessageWithRequestId(

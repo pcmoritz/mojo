@@ -149,7 +149,7 @@ void SpinningCubeView::OnDraw(
   cube_.UpdateForTimeDelta(time_delta.InSecondsF());
 
   // Update the contents of the scene.
-  mojo::Rect bounds;
+  mojo::RectF bounds;
   bounds.width = size_.width;
   bounds.height = size_.height;
 

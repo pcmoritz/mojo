@@ -173,7 +173,7 @@ class PDFDocumentView : public mojo::ui::GaneshView,
   // |ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
               const base::TimeDelta& time_delta) override {
-    mojo::Rect bounds;
+    mojo::RectF bounds;
     bounds.width = size_.width;
     bounds.height = size_.height;
 

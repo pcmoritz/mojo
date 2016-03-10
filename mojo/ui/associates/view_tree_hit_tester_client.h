@@ -29,7 +29,7 @@ class ViewTreeHitTesterClient
 
   // Performs a hit test for the specified point then invokes the callback.
   // Note: May invoke the callback immediately if no remote calls were required.
-  void HitTest(mojo::PointPtr point, const ResolvedHitsCallback& callback);
+  void HitTest(mojo::PointFPtr point, const ResolvedHitsCallback& callback);
 
   // Sets a callback to invoke when the hit tester changes.
   void set_hit_tester_changed_callback(const base::Closure& callback) {

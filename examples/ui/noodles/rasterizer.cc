@@ -28,7 +28,7 @@ Rasterizer::~Rasterizer() {}
 void Rasterizer::PublishFrame(std::unique_ptr<Frame> frame) {
   DCHECK(frame);
 
-  mojo::Rect bounds;
+  mojo::RectF bounds;
   bounds.width = frame->size().width;
   bounds.height = frame->size().height;
 

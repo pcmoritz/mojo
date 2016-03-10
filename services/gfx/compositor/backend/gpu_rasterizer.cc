@@ -175,7 +175,7 @@ void GpuRasterizer::Draw() {
   gl_context_->MakeCurrent();
 
   // Update the viewport.
-  const SkRect& viewport = frame_->viewport();
+  const SkIRect& viewport = frame_->viewport();
   bool stale_surface = false;
   if (!ganesh_surface_ ||
       ganesh_surface_->surface()->width() != viewport.width() ||

@@ -37,7 +37,7 @@ void RendererImpl::ClearRootScene() {
   engine_->ClearRootScene(state_);
 }
 
-void RendererImpl::HitTest(mojo::PointPtr point,
+void RendererImpl::HitTest(mojo::PointFPtr point,
                            const HitTestCallback& callback) {
   engine_->HitTest(state_, point.Pass(), callback);
 }

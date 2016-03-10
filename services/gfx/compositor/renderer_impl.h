@@ -40,7 +40,7 @@ class RendererImpl : public mojo::gfx::composition::Renderer,
                         hit_tester_request) override;
 
   // |HitTester|:
-  void HitTest(mojo::PointPtr point, const HitTestCallback& callback) override;
+  void HitTest(mojo::PointFPtr point, const HitTestCallback& callback) override;
 
   CompositorEngine* const engine_;
   RendererState* const state_;

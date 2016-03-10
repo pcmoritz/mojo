@@ -18,8 +18,8 @@ void Capture(const base::Closure& quit, T* out, T value) {
   quit.Run();
 }
 
-inline mojo::PointPtr MakePoint(int32_t x, int32_t y) {
-  auto result = mojo::Point::New();
+inline mojo::PointFPtr MakePointF(float x, float y) {
+  auto result = mojo::PointF::New();
   result->x = x;
   result->y = y;
   return result.Pass();

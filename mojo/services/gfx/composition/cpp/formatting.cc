@@ -168,7 +168,7 @@ std::ostream& operator<<(std::ostream& os,
 
 std::ostream& operator<<(std::ostream& os,
                          const mojo::gfx::composition::LayerNodeOp& value) {
-  return os << "{layer_size=" << value.layer_size << ", blend=" << value.blend
+  return os << "{layer_rect=" << value.layer_rect << ", blend=" << value.blend
             << "}";
 }
 

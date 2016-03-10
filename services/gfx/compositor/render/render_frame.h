@@ -24,13 +24,13 @@ namespace compositor {
 class RenderFrame {
  public:
   RenderFrame(const skia::RefPtr<SkPicture>& picture,
-              const SkRect& viewport,
+              const SkIRect& viewport,
               const mojo::gfx::composition::FrameInfo& frame_info);
   ~RenderFrame();
 
   static std::shared_ptr<RenderFrame> Create(
       const skia::RefPtr<SkPicture>& picture,
-      const SkRect& viewport,
+      const SkIRect& viewport,
       const mojo::gfx::composition::FrameInfo& frame_info) {
     return std::make_shared<RenderFrame>(picture, viewport, frame_info);
   }
@@ -38,8 +38,8 @@ class RenderFrame {
   // Gets the underlying picture to rasterize.
   const skia::RefPtr<SkPicture>& picture() const { return picture_; }
 
-  // Gets the frame's viewport.
-  const SkRect& viewport() const { return viewport_; }
+  // Gets the frame's viewport in pixels.
+  const SkIRect& viewport() const { return viewport_; }
 
   // Gets information about the frame to be rendered.
   const mojo::gfx::composition::FrameInfo& frame_info() const {
@@ -53,7 +53,7 @@ class RenderFrame {
   friend class RenderFrameBuilder;
 
   skia::RefPtr<SkPicture> picture_;
-  SkRect viewport_;
+  SkIRect viewport_;
   mojo::gfx::composition::FrameInfo frame_info_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderFrame);

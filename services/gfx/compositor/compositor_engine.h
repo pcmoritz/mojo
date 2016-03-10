@@ -74,7 +74,7 @@ class CompositorEngine {
   // Performs a hit test.
   void HitTest(
       RendererState* renderer_state,
-      mojo::PointPtr point,
+      mojo::PointFPtr point,
       const mojo::gfx::composition::HitTester::HitTestCallback& callback);
 
  private:

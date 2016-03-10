@@ -222,7 +222,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
   DCHECK(node_decl);
 
   mojo::TransformPtr content_transform = node_decl->content_transform.Pass();
-  mojo::RectPtr content_clip = node_decl->content_clip.Pass();
+  mojo::RectFPtr content_clip = node_decl->content_clip.Pass();
   mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior =
       node_decl->hit_test_behavior.Pass();
   const mojo::gfx::composition::Node::Combinator combinator =
@@ -240,7 +240,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     DCHECK(rect_node_decl->content_rect);
     DCHECK(rect_node_decl->color);
 
-    const mojo::Rect& content_rect = *rect_node_decl->content_rect;
+    const mojo::RectF& content_rect = *rect_node_decl->content_rect;
     const mojo::gfx::composition::Color& color = *rect_node_decl->color;
     return new RectNodeDef(node_id, content_transform.Pass(),
                            content_clip.Pass(), hit_test_behavior.Pass(),
@@ -251,8 +251,8 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     auto& image_node_decl = node_decl->op->get_image();
     DCHECK(image_node_decl->content_rect);
 
-    const mojo::Rect& content_rect = *image_node_decl->content_rect;
-    mojo::RectPtr image_rect = image_node_decl->image_rect.Pass();
+    const mojo::RectF& content_rect = *image_node_decl->content_rect;
+    mojo::RectFPtr image_rect = image_node_decl->image_rect.Pass();
     const uint32 image_resource_id = image_node_decl->image_resource_id;
     mojo::gfx::composition::BlendPtr blend = image_node_decl->blend.Pass();
     return new ImageNodeDef(node_id, content_transform.Pass(),
@@ -274,13 +274,13 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
   if (node_decl->op->is_layer()) {
     auto& layer_node_decl = node_decl->op->get_layer();
-    DCHECK(layer_node_decl->layer_size);
+    DCHECK(layer_node_decl->layer_rect);
 
-    const mojo::Size& layer_size = *layer_node_decl->layer_size;
+    const mojo::RectF& layer_rect = *layer_node_decl->layer_rect;
     mojo::gfx::composition::BlendPtr blend = layer_node_decl->blend.Pass();
     return new LayerNodeDef(node_id, content_transform.Pass(),
                             content_clip.Pass(), hit_test_behavior.Pass(),
-                            combinator, child_node_ids, layer_size,
+                            combinator, child_node_ids, layer_rect,
                             blend.Pass());
   }
 

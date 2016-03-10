@@ -178,7 +178,7 @@ void TileView::FinishLayout() {
     const uint32_t fallback_node_id =
         container_node_id + kViewFallbackNodeIdOffset;
 
-    mojo::Rect extent;
+    mojo::RectF extent;
     extent.width = view_data.layout_bounds.width;
     extent.height = view_data.layout_bounds.height;
 

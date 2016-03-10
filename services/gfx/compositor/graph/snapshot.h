@@ -72,7 +72,7 @@ class Snapshot : public base::RefCounted<Snapshot> {
 
   // Performs a hit test at the specified point, populating the result.
   // Only valid if |!is_blocked()|.
-  void HitTest(const mojo::Point& point,
+  void HitTest(const mojo::PointF& point,
                mojo::gfx::composition::HitTestResult* result) const;
 
   // Returns true if the specified node was blocked from rendering.

@@ -14,7 +14,7 @@ MockHitTester::MockHitTester() {}
 MockHitTester::~MockHitTester() {}
 
 void MockHitTester::SetNextResult(
-    mojo::PointPtr point,
+    mojo::PointFPtr point,
     mojo::gfx::composition::HitTestResultPtr result) {
   DCHECK(point);
   DCHECK(result);
@@ -23,7 +23,7 @@ void MockHitTester::SetNextResult(
   result_ = result.Pass();
 }
 
-void MockHitTester::HitTest(mojo::PointPtr point,
+void MockHitTester::HitTest(mojo::PointFPtr point,
                             const HitTestCallback& callback) {
   DCHECK(point);
 

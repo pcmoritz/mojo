@@ -494,26 +494,26 @@ class RectF extends bindings.Struct {
 }
 
 
-class RRect extends bindings.Struct {
+class RRectF extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(56, 0)
   ];
-  int x = 0;
-  int y = 0;
-  int width = 0;
-  int height = 0;
-  int topLeftRadiusX = 0;
-  int topLeftRadiusY = 0;
-  int topRightRadiusX = 0;
-  int topRightRadiusY = 0;
-  int bottomLeftRadiusX = 0;
-  int bottomLeftRadiusY = 0;
-  int bottomRightRadiusX = 0;
-  int bottomRightRadiusY = 0;
+  double x = 0.0;
+  double y = 0.0;
+  double width = 0.0;
+  double height = 0.0;
+  double topLeftRadiusX = 0.0;
+  double topLeftRadiusY = 0.0;
+  double topRightRadiusX = 0.0;
+  double topRightRadiusY = 0.0;
+  double bottomLeftRadiusX = 0.0;
+  double bottomLeftRadiusY = 0.0;
+  double bottomRightRadiusX = 0.0;
+  double bottomRightRadiusY = 0.0;
 
-  RRect() : super(kVersions.last.size);
+  RRectF() : super(kVersions.last.size);
 
-  static RRect deserialize(bindings.Message message) {
+  static RRectF deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -522,11 +522,11 @@ class RRect extends bindings.Struct {
     return result;
   }
 
-  static RRect decode(bindings.Decoder decoder0) {
+  static RRectF decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    RRect result = new RRect();
+    RRectF result = new RRectF();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -548,51 +548,51 @@ class RRect extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.x = decoder0.decodeInt32(8);
+      result.x = decoder0.decodeFloat(8);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.y = decoder0.decodeInt32(12);
+      result.y = decoder0.decodeFloat(12);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.width = decoder0.decodeInt32(16);
+      result.width = decoder0.decodeFloat(16);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.height = decoder0.decodeInt32(20);
+      result.height = decoder0.decodeFloat(20);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.topLeftRadiusX = decoder0.decodeInt32(24);
+      result.topLeftRadiusX = decoder0.decodeFloat(24);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.topLeftRadiusY = decoder0.decodeInt32(28);
+      result.topLeftRadiusY = decoder0.decodeFloat(28);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.topRightRadiusX = decoder0.decodeInt32(32);
+      result.topRightRadiusX = decoder0.decodeFloat(32);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.topRightRadiusY = decoder0.decodeInt32(36);
+      result.topRightRadiusY = decoder0.decodeFloat(36);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.bottomLeftRadiusX = decoder0.decodeInt32(40);
+      result.bottomLeftRadiusX = decoder0.decodeFloat(40);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.bottomLeftRadiusY = decoder0.decodeInt32(44);
+      result.bottomLeftRadiusY = decoder0.decodeFloat(44);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.bottomRightRadiusX = decoder0.decodeInt32(48);
+      result.bottomRightRadiusX = decoder0.decodeFloat(48);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.bottomRightRadiusY = decoder0.decodeInt32(52);
+      result.bottomRightRadiusY = decoder0.decodeFloat(52);
     }
     return result;
   }
@@ -600,93 +600,93 @@ class RRect extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInt32(x, 8);
+      encoder0.encodeFloat(x, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "x of struct RRect: $e";
+          "x of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(y, 12);
+      encoder0.encodeFloat(y, 12);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "y of struct RRect: $e";
+          "y of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(width, 16);
+      encoder0.encodeFloat(width, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "width of struct RRect: $e";
+          "width of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(height, 20);
+      encoder0.encodeFloat(height, 20);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "height of struct RRect: $e";
+          "height of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(topLeftRadiusX, 24);
+      encoder0.encodeFloat(topLeftRadiusX, 24);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "topLeftRadiusX of struct RRect: $e";
+          "topLeftRadiusX of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(topLeftRadiusY, 28);
+      encoder0.encodeFloat(topLeftRadiusY, 28);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "topLeftRadiusY of struct RRect: $e";
+          "topLeftRadiusY of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(topRightRadiusX, 32);
+      encoder0.encodeFloat(topRightRadiusX, 32);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "topRightRadiusX of struct RRect: $e";
+          "topRightRadiusX of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(topRightRadiusY, 36);
+      encoder0.encodeFloat(topRightRadiusY, 36);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "topRightRadiusY of struct RRect: $e";
+          "topRightRadiusY of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(bottomLeftRadiusX, 40);
+      encoder0.encodeFloat(bottomLeftRadiusX, 40);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "bottomLeftRadiusX of struct RRect: $e";
+          "bottomLeftRadiusX of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(bottomLeftRadiusY, 44);
+      encoder0.encodeFloat(bottomLeftRadiusY, 44);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "bottomLeftRadiusY of struct RRect: $e";
+          "bottomLeftRadiusY of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(bottomRightRadiusX, 48);
+      encoder0.encodeFloat(bottomRightRadiusX, 48);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "bottomRightRadiusX of struct RRect: $e";
+          "bottomRightRadiusX of struct RRectF: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(bottomRightRadiusY, 52);
+      encoder0.encodeFloat(bottomRightRadiusY, 52);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "bottomRightRadiusY of struct RRect: $e";
+          "bottomRightRadiusY of struct RRectF: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "RRect("
+    return "RRectF("
            "x: $x" ", "
            "y: $y" ", "
            "width: $width" ", "

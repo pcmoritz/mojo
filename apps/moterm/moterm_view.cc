@@ -226,7 +226,7 @@ void MotermView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
   // TODO(vtl): Draw only the dirty region(s)?
   model_state_changes_.Reset();
 
-  mojo::Rect bounds;
+  mojo::RectF bounds;
   bounds.width = view_size_.width;
   bounds.height = view_size_.height;
 

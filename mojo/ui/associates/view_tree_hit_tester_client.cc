@@ -24,7 +24,7 @@ ViewTreeHitTesterClient::ViewTreeHitTesterClient(
 
 ViewTreeHitTesterClient::~ViewTreeHitTesterClient() {}
 
-void ViewTreeHitTesterClient::HitTest(mojo::PointPtr point,
+void ViewTreeHitTesterClient::HitTest(mojo::PointFPtr point,
                                       const ResolvedHitsCallback& callback) {
   if (!hit_tester_) {
     callback.Run(nullptr);

@@ -270,7 +270,7 @@ void CompositorEngine::ClearRootScene(RendererState* renderer_state) {
 
 void CompositorEngine::HitTest(
     RendererState* renderer_state,
-    mojo::PointPtr point,
+    mojo::PointFPtr point,
     const mojo::gfx::composition::HitTester::HitTestCallback& callback) {
   DCHECK(IsRendererStateRegisteredDebug(renderer_state));
   DCHECK(point);

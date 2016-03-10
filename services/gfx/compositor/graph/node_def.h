@@ -36,7 +36,7 @@ class NodeDef : public base::RefCounted<NodeDef> {
 
   NodeDef(uint32_t node_id,
           mojo::TransformPtr content_transform,
-          mojo::RectPtr content_clip,
+          mojo::RectFPtr content_clip,
           mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
           Combinator combinator,
           const std::vector<uint32_t>& child_node_ids);
@@ -48,7 +48,7 @@ class NodeDef : public base::RefCounted<NodeDef> {
   const mojo::gfx::composition::HitTestBehavior* hit_test_behavior() const {
     return hit_test_behavior_.get();
   }
-  const mojo::Rect* content_clip() const { return content_clip_.get(); }
+  const mojo::RectF* content_clip() const { return content_clip_.get(); }
   Combinator combinator() const { return combinator_; }
   const std::vector<uint32_t>& child_node_ids() const {
     return child_node_ids_;
@@ -119,7 +119,7 @@ class NodeDef : public base::RefCounted<NodeDef> {
 
   uint32_t const node_id_;
   mojo::TransformPtr const content_transform_;
-  mojo::RectPtr const content_clip_;
+  mojo::RectFPtr const content_clip_;
   mojo::gfx::composition::HitTestBehaviorPtr const hit_test_behavior_;
   Combinator const combinator_;
   std::vector<uint32_t> const child_node_ids_;
@@ -134,14 +134,14 @@ class RectNodeDef : public NodeDef {
  public:
   RectNodeDef(uint32_t node_id,
               mojo::TransformPtr content_transform,
-              mojo::RectPtr content_clip,
+              mojo::RectFPtr content_clip,
               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
               Combinator combinator,
               const std::vector<uint32_t>& child_node_ids,
-              const mojo::Rect& content_rect,
+              const mojo::RectF& content_rect,
               const mojo::gfx::composition::Color& color);
 
-  const mojo::Rect& content_rect() const { return content_rect_; }
+  const mojo::RectF& content_rect() const { return content_rect_; }
   const mojo::gfx::composition::Color& color() const { return color_; }
 
  protected:
@@ -152,7 +152,7 @@ class RectNodeDef : public NodeDef {
                           SkCanvas* canvas) const override;
 
  private:
-  mojo::Rect const content_rect_;
+  mojo::RectF const content_rect_;
   mojo::gfx::composition::Color const color_;
 
   DISALLOW_COPY_AND_ASSIGN(RectNodeDef);
@@ -165,17 +165,17 @@ class ImageNodeDef : public NodeDef {
  public:
   ImageNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
-               mojo::RectPtr content_clip,
+               mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
-               const mojo::Rect& content_rect,
-               mojo::RectPtr image_rect,
+               const mojo::RectF& content_rect,
+               mojo::RectFPtr image_rect,
                uint32 image_resource_id,
                mojo::gfx::composition::BlendPtr blend);
 
-  const mojo::Rect& content_rect() const { return content_rect_; }
-  const mojo::Rect* image_rect() const { return image_rect_.get(); }
+  const mojo::RectF& content_rect() const { return content_rect_; }
+  const mojo::RectF* image_rect() const { return image_rect_.get(); }
   uint32_t image_resource_id() const { return image_resource_id_; }
   const mojo::gfx::composition::Blend* blend() const { return blend_.get(); }
 
@@ -189,8 +189,8 @@ class ImageNodeDef : public NodeDef {
                           SkCanvas* canvas) const override;
 
  private:
-  mojo::Rect const content_rect_;
-  mojo::RectPtr const image_rect_;
+  mojo::RectF const content_rect_;
+  mojo::RectFPtr const image_rect_;
   uint32_t const image_resource_id_;
   mojo::gfx::composition::BlendPtr const blend_;
 
@@ -204,7 +204,7 @@ class SceneNodeDef : public NodeDef {
  public:
   SceneNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
-               mojo::RectPtr content_clip,
+               mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
@@ -247,14 +247,14 @@ class LayerNodeDef : public NodeDef {
  public:
   LayerNodeDef(uint32_t node_id,
                mojo::TransformPtr content_transform,
-               mojo::RectPtr content_clip,
+               mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
                const std::vector<uint32_t>& child_node_ids,
-               const mojo::Size& size,
+               const mojo::RectF& layer_rect,
                mojo::gfx::composition::BlendPtr blend);
 
-  const mojo::Size& size() const { return size_; }
+  const mojo::RectF& layer_rect() const { return layer_rect_; }
   const mojo::gfx::composition::Blend* blend() const { return blend_.get(); }
 
  protected:
@@ -265,7 +265,7 @@ class LayerNodeDef : public NodeDef {
                           SkCanvas* canvas) const override;
 
  private:
-  mojo::Size const size_;
+  mojo::RectF const layer_rect_;
   mojo::gfx::composition::BlendPtr const blend_;
 
   DISALLOW_COPY_AND_ASSIGN(LayerNodeDef);
