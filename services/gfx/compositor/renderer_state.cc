@@ -30,7 +30,7 @@ bool RendererState::SetRootScene(SceneState* scene,
   return false;
 }
 
-bool RendererState::ResetRootScene() {
+bool RendererState::ClearRootScene() {
   if (root_scene_) {
     root_scene_ = nullptr;
     SetSnapshot(nullptr);

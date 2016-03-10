@@ -51,9 +51,9 @@ class RendererState {
                     uint32_t version,
                     const mojo::Rect& viewport);
 
-  // Resets the root scene.
+  // Removes the root scene.
   // If a change occurred, clears the current snapshot and returns true.
-  bool ResetRootScene();
+  bool ClearRootScene();
 
   // The currently visible frame, or null if none.
   scoped_refptr<const Snapshot> visible_snapshot() const {

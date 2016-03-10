@@ -334,11 +334,11 @@ void ViewRegistry::SetRoot(
   InvalidateLayoutForRoot(tree_state);
 }
 
-void ViewRegistry::ResetRoot(ViewTreeState* tree_state,
+void ViewRegistry::ClearRoot(ViewTreeState* tree_state,
                              mojo::InterfaceRequest<mojo::ui::ViewOwner>
                                  transferred_view_owner_request) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DVLOG(1) << "ResetRoot: tree=" << tree_state;
+  DVLOG(1) << "ClearRoot: tree=" << tree_state;
 
   // Ensure there is a root.
   if (!tree_state->root()) {
@@ -773,7 +773,7 @@ void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
     }
   }
 
-  tree_state->renderer()->ResetRootScene();
+  tree_state->renderer()->ClearRootScene();
 }
 
 void ViewRegistry::OnRendererDied(ViewTreeState* tree_state) {

@@ -257,12 +257,12 @@ void CompositorEngine::SetRootScene(
   }
 }
 
-void CompositorEngine::ResetRootScene(RendererState* renderer_state) {
+void CompositorEngine::ClearRootScene(RendererState* renderer_state) {
   DCHECK(IsRendererStateRegisteredDebug(renderer_state));
-  DVLOG(1) << "ResetRootScene: renderer=" << renderer_state;
+  DVLOG(1) << "ClearRootScene: renderer=" << renderer_state;
 
   // Update the root.
-  if (renderer_state->ResetRootScene()) {
+  if (renderer_state->ClearRootScene()) {
     ScheduleFrameForRenderer(renderer_state,
                              Scheduler::SchedulingMode::kSnapshot);
   }

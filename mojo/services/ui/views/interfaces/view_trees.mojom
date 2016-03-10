@@ -117,7 +117,7 @@ interface ViewTree {
   //
   // It is an error to call this function if the root was not previously set;
   // the connection will be closed.
-  ResetRoot(mojo.ui.ViewOwner&? transferred_view_owner);
+  ClearRoot(mojo.ui.ViewOwner&? transferred_view_owner);
 
   // Sets the layout parameters of the root of the view tree and retrieves
   // its layout information.

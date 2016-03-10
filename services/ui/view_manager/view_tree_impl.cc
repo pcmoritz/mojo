@@ -40,9 +40,9 @@ void ViewTreeImpl::SetRoot(
   registry_->SetRoot(state_, root_key, root_view_owner.Pass());
 }
 
-void ViewTreeImpl::ResetRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
+void ViewTreeImpl::ClearRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
                                  transferred_view_owner_request) {
-  registry_->ResetRoot(state_, transferred_view_owner_request.Pass());
+  registry_->ClearRoot(state_, transferred_view_owner_request.Pass());
 }
 
 static void RunLayoutRootCallback(

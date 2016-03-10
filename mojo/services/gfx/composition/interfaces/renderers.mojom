@@ -33,7 +33,7 @@ interface Renderer {
     mojo.Rect viewport);
 
   // Dissociates the root scene from the renderer.
-  ResetRootScene();
+  ClearRootScene();
 
   // Provides an interface which can be used to perform hit tests on the
   // contents of the renderer's scene graph.

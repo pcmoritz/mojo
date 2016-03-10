@@ -115,9 +115,9 @@ class ViewRegistry : public mojo::ui::ViewInspector {
                uint32_t root_key,
                mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner);
 
-  // Resets the root of the view tree.
+  // Removes the root of the view tree.
   // Destroys |tree_state| if an error occurs.
-  void ResetRoot(ViewTreeState* tree_state,
+  void ClearRoot(ViewTreeState* tree_state,
                  mojo::InterfaceRequest<mojo::ui::ViewOwner>
                      transferred_view_owner_request);
 

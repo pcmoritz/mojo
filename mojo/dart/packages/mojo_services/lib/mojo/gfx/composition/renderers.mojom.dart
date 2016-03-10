@@ -115,14 +115,14 @@ class _RendererSetRootSceneParams extends bindings.Struct {
 }
 
 
-class _RendererResetRootSceneParams extends bindings.Struct {
+class _RendererClearRootSceneParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
   ];
 
-  _RendererResetRootSceneParams() : super(kVersions.last.size);
+  _RendererClearRootSceneParams() : super(kVersions.last.size);
 
-  static _RendererResetRootSceneParams deserialize(bindings.Message message) {
+  static _RendererClearRootSceneParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -131,11 +131,11 @@ class _RendererResetRootSceneParams extends bindings.Struct {
     return result;
   }
 
-  static _RendererResetRootSceneParams decode(bindings.Decoder decoder0) {
+  static _RendererClearRootSceneParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _RendererResetRootSceneParams result = new _RendererResetRootSceneParams();
+    _RendererClearRootSceneParams result = new _RendererClearRootSceneParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -163,7 +163,7 @@ class _RendererResetRootSceneParams extends bindings.Struct {
   }
 
   String toString() {
-    return "_RendererResetRootSceneParams("")";
+    return "_RendererClearRootSceneParams("")";
   }
 
   Map toJson() {
@@ -244,7 +244,7 @@ class _RendererGetHitTesterParams extends bindings.Struct {
 }
 
 const int _Renderer_setRootSceneName = 0;
-const int _Renderer_resetRootSceneName = 1;
+const int _Renderer_clearRootSceneName = 1;
 const int _Renderer_getHitTesterName = 2;
 
 class _RendererServiceDescription implements service_describer.ServiceDescription {
@@ -261,7 +261,7 @@ class _RendererServiceDescription implements service_describer.ServiceDescriptio
 abstract class Renderer {
   static const String serviceName = null;
   void setRootScene(scene_token_mojom.SceneToken sceneToken, int sceneVersion, geometry_mojom.Rect viewport);
-  void resetRootScene();
+  void clearRootScene();
   void getHitTester(Object hitTester);
 }
 
@@ -315,13 +315,13 @@ class _RendererProxyCalls implements Renderer {
       params.viewport = viewport;
       _proxyImpl.sendMessage(params, _Renderer_setRootSceneName);
     }
-    void resetRootScene() {
+    void clearRootScene() {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
-      var params = new _RendererResetRootSceneParams();
-      _proxyImpl.sendMessage(params, _Renderer_resetRootSceneName);
+      var params = new _RendererClearRootSceneParams();
+      _proxyImpl.sendMessage(params, _Renderer_clearRootSceneName);
     }
     void getHitTester(Object hitTester) {
       if (!_proxyImpl.isBound) {
@@ -427,8 +427,8 @@ class RendererStub extends bindings.Stub {
             message.payload);
         _impl.setRootScene(params.sceneToken, params.sceneVersion, params.viewport);
         break;
-      case _Renderer_resetRootSceneName:
-        _impl.resetRootScene();
+      case _Renderer_clearRootSceneName:
+        _impl.clearRootScene();
         break;
       case _Renderer_getHitTesterName:
         var params = _RendererGetHitTesterParams.deserialize(

@@ -54,7 +54,7 @@ void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
     view_tree_->SetRoot(++root_key_, owner.Pass());
     root_was_set_ = true;
   } else {
-    view_tree_->ResetRoot(nullptr);
+    view_tree_->ClearRoot(nullptr);
     root_was_set_ = false;
   }
   root_layout_info_.reset();

@@ -501,15 +501,15 @@ class _ViewTreeSetRootParams extends bindings.Struct {
 }
 
 
-class _ViewTreeResetRootParams extends bindings.Struct {
+class _ViewTreeClearRootParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   Object transferredViewOwner = null;
 
-  _ViewTreeResetRootParams() : super(kVersions.last.size);
+  _ViewTreeClearRootParams() : super(kVersions.last.size);
 
-  static _ViewTreeResetRootParams deserialize(bindings.Message message) {
+  static _ViewTreeClearRootParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -518,11 +518,11 @@ class _ViewTreeResetRootParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewTreeResetRootParams decode(bindings.Decoder decoder0) {
+  static _ViewTreeClearRootParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewTreeResetRootParams result = new _ViewTreeResetRootParams();
+    _ViewTreeClearRootParams result = new _ViewTreeClearRootParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -555,13 +555,13 @@ class _ViewTreeResetRootParams extends bindings.Struct {
       encoder0.encodeInterfaceRequest(transferredViewOwner, 8, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "transferredViewOwner of struct _ViewTreeResetRootParams: $e";
+          "transferredViewOwner of struct _ViewTreeClearRootParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewTreeResetRootParams("
+    return "_ViewTreeClearRootParams("
            "transferredViewOwner: $transferredViewOwner" ")";
   }
 
@@ -1084,7 +1084,7 @@ const int _ViewTree_getServiceProviderName = 1;
 const int _ViewTree_setRendererName = 2;
 const int _ViewTree_requestLayoutName = 3;
 const int _ViewTree_setRootName = 4;
-const int _ViewTree_resetRootName = 5;
+const int _ViewTree_clearRootName = 5;
 const int _ViewTree_layoutRootName = 6;
 
 class _ViewTreeServiceDescription implements service_describer.ServiceDescription {
@@ -1105,7 +1105,7 @@ abstract class ViewTree {
   void setRenderer(Object renderer);
   void requestLayout();
   void setRoot(int rootKey, Object rootViewOwner);
-  void resetRoot(Object transferredViewOwner);
+  void clearRoot(Object transferredViewOwner);
   dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]);
 }
 
@@ -1232,14 +1232,14 @@ class _ViewTreeProxyCalls implements ViewTree {
       params.rootViewOwner = rootViewOwner;
       _proxyImpl.sendMessage(params, _ViewTree_setRootName);
     }
-    void resetRoot(Object transferredViewOwner) {
+    void clearRoot(Object transferredViewOwner) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
-      var params = new _ViewTreeResetRootParams();
+      var params = new _ViewTreeClearRootParams();
       params.transferredViewOwner = transferredViewOwner;
-      _proxyImpl.sendMessage(params, _ViewTree_resetRootName);
+      _proxyImpl.sendMessage(params, _ViewTree_clearRootName);
     }
     dynamic layoutRoot(layouts_mojom.ViewLayoutParams rootLayoutParams,[Function responseFactory = null]) {
       var params = new _ViewTreeLayoutRootParams();
@@ -1388,10 +1388,10 @@ class ViewTreeStub extends bindings.Stub {
             message.payload);
         _impl.setRoot(params.rootKey, params.rootViewOwner);
         break;
-      case _ViewTree_resetRootName:
-        var params = _ViewTreeResetRootParams.deserialize(
+      case _ViewTree_clearRootName:
+        var params = _ViewTreeClearRootParams.deserialize(
             message.payload);
-        _impl.resetRoot(params.transferredViewOwner);
+        _impl.clearRoot(params.transferredViewOwner);
         break;
       case _ViewTree_layoutRootName:
         var params = _ViewTreeLayoutRootParams.deserialize(

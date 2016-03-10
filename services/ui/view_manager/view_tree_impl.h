@@ -32,7 +32,7 @@ class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
   void SetRoot(
       uint32_t root_key,
       mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) override;
-  void ResetRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
+  void ClearRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
                      transferred_view_owner_request) override;
   void LayoutRoot(mojo::ui::ViewLayoutParamsPtr root_layout_params,
                   const LayoutRootCallback& callback) override;
