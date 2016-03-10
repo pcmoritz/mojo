@@ -126,4 +126,22 @@ mojo::TransformPtr TypeConverter<mojo::TransformPtr, SkMatrix>::Convert(
   return output.Pass();
 }
 
+SkMatrix44 TypeConverter<SkMatrix44, mojo::TransformPtr>::Convert(
+    const mojo::TransformPtr& input) {
+  if (!input)
+    return SkMatrix44::I();
+
+  SkMatrix44 output(SkMatrix44::kUninitialized_Constructor);
+  output.setRowMajorf(input->matrix.data());
+  return output;
+}
+
+mojo::TransformPtr TypeConverter<mojo::TransformPtr, SkMatrix44>::Convert(
+    const SkMatrix44& input) {
+  auto output = mojo::Transform::New();
+  output->matrix.resize(16u);
+  input.asRowMajorf(output->matrix.data());
+  return output.Pass();
+}
+
 }  // namespace mojo

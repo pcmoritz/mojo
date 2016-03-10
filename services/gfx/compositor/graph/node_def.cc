@@ -12,6 +12,7 @@
 #include "services/gfx/compositor/graph/scene_content.h"
 #include "services/gfx/compositor/graph/scene_def.h"
 #include "services/gfx/compositor/graph/snapshot.h"
+#include "services/gfx/compositor/graph/transform_pair.h"
 #include "services/gfx/compositor/render/render_image.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -19,6 +20,7 @@
 #include "third_party/skia/include/core/SkPaint.h"
 #include "third_party/skia/include/core/SkPoint.h"
 #include "third_party/skia/include/core/SkRect.h"
+#include "third_party/skia/include/utils/SkMatrix44.h"
 
 namespace compositor {
 namespace {
@@ -39,13 +41,13 @@ bool Contains(const SkRect& bounds, const SkPoint& point) {
 }  // namespace
 
 NodeDef::NodeDef(uint32_t node_id,
-                 mojo::TransformPtr content_transform,
+                 std::unique_ptr<TransformPair> content_transform,
                  mojo::RectFPtr content_clip,
                  mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                  Combinator combinator,
                  const std::vector<uint32_t>& child_node_ids)
     : node_id_(node_id),
-      content_transform_(content_transform.Pass()),
+      content_transform_(std::move(content_transform)),
       content_clip_(content_clip.Pass()),
       hit_test_behavior_(hit_test_behavior.Pass()),
       combinator_(combinator),
@@ -205,7 +207,7 @@ void NodeDef::RecordPicture(const SceneContent* content,
   if (must_save) {
     canvas->save();
     if (content_transform_)
-      canvas->concat(content_transform_.To<SkMatrix>());
+      canvas->concat(content_transform_->forward());
     if (content_clip_)
       canvas->clipRect(content_clip_->To<SkRect>());
   }
@@ -234,7 +236,7 @@ void NodeDef::RecordPictureInner(const SceneContent* content,
 bool NodeDef::HitTest(const SceneContent* content,
                       const Snapshot* snapshot,
                       const SkPoint& parent_point,
-                      const SkMatrix& global_to_parent_transform,
+                      const SkMatrix44& global_to_parent_transform,
                       mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
   DCHECK(content);
   DCHECK(snapshot);
@@ -242,20 +244,12 @@ bool NodeDef::HitTest(const SceneContent* content,
 
   // TODO(jeffbrown): These calculations should probably be happening using
   // a 4x4 matrix instead.
-  SkPoint local_point = parent_point;
-  SkMatrix global_to_local_transform = global_to_parent_transform;
+  SkPoint local_point(parent_point);
+  SkMatrix global_to_local_transform(global_to_parent_transform);
   if (content_transform_) {
-    // TODO(jeffbrown): Cache the inverse transform.
-    // Defer matrix multiplications using a matrix stack.
-    SkMatrix inverse_transform;
-    if (!content_transform_.To<SkMatrix>().invert(&inverse_transform)) {
-      // Matrix is singular!
-      // Return [0,0,0][0,0,0][0,0,1] (all zeroes except last component).
-      // This causes all points to be mapped to (0,0) when transformed.
-      inverse_transform.setScale(0.f, 0.f);
-    }
-    inverse_transform.mapXY(parent_point.x(), parent_point.y(), &local_point);
-    global_to_local_transform.preConcat(inverse_transform);
+    // TODO(jeffbrown): Defer matrix multiplications using a matrix stack.
+    local_point = content_transform_->InverseMapPoint(parent_point);
+    global_to_local_transform.preConcat(content_transform_->GetInverse());
   }
 
   if (content_clip_ && !Contains(content_clip_->To<SkRect>(), local_point))
@@ -276,7 +270,7 @@ bool NodeDef::HitTestInner(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
-    const SkMatrix& global_to_local_transform,
+    const SkMatrix44& global_to_local_transform,
     mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
   DCHECK(content);
   DCHECK(snapshot);
@@ -303,7 +297,7 @@ bool NodeDef::HitTestSelf(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
-    const SkMatrix& global_to_local_transform,
+    const SkMatrix44& global_to_local_transform,
     mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
   DCHECK(content);
   DCHECK(snapshot);
@@ -330,7 +324,7 @@ bool NodeDef::HitTestSelf(
 
 RectNodeDef::RectNodeDef(
     uint32_t node_id,
-    mojo::TransformPtr content_transform,
+    std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
@@ -338,7 +332,7 @@ RectNodeDef::RectNodeDef(
     const mojo::RectF& content_rect,
     const mojo::gfx::composition::Color& color)
     : NodeDef(node_id,
-              content_transform.Pass(),
+              std::move(content_transform),
               content_clip.Pass(),
               hit_test_behavior.Pass(),
               combinator,
@@ -364,7 +358,7 @@ void RectNodeDef::RecordPictureInner(const SceneContent* content,
 
 ImageNodeDef::ImageNodeDef(
     uint32_t node_id,
-    mojo::TransformPtr content_transform,
+    std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
@@ -374,7 +368,7 @@ ImageNodeDef::ImageNodeDef(
     uint32 image_resource_id,
     mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
-              content_transform.Pass(),
+              std::move(content_transform),
               content_clip.Pass(),
               hit_test_behavior.Pass(),
               combinator,
@@ -420,7 +414,7 @@ void ImageNodeDef::RecordPictureInner(const SceneContent* content,
 
 SceneNodeDef::SceneNodeDef(
     uint32_t node_id,
-    mojo::TransformPtr content_transform,
+    std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
@@ -428,7 +422,7 @@ SceneNodeDef::SceneNodeDef(
     uint32_t scene_resource_id,
     uint32_t scene_version)
     : NodeDef(node_id,
-              content_transform.Pass(),
+              std::move(content_transform),
               content_clip.Pass(),
               hit_test_behavior.Pass(),
               combinator,
@@ -492,7 +486,7 @@ bool SceneNodeDef::HitTestInner(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
-    const SkMatrix& global_to_local_transform,
+    const SkMatrix44& global_to_local_transform,
     mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
   DCHECK(content);
   DCHECK(snapshot);
@@ -519,7 +513,7 @@ bool SceneNodeDef::HitTestInner(
 
 LayerNodeDef::LayerNodeDef(
     uint32_t node_id,
-    mojo::TransformPtr content_transform,
+    std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
     mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
     Combinator combinator,
@@ -527,7 +521,7 @@ LayerNodeDef::LayerNodeDef(
     const mojo::RectF& layer_rect,
     mojo::gfx::composition::BlendPtr blend)
     : NodeDef(node_id,
-              content_transform.Pass(),
+              std::move(content_transform),
               content_clip.Pass(),
               hit_test_behavior.Pass(),
               combinator,

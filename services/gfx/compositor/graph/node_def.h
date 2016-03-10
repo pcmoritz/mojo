@@ -6,6 +6,7 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_NODE_DEF_H_
 
 #include <iosfwd>
+#include <memory>
 #include <vector>
 
 #include "base/macros.h"
@@ -15,13 +16,14 @@
 
 class SkCanvas;
 struct SkPoint;
-class SkMatrix;
+class SkMatrix44;
 
 namespace compositor {
 
 class SceneContent;
 class SceneContentBuilder;
 class SceneDef;
+class TransformPair;
 
 // Represents a scene graph node.
 //
@@ -35,14 +37,14 @@ class NodeDef : public base::RefCounted<NodeDef> {
   using Combinator = mojo::gfx::composition::Node::Combinator;
 
   NodeDef(uint32_t node_id,
-          mojo::TransformPtr content_transform,
+          std::unique_ptr<TransformPair> content_transform,
           mojo::RectFPtr content_clip,
           mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
           Combinator combinator,
           const std::vector<uint32_t>& child_node_ids);
 
   uint32_t node_id() const { return node_id_; }
-  const mojo::Transform* content_transform() const {
+  const TransformPair* content_transform() const {
     return content_transform_.get();
   }
   const mojo::gfx::composition::HitTestBehavior* hit_test_behavior() const {
@@ -83,7 +85,7 @@ class NodeDef : public base::RefCounted<NodeDef> {
   bool HitTest(const SceneContent* content,
                const Snapshot* snapshot,
                const SkPoint& parent_point,
-               const SkMatrix& global_to_parent_transform,
+               const SkMatrix44& global_to_parent_transform,
                mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
 
  protected:
@@ -107,18 +109,18 @@ class NodeDef : public base::RefCounted<NodeDef> {
       const SceneContent* content,
       const Snapshot* snapshot,
       const SkPoint& local_point,
-      const SkMatrix& global_to_local_transform,
+      const SkMatrix44& global_to_local_transform,
       mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
 
  private:
   bool HitTestSelf(const SceneContent* content,
                    const Snapshot* snapshot,
                    const SkPoint& local_point,
-                   const SkMatrix& global_to_local_transform,
+                   const SkMatrix44& global_to_local_transform,
                    mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
 
   uint32_t const node_id_;
-  mojo::TransformPtr const content_transform_;
+  std::unique_ptr<TransformPair> const content_transform_;
   mojo::RectFPtr const content_clip_;
   mojo::gfx::composition::HitTestBehaviorPtr const hit_test_behavior_;
   Combinator const combinator_;
@@ -133,7 +135,7 @@ class NodeDef : public base::RefCounted<NodeDef> {
 class RectNodeDef : public NodeDef {
  public:
   RectNodeDef(uint32_t node_id,
-              mojo::TransformPtr content_transform,
+              std::unique_ptr<TransformPair> content_transform,
               mojo::RectFPtr content_clip,
               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
               Combinator combinator,
@@ -164,7 +166,7 @@ class RectNodeDef : public NodeDef {
 class ImageNodeDef : public NodeDef {
  public:
   ImageNodeDef(uint32_t node_id,
-               mojo::TransformPtr content_transform,
+               std::unique_ptr<TransformPair> content_transform,
                mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
@@ -203,7 +205,7 @@ class ImageNodeDef : public NodeDef {
 class SceneNodeDef : public NodeDef {
  public:
   SceneNodeDef(uint32_t node_id,
-               mojo::TransformPtr content_transform,
+               std::unique_ptr<TransformPair> content_transform,
                mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,
@@ -230,7 +232,7 @@ class SceneNodeDef : public NodeDef {
       const SceneContent* content,
       const Snapshot* snapshot,
       const SkPoint& local_point,
-      const SkMatrix& global_to_local_transform,
+      const SkMatrix44& global_to_local_transform,
       mojo::Array<mojo::gfx::composition::HitPtr>* hits) const override;
 
  private:
@@ -246,7 +248,7 @@ class SceneNodeDef : public NodeDef {
 class LayerNodeDef : public NodeDef {
  public:
   LayerNodeDef(uint32_t node_id,
-               mojo::TransformPtr content_transform,
+               std::unique_ptr<TransformPair> content_transform,
                mojo::RectFPtr content_clip,
                mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
                Combinator combinator,

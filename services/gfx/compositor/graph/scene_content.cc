@@ -32,7 +32,7 @@ void SceneContent::RecordPicture(const Snapshot* snapshot,
 bool SceneContent::HitTest(
     const Snapshot* snapshot,
     const SkPoint& scene_point,
-    const SkMatrix& global_to_scene_transform,
+    const SkMatrix44& global_to_scene_transform,
     mojo::gfx::composition::SceneHitPtr* out_scene_hit) const {
   DCHECK(snapshot);
   DCHECK(out_scene_hit);

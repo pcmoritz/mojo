@@ -19,7 +19,7 @@
 
 class SkCanvas;
 struct SkPoint;
-class SkMatrix;
+class SkMatrix44;
 
 namespace compositor {
 
@@ -65,7 +65,7 @@ class SceneContent : public base::RefCounted<SceneContent> {
   // Returns true if the search was terminated by an opaque hit.
   bool HitTest(const Snapshot* snapshot,
                const SkPoint& scene_point,
-               const SkMatrix& global_to_scene_transform,
+               const SkMatrix44& global_to_scene_transform,
                mojo::gfx::composition::SceneHitPtr* out_scene_hit) const;
 
   // Gets the requested resource, never null because it must be present.

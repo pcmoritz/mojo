@@ -6,6 +6,7 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_SCENE_DEF_H_
 
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>

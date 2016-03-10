@@ -9,9 +9,9 @@
 #include "services/gfx/compositor/graph/scene_content.h"
 #include "services/gfx/compositor/graph/scene_def.h"
 #include "services/gfx/compositor/render/render_frame.h"
-#include "third_party/skia/include/core/SkMatrix.h"
 #include "third_party/skia/include/core/SkPictureRecorder.h"
 #include "third_party/skia/include/core/SkRect.h"
+#include "third_party/skia/include/utils/SkMatrix44.h"
 
 namespace compositor {
 
@@ -44,7 +44,7 @@ void Snapshot::HitTest(const mojo::PointF& point,
   DCHECK(!is_blocked());
   DCHECK(root_scene_content_);
 
-  root_scene_content_->HitTest(this, point.To<SkPoint>(), SkMatrix::I(),
+  root_scene_content_->HitTest(this, point.To<SkPoint>(), SkMatrix44::I(),
                                &result->root);
 }
 

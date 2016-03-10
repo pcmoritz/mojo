@@ -34,6 +34,8 @@ source_set("common") {
     "graph/scene_label.h",
     "graph/snapshot.cc",
     "graph/snapshot.h",
+    "graph/transform_pair.cc",
+    "graph/transform_pair.h",
     "render/render_frame.cc",
     "render/render_frame.h",
     "render/render_image.cc",

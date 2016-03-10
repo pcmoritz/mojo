@@ -11,7 +11,9 @@
 #include "base/message_loop/message_loop.h"
 #include "base/strings/stringprintf.h"
 #include "mojo/services/gfx/composition/cpp/formatting.h"
+#include "mojo/skia/type_converters.h"
 #include "services/gfx/compositor/graph/scene_content.h"
+#include "services/gfx/compositor/graph/transform_pair.h"
 #include "services/gfx/compositor/render/render_image.h"
 
 namespace compositor {
@@ -221,7 +223,11 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     std::ostream& err) {
   DCHECK(node_decl);
 
-  mojo::TransformPtr content_transform = node_decl->content_transform.Pass();
+  std::unique_ptr<TransformPair> content_transform;
+  if (node_decl->content_transform) {
+    content_transform.reset(
+        new TransformPair(node_decl->content_transform.To<SkMatrix44>()));
+  }
   mojo::RectFPtr content_clip = node_decl->content_clip.Pass();
   mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior =
       node_decl->hit_test_behavior.Pass();
@@ -231,8 +237,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
       node_decl->child_node_ids.storage();
 
   if (!node_decl->op) {
-    return new NodeDef(node_id, content_transform.Pass(), content_clip.Pass(),
-                       hit_test_behavior.Pass(), combinator, child_node_ids);
+    return new NodeDef(node_id, std::move(content_transform),
+                       content_clip.Pass(), hit_test_behavior.Pass(),
+                       combinator, child_node_ids);
   }
 
   if (node_decl->op->is_rect()) {
@@ -242,7 +249,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const mojo::RectF& content_rect = *rect_node_decl->content_rect;
     const mojo::gfx::composition::Color& color = *rect_node_decl->color;
-    return new RectNodeDef(node_id, content_transform.Pass(),
+    return new RectNodeDef(node_id, std::move(content_transform),
                            content_clip.Pass(), hit_test_behavior.Pass(),
                            combinator, child_node_ids, content_rect, color);
   }
@@ -255,7 +262,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     mojo::RectFPtr image_rect = image_node_decl->image_rect.Pass();
     const uint32 image_resource_id = image_node_decl->image_resource_id;
     mojo::gfx::composition::BlendPtr blend = image_node_decl->blend.Pass();
-    return new ImageNodeDef(node_id, content_transform.Pass(),
+    return new ImageNodeDef(node_id, std::move(content_transform),
                             content_clip.Pass(), hit_test_behavior.Pass(),
                             combinator, child_node_ids, content_rect,
                             image_rect.Pass(), image_resource_id, blend.Pass());
@@ -266,7 +273,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const uint32_t scene_resource_id = scene_node_decl->scene_resource_id;
     const uint32_t scene_version = scene_node_decl->scene_version;
-    return new SceneNodeDef(node_id, content_transform.Pass(),
+    return new SceneNodeDef(node_id, std::move(content_transform),
                             content_clip.Pass(), hit_test_behavior.Pass(),
                             combinator, child_node_ids, scene_resource_id,
                             scene_version);
@@ -278,7 +285,7 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const mojo::RectF& layer_rect = *layer_node_decl->layer_rect;
     mojo::gfx::composition::BlendPtr blend = layer_node_decl->blend.Pass();
-    return new LayerNodeDef(node_id, content_transform.Pass(),
+    return new LayerNodeDef(node_id, std::move(content_transform),
                             content_clip.Pass(), hit_test_behavior.Pass(),
                             combinator, child_node_ids, layer_rect,
                             blend.Pass());

@@ -10,6 +10,7 @@
 #include "third_party/skia/include/core/SkPoint.h"
 #include "third_party/skia/include/core/SkRRect.h"
 #include "third_party/skia/include/core/SkRect.h"
+#include "third_party/skia/include/utils/SkMatrix44.h"
 
 namespace mojo {
 
@@ -59,7 +60,7 @@ struct TypeConverter<mojo::RRectF, SkRRect> {
 };
 
 // Note: This transformation is lossy since Transform is 4x4 whereas
-// SkMatrix is only 3x3.
+// SkMatrix is only 3x3 so we drop the 3rd row and column.
 template <>
 struct TypeConverter<SkMatrix, mojo::TransformPtr> {
   static SkMatrix Convert(const mojo::TransformPtr& input);
@@ -67,6 +68,16 @@ struct TypeConverter<SkMatrix, mojo::TransformPtr> {
 template <>
 struct TypeConverter<mojo::TransformPtr, SkMatrix> {
   static mojo::TransformPtr Convert(const SkMatrix& input);
+};
+
+// Note: This transformation is lossless.
+template <>
+struct TypeConverter<SkMatrix44, mojo::TransformPtr> {
+  static SkMatrix44 Convert(const mojo::TransformPtr& input);
+};
+template <>
+struct TypeConverter<mojo::TransformPtr, SkMatrix44> {
+  static mojo::TransformPtr Convert(const SkMatrix44& input);
 };
 
 }  // namespace mojo
