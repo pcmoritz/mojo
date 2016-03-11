@@ -20,7 +20,7 @@
 #include "mojo/public/c/system/handle.h"
 #include "mojo/public/c/system/message_pipe.h"
 #include "mojo/public/c/system/result.h"
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/time.h"
 #include "mojo/public/cpp/system/macros.h"
 
 namespace mojo {
@@ -83,10 +83,17 @@ class Core {
   // of these methods is to look at the header files defining the corresponding
   // API functions, referenced below.
 
-  // These methods correspond to the API functions defined in
-  // "mojo/public/c/system/functions.h":
+  // This method corresponds to the API function defined in
+  // "mojo/public/c/system/time.h":
+
   MojoTimeTicks GetTimeTicksNow();
+
+  // This method corresponds to the API function defined in
+  // "mojo/public/c/system/handle.h":
   MojoResult Close(MojoHandle handle);
+
+  // These methods correspond to the API functions defined in
+  // "mojo/public/c/system/wait.h":
   MojoResult Wait(MojoHandle handle,
                   MojoHandleSignals signals,
                   MojoDeadline deadline,

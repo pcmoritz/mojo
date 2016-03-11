@@ -5,7 +5,8 @@
 #ifndef MOJO_NACL_NONSFI_IRT_MOJO_NONSFI_H_
 #define MOJO_NACL_NONSFI_IRT_MOJO_NONSFI_H_
 
-#include "mojo/public/c/system/functions.h"
+#include "mojo/public/c/system/handle.h"
+#include "mojo/public/c/system/result.h"
 #include "native_client/src/untrusted/irt/irt_dev.h"
 
 namespace nacl {

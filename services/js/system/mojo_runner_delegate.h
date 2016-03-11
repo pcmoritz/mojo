@@ -7,7 +7,7 @@
 
 #include "base/macros.h"
 #include "gin/modules/module_runner_delegate.h"
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/handle.h"
 
 namespace mojo {
 namespace js {
