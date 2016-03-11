@@ -510,13 +510,18 @@ void ViewRegistry::TransferOrUnregisterViewStub(
   DCHECK(view_stub);
 
   if (transferred_view_owner_request.is_pending()) {
-    if (view_stub->state())
-      view_stub->state()->BindOwner(transferred_view_owner_request.Pass());
-    else if (view_stub->is_pending())
-      CHECK(false);  // TODO(jeffbrown): Handle transfer of pending view
-  } else {
-    UnregisterViewStub(std::move(view_stub));
+    if (view_stub->state()) {
+      view_stub->ReleaseView()->BindOwner(
+          transferred_view_owner_request.Pass());
+      return;
+    }
+    if (view_stub->is_pending()) {
+      // TODO(jeffbrown): Handle transfer of pending view
+      CHECK(false);
+      return;
+    }
   }
+  UnregisterViewStub(std::move(view_stub));
 }
 
 void ViewRegistry::UnregisterViewStub(std::unique_ptr<ViewStub> view_stub) {
