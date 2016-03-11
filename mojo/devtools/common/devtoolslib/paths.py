@@ -59,8 +59,10 @@ def infer_params(is_android, is_debug, target_cpu):
   params['build_dir_path'] = build_dir_path
   if is_android:
     params['shell_path'] = os.path.join(build_dir_path, 'apks', 'MojoShell.apk')
-    params['adb_path'] = os.path.join(root_path, 'third_party', 'android_tools',
-                                'sdk', 'platform-tools', 'adb')
+    adb_path = os.path.join(root_path, 'third_party', 'android_tools',
+                            'sdk', 'platform-tools', 'adb')
+    if os.path.isfile(adb_path):
+      params['adb_path'] = adb_path
   else:
     params['shell_path'] = os.path.join(build_dir_path, 'mojo_shell')
 
