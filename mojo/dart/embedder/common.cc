@@ -124,6 +124,39 @@ void DartEmbedder::SetCStringReturn(Dart_NativeArguments arguments,
   Dart_SetReturnValue(arguments, NewCString(str));
 }
 
+bool DartEmbedder::GetBooleanArgument(Dart_NativeArguments args,
+                                      intptr_t index) {
+  bool result;
+  Dart_Handle err = Dart_GetNativeBooleanArgument(args, index, &result);
+  if (Dart_IsError(err)) {
+    Dart_PropagateError(err);
+  }
+  return result;
+}
+
+int64_t DartEmbedder::GetIntegerArgument(Dart_NativeArguments args,
+                                         intptr_t index) {
+  int64_t result;
+  Dart_Handle err = Dart_GetNativeIntegerArgument(args, index, &result);
+  if (Dart_IsError(err)) {
+    Dart_PropagateError(err);
+  }
+  return result;
+}
+
+intptr_t DartEmbedder::GetIntptrArgument(Dart_NativeArguments args,
+                                         intptr_t index) {
+  int64_t value = 0;
+  Dart_Handle result = Dart_GetNativeIntegerArgument(args, index, &value);
+  if (Dart_IsError(result)) {
+    Dart_PropagateError(result);
+  }
+  if (value < INTPTR_MIN || INTPTR_MAX < value) {
+    Dart_PropagateError(Dart_NewApiError("Value outside intptr_t range"));
+  }
+  return static_cast<intptr_t>(value);
+}
+
 const char* DartEmbedder::GetStringArgument(Dart_NativeArguments arguments,
                                             intptr_t index) {
   Dart_Handle str_arg = Dart_GetNativeArgument(arguments, index);

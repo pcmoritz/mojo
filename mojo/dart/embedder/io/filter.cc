@@ -12,30 +12,46 @@ const int kZLibFlagAcceptAnyHeader = 32;
 
 static const int kFilterPointerNativeField = 0;
 
-Dart_Handle Filter::SetFilterPointerNativeField(Dart_Handle filter,
-                                                Filter* filter_pointer) {
-  return Dart_SetNativeInstanceField(
+static void DeleteFilter(
+    void* isolate_data,
+    Dart_WeakPersistentHandle handle,
+    void* filter_pointer) {
+  Filter* filter = reinterpret_cast<Filter*>(filter_pointer);
+  delete filter;
+}
+
+Dart_Handle Filter::SetFilterAndCreateFinalizer(Dart_Handle filter,
+                                                Filter* filter_pointer,
+                                                intptr_t size) {
+  Dart_Handle err = Dart_SetNativeInstanceField(
       filter,
       kFilterPointerNativeField,
       reinterpret_cast<intptr_t>(filter_pointer));
+  if (Dart_IsError(err)) {
+    return err;
+  }
+  Dart_NewWeakPersistentHandle(filter,
+                               reinterpret_cast<void*>(filter_pointer),
+                               size,
+                               DeleteFilter);
+  return err;
 }
 
-
-Dart_Handle Filter::GetFilterPointerNativeField(Dart_Handle filter,
-                                                Filter** filter_pointer) {
+Dart_Handle Filter::GetFilterNativeField(Dart_Handle filter,
+                                         Filter** filter_pointer) {
   return Dart_GetNativeInstanceField(
       filter,
       kFilterPointerNativeField,
       reinterpret_cast<intptr_t*>(filter_pointer));
 }
 
-
 ZLibDeflateFilter::~ZLibDeflateFilter() {
   delete[] dictionary_;
   delete[] current_buffer_;
-  if (initialized()) deflateEnd(&stream_);
+  if (initialized()) {
+    deflateEnd(&stream_);
+  }
 }
-
 
 bool ZLibDeflateFilter::Init() {
   int window_bits = window_bits_;
@@ -53,7 +69,7 @@ bool ZLibDeflateFilter::Init() {
   if (result != Z_OK) {
     return false;
   }
-  if (dictionary_ != NULL && !gzip_ && !raw_) {
+  if ((dictionary_ != NULL) && !gzip_ && !raw_) {
     result = deflateSetDictionary(&stream_, dictionary_, dictionary_length_);
     delete[] dictionary_;
     dictionary_ = NULL;
@@ -65,9 +81,10 @@ bool ZLibDeflateFilter::Init() {
   return true;
 }
 
-
 bool ZLibDeflateFilter::Process(uint8_t* data, intptr_t length) {
-  if (current_buffer_ != NULL) return false;
+  if (current_buffer_ != NULL) {
+    return false;
+  }
   stream_.avail_in = length;
   stream_.next_in = current_buffer_ = data;
   return true;
@@ -103,13 +120,13 @@ intptr_t ZLibDeflateFilter::Processed(uint8_t* buffer,
   return error ? -1 : 0;
 }
 
-
 ZLibInflateFilter::~ZLibInflateFilter() {
   delete[] dictionary_;
   delete[] current_buffer_;
-  if (initialized()) inflateEnd(&stream_);
+  if (initialized()) {
+    inflateEnd(&stream_);
+  }
 }
-
 
 bool ZLibInflateFilter::Init() {
   int window_bits = raw_ ?
@@ -129,14 +146,14 @@ bool ZLibInflateFilter::Init() {
   return true;
 }
 
-
 bool ZLibInflateFilter::Process(uint8_t* data, intptr_t length) {
-  if (current_buffer_ != NULL) return false;
+  if (current_buffer_ != NULL) {
+    return false;
+  }
   stream_.avail_in = length;
   stream_.next_in = current_buffer_ = data;
   return true;
 }
-
 
 intptr_t ZLibInflateFilter::Processed(uint8_t* buffer,
                                       intptr_t length,

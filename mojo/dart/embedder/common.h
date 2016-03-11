@@ -24,29 +24,36 @@ class DartEmbedder {
   // Returns the integer value of a Dart object. If the object is not
   // an integer value an API error is propagated.
   static int64_t GetIntegerValue(Dart_Handle value_obj);
+
   // Returns the integer value of a Dart object. If the object is not
-  // an integer value or outside the requested range an API error is
+  // an integer value or outside the requested range, an API error is
   // propagated.
   static int64_t GetInt64ValueCheckRange(
       Dart_Handle value_obj, int64_t lower, int64_t upper);
+
   // Returns the intptr_t value of a Dart object. If the object is not
-  // an integer value or the value is outside the intptr_t range an
+  // an integer value or the value is outside the intptr_t range, an
   // API error is propagated.
   static intptr_t GetIntptrValue(Dart_Handle value_obj);
+
   // Returns the string value of a Dart object. If the object is not
-  // a string value an API error is propagated.
+  // a string value, an API error is propagated.
   static const char* GetStringValue(Dart_Handle str_obj);
+
   // Returns the boolean value of a Dart object. If the object is not
-  // a boolean value an API error is propagated.
+  // a boolean value, an API error is propagated.
   static bool GetBooleanValue(Dart_Handle bool_obj);
+
   // Sets the field "name" in handle to val. Any error is propagated.
   static void SetIntegerField(Dart_Handle handle,
                               const char* name,
                               int64_t val);
+
   // Sets the field "name" in handle to val. Any error is propagated.
   static void SetStringField(Dart_Handle handle,
                              const char* name,
                              const char* val);
+
   // Returns a new Dart string. Any error is propagated.
   static Dart_Handle NewCString(const char* str);
 
@@ -55,6 +62,15 @@ class DartEmbedder {
 
   // Sets the return value in arguments to a string created from |str|.
   static void SetCStringReturn(Dart_NativeArguments arguments, const char* str);
+
+  // Returns the boolean value from native arguments. If the object is not
+  // a boolean value, an API error is propagated.
+  static bool GetBooleanArgument(Dart_NativeArguments args, intptr_t index);
+
+  // Returns the integer value from native arguments. If the object is not
+  // an integer value, an API error is propagated.
+  static int64_t GetIntegerArgument(Dart_NativeArguments args, intptr_t index);
+  static intptr_t GetIntptrArgument(Dart_NativeArguments args, intptr_t index);
 
   // Gets the string argument at index and returns a C string.
   // Any error is propagated.
