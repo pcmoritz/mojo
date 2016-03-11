@@ -14,7 +14,7 @@
 #include "mojo/public/c/environment/logger.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
-#include "mojo/public/cpp/system/functions.h"
+#include "mojo/public/cpp/system/time.h"
 #include "mojo/services/log/interfaces/entry.mojom.h"
 #include "mojo/services/log/interfaces/log.mojom.h"
 #include "services/log/log_impl.h"

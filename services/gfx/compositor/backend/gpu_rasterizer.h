@@ -15,7 +15,6 @@
 #include "base/timer/timer.h"
 #include "mojo/gpu/gl_context.h"
 #include "mojo/public/cpp/bindings/binding.h"
-#include "mojo/public/cpp/system/functions.h"
 #include "mojo/services/gpu/interfaces/context_provider.mojom.h"
 #include "mojo/skia/ganesh_context.h"
 #include "mojo/skia/ganesh_framebuffer_surface.h"

@@ -6,7 +6,7 @@
 
 #include "base/bind.h"
 #include "base/logging.h"
-#include "mojo/public/cpp/system/functions.h"
+#include "mojo/public/cpp/system/time.h"
 
 namespace mojo {
 namespace ui {
@@ -61,7 +61,7 @@ void Choreographer::DoFrame(mojo::gfx::composition::FrameInfoPtr frame_info) {
     // Ensure frame info is sane since it comes from another service.
     // TODO(jeffbrown): Would be better to report an error to the client
     // who can shut things down if needed.
-    MojoTimeTicks now = MojoGetTimeTicksNow();
+    MojoTimeTicks now = mojo::GetTimeTicksNow();
     if (frame_info->frame_time > now) {
       LOG(WARNING) << "Frame time is in the future: frame_time="
                    << frame_info->frame_time << ", now=" << now;

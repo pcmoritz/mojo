@@ -11,7 +11,6 @@
 #include "base/logging.h"
 #include "base/strings/stringprintf.h"
 #include "mojo/public/cpp/application/application_connection.h"
-#include "mojo/public/cpp/system/functions.h"
 #include "mojo/services/log/interfaces/entry.mojom.h"
 
 namespace mojo {
