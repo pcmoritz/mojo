@@ -3449,5 +3449,10 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   var bdata = new ByteData.view(unzippedBytes.buffer);
   var message = new bindings.Message(bdata, null, unzippedBytes.length, 0);
   _runtimeTypeInfo = mojom_types.RuntimeTypeInfo.deserialize(message);
+  test_included_unions_mojom.getAllMojomTypeDefinitions()
+      .forEach((String s, mojom_types.UserDefinedType udt) {
+          _runtimeTypeInfo.typeMap[s] = udt;
+      });
+
   return _runtimeTypeInfo;
 }
