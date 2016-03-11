@@ -28,6 +28,10 @@ var emitLineAndColumnNumbers bool = true
 // runtime type info.
 var emitSerializedRuntimeTypeInfo bool = true
 
+// By default we do not populate the complete type set of each top-level interface
+// because doing so is expensive and we are not currently using the the data.
+var populateCompleteTypeSet bool = false
+
 // Serialize serializes the MojomDescriptor into a binary form that is passed to the
 // backend of the compiler in order to invoke the code generators.
 // To do this we use Mojo serialization.
@@ -35,20 +39,25 @@ var emitSerializedRuntimeTypeInfo bool = true
 // of the serialized mojom_types.FileGraph.
 // This function is not thread safe.
 func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString string, err error) {
-	return serialize(d, debug, true, true)
+	return serialize(d, debug, true, true, false)
 }
 
 // serialize() is a package-private version of the public method Serialize().
 // It is intended for use in tests because it allows setting of the variables
-// emitLineAndColumnNumbers and emitSerializedRuntimeTypeInfo.
-// This function is not thread safe because it accesses the global variables
-// emitLineAndColumnNumbers and emitSerializedRuntimeTypeInfo.
+// emitLineAndColumnNumbers, emitSerializedRuntimeTypeInfo and populateCompleteTypeSet.
+// This function is not thread safe because it sets and accesses these global
+// variables.
 func serialize(d *mojom.MojomDescriptor, debug,
-	emitLineAndColumnNumbersParam, emitSerializedRuntimeTypeInfoParam bool) (bytes []byte, debugString string, err error) {
+	emitLineAndColumnNumbersParam, emitSerializedRuntimeTypeInfoParam,
+	populateCompleteTypeSetParam bool) (bytes []byte, debugString string, err error) {
+
+	// Save the global state and then set it based on the parameters.
 	saveEmitLineAndColumnNumbers := emitLineAndColumnNumbers
 	emitLineAndColumnNumbers = emitLineAndColumnNumbersParam
 	saveEmitSerializedRuntimeTypeInfo := emitSerializedRuntimeTypeInfo
 	emitSerializedRuntimeTypeInfo = emitSerializedRuntimeTypeInfoParam
+	savePopulateCompleteTypeSet := populateCompleteTypeSet
+	populateCompleteTypeSet = populateCompleteTypeSetParam
 
 	fileGraph := translateDescriptor(d)
 	if debug {
@@ -59,8 +68,10 @@ func serialize(d *mojom.MojomDescriptor, debug,
 	fileGraph.Encode(encoder)
 	bytes, _, err = encoder.Data()
 
+	// Restore the original values of the global state.
 	emitLineAndColumnNumbers = saveEmitLineAndColumnNumbers
 	emitSerializedRuntimeTypeInfo = saveEmitSerializedRuntimeTypeInfo
+	populateCompleteTypeSet = savePopulateCompleteTypeSet
 	return
 }
 
@@ -243,7 +254,9 @@ func addServiceTypeInfo(intrfc *mojom.MojomInterface, typeInfo *mojom_types.Runt
 	if isTopLevel {
 		serviceTypeInfo := mojom_types.ServiceTypeInfo{}
 		serviceTypeInfo.TopLevelInterface = intrfc.TypeKey()
-		serviceTypeInfo.CompleteTypeSet = intrfc.FindReachableTypes()
+		if populateCompleteTypeSet {
+			serviceTypeInfo.CompleteTypeSet = intrfc.FindReachableTypes()
+		}
 		typeInfo.ServicesByName[*intrfc.ServiceName] = serviceTypeInfo
 	}
 	return

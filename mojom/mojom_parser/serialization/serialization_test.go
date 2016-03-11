@@ -1007,14 +1007,14 @@ func TestSingleFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
 		// Serialize again and check for consistency.
-		bytes2, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		bytes2, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -1111,7 +1111,7 @@ func TestMetaDataOnlyMode(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -1390,7 +1390,7 @@ func TestTwoFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false)
+		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -2014,7 +2014,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, true)
+		bytes, _, err := serialize(descriptor, false, false, true, true)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -2039,6 +2039,28 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		// Compare B
 		if err := compareTwoGoObjects(c.expectedRuntimeTypeInfoB, &runtimeTypeInfoB); err != nil {
 			t.Errorf("case %d B:\n%s", i, err.Error())
+		}
+
+		// Test the parameter populateCompleteTypeSet. We set the final
+		// parameter to false.
+		bytes, _, err = serialize(descriptor, false, false, true, false)
+		if err != nil {
+			t.Errorf("Serialization error for case %d: %s", i, err.Error())
+			continue
+		}
+
+		// Deserialize
+		decoder = bindings.NewDecoder(bytes, nil)
+		fileGraph = mojom_files.MojomFileGraph{}
+		fileGraph.Decode(decoder)
+		runtimeTypeInfoA = deserializeRuntimeTypeInfo(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo)
+
+		// Check that CompleteTypeSet has not been populated for any service.
+		for name, service := range runtimeTypeInfoA.ServicesByName {
+			length := len(service.CompleteTypeSet)
+			if length != 0 {
+				t.Errorf("len(CompleteTypeSet)=%d for service=%q", length, name)
+			}
 		}
 	}
 }
