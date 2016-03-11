@@ -6,7 +6,7 @@
 
 #include "base/files/file_util.h"
 #include "mojo/nacl/nonsfi/irt_mojo_nonsfi.h"
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/handle.h"
 #include "native_client/src/public/irt_core.h"
 #include "native_client/src/public/nonsfi/elf_loader.h"
 

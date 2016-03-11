@@ -5,7 +5,7 @@
 #ifndef MOJO_NACL_SFI_NACL_BINDINGS_MONACL_SEL_MAIN_H_
 #define MOJO_NACL_SFI_NACL_BINDINGS_MONACL_SEL_MAIN_H_
 
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/handle.h"
 
 struct NaClDesc;
 

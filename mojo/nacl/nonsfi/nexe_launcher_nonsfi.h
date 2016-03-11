@@ -5,7 +5,7 @@
 #ifndef MOJO_NACL_NONSFI_NEXE_LAUNCHER_NONSFI_H_
 #define MOJO_NACL_NONSFI_NEXE_LAUNCHER_NONSFI_H_
 
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/handle.h"
 
 namespace nacl {
 

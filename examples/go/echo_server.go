@@ -14,7 +14,8 @@ import (
 	"examples/echo/echo"
 )
 
-//#include "mojo/public/c/system/types.h"
+//#include "mojo/public/c/system/handle.h"
+//#include "mojo/public/c/system/result.h"
 import "C"
 
 type EchoImpl struct{}

@@ -5,7 +5,8 @@
 #ifndef MOJO_NACL_SFI_NACL_BINDINGS_MOJO_SYSCALL_H_
 #define MOJO_NACL_SFI_NACL_BINDINGS_MOJO_SYSCALL_H_
 
-#include "mojo/public/c/system/types.h"
+#include "mojo/public/c/system/handle.h"
+#include "mojo/public/c/system/result.h"
 
 // Injects a NaClDesc for Mojo support and sets a MojoHandle to be provided to
 // untrusted code as a "service provider" MojoHandle.  This provides the

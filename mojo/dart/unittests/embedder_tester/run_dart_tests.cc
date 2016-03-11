@@ -8,7 +8,6 @@
 #include "base/rand_util.h"
 #include "mojo/dart/embedder/dart_controller.h"
 #include "mojo/dart/unittests/embedder_tester/dart_test.h"
-#include "mojo/public/c/system/types.h"
 #include "mojo/public/cpp/environment/environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
