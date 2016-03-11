@@ -210,14 +210,14 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 		p.writef("@%v", mojomMethod.DeclaredOrdinal())
 	}
 
-	p.writeMethodParams(mojomMethod.Parameters)
+	p.writeMethodParams(mojomMethod.Parameters, mojomMethod)
 	if mojomMethod.ResponseParameters != nil {
 		if splitResponse {
 			p.nl()
 			p.write("   ")
 		}
 		p.write(" => ")
-		p.writeMethodParams(mojomMethod.ResponseParameters)
+		p.writeMethodParams(mojomMethod.ResponseParameters, mojomMethod)
 	}
 	p.write(";")
 	p.writeRightComments(mojomMethod)
@@ -225,13 +225,24 @@ func (p *printer) writeMojomMethod(mojomMethod *mojom.MojomMethod) {
 
 // writeMethodParams writes the pretty-printed method parameters represented by
 // a MojomStruct.
-func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
+func (p *printer) writeMethodParams(params *mojom.MojomStruct, method *mojom.MojomMethod) {
+	// The presence or absence of a semi-colon needs to be taken into account when
+	// trying to enforce the line size limit.
+	semiColon := false
+	if params.StructType() == mojom.StructTypeSyntheticResponse || method.ResponseParameters == nil {
+		semiColon = true
+	}
 	ownLine := false
 	if p.maxLineLength > 0 {
 		scratch := newPrinter()
 		scratch.maxLineLength = -1
-		scratch.writeMethodParams(params)
-		if len(scratch.result())+p.lineLength() > p.maxLineLength {
+		scratch.writeMethodParams(params, method)
+		scratchLineLen := len(scratch.result()) + p.lineLength()
+		// If a semi-colon will be added after the parameters, account for it.
+		if semiColon {
+			scratchLineLen += 1
+		}
+		if scratchLineLen > p.maxLineLength {
 			ownLine = true
 		}
 	}
@@ -242,14 +253,23 @@ func (p *printer) writeMethodParams(params *mojom.MojomStruct) {
 	if ownLine {
 		// If we are printing every parameter on its own line, check to see if
 		// aligning the parameters to the right of the method name can be done.
-		for _, param := range declaredObjects {
+		for i, param := range declaredObjects {
 			scratch := newPrinter()
 			scratch.maxLineLength = -1
 			scratch.writeMethodParam(param.(*mojom.StructField))
 			// If any parameter would go beyond the maximum line length, start the
 			// list of parameters on the line after the method name and indented 4
 			// more than the method itself.
-			if len(scratch.result())+p.lineLength() > p.maxLineLength {
+			scratchLineLen := len(scratch.result()) + p.lineLength()
+			// If this is the last parameter, account for the closing parenthesis.
+			if i == len(declaredObjects)-1 {
+				scratchLineLen += 1
+				// If a semi-colo will be added after the parameters, account for it.
+				if semiColon {
+					scratchLineLen += 1
+				}
+			}
+			if scratchLineLen > p.maxLineLength {
 				p.nl()
 				extraIndent = 4
 				break

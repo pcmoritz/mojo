@@ -58,6 +58,14 @@ enum SomeWeirdFormat { VALUE1 = 10, VALUE2 = 20};
 
 // end-no-format
 
+interface InterfaceBar {
+  CreateApplicationConnector(
+      ApplicationConnector& application_connector_request);
+  SetRootScene(SceneToken scene_token,
+               uint32 scene_version,
+               mojo.Rect viewport);
+};
+
 // constant comment.
 const int8 foo_constant1 = 10;  // constant comment.
 const int8 foo_constant2 = -10;  // constant comment.
