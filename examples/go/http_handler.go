@@ -58,7 +58,7 @@ func (d *HttpHandlerDelegate) Initialize(ctx application.Context) {
 	factory := http_server_factory.NewHttpServerFactoryProxy(pointer, bindings.GetAsyncWaiter())
 
 	addr := &net_address.NetAddress{
-		net_address.NetAddressFamily_IpV4,
+		net_address.NetAddressFamily_Ipv4,
 		&net_address.NetAddressIPv4{
 			8080,
 			[4]uint8{127, 0, 0, 1},

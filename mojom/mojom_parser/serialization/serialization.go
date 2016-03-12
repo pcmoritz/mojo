@@ -459,21 +459,21 @@ func translateSimpleType(simpleType mojom.SimpleType) *mojom_types.TypeSimpleTyp
 	case mojom.SimpleTypeFloat:
 		value = mojom_types.SimpleType_Float
 	case mojom.SimpleTypeInt8:
-		value = mojom_types.SimpleType_InT8
+		value = mojom_types.SimpleType_Int8
 	case mojom.SimpleTypeInt16:
-		value = mojom_types.SimpleType_InT16
+		value = mojom_types.SimpleType_Int16
 	case mojom.SimpleTypeInt32:
-		value = mojom_types.SimpleType_InT32
+		value = mojom_types.SimpleType_Int32
 	case mojom.SimpleTypeInt64:
-		value = mojom_types.SimpleType_InT64
+		value = mojom_types.SimpleType_Int64
 	case mojom.SimpleTypeUInt8:
-		value = mojom_types.SimpleType_UinT8
+		value = mojom_types.SimpleType_Uint8
 	case mojom.SimpleTypeUInt16:
-		value = mojom_types.SimpleType_UinT16
+		value = mojom_types.SimpleType_Uint16
 	case mojom.SimpleTypeUInt32:
-		value = mojom_types.SimpleType_UinT32
+		value = mojom_types.SimpleType_Uint32
 	case mojom.SimpleTypeUInt64:
-		value = mojom_types.SimpleType_UinT64
+		value = mojom_types.SimpleType_Uint64
 	}
 	return &mojom_types.TypeSimpleType{value}
 }

@@ -256,17 +256,17 @@ func TestUnionType(t *testing.T) {
 		// Special case each field since we know what's inside.
 		switch ordinal {
 		case 0:
-			if tst.Value != mojom_types.SimpleType_UinT16 {
-				t.Fatalf("UnionB's field %d's Type value was not SimpleType_UinT16", ordinal)
+			if tst.Value != mojom_types.SimpleType_Uint16 {
+				t.Fatalf("UnionB's field %d's Type value was not SimpleType_Uint16", ordinal)
 			}
 		case 1:
 		case 3:
-			if tst.Value != mojom_types.SimpleType_UinT32 {
-				t.Fatalf("UnionB's field %d's Type value was not SimpleType_UinT32", ordinal)
+			if tst.Value != mojom_types.SimpleType_Uint32 {
+				t.Fatalf("UnionB's field %d's Type value was not SimpleType_Uint32", ordinal)
 			}
 		case 2:
-			if tst.Value != mojom_types.SimpleType_UinT64 {
-				t.Fatalf("UnionB's field %d's Type value was not SimpleType_UinT64", ordinal)
+			if tst.Value != mojom_types.SimpleType_Uint64 {
+				t.Fatalf("UnionB's field %d's Type value was not SimpleType_Uint64", ordinal)
 			}
 		default:
 			t.Fatalf("There should not be a field Tag %d for UnionB", ordinal)
@@ -446,8 +446,8 @@ func checkMojomInterface(t *testing.T, mi mojom_types.MojomInterface, shortName,
 			}
 			if tst, ok := params.Fields[0].Type.(*mojom_types.TypeSimpleType); !ok {
 				t.Fatalf("Method0 Request param 0's Type should be a *TypeSimpleType")
-			} else if tst.Value != mojom_types.SimpleType_UinT8 {
-				t.Fatalf("Method0 Request param 0's Type's Value should be a SimpleType_UinT8")
+			} else if tst.Value != mojom_types.SimpleType_Uint8 {
+				t.Fatalf("Method0 Request param 0's Type's Value should be a SimpleType_Uint8")
 			}
 
 			response := method.ResponseParams
@@ -459,8 +459,8 @@ func checkMojomInterface(t *testing.T, mi mojom_types.MojomInterface, shortName,
 			}
 			if tst, ok := response.Fields[0].Type.(*mojom_types.TypeSimpleType); !ok {
 				t.Fatalf("Method0 Response param 0's Type should be a *TypeSimpleType")
-			} else if tst.Value != mojom_types.SimpleType_UinT8 {
-				t.Fatalf("Method0 Response param 0's Type's Value should be a SimpleType_UinT8")
+			} else if tst.Value != mojom_types.SimpleType_Uint8 {
+				t.Fatalf("Method0 Response param 0's Type's Value should be a SimpleType_Uint8")
 			}
 		case 1:
 			// We expect 1 to be a MojomMethod with a request and nil response params.
@@ -470,8 +470,8 @@ func checkMojomInterface(t *testing.T, mi mojom_types.MojomInterface, shortName,
 			}
 			if tst, ok := params.Fields[0].Type.(*mojom_types.TypeSimpleType); !ok {
 				t.Fatalf("Method1 Request param 0's Type should be a *TypeSimpleType")
-			} else if tst.Value != mojom_types.SimpleType_UinT8 {
-				t.Fatalf("Method1 Request param 0's Type's Value should be a SimpleType_UinT8")
+			} else if tst.Value != mojom_types.SimpleType_Uint8 {
+				t.Fatalf("Method1 Request param 0's Type's Value should be a SimpleType_Uint8")
 			}
 
 			if method.ResponseParams != nil {

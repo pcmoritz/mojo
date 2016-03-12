@@ -23,14 +23,14 @@ const (
 	SimpleType_Bool = 0
 	SimpleType_Double = SimpleType_Bool + 1;
 	SimpleType_Float = SimpleType_Double + 1;
-	SimpleType_InT8 = SimpleType_Float + 1;
-	SimpleType_InT16 = SimpleType_InT8 + 1;
-	SimpleType_InT32 = SimpleType_InT16 + 1;
-	SimpleType_InT64 = SimpleType_InT32 + 1;
-	SimpleType_UinT8 = SimpleType_InT64 + 1;
-	SimpleType_UinT16 = SimpleType_UinT8 + 1;
-	SimpleType_UinT32 = SimpleType_UinT16 + 1;
-	SimpleType_UinT64 = SimpleType_UinT32 + 1;
+	SimpleType_Int8 = SimpleType_Float + 1;
+	SimpleType_Int16 = SimpleType_Int8 + 1;
+	SimpleType_Int32 = SimpleType_Int16 + 1;
+	SimpleType_Int64 = SimpleType_Int32 + 1;
+	SimpleType_Uint8 = SimpleType_Int64 + 1;
+	SimpleType_Uint16 = SimpleType_Uint8 + 1;
+	SimpleType_Uint32 = SimpleType_Uint16 + 1;
+	SimpleType_Uint64 = SimpleType_Uint32 + 1;
 )
 
 

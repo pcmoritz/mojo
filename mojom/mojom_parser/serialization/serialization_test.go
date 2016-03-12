@@ -207,22 +207,22 @@ func TestSingleFileSerialization(t *testing.T) {
 				// field z
 				{
 					DeclData: test.newShortDeclDataO(2, 0, "z"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field w
 				{
 					DeclData: test.newShortDeclDataO(3, 1, "w"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field x
 				{
 					DeclData: test.newShortDeclDataO(0, 2, "x"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(1, 3, "y"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 			},
 		}}
@@ -260,22 +260,22 @@ func TestSingleFileSerialization(t *testing.T) {
 				// field z
 				{
 					DeclData: test.newShortDeclDataO(2, 0, "z"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field w
 				{
 					DeclData: test.newShortDeclDataO(3, -1, "w"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field x
 				{
 					DeclData: test.newShortDeclDataO(0, 2, "x"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(1, -1, "y"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 			},
 		}}
@@ -425,25 +425,25 @@ func TestSingleFileSerialization(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(0, -1, "bar1"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
-						false, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						false, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar2 is not nullable and fixed length of 7
 				{
 					DeclData: test.newShortDeclDataO(1, -1, "bar2"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
-						false, 7, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						false, 7, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar3 is nullable and not fixed length
 				{
 					DeclData: test.newShortDeclDataO(2, -1, "bar3"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
-						true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar4 is nullable and fixed length of 8
 				{
 					DeclData: test.newShortDeclDataO(3, -1, "bar4"),
 					Type: &mojom_types.TypeArrayType{mojom_types.ArrayType{
-						true, 8, &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						true, 8, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 			},
 		}}
@@ -481,7 +481,7 @@ func TestSingleFileSerialization(t *testing.T) {
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						false,
 						&mojom_types.TypeStringType{mojom_types.StringType{false}},
-						&mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						&mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar2 is non-nullable with a nullable key.
 				{
@@ -489,7 +489,7 @@ func TestSingleFileSerialization(t *testing.T) {
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						false,
 						&mojom_types.TypeStringType{mojom_types.StringType{true}},
-						&mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						&mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar3 is nullable with a non-nullable key.
 				{
@@ -497,7 +497,7 @@ func TestSingleFileSerialization(t *testing.T) {
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						true,
 						&mojom_types.TypeStringType{mojom_types.StringType{false}},
-						&mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						&mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 				// field bar4 is nullable with a nullable key.
 				{
@@ -505,7 +505,7 @@ func TestSingleFileSerialization(t *testing.T) {
 					Type: &mojom_types.TypeMapType{mojom_types.MapType{
 						true,
 						&mojom_types.TypeStringType{mojom_types.StringType{true}},
-						&mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32}}},
+						&mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 				},
 			},
 		}}
@@ -728,7 +728,7 @@ func TestSingleFileSerialization(t *testing.T) {
 							},
 							mojom_types.StructField{
 								DeclData: test.newDeclDataO(1, -1, "millis", ""),
-								Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+								Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 							},
 						},
 					},
@@ -829,56 +829,56 @@ func TestSingleFileSerialization(t *testing.T) {
 		// xu8
 		test.expectedGraph().ResolvedValues["TYPE_KEY:xu8"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu8", "xu8"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_UinT8},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint8},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint8Value{255}},
 		}}
 
 		// x8
 		test.expectedGraph().ResolvedValues["TYPE_KEY:x8"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x8", "x8"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT8},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{-127}},
 		}}
 
 		// xu16
 		test.expectedGraph().ResolvedValues["TYPE_KEY:xu16"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu16", "xu16"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_UinT16},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint16Value{0xFFFF}},
 		}}
 
 		// x16
 		test.expectedGraph().ResolvedValues["TYPE_KEY:x16"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x16", "x16"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT16},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt16Value{-0x7FFF}},
 		}}
 
 		// xu32
 		test.expectedGraph().ResolvedValues["TYPE_KEY:xu32"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu32", "xu32"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_UinT32},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint32},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint32Value{4294967295}},
 		}}
 
 		// x32
 		test.expectedGraph().ResolvedValues["TYPE_KEY:x32"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x32", "x32"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt32Value{-2147483647}},
 		}}
 
 		// xu64
 		test.expectedGraph().ResolvedValues["TYPE_KEY:xu64"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu64", "xu64"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_UinT64},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint64},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint64Value{0xFFFFFFFFFFFFFFFF}},
 		}}
 
 		// x64
 		test.expectedGraph().ResolvedValues["TYPE_KEY:x64"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x64", "x64"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT64},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt64Value{-0x7FFFFFFFFFFFFFFF}},
 		}}
 
@@ -1004,7 +1004,7 @@ func TestSingleFileSerialization(t *testing.T) {
 		// NUM_MAGI
 		test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.NUM_MAGI"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("NUM_MAGI", "mojom.test.NUM_MAGI"),
-			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_UinT16},
+			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{3}},
 		}}
 
@@ -1052,7 +1052,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				// field x
 				{
 					DeclData: test.newShortDeclDataO(0, -1, "x"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 				},
 				// field y
 				{

@@ -172,7 +172,7 @@ type HttpServerDelegate struct {
 
 func (d *HttpServerDelegate) InitTCPBoundSocket() error {
 	addr := &net_address.NetAddress{
-		net_address.NetAddressFamily_IpV4,
+		net_address.NetAddressFamily_Ipv4,
 		&net_address.NetAddressIPv4{
 			8080,
 			[4]uint8{127, 0, 0, 1},
