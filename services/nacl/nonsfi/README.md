@@ -36,7 +36,10 @@ the content handler and these helper nexes more complicated.
 For the full picture of the compilation process:
 
 * PexeContentHandler
-  * Create a message pipe, which has a parent and child handle
+  * Hash the input file, and observe if it has already been translated.
+    If it has, then read the pre-translated nexe from storage and launch it
+    immediately.
+  * Create a message pipe, which has a parent and child handle.
   * Call `PexeCompilerStart`, passing in the child end of the message pipe. This
   contacts a new service which is responsible for launching `pnacl_llc.nexe`.
 * PexeCompiler (new process)
@@ -54,17 +57,16 @@ For the full picture of the compilation process:
   object files created by compilation
 * Meanwhile, back in the pnacl_llc nexe:
   * Actually do the requested compilation, and pass back the newly created
-  object files
+  object files.
 
 The linking process works similarly, but utilizes a different interface which
-lets it receive object files and return a linked nexe.
+lets it receive object files and return a linked nexe. Once linking has
+finished, the PexeContentHandler may choose to cache the resultant nexe so that
+future clients accessing the same pexe will be able to skip the translation
+process.
 
 Once both the compilation and linking steps have been completed, the
 PexeContentHandler is able to launch the requested nexe.
 
-TODO
-====
-
-* Use subzero (a NaCl project to improve translation speed) for pexe
-translation.
-* Enable caching of translated pexes.
+Note: For x86 and x86-64 systems, Subzero is used for translating the pexe
+into a native format, and `sz.nexe` is used instead of `pnacl-llc.nexe`.
