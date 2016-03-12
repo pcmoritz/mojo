@@ -325,7 +325,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				// field x
 				{
 					DeclData: test.newShortDeclDataO(0, 21, "x"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 					Tag:      21,
 				},
 				// field y
@@ -382,7 +382,7 @@ func TestSingleFileSerialization(t *testing.T) {
 				// field x
 				{
 					DeclData: test.newShortDeclDataO(0, 21, "x"),
-					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 					Tag:      21,
 				},
 				// field y
