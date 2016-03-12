@@ -650,6 +650,69 @@ func TestErrorParsing(t *testing.T) {
 	endTestCase()
 
 	////////////////////////////////////////////////////////////
+	// Test Case (Invalid union field ordinal: too big for uint32)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	union MyUnion {
+		int8  x;
+		int16 y@4294967295;
+		int32 z;
+	};
+
+	`
+	expectError("union field \"y\": Invalid ordinal string following '@'")
+	expectError("4294967295")
+	expectError("Ordinals must be decimal integers between 0 and 4294967294")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid union field ordinal: implicit next value too big for uint32)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	union MyUnion {
+		int8  x;
+		int16 y@4294967294;
+		int32 z;
+	};
+	`
+	expectError("Invalid tag for field z")
+	expectError("4294967295")
+	expectError("A union field tag must be between 0 and 4,294,967,294.")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid union field ordinal: Duplicate explicit)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	union MyUnion {
+		int8  x@0;
+		int16 y;
+		int32 z@0;
+	};
+	`
+	expectError("Invalid tag for field z: 0.")
+	expectError("There is already a field in union MyUnion with that tag: x")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
+	// Test Case (Invalid union field ordinal: Duplicate implicit)
+	////////////////////////////////////////////////////////////
+	startTestCase("")
+	cases[testCaseNum].mojomContents = `
+	union MyUnion {
+		int8  x;
+		int16 y;
+		int32 z@1;
+	};
+	`
+	expectError("Invalid tag for field z: 1.")
+	expectError("There is already a field in union MyUnion with that tag: y")
+	endTestCase()
+
+	////////////////////////////////////////////////////////////
 	// Test Case (Invalid method ordinal: too big for uint32)
 	////////////////////////////////////////////////////////////
 	startTestCase("")

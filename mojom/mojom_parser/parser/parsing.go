@@ -865,7 +865,10 @@ func (p *Parser) parseUnionDecl(attributes *mojom.Attributes) (union *mojom.Mojo
 	union.SetClosingBraceToken(&closingBraceToken)
 
 	if p.matchSemicolon() {
-		union.ComputeFieldTags()
+		if err := union.ComputeFieldTags(); err != nil {
+			p.err = err
+			return
+		}
 	}
 
 	return

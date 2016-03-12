@@ -26,6 +26,7 @@ action("mojom_tool") {
     "parser/parser.go",
     "parser/parsing.go",
     "serialization/serialization.go",
+    "utils/sort_utils.go",
   ]
 
   outputs = [

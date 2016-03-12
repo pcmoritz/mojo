@@ -284,6 +284,120 @@ func TestSingleFileSerialization(t *testing.T) {
 	}
 
 	////////////////////////////////////////////////////////////
+	// Test Case: union field tags
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	union Foo{
+	  int32 x@21;
+	  string y@32;
+	  bool z@6;
+	  float w@17;
+	};`
+
+		test.addTestCase("", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Unions = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// union Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeUnionType{mojom_types.MojomUnion{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.UnionField{
+				// The fields are in tag order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(2, 6, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Tag:      6,
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(3, 17, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Float},
+					Tag:      17,
+				},
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, 21, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Tag:      21,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, 32, "y"),
+					Type:     &mojom_types.TypeStringType{mojom_types.StringType{false}},
+					Tag:      32,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: union field tags, some implicit
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	union Foo{
+	  int32 x@21;
+	  string y;
+	  bool z@6;
+	  float w;
+	};`
+
+		test.addTestCase("", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Unions = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// union Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeUnionType{mojom_types.MojomUnion{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.UnionField{
+				// The fields are in tag order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(2, 6, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Tag:      6,
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Float},
+					Tag:      7,
+				},
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, 21, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_InT32},
+					Tag:      21,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeStringType{mojom_types.StringType{false}},
+					Tag:      22,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
 	// Test Case: array of int32
 	////////////////////////////////////////////////////////////
 	{

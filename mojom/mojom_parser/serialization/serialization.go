@@ -370,7 +370,7 @@ func translateMojomEnum(enum *mojom.MojomEnum) *mojom_types.UserDefinedTypeEnumT
 func translateMojomUnion(union *mojom.MojomUnion) *mojom_types.UserDefinedTypeUnionType {
 	mojomUnion := mojom_types.UserDefinedTypeUnionType{}
 	mojomUnion.Value.DeclData = translateDeclarationData(&union.DeclarationData)
-	for _, field := range union.Fields {
+	for _, field := range union.FieldsInTagOrder() {
 		mojomUnion.Value.Fields = append(mojomUnion.Value.Fields,
 			translateUnionField(field))
 	}
@@ -623,7 +623,7 @@ func translateDeclarationData(d *mojom.DeclarationData) *mojom_types.Declaration
 	// We do not serialize the fully-qualified-name for objects that only exist
 	// as children of their container objects and are not independently
 	// referenceable.
-	case *mojom.StructField, *mojom.MojomMethod:
+	case *mojom.StructField, *mojom.MojomMethod, *mojom.UnionField:
 	case *mojom.MojomStruct:
 		switch declaredObject.StructType() {
 		case mojom.StructTypeRegular:

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"mojom/mojom_parser/lexer"
+	"mojom/mojom_parser/utils"
 	"sort"
 	"strings"
 )
@@ -461,7 +462,7 @@ func (e *StructFieldOrdinalError) Error() string {
 			e.Field.SimpleName(), e.Ord, e.StructName,
 			e.ExistingField.SimpleName())
 	default:
-		panic(fmt.Sprintf("Unrecognized type of MethodOrdinalError %v", e.Err))
+		panic(fmt.Sprintf("Unrecognized type of StructFieldOrdinalError %v", e.Err))
 	}
 	return UserErrorMessage(e.Field.OwningFile(), e.Field.NameToken(), message)
 }
@@ -693,7 +694,7 @@ func (e *MethodOrdinalError) Error() string {
 	switch e.Err {
 	case ErrOrdinalRange:
 		message = fmt.Sprintf("Invalid method ordinal for method %s: %d. "+
-			"A method ordinal must be a non-negative 32-bit integer value.",
+			"A method ordinal must be between 0 and 4,294,967,294.",
 			e.Method.SimpleName(), e.Ord)
 	case ErrOrdinalDuplicate:
 		message = fmt.Sprintf("Invalid method ordinal for method %s: %d. "+
@@ -805,14 +806,15 @@ type MojomUnion struct {
 	UserDefinedTypeBase
 	DeclaredObjectsContainerBase
 
-	fieldsByName map[string]*UnionField
-	Fields       []*UnionField
+	fieldsByName         map[string]*UnionField
+	FieldsInLexicalOrder []*UnionField
+	fieldsInTagOrder     []*UnionField
 }
 
 func NewMojomUnion(declData DeclarationData) *MojomUnion {
 	mojomUnion := new(MojomUnion)
 	mojomUnion.fieldsByName = make(map[string]*UnionField)
-	mojomUnion.Fields = make([]*UnionField, 0)
+	mojomUnion.FieldsInLexicalOrder = make([]*UnionField, 0)
 	mojomUnion.Init(declData, mojomUnion)
 	return mojomUnion
 }
@@ -828,15 +830,86 @@ func (u *MojomUnion) AddField(declData DeclarationData, FieldType TypeRef) Dupli
 			"field", "union", u.simpleName}
 	}
 	u.fieldsByName[field.simpleName] = &field
-	u.Fields = append(u.Fields, &field)
+	field.lexicalPosition = int32(len(u.FieldsInLexicalOrder))
+	u.FieldsInLexicalOrder = append(u.FieldsInLexicalOrder, &field)
 	u.DeclaredObjects = append(u.DeclaredObjects, &field)
 	return nil
 }
 
+func (u *MojomUnion) FieldsInTagOrder() []*UnionField {
+	if u.fieldsInTagOrder == nil {
+		panic("The method ComputeFieldTags() must be invoked first.")
+	}
+	return u.fieldsInTagOrder
+}
+
+type UnionFieldTagOrdinalError struct {
+	Ord           int64       // The attemted ordinal
+	UnionName     string      // The name of the union in which the problem occurs.
+	Field         *UnionField // The field with the attempted ordinal
+	ExistingField *UnionField // Used if Err == ErrOrdinalDuplicate
+	Err           error       // the type of error (ErrOrdinalRange, ErrOrdinalDuplicate)
+}
+
+// UnionFieldTagOrdinalError implements error.
+func (e *UnionFieldTagOrdinalError) Error() string {
+	var message string
+	switch e.Err {
+	case ErrOrdinalRange:
+		message = fmt.Sprintf("Invalid tag for field %s: %d. "+
+			"A union field tag must be between 0 and 4,294,967,294.",
+			e.Field.SimpleName(), e.Ord)
+	case ErrOrdinalDuplicate:
+		message = fmt.Sprintf("Invalid tag for field %s: %d. "+
+			"There is already a field in union %s with that tag: %s.",
+			e.Field.SimpleName(), e.Ord, e.UnionName,
+			e.ExistingField.SimpleName())
+	default:
+		panic(fmt.Sprintf("Unrecognized type of UnionFieldTagOrdinalError %v", e.Err))
+	}
+	return UserErrorMessage(e.Field.OwningFile(), e.Field.NameToken(), message)
+}
+
 // This should be invoked some time after all of the fields have been added
 // to the union.
-func (u *MojomUnion) ComputeFieldTags() {
-	// TODO(rudominer) Implement MojomUnion.ComputeFieldTags()
+func (u *MojomUnion) ComputeFieldTags() error {
+	numFields := uint32(len(u.FieldsInLexicalOrder))
+	fieldsByTag := make(map[uint32]*UnionField)
+	allTags := make([]uint32, numFields)
+	previousTag := uint32(math.MaxUint32) // initialize to (uint32)(-1)
+	for i, field := range u.FieldsInLexicalOrder {
+		var fieldTag uint32
+		if field.declaredOrdinal >= 0 {
+			if field.declaredOrdinal >= math.MaxUint32 {
+				return &UnionFieldTagOrdinalError{Ord: field.declaredOrdinal,
+					UnionName: u.SimpleName(), Field: field,
+					Err: ErrOrdinalRange}
+			}
+			fieldTag = uint32(field.declaredOrdinal)
+		} else {
+			if previousTag >= (math.MaxUint32-1) && i > 0 {
+				return &UnionFieldTagOrdinalError{Ord: int64(previousTag) + 1,
+					UnionName: u.SimpleName(), Field: field,
+					Err: ErrOrdinalRange}
+			}
+			fieldTag = previousTag + 1
+		}
+		if existingField := fieldsByTag[fieldTag]; existingField != nil {
+			return &UnionFieldTagOrdinalError{Ord: int64(fieldTag),
+				UnionName: u.SimpleName(), Field: field,
+				ExistingField: existingField, Err: ErrOrdinalDuplicate}
+		}
+		fieldsByTag[fieldTag] = field
+		allTags[i] = fieldTag
+		field.Tag = fieldTag
+		previousTag = fieldTag
+	}
+	sort.Sort(utils.UInt32Slice(allTags))
+	u.fieldsInTagOrder = make([]*UnionField, numFields)
+	for i, tag := range allTags {
+		u.fieldsInTagOrder[i] = fieldsByTag[tag]
+	}
+	return nil
 }
 
 func (MojomUnion) Kind() UserDefinedTypeKind {
@@ -855,7 +928,7 @@ type UnionField struct {
 }
 
 func (f *UnionField) RegisterInScope(scope *Scope) DuplicateNameError {
-	// We currently have not reason to register a UnionField in a scope.
+	// We currently have no reason to register a UnionField in a scope.
 	panic("Not implemented.")
 }
 
