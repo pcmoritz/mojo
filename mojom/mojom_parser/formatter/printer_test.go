@@ -154,6 +154,28 @@ func TestWriteMultilineComments(t *testing.T) {
 	checkEq(t, commentText, p.result())
 }
 
+func TestWriteMultilineCommentsWrapping(t *testing.T) {
+	commentText := `/*
+ * Some comment more words and even more words and even more words and more words more words.
+ * More comments.
+ * Even more comments.
+
+ * And after a space.
+ */`
+	expected := `/*
+ * Some comment more words and even more words and even more words and more
+ * words more words.
+ * More comments.
+ * Even more comments.
+
+ * And after a space.
+ */`
+	token := lexer.Token{Kind: lexer.MultiLineComment, Text: commentText}
+	p := getNewPrinter()
+	p.writeMultiLineComment(token)
+	checkEq(t, expected, p.result())
+}
+
 func cppComment(line int, c string) (t lexer.Token) {
 	t.Kind = lexer.SingleLineComment
 	t.Text = "// " + c

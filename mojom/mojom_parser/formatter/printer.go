@@ -666,7 +666,28 @@ func (p *printer) writeMultiLineComment(comment lexer.Token) {
 				p.write("   ")
 			}
 		}
-		p.write(trimmed)
+
+		if p.lineLength()+len(trimmed) <= p.maxLineLength || p.maxLineLength < 0 {
+			p.write(trimmed)
+		} else {
+			// If the comment is too long to fit it on a line, break up the line along
+			// spaces and wrap the line.
+			words := strings.Split(trimmed, " ")
+			for i, word := range words {
+				if i > 0 && len(word)+p.lineLength()+1 > p.maxLineLength {
+					p.nl()
+					if trimmed[0] == '*' {
+						p.write(" *")
+					} else {
+						p.write("  ")
+					}
+				}
+				if i > 0 {
+					p.write(" ")
+				}
+				p.write(word)
+			}
+		}
 		if i < len(lines)-1 {
 			p.nl()
 		}
