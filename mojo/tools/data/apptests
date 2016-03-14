@@ -57,8 +57,11 @@ tests = [
     "test": "mojo:prediction_apptests",
   },
   {
-    "test": "mojo:ui_unittests",
+    "test": "mojo:ui_apptests",
     "shell-args": ["--args-for=mojo:native_viewport_service --use-headless-config --use-osmesa"],
+  },
+  {
+    "test": "mojo:ui_associates_apptests",
   },
   {
     "test": "mojo:url_response_disk_cache_apptests",
