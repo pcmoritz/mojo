@@ -8,6 +8,7 @@
 
 #include "base/bind.h"
 #include "base/macros.h"
+#include "mojo/public/cpp/system/wait.h"
 
 namespace shell {
 

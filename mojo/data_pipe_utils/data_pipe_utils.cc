@@ -11,6 +11,7 @@
 #include "base/threading/platform_thread.h"
 #include "base/trace_event/trace_event.h"
 #include "mojo/data_pipe_utils/data_pipe_utils_internal.h"
+#include "mojo/public/cpp/system/wait.h"
 
 namespace mojo {
 namespace common {

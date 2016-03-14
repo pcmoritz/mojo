@@ -9,6 +9,7 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
 #include "mojo/public/cpp/system/data_pipe.h"
+#include "mojo/public/cpp/system/wait.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/media/audio/interfaces/audio_server.mojom.h"
 #include "mojo/services/media/audio/interfaces/audio_track.mojom.h"

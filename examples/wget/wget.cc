@@ -10,6 +10,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/system/wait.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
 #include "mojo/services/network/interfaces/url_loader.mojom.h"
