@@ -766,12 +766,14 @@ class TypeReference extends bindings.Struct {
 
 class StructField extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(56, 0)
+    const bindings.StructDataHeader(64, 0)
   ];
   DeclarationData declData = null;
   Type type = null;
   DefaultFieldValue defaultValue = null;
   int offset = 0;
+  int bit = 0;
+  int minVersion = 0;
 
   StructField() : super(kVersions.last.size);
 
@@ -829,6 +831,14 @@ class StructField extends bindings.Struct {
       
       result.offset = decoder0.decodeInt32(48);
     }
+    if (mainDataHeader.version >= 0) {
+      
+      result.bit = decoder0.decodeInt8(52);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.minVersion = decoder0.decodeUint32(56);
+    }
     return result;
   }
 
@@ -862,6 +872,20 @@ class StructField extends bindings.Struct {
           "offset of struct StructField: $e";
       rethrow;
     }
+    try {
+      encoder0.encodeInt8(bit, 52);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "bit of struct StructField: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint32(minVersion, 56);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "minVersion of struct StructField: $e";
+      rethrow;
+    }
   }
 
   String toString() {
@@ -869,7 +893,9 @@ class StructField extends bindings.Struct {
            "declData: $declData" ", "
            "type: $type" ", "
            "defaultValue: $defaultValue" ", "
-           "offset: $offset" ")";
+           "offset: $offset" ", "
+           "bit: $bit" ", "
+           "minVersion: $minVersion" ")";
   }
 
   Map toJson() {
@@ -878,6 +904,8 @@ class StructField extends bindings.Struct {
     map["type"] = type;
     map["defaultValue"] = defaultValue;
     map["offset"] = offset;
+    map["bit"] = bit;
+    map["minVersion"] = minVersion;
     return map;
   }
 }

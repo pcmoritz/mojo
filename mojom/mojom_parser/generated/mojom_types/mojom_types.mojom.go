@@ -460,11 +460,13 @@ type StructField struct {
 	Type Type
 	DefaultValue DefaultFieldValue
 	Offset int32
+	Bit int8
+	MinVersion uint32
 }
 
 
 func (s *StructField) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(48, 0)
+	encoder.StartStruct(56, 0)
 	if s.DeclData == nil {
 		encoder.WriteNullPointer()
 	} else {
@@ -491,6 +493,12 @@ func (s *StructField) Encode(encoder *bindings.Encoder) error {
 	if err := encoder.WriteInt32(s.Offset); err != nil {
 		return err
 	}
+	if err := encoder.WriteInt8(s.Bit); err != nil {
+		return err
+	}
+	if err := encoder.WriteUint32(s.MinVersion); err != nil {
+		return err
+	}
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
@@ -498,7 +506,7 @@ func (s *StructField) Encode(encoder *bindings.Encoder) error {
 }
 
 var structField_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{56, 0},
+	bindings.DataHeader{64, 0},
 }
 
 func (s *StructField) Decode(decoder *bindings.Decoder) error {
@@ -557,6 +565,20 @@ func (s *StructField) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		s.Offset = value0
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadInt8()
+		if err != nil {
+			return err
+		}
+		s.Bit = value0
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.MinVersion = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err
