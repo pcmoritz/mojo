@@ -66,6 +66,10 @@ interface InterfaceBar {
                mojo.Rect viewport);
 };
 
+interface CommentOnly {
+	// Only a comment.
+};
+
 // constant comment.
 const int8 foo_constant1 = 10;  // constant comment.
 const int8 foo_constant2 = -10;  // constant comment.

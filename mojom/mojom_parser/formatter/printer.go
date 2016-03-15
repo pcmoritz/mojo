@@ -382,7 +382,7 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 	}
 
 	// Write the comments at the end of the struct, enum, union or interface body.
-	p.writeFinalComments(container.(mojom.MojomElement))
+	p.writeFinalComments(container)
 
 	p.decIndent()
 	p.nl()
@@ -568,15 +568,20 @@ func (p *printer) writeAboveComments(el mojom.MojomElement) {
 	p.writeCommentBlocks(attachedComments.Above, true)
 }
 
-func (p *printer) writeFinalComments(el mojom.MojomElement) {
+func (p *printer) writeFinalComments(container mojom.DeclaredObjectsContainer) {
+	el := container.(mojom.MojomElement)
 	attachedComments := el.AttachedComments()
 	if attachedComments == nil || len(attachedComments.Final) == 0 {
 		return
 	}
 
-	p.nl()
-	if attachedComments.Final[0].Kind == lexer.EmptyLine {
+	// Only print blank lines if there is something other than comments in the
+	// container.
+	if len(container.GetDeclaredObjects()) > 0 {
 		p.nl()
+		if attachedComments.Final[0].Kind == lexer.EmptyLine {
+			p.nl()
+		}
 	}
 	p.writeCommentBlocks(attachedComments.Final, false)
 }
