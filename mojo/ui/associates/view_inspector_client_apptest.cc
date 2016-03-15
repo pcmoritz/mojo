@@ -23,10 +23,10 @@ class ViewInspectorClientTest : public mojo::test::ApplicationTestBase {
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
 
-    mojo::ui::ViewInspectorPtr view_inspector_ptr;
-    view_inspector_binding_.Bind(&view_inspector_ptr);
+    mojo::InterfaceHandle<mojo::ui::ViewInspector> view_inspector;
+    view_inspector_binding_.Bind(&view_inspector);
     view_inspector_client_ =
-        new mojo::ui::ViewInspectorClient(view_inspector_ptr.Pass());
+        new mojo::ui::ViewInspectorClient(view_inspector.Pass());
   }
 
  protected:

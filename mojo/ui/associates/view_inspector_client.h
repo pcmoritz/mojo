@@ -20,7 +20,8 @@ namespace ui {
 // Provides facilities for using a |ViewInspector|, including caching.
 class ViewInspectorClient : public base::RefCounted<ViewInspectorClient> {
  public:
-  ViewInspectorClient(mojo::ui::ViewInspectorPtr view_inspector);
+  ViewInspectorClient(
+      mojo::InterfaceHandle<mojo::ui::ViewInspector> view_inspector);
 
   mojo::ui::ViewInspector* view_inspector() { return view_inspector_.get(); }
 

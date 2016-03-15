@@ -13,8 +13,9 @@ namespace mojo {
 namespace ui {
 
 ViewInspectorClient::ViewInspectorClient(
-    mojo::ui::ViewInspectorPtr view_inspector)
-    : view_inspector_(view_inspector.Pass()) {
+    mojo::InterfaceHandle<mojo::ui::ViewInspector> view_inspector)
+    : view_inspector_(
+          mojo::ui::ViewInspectorPtr::Create(view_inspector.Pass())) {
   DCHECK(view_inspector_);
 }
 
