@@ -30,7 +30,7 @@ class SpinningCubeApp : public mojo::ApplicationDelegate,
 
   ~SpinningCubeApp() override {
     // TODO(darin): Fix shutdown so we don't need to leak this.
-    mojo_ignore_result(gles2_client_.release());
+    mojo::ignore_result(gles2_client_.release());
   }
 
   void Initialize(mojo::ApplicationImpl* app) override {
