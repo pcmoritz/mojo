@@ -26,7 +26,7 @@
 #include "base/android/jni_string.h"
 #include "jni/DeviceName_jni.h"
 #include "mojo/public/c/system/main.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/c/system/time.h"
 
 namespace mojo {
 

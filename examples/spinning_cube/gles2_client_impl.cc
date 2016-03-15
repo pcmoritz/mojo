@@ -16,6 +16,7 @@
 #include "mojo/public/c/gpu/MGL/mgl.h"
 #include "mojo/public/c/gpu/MGL/mgl_onscreen.h"
 #include "mojo/public/cpp/environment/environment.h"
+#include "mojo/public/cpp/system/time.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 
 namespace examples {

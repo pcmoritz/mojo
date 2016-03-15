@@ -38,7 +38,7 @@
 #include "mojo/edk/util/ref_ptr.h"
 #include "mojo/message_pump/message_pump_mojo.h"
 #include "mojo/public/cpp/bindings/binding.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/cpp/system/message_pipe.h"
 #include "shell/child_controller.mojom.h"
 #include "shell/child_switches.h"
 #include "shell/init.h"

@@ -10,7 +10,8 @@
 #include "gin/runner.h"
 #include "gin/wrappable.h"
 #include "mojo/public/c/environment/async_waiter.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/c/system/handle.h"
+#include "mojo/public/c/system/result.h"
 #include "services/js/system/handle.h"
 #include "services/js/system/handle_close_observer.h"
 

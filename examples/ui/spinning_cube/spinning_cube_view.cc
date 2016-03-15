@@ -14,6 +14,7 @@
 #include <cmath>
 
 #include "base/bind.h"
+#include "mojo/public/cpp/system/time.h"
 #include "mojo/services/geometry/cpp/geometry_util.h"
 
 namespace examples {

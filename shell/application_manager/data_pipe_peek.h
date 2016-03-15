@@ -7,7 +7,8 @@
 
 #include <string>
 
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/c/system/time.h"
+#include "mojo/public/cpp/system/data_pipe.h"
 
 namespace shell {
 

@@ -9,7 +9,7 @@
 
 #include "base/macros.h"
 #include "base/message_loop/message_loop.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/cpp/system/message_pipe.h"
 #include "shell/context.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

@@ -8,7 +8,7 @@
 #include "base/macros.h"
 #include "base/memory/scoped_ptr.h"
 #include "gpu/command_buffer/common/buffer.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/cpp/system/buffer.h"
 
 namespace gles2 {
 

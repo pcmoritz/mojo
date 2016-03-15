@@ -8,14 +8,12 @@
 #include <utility>
 
 #include "base/bind.h"
-#include "base/memory/scoped_ptr.h"
 #include "examples/spinning_cube/gles2_client_impl.h"
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
-#include "mojo/public/cpp/system/core.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/native_viewport/interfaces/native_viewport.mojom.h"
@@ -83,12 +81,12 @@ class SpinningCubeApp : public mojo::ApplicationDelegate,
 
   void OnViewportConnectionError() { mojo::RunLoop::current()->Quit(); }
 
-  scoped_ptr<GLES2ClientImpl> gles2_client_;
+  std::unique_ptr<GLES2ClientImpl> gles2_client_;
   mojo::NativeViewportPtr viewport_;
   mojo::ContextProviderPtr onscreen_context_provider_;
   mojo::Binding<NativeViewportEventDispatcher> dispatcher_binding_;
 
-  DISALLOW_COPY_AND_ASSIGN(SpinningCubeApp);
+  MOJO_DISALLOW_COPY_AND_ASSIGN(SpinningCubeApp);
 };
 
 }  // namespace examples

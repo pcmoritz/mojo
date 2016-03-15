@@ -12,7 +12,6 @@
 #include "gin/per_isolate_data.h"
 #include "gin/public/wrapper_info.h"
 #include "gin/wrappable.h"
-#include "mojo/public/cpp/system/core.h"
 #include "services/js/system/handle.h"
 #include "services/js/system/waiting_callback.h"
 

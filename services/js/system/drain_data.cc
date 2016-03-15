@@ -10,7 +10,6 @@
 #include "gin/per_context_data.h"
 #include "gin/per_isolate_data.h"
 #include "mojo/public/cpp/environment/environment.h"
-#include "mojo/public/cpp/system/core.h"
 
 namespace mojo {
 namespace js {

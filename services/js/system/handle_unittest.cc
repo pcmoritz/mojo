@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "base/macros.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/cpp/system/message_pipe.h"
 #include "services/js/system/handle.h"
 #include "services/js/system/handle_close_observer.h"
 #include "testing/gtest/include/gtest/gtest.h"

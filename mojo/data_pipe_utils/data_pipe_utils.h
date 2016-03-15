@@ -11,7 +11,7 @@
 #include "base/callback_forward.h"
 #include "base/files/scoped_file.h"
 #include "base/threading/platform_thread.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/cpp/system/data_pipe.h"
 
 namespace base {
 class FilePath;

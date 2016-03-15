@@ -9,7 +9,9 @@
 #include "gin/converter.h"
 #include "gin/handle.h"
 #include "gin/wrappable.h"
-#include "mojo/public/cpp/system/core.h"
+#include "mojo/public/c/system/handle.h"
+#include "mojo/public/cpp/system/handle.h"
+#include "mojo/public/cpp/system/message_pipe.h"
 
 namespace mojo {
 namespace js {

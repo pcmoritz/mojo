@@ -15,9 +15,9 @@
 #include "mojo/dart/embedder/dart_controller.h"
 #include "mojo/dart/unittests/embedder_tester/dart_test.h"
 #include "mojo/dart/unittests/embedder_tester/dart_to_cpp.mojom.h"
+#include "mojo/public/c/system/data_pipe.h"
+#include "mojo/public/c/system/message_pipe.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
-#include "mojo/public/cpp/system/core.h"
-#include "mojo/public/cpp/system/macros.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace mojo {

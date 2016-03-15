@@ -7,11 +7,7 @@
 
 #include <Python.h>
 
-#include "base/base_export.h"
 #include "base/message_loop/message_loop.h"
-#include "base/run_loop.h"
-#include "mojo/public/cpp/bindings/callback.h"
-#include "mojo/public/cpp/system/core.h"
 #include "mojo/public/python/src/common.h"
 
 namespace services {

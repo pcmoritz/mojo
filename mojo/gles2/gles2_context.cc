@@ -7,7 +7,6 @@
 #include "gpu/command_buffer/client/gles2_cmd_helper.h"
 #include "gpu/command_buffer/client/gles2_implementation.h"
 #include "gpu/command_buffer/client/transfer_buffer.h"
-#include "mojo/public/cpp/system/core.h"
 
 namespace gles2 {
 
