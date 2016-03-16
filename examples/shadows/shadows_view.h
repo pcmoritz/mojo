@@ -5,6 +5,9 @@
 #ifndef EXAMPLES_SHADOWS_SHADOWS_VIEW_H_
 #define EXAMPLES_SHADOWS_SHADOWS_VIEW_H_
 
+#include <memory>
+
+#include "examples/shadows/shadows_renderer.h"
 #include "mojo/ui/choreographer.h"
 #include "mojo/ui/gl_view.h"
 
@@ -33,6 +36,7 @@ class ShadowsView : public mojo::ui::GLView,
   mojo::ui::Choreographer choreographer_;
 
   mojo::Size size_;
+  std::unique_ptr<ShadowsRenderer> renderer_;
 
   DISALLOW_COPY_AND_ASSIGN(ShadowsView);
 };

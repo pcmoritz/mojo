@@ -11,12 +11,15 @@ mojo_native_application("shadows") {
     "main.cc",
     "shadows_app.cc",
     "shadows_app.h",
+    "shadows_renderer.cc",
+    "shadows_renderer.h",
     "shadows_view.cc",
     "shadows_view.h",
   ]
 
   deps = [
     "//base",
+    "//examples/shadows/vfx",
     "//mojo/application",
     "//mojo/common",
     "//mojo/environment:chromium",

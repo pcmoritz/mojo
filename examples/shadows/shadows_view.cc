@@ -24,6 +24,7 @@ ShadowsView::ShadowsView(
     : GLView(app_impl, view_owner_request.Pass(), "Shadows"),
       choreographer_(scene(), this) {
   gl_renderer()->gl_context()->MakeCurrent();
+  renderer_.reset(new ShadowsRenderer());
 }
 
 ShadowsView::~ShadowsView() {}
@@ -78,8 +79,7 @@ void ShadowsView::OnDraw(
 }
 
 void ShadowsView::Render() {
-  glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+  renderer_->Render(size_);
 }
 
 }  // namespace examples
