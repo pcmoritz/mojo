@@ -1,19 +1,238 @@
-**TODO(vtl)**: Reorganize this to be properly structured.
+# Mojom language reference
 
-# Mojom IDL
+This is a reference for the Mojom interface definition language (IDL). See
+[Mojom IDL](../intro/mojom_idl.md) for a shorter introduction.
 
-The Mojom IDL (interface definition language) is primarily used to describe
-*interfaces* to be used on [message pipes](message_pipes.md). Below, we describe
-practical aspects of the Mojom language. Elsewhere, we describe the [Mojom
-protocol](mojom_protocol.md). (**TODO(vtl)**: Also, serialization format?
-Versioning?)
+The Mojom language is ultimately about defining *types* (and things associated
+to types), including in particular *interface* types (hence "interface
+definition language"). It also allows "constant" values to be defined for some
+simple types, though this is mostly in support of the former role.
 
-Text files written in Mojom IDL are given the `.mojom` extension by convention
-(and are usually referred to as Mojom/mojom/`.mojom` files). The Mojom bindings
-generator (**TODO(vtl)**: link?) may be used to generate code in a variety of
-languages (including C++, Dart, and Go) from a Mojom file. Such generated code
-"implements" the things specified in the Mojom file, in a way that's appropriate
-for the particular target language.
+## Mojom files
+
+Mojom files are Unicode text files, encoded in UTF-8. *Whitespace* (spaces,
+tabs, newlines, carriage returns) is not significant in Mojom files, except
+insofar as they separate tokens. Thus any consecutive sequence of whitespace
+characters may be replaced by a single whitespace character without any semantic
+change.
+
+### Comments
+
+There are two kinds of *comments*. Both are ignored, except that they too
+separate tokens (so any comment may be replaced by a single whitespace
+character).
+
+The first is the *single-line* (C++-style) comment. It is started by a `//`
+outside of a *string literal* and outside another comment and terminated by a
+newline. For example:
+```mojom
+// This is a comment.
+
+interface// This "separates" tokens.
+AnInterface {};
+
+const string kAConstString = "// This is not a comment.";
+
+[AnAttribute="// This is also not a comment either."]
+interface AnotherInterface {};
+```
+
+The second is the *multi-line* (C-style) comment. It is started by a `/*`
+outside of a string literal and terminated by a `*/` (anywhere!). For example:
+```mojom
+/* This is a
+   multi-line comment. */
+
+/* /* Comments don't nest. */
+
+/* // The "//" is meaningless here. */
+
+/* "This isn't a string literal. */
+
+interface/*This_separates_tokens*/AnInterface {};
+
+const string kAConstString = "/* This is not a comment. */";
+```
+
+### File structure
+
+Apart from comments and whitespace, a Mojom file consists of, in order:
+* an optional *module* declaration;
+* zero or more *import* statements (the order of these is not important); and
+* zero or more declarations of *struct*s, *interface*s, *union*s, *enum*s, or
+  *const*s (the order of these is not important).
+These elements will be described in following sections.
+
+As stated above, the order of struct/interface/union/enum/const declarations is
+not important. This is required to allow "cyclic" structures to be defined.
+Nonetheless, whenever possible, one should declare things before they are
+"used". For example, the following is valid but not recommended:
+```mojom
+// NOT recommended.
+
+const MyEnum kMyConst = kMyOtherConst;
+const MyEnum kMyOtherConst = A_VALUE;
+
+enum MyEnum {
+  A_VALUE,
+  ANOTHER_VALUE,
+};
+```
+
+## Names and identifiers
+
+*Names* in Mojom start with a letter (`a`-`z`, `A`-`Z`) and are followed by any
+number of letters, digits (`0`-`9`), or underscores (`_`). For example:
+`MyThing`, `MyThing123`, `MyThing_123`, `my_thing`, `myThing`, `MY_THING`. (See
+below for naming conventions, however.)
+
+Various things in Mojom are named (i.e., assigned names):
+* types (e.g., interfaces, structs, unions, and enums),
+* things associated with particular types (e.g., messages in interfaces,
+  parameters in messages, fields in structs and unions, and values in enums),
+  and
+* const values.
+
+*Identifiers* consist of one or more names, separated by `.`. These are used in
+module declarations, as well as in referencing other named things.
+
+### Namespacing and name resolution
+
+As mentioned above, not only are types named, but things associated with a given
+type may be named. For example, consider:
+```mojom
+enum MyEnum {
+  A_VALUE,
+  ANOTHER_VALUE,
+  A_DUPLICATE_VALUE = A_VALUE,
+};
+```
+`MyEnum` is the name of an enum type, and `A_VALUE` is the name of a value of
+`MyEnum`. Within the *scope* of `MyEnum` (or where that scope is implied),
+`A_VALUE` may be used without additional qualification. Outside that scope, it
+may be referred to using the identifier `MyEnum.A_VALUE`.
+
+Some type definitions allow (some) other type definitions to be nested within.
+For example:
+```mojom
+struct MyStruct {
+  enum MyEnum {
+    A_VALUE,
+  };
+
+  MyEnum my_field1 = A_VALUE;
+  MyStruct.MyEnum my_field2 = MyStruct.MyEnum.A_VALUE;
+};
+```
+Within `MyStruct`, `MyEnum` may be referred to without qualification (e.g., to
+define the field `my_field1`). Outside, it may be referred to using the
+identifier `MyStruct.MyEnum`. Notice that `my_field1` is assigned a default
+value of `A_VALUE`, which is resolved correctly since there is an implied scope
+of `MyEnum`. It would also be legal to write the default value as
+`MyEnum.A_VALUE` or even `MyStruct.MyEnum.A_VALUE`, as is done for `my_field2`.
+
+Thus names live in a name hierarchy, with the "enclosing" scopes often being
+other type names. Additionally, *module names* (see below) can be used to define
+artificial outermost scopes.
+
+Names (or, more properly, identifiers) are resolved in a C++-like way: Scopes
+are searched from inside outwards, i.e., starting with the current, innermost
+scope and then working outwards.
+
+### Standard naming style
+
+Though Mojom allows arbitrary names, as indicated above, there are standard
+stylistic conventions for naming different things. Code generators for different
+languages typically expect these styles to be followed, since they will often
+convert the standard style to one appropriate for their target language. Thus
+following the standard style is highly recommended.
+
+The standard styles are (getting ahead of ourselves slightly):
+* `StudlyCaps` (i.e., concatenated capitalized words), used for user-defined
+  (struct, interface, union, enum) type names and message (a.k.a. function or
+  method) names;
+* `unix_hacker_style` (i.e., lowercase words joined by underscores), used for
+  field (a.k.a. "parameter" for messages) names in structs, unions, and
+  messages;
+* `ALL_CAPS_UNIX_HACKER_STYLE` (i.e., uppercase words joined by underscores),
+  used for enum value names; and
+* `kStudlyCaps` (i.e., `k` followed by concatenated capitalized words), used for
+  const names.
+
+## Module statements
+
+The Mojom *module* statement is a way of logically grouping Mojom declarations.
+For example:
+```mojom
+module my_module;
+```
+Mojom modules are similar to C++ namespaces (and the standard C++ code generator
+would put generated code into the `my_module` namespace), in that there is no
+implication that the file contains the entirety of the "module" definition;
+multiple files may have the same module statement. (There is also no requirement
+that the module name have anything to do with the file path containing the Mojom
+file.)
+
+The specified Mojom module name is an identifier: it can consist of multiple
+parts separated by `.`. For example:
+```mojom
+module my_module.my_submodule;
+
+struct MyStruct {
+};
+```
+Recall that name look-up is similar to C++: E.g., if the current module is
+`my_module.my_submodule` then `MyStruct`, `my_submodule.MyStruct`, and
+`my_module.my_submodule.MyStruct` all refer to the above struct, whereas if the
+current module is just `my_module` then only the latter two do.
+
+Note that "module name" is really a misnomer, since Mojom does not actually
+define modules per se. Instead, as suggested above, module names play only a
+namespacing role, defining the "root" namespace for the contents of a file.
+
+## Import statements
+
+An *import* statement makes the declarations from another Mojom file available
+in the current Mojom file. Moreover, it operates transitively, in that it also
+makes the imports of the imported file available, etc. The "argument" to the
+import statement is a string literal that is interpreted as the path to the file
+to import. Tools that work with Mojom files are typically provided with a search
+path for importing files (just as a C++ compiler can be provided with an
+"include path"), for the purposes of resolving these paths. (**TODO(vtl)**: This
+always includes the current Mojom file's path, right? Is the current path the
+first path that's searched?)
+
+For example:
+```mojom
+module my_module;
+
+import "path/to/another.mojom";
+import "path/to/yet/a/different.mojom";
+```
+This makes the contents of the two specified Mojom files available, together
+with whatever they import, transitively. (Names are resolved in the way
+described in the previous section.)
+
+Import cycles are not permitted (so, e.g., it would be an error if
+`path/to/another.mojom` imported the current Mojom file). However, it is
+entirely valid for Mojom files to be imported (transitively) multiple times
+(e.g., it is fine for `path/to/another.mojom` to also import
+`path/to/yet/a/different.mojom`).
+
+## Types in Mojom
+
+### Reference and non-reference types
+
+### Built-in types
+
+### Simple types
+
+### Arrays
+
+### Maps
+
+
+**TODO(vtl)**: The stuff below is old stuff to be reorganized/rewritten.
 
 ## Interfaces
 
@@ -116,103 +335,6 @@ discuss this matter further here.
 
 **TODO(vtl)**: Maybe mention exceptions to this in attributes (e.g.,
 `ServiceName`).
-
-## Mojom files
-
-A Mojom file consists of, in order:
-* an optional *module* declaration;
-* zero or more *import* statements (the order of these is not important); and
-* zero or more declarations of *struct*s, *interface*s, *union*s, *enum*s, or
-  *const*s (the order of these is not important).
-(These are all described further below.)
-
-Additionally, C/C++-style comments are supported (i.e., single-line comments
-starting with `//` or multi-line comments of the form `/* ... */`).
-
-As stated above, the order of struct/interface/union/enum/const declarations is
-not important. This is required to allow "cyclic" structures to be defined.
-Nonetheless, whenever possible, one should declare things before they are
-"used". For example, the following is valid but not recommended:
-```mojom
-// NOT recommended.
-
-const MyEnum kMyConst = kMyOtherConst;
-const MyEnum kMyOtherConst = A_VALUE;
-
-enum MyEnum {
-  A_VALUE,
-  ANOTHER_VALUE,
-};
-```
-
-### Naming style
-
-There is a standard style for naming things:
-* `StudlyCaps` (a.k.a. `CapitalizedCamelCase`) for: (struct, interface, union,
-  and enum) type names and message (a.k.a. function or method) names;
-* `unix_hacker_style` for field names (in structs and unions) and "parameter"
-  names;
-* `ALL_CAPS_UNIX_HACKER_STYLE` for enum value names; and
-* `kStudlyCaps` for const names.
-
-Following this style is highly recommended, since code generators for various
-languages will expect this style, in order to transform the names into a more
-language-appropriate style.
-
-### Module statement
-
-The Mojom *module* statement is just a way of logically grouping Mojom
-declarations. For example:
-```mojom
-module my_module;
-```
-Mojom modules are similar to C++ namespaces (and the standard C++ code generator
-would put generated code into the `my_module` namespace), in that there is no
-implication that the file contains the entirety of the "module" definiton;
-multiple files may have the same module statement. (There is also no requirement
-that the module name have anything to do with the file path containing the Mojom
-file.)
-
-Mojom module names are hierarchical in that they can be composed of multiple
-parts separated by `.`. For example:
-```mojom
-module my_module.my_submodule;
-
-struct MyStruct {
-};
-```
-Name look-up is similar to C++: E.g., if the current module is
-`my_module.my_submodule` then `MyStruct`, `my_submodule.MyStruct`, and
-`my_module.my_submodule.MyStruct` all refer to the above struct, whereas if the
-current module is just `my_module` then only the latter two do.
-
-### Import declarations
-
-An *import* declaration makes the declarations from another Mojom file available
-in the current Mojom file. Moreover, it operates transitively, in the sense that
-it also makes the imports of the imported file available, etc. The "argument" to
-the import statement is a path to a file. Tools that work with Mojom files are
-typically provided with a search path for importing files (just as a C++
-compiler can be provided with an "include path"), for the purposes of resolving
-these paths. (**TODO(vtl)**: This always includes the current Mojom file's path,
-right? Is the current path the first path that's searched?)
-
-For example:
-```mojom
-module my_module;
-
-import "path/to/another.mojom";
-import "path/to/yet/a/different.mojom";
-```
-This makes the contents of the two mentioned Mojom files available, together
-with whatever they import, transitively. (Note that names are resolved in the
-way described in the previous section.)
-
-Import cycles are not permitted (so, e.g., it would be an error if
-`path/to/another.mojom` imported the current Mojom file). However, it is
-entirely valid for Mojom files to be imported (transitively) multiple times
-(e.g., it is fine for `path/to/another.mojom` to also import
-`path/to/yet/a/different.mojom`).
 
 ### Struct declarations
 
