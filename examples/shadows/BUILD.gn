@@ -9,6 +9,8 @@ mojo_native_application("shadows") {
 
   sources = [
     "main.cc",
+    "penumbra_program.cc",
+    "penumbra_program.h",
     "shadows_app.cc",
     "shadows_app.h",
     "shadows_renderer.cc",
