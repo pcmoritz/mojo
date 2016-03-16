@@ -8,9 +8,242 @@ import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
-import 'package:mojo_services/mojo/media/media_pipe.mojom.dart' as media_pipe_mojom;
 import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_mojom;
 
+
+
+class MediaPacketRegion extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  int offset = 0;
+  int length = 0;
+
+  MediaPacketRegion() : super(kVersions.last.size);
+
+  static MediaPacketRegion deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaPacketRegion decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaPacketRegion result = new MediaPacketRegion();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.offset = decoder0.decodeUint64(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.length = decoder0.decodeUint64(16);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint64(offset, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "offset of struct MediaPacketRegion: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint64(length, 16);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "length of struct MediaPacketRegion: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "MediaPacketRegion("
+           "offset: $offset" ", "
+           "length: $length" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["offset"] = offset;
+    map["length"] = length;
+    return map;
+  }
+}
+
+
+class MediaPacket extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(48, 0)
+  ];
+  static const int kNoTimestamp = 9223372036854775807;
+  int pts = 9223372036854775807;
+  int duration = 0;
+  bool endOfStream = false;
+  MediaPacketRegion payload = null;
+  List<MediaPacketRegion> extraPayload = null;
+
+  MediaPacket() : super(kVersions.last.size);
+
+  static MediaPacket deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaPacket decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaPacket result = new MediaPacket();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.pts = decoder0.decodeInt64(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.duration = decoder0.decodeUint64(16);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.endOfStream = decoder0.decodeBool(24, 0);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(32, false);
+      result.payload = MediaPacketRegion.decode(decoder1);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(40, true);
+      if (decoder1 == null) {
+        result.extraPayload = null;
+      } else {
+        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        result.extraPayload = new List<MediaPacketRegion>(si1.numElements);
+        for (int i1 = 0; i1 < si1.numElements; ++i1) {
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
+          result.extraPayload[i1] = MediaPacketRegion.decode(decoder2);
+        }
+      }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInt64(pts, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "pts of struct MediaPacket: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint64(duration, 16);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "duration of struct MediaPacket: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeBool(endOfStream, 24, 0);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "endOfStream of struct MediaPacket: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeStruct(payload, 32, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "payload of struct MediaPacket: $e";
+      rethrow;
+    }
+    try {
+      if (extraPayload == null) {
+        encoder0.encodeNullPointer(40, true);
+      } else {
+        var encoder1 = encoder0.encodePointerArray(extraPayload.length, 40, bindings.kUnspecifiedArrayLength);
+        for (int i0 = 0; i0 < extraPayload.length; ++i0) {
+          encoder1.encodeStruct(extraPayload[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
+        }
+      }
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "extraPayload of struct MediaPacket: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "MediaPacket("
+           "pts: $pts" ", "
+           "duration: $duration" ", "
+           "endOfStream: $endOfStream" ", "
+           "payload: $payload" ", "
+           "extraPayload: $extraPayload" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["pts"] = pts;
+    map["duration"] = duration;
+    map["endOfStream"] = endOfStream;
+    map["payload"] = payload;
+    map["extraPayload"] = extraPayload;
+    return map;
+  }
+}
 
 
 class _MediaProducerConnectParams extends bindings.Struct {
@@ -333,7 +566,7 @@ class _MediaPullModeProducerPullPacketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  media_pipe_mojom.MediaPacket toRelease = null;
+  MediaPacket toRelease = null;
 
   _MediaPullModeProducerPullPacketParams() : super(kVersions.last.size);
 
@@ -373,7 +606,7 @@ class _MediaPullModeProducerPullPacketParams extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, true);
-      result.toRelease = media_pipe_mojom.MediaPacket.decode(decoder1);
+      result.toRelease = MediaPacket.decode(decoder1);
     }
     return result;
   }
@@ -406,7 +639,7 @@ class MediaPullModeProducerPullPacketResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  media_pipe_mojom.MediaPacket packet = null;
+  MediaPacket packet = null;
 
   MediaPullModeProducerPullPacketResponseParams() : super(kVersions.last.size);
 
@@ -446,7 +679,7 @@ class MediaPullModeProducerPullPacketResponseParams extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.packet = media_pipe_mojom.MediaPacket.decode(decoder1);
+      result.packet = MediaPacket.decode(decoder1);
     }
     return result;
   }
@@ -479,7 +712,7 @@ class _MediaPullModeProducerReleasePacketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  media_pipe_mojom.MediaPacket toRelease = null;
+  MediaPacket toRelease = null;
 
   _MediaPullModeProducerReleasePacketParams() : super(kVersions.last.size);
 
@@ -519,7 +752,7 @@ class _MediaPullModeProducerReleasePacketParams extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.toRelease = media_pipe_mojom.MediaPacket.decode(decoder1);
+      result.toRelease = MediaPacket.decode(decoder1);
     }
     return result;
   }
@@ -690,15 +923,15 @@ class MediaConsumerSetBufferResponseParams extends bindings.Struct {
 }
 
 
-class _MediaConsumerPushPacketParams extends bindings.Struct {
+class _MediaConsumerSendPacketParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
-  media_pipe_mojom.MediaPacket packet = null;
+  MediaPacket packet = null;
 
-  _MediaConsumerPushPacketParams() : super(kVersions.last.size);
+  _MediaConsumerSendPacketParams() : super(kVersions.last.size);
 
-  static _MediaConsumerPushPacketParams deserialize(bindings.Message message) {
+  static _MediaConsumerSendPacketParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -707,11 +940,11 @@ class _MediaConsumerPushPacketParams extends bindings.Struct {
     return result;
   }
 
-  static _MediaConsumerPushPacketParams decode(bindings.Decoder decoder0) {
+  static _MediaConsumerSendPacketParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _MediaConsumerPushPacketParams result = new _MediaConsumerPushPacketParams();
+    _MediaConsumerSendPacketParams result = new _MediaConsumerSendPacketParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -734,7 +967,7 @@ class _MediaConsumerPushPacketParams extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.packet = media_pipe_mojom.MediaPacket.decode(decoder1);
+      result.packet = MediaPacket.decode(decoder1);
     }
     return result;
   }
@@ -745,13 +978,13 @@ class _MediaConsumerPushPacketParams extends bindings.Struct {
       encoder0.encodeStruct(packet, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "packet of struct _MediaConsumerPushPacketParams: $e";
+          "packet of struct _MediaConsumerSendPacketParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_MediaConsumerPushPacketParams("
+    return "_MediaConsumerSendPacketParams("
            "packet: $packet" ")";
   }
 
@@ -763,14 +996,15 @@ class _MediaConsumerPushPacketParams extends bindings.Struct {
 }
 
 
-class MediaConsumerPushPacketResponseParams extends bindings.Struct {
+class MediaConsumerSendPacketResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
+  MediaConsumerSendResult result = null;
 
-  MediaConsumerPushPacketResponseParams() : super(kVersions.last.size);
+  MediaConsumerSendPacketResponseParams() : super(kVersions.last.size);
 
-  static MediaConsumerPushPacketResponseParams deserialize(bindings.Message message) {
+  static MediaConsumerSendPacketResponseParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -779,11 +1013,86 @@ class MediaConsumerPushPacketResponseParams extends bindings.Struct {
     return result;
   }
 
-  static MediaConsumerPushPacketResponseParams decode(bindings.Decoder decoder0) {
+  static MediaConsumerSendPacketResponseParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    MediaConsumerPushPacketResponseParams result = new MediaConsumerPushPacketResponseParams();
+    MediaConsumerSendPacketResponseParams result = new MediaConsumerSendPacketResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+        result.result = MediaConsumerSendResult.decode(decoder0, 8);
+        if (result.result == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable MediaConsumerSendResult.');
+        }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeEnum(result, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "result of struct MediaConsumerSendPacketResponseParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "MediaConsumerSendPacketResponseParams("
+           "result: $result" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["result"] = result;
+    return map;
+  }
+}
+
+
+class _MediaConsumerPrimeParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _MediaConsumerPrimeParams() : super(kVersions.last.size);
+
+  static _MediaConsumerPrimeParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaConsumerPrimeParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaConsumerPrimeParams result = new _MediaConsumerPrimeParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -811,7 +1120,65 @@ class MediaConsumerPushPacketResponseParams extends bindings.Struct {
   }
 
   String toString() {
-    return "MediaConsumerPushPacketResponseParams("")";
+    return "_MediaConsumerPrimeParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class MediaConsumerPrimeResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  MediaConsumerPrimeResponseParams() : super(kVersions.last.size);
+
+  static MediaConsumerPrimeResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaConsumerPrimeResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaConsumerPrimeResponseParams result = new MediaConsumerPrimeResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "MediaConsumerPrimeResponseParams("")";
   }
 
   Map toJson() {
@@ -1198,8 +1565,8 @@ class _MediaPullModeProducerServiceDescription implements service_describer.Serv
 abstract class MediaPullModeProducer {
   static const String serviceName = null;
   dynamic getBuffer([Function responseFactory = null]);
-  dynamic pullPacket(media_pipe_mojom.MediaPacket toRelease,[Function responseFactory = null]);
-  void releasePacket(media_pipe_mojom.MediaPacket toRelease);
+  dynamic pullPacket(MediaPacket toRelease,[Function responseFactory = null]);
+  void releasePacket(MediaPacket toRelease);
 }
 
 
@@ -1289,7 +1656,7 @@ class _MediaPullModeProducerProxyCalls implements MediaPullModeProducer {
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    dynamic pullPacket(media_pipe_mojom.MediaPacket toRelease,[Function responseFactory = null]) {
+    dynamic pullPacket(MediaPacket toRelease,[Function responseFactory = null]) {
       var params = new _MediaPullModeProducerPullPacketParams();
       params.toRelease = toRelease;
       return _proxyImpl.sendMessageWithRequestId(
@@ -1298,7 +1665,7 @@ class _MediaPullModeProducerProxyCalls implements MediaPullModeProducer {
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    void releasePacket(media_pipe_mojom.MediaPacket toRelease) {
+    void releasePacket(MediaPacket toRelease) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
@@ -1393,7 +1760,7 @@ class MediaPullModeProducerStub extends bindings.Stub {
     mojo_factory_result.buffer = buffer;
     return mojo_factory_result;
   }
-  MediaPullModeProducerPullPacketResponseParams _MediaPullModeProducerPullPacketResponseParamsFactory(media_pipe_mojom.MediaPacket packet) {
+  MediaPullModeProducerPullPacketResponseParams _MediaPullModeProducerPullPacketResponseParamsFactory(MediaPacket packet) {
     var mojo_factory_result = new MediaPullModeProducerPullPacketResponseParams();
     mojo_factory_result.packet = packet;
     return mojo_factory_result;
@@ -1484,8 +1851,61 @@ class MediaPullModeProducerStub extends bindings.Stub {
 }
 
 const int _MediaConsumer_setBufferName = 0;
-const int _MediaConsumer_pushPacketName = 1;
-const int _MediaConsumer_flushName = 2;
+const int _MediaConsumer_sendPacketName = 1;
+const int _MediaConsumer_primeName = 2;
+const int _MediaConsumer_flushName = 3;
+  
+class MediaConsumerSendResult extends bindings.MojoEnum {
+  static const MediaConsumerSendResult consumed = const MediaConsumerSendResult._(0);
+  static const MediaConsumerSendResult flushed = const MediaConsumerSendResult._(1);
+
+  const MediaConsumerSendResult._(int v) : super(v);
+
+  static const Map<String, MediaConsumerSendResult> valuesMap = const {
+    "consumed": consumed,
+    "flushed": flushed,
+  };
+  static const List<MediaConsumerSendResult> values = const [
+    consumed,
+    flushed,
+  ];
+
+  static MediaConsumerSendResult valueOf(String name) => valuesMap[name];
+
+  factory MediaConsumerSendResult(int v) {
+    switch (v) {
+      case 0:
+        return MediaConsumerSendResult.consumed;
+      case 1:
+        return MediaConsumerSendResult.flushed;
+      default:
+        return null;
+    }
+  }
+
+  static MediaConsumerSendResult decode(bindings.Decoder decoder0, int offset) {
+    int v = decoder0.decodeUint32(offset);
+    MediaConsumerSendResult result = new MediaConsumerSendResult(v);
+    if (result == null) {
+      throw new bindings.MojoCodecError(
+          'Bad value $v for enum MediaConsumerSendResult.');
+    }
+    return result;
+  }
+
+  String toString() {
+    switch(this) {
+      case consumed:
+        return 'MediaConsumerSendResult.consumed';
+      case flushed:
+        return 'MediaConsumerSendResult.flushed';
+      default:
+        return null;
+    }
+  }
+
+  int toJson() => mojoEnumValue;
+}
 
 class _MediaConsumerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1501,8 +1921,10 @@ class _MediaConsumerServiceDescription implements service_describer.ServiceDescr
 abstract class MediaConsumer {
   static const String serviceName = null;
   dynamic setBuffer(core.MojoSharedBuffer buffer,int size,[Function responseFactory = null]);
-  dynamic pushPacket(media_pipe_mojom.MediaPacket packet,[Function responseFactory = null]);
+  dynamic sendPacket(MediaPacket packet,[Function responseFactory = null]);
+  dynamic prime([Function responseFactory = null]);
   dynamic flush([Function responseFactory = null]);
+  static const int kMaxBufferLen = 4611686018427387903;
 }
 
 
@@ -1546,8 +1968,28 @@ class _MediaConsumerProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaConsumer_pushPacketName:
-        var r = MediaConsumerPushPacketResponseParams.deserialize(
+      case _MediaConsumer_sendPacketName:
+        var r = MediaConsumerSendPacketResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      case _MediaConsumer_primeName:
+        var r = MediaConsumerPrimeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1614,12 +2056,20 @@ class _MediaConsumerProxyCalls implements MediaConsumer {
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    dynamic pushPacket(media_pipe_mojom.MediaPacket packet,[Function responseFactory = null]) {
-      var params = new _MediaConsumerPushPacketParams();
+    dynamic sendPacket(MediaPacket packet,[Function responseFactory = null]) {
+      var params = new _MediaConsumerSendPacketParams();
       params.packet = packet;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaConsumer_pushPacketName,
+          _MediaConsumer_sendPacketName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    dynamic prime([Function responseFactory = null]) {
+      var params = new _MediaConsumerPrimeParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _MediaConsumer_primeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1716,8 +2166,13 @@ class MediaConsumerStub extends bindings.Stub {
     var mojo_factory_result = new MediaConsumerSetBufferResponseParams();
     return mojo_factory_result;
   }
-  MediaConsumerPushPacketResponseParams _MediaConsumerPushPacketResponseParamsFactory() {
-    var mojo_factory_result = new MediaConsumerPushPacketResponseParams();
+  MediaConsumerSendPacketResponseParams _MediaConsumerSendPacketResponseParamsFactory(MediaConsumerSendResult result) {
+    var mojo_factory_result = new MediaConsumerSendPacketResponseParams();
+    mojo_factory_result.result = result;
+    return mojo_factory_result;
+  }
+  MediaConsumerPrimeResponseParams _MediaConsumerPrimeResponseParamsFactory() {
+    var mojo_factory_result = new MediaConsumerPrimeResponseParams();
     return mojo_factory_result;
   }
   MediaConsumerFlushResponseParams _MediaConsumerFlushResponseParamsFactory() {
@@ -1755,16 +2210,16 @@ class MediaConsumerStub extends bindings.Stub {
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaConsumer_pushPacketName:
-        var params = _MediaConsumerPushPacketParams.deserialize(
+      case _MediaConsumer_sendPacketName:
+        var params = _MediaConsumerSendPacketParams.deserialize(
             message.payload);
-        var response = _impl.pushPacket(params.packet,_MediaConsumerPushPacketResponseParamsFactory);
+        var response = _impl.sendPacket(params.packet,_MediaConsumerSendPacketResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaConsumer_pushPacketName,
+                  _MediaConsumer_sendPacketName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1772,7 +2227,27 @@ class MediaConsumerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaConsumer_pushPacketName,
+              _MediaConsumer_sendPacketName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _MediaConsumer_primeName:
+        var response = _impl.prime(_MediaConsumerPrimeResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _MediaConsumer_primeName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _MediaConsumer_primeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

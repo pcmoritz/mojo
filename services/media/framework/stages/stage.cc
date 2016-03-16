@@ -20,7 +20,5 @@ void Stage::UnprepareOutput(
     size_t index,
     const UpstreamCallback& callback) {}
 
-void Stage::Prime() {}
-
 }  // namespace media
 }  // namespace mojo

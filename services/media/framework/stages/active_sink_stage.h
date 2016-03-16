@@ -36,8 +36,6 @@ class ActiveSinkStage : public Stage {
       PayloadAllocator* allocator,
       const UpstreamCallback& callback) override;
 
-  void Prime() override;
-
   void Update(Engine* engine) override;
 
   void FlushInput(

@@ -184,9 +184,6 @@ class Graph {
   // prepare subgraphs added when the rest of the graph is already prepared.
   void PrepareInput(const InputRef& input);
 
-  // Primes all the sinks in the graph.
-  void PrimeSinks();
-
   // Flushes the output and the subgraph downstream of it.
   void FlushOutput(const OutputRef& output);
 

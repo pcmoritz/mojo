@@ -11,6 +11,7 @@ import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_
 import 'package:mojo_services/mojo/media/media_player.mojom.dart' as media_player_mojom;
 import 'package:mojo_services/mojo/media/media_sink.mojom.dart' as media_sink_mojom;
 import 'package:mojo_services/mojo/media/media_source.mojom.dart' as media_source_mojom;
+import 'package:mojo_services/mojo/media/media_type_converter.mojom.dart' as media_type_converter_mojom;
 
 
 
@@ -310,9 +311,95 @@ class _MediaFactoryCreateSinkParams extends bindings.Struct {
   }
 }
 
+
+class _MediaFactoryCreateDecoderParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  media_types_mojom.MediaType inputMediaType = null;
+  Object decoder = null;
+
+  _MediaFactoryCreateDecoderParams() : super(kVersions.last.size);
+
+  static _MediaFactoryCreateDecoderParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaFactoryCreateDecoderParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaFactoryCreateDecoderParams result = new _MediaFactoryCreateDecoderParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      result.inputMediaType = media_types_mojom.MediaType.decode(decoder1);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.decoder = decoder0.decodeInterfaceRequest(16, false, media_type_converter_mojom.MediaTypeConverterStub.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(inputMediaType, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "inputMediaType of struct _MediaFactoryCreateDecoderParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterfaceRequest(decoder, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "decoder of struct _MediaFactoryCreateDecoderParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_MediaFactoryCreateDecoderParams("
+           "inputMediaType: $inputMediaType" ", "
+           "decoder: $decoder" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
 const int _MediaFactory_createPlayerName = 0;
 const int _MediaFactory_createSourceName = 1;
 const int _MediaFactory_createSinkName = 2;
+const int _MediaFactory_createDecoderName = 3;
 
 class _MediaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -330,6 +417,7 @@ abstract class MediaFactory {
   void createPlayer(String originUrl, Object player);
   void createSource(String originUrl, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source);
   void createSink(String destinationUrl, media_types_mojom.MediaType mediaType, Object sink);
+  void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder);
 }
 
 
@@ -402,6 +490,16 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       params.mediaType = mediaType;
       params.sink = sink;
       _proxyImpl.sendMessage(params, _MediaFactory_createSinkName);
+    }
+    void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _MediaFactoryCreateDecoderParams();
+      params.inputMediaType = inputMediaType;
+      params.decoder = decoder;
+      _proxyImpl.sendMessage(params, _MediaFactory_createDecoderName);
     }
 }
 
@@ -507,6 +605,11 @@ class MediaFactoryStub extends bindings.Stub {
         var params = _MediaFactoryCreateSinkParams.deserialize(
             message.payload);
         _impl.createSink(params.destinationUrl, params.mediaType, params.sink);
+        break;
+      case _MediaFactory_createDecoderName:
+        var params = _MediaFactoryCreateDecoderParams.deserialize(
+            message.payload);
+        _impl.createDecoder(params.inputMediaType, params.decoder);
         break;
       default:
         throw new bindings.MojoCodecError("Unexpected message name");

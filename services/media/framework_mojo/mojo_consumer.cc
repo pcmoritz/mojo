@@ -25,6 +25,11 @@ void MojoConsumer::AddBinding(InterfaceRequest<MediaConsumer> consumer) {
   DCHECK(task_runner_);
 }
 
+void MojoConsumer::SetPrimeRequestedCallback(
+    const PrimeRequestedCallback& callback) {
+  prime_requested_callback_ = callback;
+}
+
 void MojoConsumer::SetFlushRequestedCallback(
     const FlushRequestedCallback& callback) {
   flush_requested_callback_ = callback;
@@ -38,15 +43,24 @@ void MojoConsumer::SetBuffer(
   callback.Run();
 }
 
-void MojoConsumer::PushPacket(
+void MojoConsumer::SendPacket(
     MediaPacketPtr media_packet,
-    const PushPacketCallback& callback) {
+    const SendPacketCallback& callback) {
   DCHECK(supply_callback_);
   supply_callback_(PacketImpl::Create(
       media_packet.Pass(),
       callback,
       task_runner_,
       buffer_));
+}
+
+void MojoConsumer::Prime(const PrimeCallback& callback) {
+  if (prime_requested_callback_) {
+    prime_requested_callback_(callback);
+  } else {
+    LOG(WARNING) << "prime requested but no callback registered";
+    callback.Run();
+  }
 }
 
 void MojoConsumer::MediaConsumerFlush(const FlushCallback& callback) {
@@ -74,7 +88,7 @@ void MojoConsumer::SetDownstreamDemand(Demand demand) {}
 
 MojoConsumer::PacketImpl::PacketImpl(
     MediaPacketPtr media_packet,
-    const PushPacketCallback& callback,
+    const SendPacketCallback& callback,
     scoped_refptr<base::SingleThreadTaskRunner> task_runner,
     const MappedSharedBuffer& buffer) :
     media_packet_(media_packet.Pass()),
@@ -85,8 +99,8 @@ MojoConsumer::PacketImpl::PacketImpl(
 MojoConsumer::PacketImpl::~PacketImpl() {}
 
 // static
-void MojoConsumer::PacketImpl::RunCallback(const PushPacketCallback& callback) {
-  callback.Run();
+void MojoConsumer::PacketImpl::RunCallback(const SendPacketCallback& callback) {
+  callback.Run(MediaConsumer::SendResult::CONSUMED);
 }
 
 void MojoConsumer::PacketImpl::Release() {

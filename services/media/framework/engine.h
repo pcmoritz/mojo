@@ -55,8 +55,7 @@ namespace media {
 //
 // 1) An update callback cannot be called synchronously with a Stage::Update
 //    call, because the lock is taken for the duration of Update, and the
-//    callback will take the lock. Update callbacks may occur during Engine::
-//    PrimeSinks, and they generally will.
+//    callback will take the lock.
 // 2) A stage cannot update supply/demand on its inputs/outputs except during
 //    Update. When an external event occurs, the stage and/or its hosted part
 //    should update its internal state as required and invoke the callback.

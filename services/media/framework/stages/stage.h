@@ -68,10 +68,6 @@ class Stage {
     size_t index,
     const UpstreamCallback& callback);
 
-  // Initiates demand. Called on sink stages after the graph is prepared. The
-  // default implementation does nothing.
-  virtual void Prime();
-
   // Performs processing.
   virtual void Update(Engine* engine) = 0;
 

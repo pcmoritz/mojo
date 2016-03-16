@@ -179,7 +179,6 @@ AddResult AddTransformsForLpcm(
   // transforms that handle more than one conversion.
   if (in_type.sample_format() != out_type_set.sample_format() &&
       out_type_set.sample_format() != LpcmStreamType::SampleFormat::kAny) {
-    // The reformatter will fix interleave conversion.
     *output = graph->ConnectOutputToPart(
         *output,
         graph->Add(LpcmReformatter::Create(in_type, out_type_set))).output();

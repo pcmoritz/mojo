@@ -53,11 +53,6 @@ void ActiveSinkStage::PrepareOutput(
   CHECK(false) << "PrepareOutput called on sink";
 }
 
-void ActiveSinkStage::Prime() {
-  DCHECK(sink_);
-  sink_->Prime();
-}
-
 void ActiveSinkStage::Update(Engine* engine) {
   DCHECK(engine);
   DCHECK(sink_);

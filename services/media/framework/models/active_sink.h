@@ -27,9 +27,6 @@ class ActiveSink : public Part {
   // Sets the callback that signals demand asynchronously.
   virtual void SetDemandCallback(const DemandCallback& demand_callback) = 0;
 
-  // Initiates demand.
-  virtual void Prime() = 0;
-
   // Supplies a packet to the sink, returning the new demand for the input.
   virtual Demand SupplyPacket(PacketPtr packet) = 0;
 };

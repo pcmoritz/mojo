@@ -289,6 +289,12 @@ bool StandardOutputBase::ProcessMix(
   int64_t final_sample_ftf = first_sample_ftf +
     ((frames_left - 1) * static_cast<int64_t>(info->step_size));
 
+  // If the packet has no frames, there's no need to mix it and it may be
+  // skipped.
+  if (packet->end_pts() == packet->start_pts()) {
+    return true;
+  }
+
   // Figure out the PTS of the final frame of audio in our input packet.
   DCHECK((packet->end_pts() - packet->start_pts()) >= Mixer::FRAC_ONE);
   int64_t final_pts = packet->end_pts() - Mixer::FRAC_ONE;

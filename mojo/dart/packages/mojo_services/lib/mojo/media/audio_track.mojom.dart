@@ -8,7 +8,7 @@ import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
-import 'package:mojo_services/mojo/media/media_pipe.mojom.dart' as media_pipe_mojom;
+import 'package:mojo_services/mojo/media/media_transport.mojom.dart' as media_transport_mojom;
 import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_mojom;
 import 'package:mojo_services/mojo/media/rate_control.mojom.dart' as rate_control_mojom;
 
@@ -383,7 +383,7 @@ class _AudioTrackConfigureParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.pipe = decoder0.decodeInterfaceRequest(16, false, media_pipe_mojom.MediaPipeStub.newFromEndpoint);
+      result.pipe = decoder0.decodeInterfaceRequest(16, false, media_transport_mojom.MediaConsumerStub.newFromEndpoint);
     }
     return result;
   }

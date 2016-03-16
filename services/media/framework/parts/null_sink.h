@@ -24,8 +24,6 @@ class NullSink : public ActiveSink {
 
   void SetDemandCallback(const DemandCallback& demand_callback) override;
 
-  void Prime() override;
-
   Demand SupplyPacket(PacketPtr packet) override;
 
  private:

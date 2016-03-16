@@ -6,8 +6,9 @@
 #define SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_FORMATTING_H_
 
 #include "mojo/services/media/common/interfaces/media_common.mojom.h"
-#include "mojo/services/media/common/interfaces/media_pipe.mojom.h"
+#include "mojo/services/media/common/interfaces/media_transport.mojom.h"
 #include "mojo/services/media/common/interfaces/media_types.mojom.h"
+#include "mojo/services/media/common/interfaces/rate_control.mojom.h"
 #include "mojo/services/media/control/interfaces/media_source.mojom.h"
 #include "services/media/framework/formatting.h"
 
@@ -77,6 +78,12 @@ std::ostream& operator<<(
 std::ostream& operator<<(
     std::ostream& os,
     const MediaSourceStreamDescriptorPtr& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const TimelineQuadPtr& value);
+std::ostream& operator<<(
+    std::ostream& os,
+    const TimelineTransformPtr& value);
 
 } // namespace media
 } // namespace mojo

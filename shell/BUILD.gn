@@ -212,6 +212,7 @@ source_set("parent_lib") {
     "//mojo/services/media/audio/interfaces",
     "//mojo/services/media/common/interfaces",
     "//mojo/services/media/control/interfaces",
+    "//mojo/services/media/core/interfaces",
     "//mojo/services/network/interfaces",
     "//mojo/services/tracing/interfaces",
     "//services/url_response_disk_cache",

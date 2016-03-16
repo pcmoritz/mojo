@@ -20,9 +20,17 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
 
  protected:
   // FfmpegDecoderBase overrides.
-  int Decode(PayloadAllocator* allocator, bool* frame_decoded_out) override;
+  void Flush() override;
 
-  PacketPtr CreateOutputPacket(PayloadAllocator* allocator) override;
+  int Decode(
+      const AVPacket& av_packet,
+      const AvFramePtr& av_frame_ptr,
+      PayloadAllocator* allocator,
+      bool* frame_decoded_out) override;
+
+  PacketPtr CreateOutputPacket(
+      const AVFrame& av_frame,
+      PayloadAllocator* allocator) override;
 
   PacketPtr CreateOutputEndOfStreamPacket() override;
 
@@ -104,7 +112,7 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   std::unique_ptr<StreamType> stream_type_;
 
   // Used to supply missing PTS.
-  int64_t next_presentation_time_= 0;
+  int64_t next_presentation_time_= Packet::kUnknownPresentationTime;
 };
 
 }  // namespace media

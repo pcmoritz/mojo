@@ -46,8 +46,6 @@ class Demux : public MultistreamSource {
   // would tell its owner how much data it needs from the reader, and the
   // owner would later hand over the data and possibly get a packet back.
 
-  // TODO(dalesat): Implement seek, etc.
-
   // TODO(dalesat): Make the demux use an allocator. Ffmpeg demuxes don't
   // support this.
 
@@ -59,6 +57,9 @@ class Demux : public MultistreamSource {
 
   // Gets the stream collection.
   virtual const std::vector<DemuxStream*>& streams() const = 0;
+
+  // Seeks to the specified position.
+  virtual void Seek(int64_t position) = 0;
 };
 
 }  // namespace media

@@ -11,8 +11,8 @@ namespace media {
 
 FfmpegDecoderBase::FfmpegDecoderBase(AvCodecContextPtr av_codec_context) :
     av_codec_context_(std::move(av_codec_context)),
-    av_frame_(av_frame_alloc()) {
-  DCHECK(av_codec_context);
+    av_frame_ptr_(av_frame_alloc()) {
+  DCHECK(av_codec_context_);
 }
 
 FfmpegDecoderBase::~FfmpegDecoderBase() {}
@@ -42,7 +42,8 @@ bool FfmpegDecoderBase::TransformPacket(
   }
 
   bool frame_decoded = false;
-  int input_bytes_used = Decode(allocator, &frame_decoded);
+  int input_bytes_used =
+      Decode(av_packet_, av_frame_ptr_, allocator, &frame_decoded);
   if (input_bytes_used < 0) {
     // Decode failed.
     return UnprepareInputPacket(input, output);
@@ -50,8 +51,8 @@ bool FfmpegDecoderBase::TransformPacket(
 
   if (frame_decoded) {
     DCHECK(allocator);
-    *output = CreateOutputPacket(allocator);
-    av_frame_unref(av_frame_.get());
+    *output = CreateOutputPacket(*av_frame_ptr_, allocator);
+    av_frame_unref(av_frame_ptr_.get());
   }
 
   CHECK(input_bytes_used <= av_packet_.size)
@@ -75,6 +76,7 @@ void FfmpegDecoderBase::PrepareInputPacket(const PacketPtr& input) {
   av_init_packet(&av_packet_);
   av_packet_.data = reinterpret_cast<uint8_t*>(input->payload());
   av_packet_.size = input->size();
+  av_packet_.pts = input->presentation_time();
 }
 
 bool FfmpegDecoderBase::UnprepareInputPacket(

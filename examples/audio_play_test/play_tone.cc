@@ -132,7 +132,7 @@ void PlayToneApp::Initialize(ApplicationImpl* app) {
   cfg->media_type->details = MediaTypeDetails::New();
   cfg->media_type->details->set_lpcm(pcm_cfg.Pass());
 
-  MediaPipePtr pipe;
+  MediaConsumerPtr pipe;
   audio_track_->Configure(cfg.Pass(), GetProxy(&pipe));
 
   // Now that the configuration request is in-flight and we our media pipe

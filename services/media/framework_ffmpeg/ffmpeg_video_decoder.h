@@ -20,9 +20,15 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
 
  protected:
   // FfmpegDecoderBase overrides.
-  int Decode(PayloadAllocator* allocator, bool* frame_decoded_out) override;
+  int Decode(
+      const AVPacket& av_packet,
+      const AvFramePtr& av_frame_ptr,
+      PayloadAllocator* allocator,
+      bool* frame_decoded_out) override;
 
-  PacketPtr CreateOutputPacket(PayloadAllocator* allocator) override;
+  PacketPtr CreateOutputPacket(
+      const AVFrame& av_frame,
+      PayloadAllocator* allocator) override;
 
   PacketPtr CreateOutputEndOfStreamPacket() override;
 

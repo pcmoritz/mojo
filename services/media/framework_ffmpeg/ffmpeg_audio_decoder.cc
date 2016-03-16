@@ -26,13 +26,28 @@ FfmpegAudioDecoder::FfmpegAudioDecoder(AvCodecContextPtr av_codec_context) :
 
 FfmpegAudioDecoder::~FfmpegAudioDecoder() {}
 
+void FfmpegAudioDecoder::Flush() {
+  FfmpegDecoderBase::Flush();
+  next_presentation_time_= Packet::kUnknownPresentationTime;
+}
+
 int FfmpegAudioDecoder::Decode(
+    const AVPacket& av_packet,
+    const AvFramePtr& av_frame_ptr,
     PayloadAllocator* allocator,
     bool* frame_decoded_out) {
   DCHECK(allocator);
   DCHECK(frame_decoded_out);
   DCHECK(context());
-  DCHECK(frame());
+  DCHECK(av_frame_ptr);
+
+  if (next_presentation_time_ == Packet::kUnknownPresentationTime) {
+    if (av_packet.pts == AV_NOPTS_VALUE) {
+      next_presentation_time_ = 0;
+    } else {
+      next_presentation_time_ = av_packet.pts;
+    }
+  }
 
   // Use the provided allocator (for allocations in AllocateBufferForAvFrame)
   // unless we intend to interleave later, in which case use the default
@@ -43,9 +58,9 @@ int FfmpegAudioDecoder::Decode(
   int frame_decoded = 0;
   int input_bytes_used = avcodec_decode_audio4(
       context().get(),
-      frame().get(),
+      av_frame_ptr.get(),
       &frame_decoded,
-      &packet());
+      &av_packet);
   *frame_decoded_out = frame_decoded != 0;
 
   // We're done with this allocator.
@@ -54,22 +69,22 @@ int FfmpegAudioDecoder::Decode(
   return input_bytes_used;
 }
 
-PacketPtr FfmpegAudioDecoder::CreateOutputPacket(PayloadAllocator* allocator) {
+PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
+    const AVFrame& av_frame,
+    PayloadAllocator* allocator) {
   DCHECK(allocator);
-  DCHECK(frame());
 
-  int64_t presentation_time = frame()->pts;
+  int64_t presentation_time = av_frame.pts;
   if (presentation_time == AV_NOPTS_VALUE) {
-    // TODO(dalesat): Adjust next_presentation_time_ for seek/non-zero start.
     presentation_time = next_presentation_time_;
-    next_presentation_time_ += frame()->nb_samples;
+    next_presentation_time_ += av_frame.nb_samples;
   }
 
   uint64_t payload_size;
   void *payload_buffer;
 
   AvBufferContext* av_buffer_context =
-      reinterpret_cast<AvBufferContext*>(av_buffer_get_opaque(frame()->buf[0]));
+      reinterpret_cast<AvBufferContext*>(av_buffer_get_opaque(av_frame.buf[0]));
 
   if (lpcm_util_) {
     // We need to interleave. The non-interleaved frames are in a buffer that
@@ -78,14 +93,14 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(PayloadAllocator* allocator) {
     // interleaved frames, which we get from the provided allocator.
     DCHECK(stream_type_);
     DCHECK(stream_type_->lpcm());
-    payload_size = stream_type_->lpcm()->min_buffer_size(frame()->nb_samples);
+    payload_size = stream_type_->lpcm()->min_buffer_size(av_frame.nb_samples);
     payload_buffer = allocator->AllocatePayloadBuffer(payload_size);
 
     lpcm_util_->Interleave(
         av_buffer_context->buffer(),
         av_buffer_context->size(),
         payload_buffer,
-        frame()->nb_samples);
+        av_frame.nb_samples);
   } else {
     // We don't need to interleave. The interleaved frames are in a buffer that
     // was allocated from the correct allocator. We take ownership of the buffer
@@ -96,7 +111,7 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(PayloadAllocator* allocator) {
 
   return Packet::Create(
       presentation_time,
-      frame()->nb_samples,
+      av_frame.nb_samples,
       false, // The base class is responsible for end-of-stream.
       payload_size,
       payload_buffer,

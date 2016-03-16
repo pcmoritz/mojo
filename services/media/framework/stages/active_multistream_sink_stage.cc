@@ -50,11 +50,6 @@ void ActiveMultistreamSinkStage::PrepareOutput(
   CHECK(false) << "PrepareOutput called on sink";
 }
 
-void ActiveMultistreamSinkStage::Prime() {
-  DCHECK(sink_);
-  sink_->Prime();
-}
-
 void ActiveMultistreamSinkStage::Update(Engine* engine) {
   DCHECK(engine);
   DCHECK(sink_);

@@ -1074,6 +1074,122 @@ class MediaSourcePrepareResponseParams extends bindings.Struct {
 }
 
 
+class _MediaSourcePrimeParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _MediaSourcePrimeParams() : super(kVersions.last.size);
+
+  static _MediaSourcePrimeParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaSourcePrimeParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaSourcePrimeParams result = new _MediaSourcePrimeParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_MediaSourcePrimeParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class MediaSourcePrimeResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  MediaSourcePrimeResponseParams() : super(kVersions.last.size);
+
+  static MediaSourcePrimeResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaSourcePrimeResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaSourcePrimeResponseParams result = new MediaSourcePrimeResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "MediaSourcePrimeResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
 class _MediaSourceFlushParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -1189,6 +1305,136 @@ class MediaSourceFlushResponseParams extends bindings.Struct {
   }
 }
 
+
+class _MediaSourceSeekParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  int position = 0;
+
+  _MediaSourceSeekParams() : super(kVersions.last.size);
+
+  static _MediaSourceSeekParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaSourceSeekParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaSourceSeekParams result = new _MediaSourceSeekParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.position = decoder0.decodeInt64(8);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInt64(position, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "position of struct _MediaSourceSeekParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_MediaSourceSeekParams("
+           "position: $position" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["position"] = position;
+    return map;
+  }
+}
+
+
+class MediaSourceSeekResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  MediaSourceSeekResponseParams() : super(kVersions.last.size);
+
+  static MediaSourceSeekResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static MediaSourceSeekResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    MediaSourceSeekResponseParams result = new MediaSourceSeekResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "MediaSourceSeekResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
 const int _MediaSource_getStreamsName = 0;
 const int _MediaSource_getClockDispositionName = 1;
 const int _MediaSource_getMasterClockName = 2;
@@ -1197,7 +1443,9 @@ const int _MediaSource_getProducerName = 4;
 const int _MediaSource_getPullModeProducerName = 5;
 const int _MediaSource_getStatusName = 6;
 const int _MediaSource_prepareName = 7;
-const int _MediaSource_flushName = 8;
+const int _MediaSource_primeName = 8;
+const int _MediaSource_flushName = 9;
+const int _MediaSource_seekName = 10;
 
 class _MediaSourceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1220,7 +1468,9 @@ abstract class MediaSource {
   void getPullModeProducer(int streamIndex, Object producer);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
   dynamic prepare([Function responseFactory = null]);
+  dynamic prime([Function responseFactory = null]);
   dynamic flush([Function responseFactory = null]);
+  dynamic seek(int position,[Function responseFactory = null]);
 }
 
 
@@ -1324,8 +1574,48 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
+      case _MediaSource_primeName:
+        var r = MediaSourcePrimeResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
       case _MediaSource_flushName:
         var r = MediaSourceFlushResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      case _MediaSource_seekName:
+        var r = MediaSourceSeekResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1433,11 +1723,28 @@ class _MediaSourceProxyCalls implements MediaSource {
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
+    dynamic prime([Function responseFactory = null]) {
+      var params = new _MediaSourcePrimeParams();
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _MediaSource_primeName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
     dynamic flush([Function responseFactory = null]) {
       var params = new _MediaSourceFlushParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
           _MediaSource_flushName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    dynamic seek(int position,[Function responseFactory = null]) {
+      var params = new _MediaSourceSeekParams();
+      params.position = position;
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _MediaSource_seekName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1542,8 +1849,16 @@ class MediaSourceStub extends bindings.Stub {
     var mojo_factory_result = new MediaSourcePrepareResponseParams();
     return mojo_factory_result;
   }
+  MediaSourcePrimeResponseParams _MediaSourcePrimeResponseParamsFactory() {
+    var mojo_factory_result = new MediaSourcePrimeResponseParams();
+    return mojo_factory_result;
+  }
   MediaSourceFlushResponseParams _MediaSourceFlushResponseParamsFactory() {
     var mojo_factory_result = new MediaSourceFlushResponseParams();
+    return mojo_factory_result;
+  }
+  MediaSourceSeekResponseParams _MediaSourceSeekResponseParamsFactory() {
+    var mojo_factory_result = new MediaSourceSeekResponseParams();
     return mojo_factory_result;
   }
 
@@ -1657,6 +1972,26 @@ class MediaSourceStub extends bindings.Stub {
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
+      case _MediaSource_primeName:
+        var response = _impl.prime(_MediaSourcePrimeResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _MediaSource_primeName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _MediaSource_primeName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
       case _MediaSource_flushName:
         var response = _impl.flush(_MediaSourceFlushResponseParamsFactory);
         if (response is Future) {
@@ -1673,6 +2008,28 @@ class MediaSourceStub extends bindings.Stub {
           return buildResponseWithId(
               response,
               _MediaSource_flushName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _MediaSource_seekName:
+        var params = _MediaSourceSeekParams.deserialize(
+            message.payload);
+        var response = _impl.seek(params.position,_MediaSourceSeekResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _MediaSource_seekName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _MediaSource_seekName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

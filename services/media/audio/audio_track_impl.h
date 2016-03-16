@@ -62,7 +62,7 @@ class AudioTrackImpl : public AudioTrack {
   // Implementation of AudioTrack interface.
   void Describe(const DescribeCallback& cbk) override;
   void Configure(AudioTrackConfigurationPtr configuration,
-                 InterfaceRequest<MediaPipe> req) override;
+                 InterfaceRequest<MediaConsumer> req) override;
   void GetRateControl(InterfaceRequest<RateControl> req) override;
   void SetGain(float db_gain) override;
 
@@ -74,7 +74,7 @@ class AudioTrackImpl : public AudioTrack {
   // encapsulation so that AudioPipe does not have to know that we are an
   // AudioTrackImpl (just that we implement its interface).
   void OnPacketReceived(AudioPipe::AudioPacketRefPtr packet);
-  bool OnFlushRequested(const MediaPipe::FlushCallback& cbk);
+  bool OnFlushRequested(const MediaConsumer::FlushCallback& cbk);
 
   AudioTrackImplWeakPtr     weak_this_;
   AudioServerImpl*          owner_;

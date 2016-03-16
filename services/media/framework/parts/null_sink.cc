@@ -19,11 +19,6 @@ void NullSink::SetDemandCallback(const DemandCallback& demand_callback) {
   demand_callback_ = demand_callback;
 }
 
-void NullSink::Prime() {
-  DCHECK(demand_callback_);
-  demand_callback_(Demand::kNeutral);
-}
-
 Demand NullSink::SupplyPacket(PacketPtr packet) {
   return Demand::kNeutral;
 }

@@ -16,35 +16,39 @@ FfmpegVideoDecoder::FfmpegVideoDecoder(AvCodecContextPtr av_codec_context) :
 FfmpegVideoDecoder::~FfmpegVideoDecoder() {}
 
 int FfmpegVideoDecoder::Decode(
+    const AVPacket& av_packet,
+    const AvFramePtr& av_frame_ptr,
     PayloadAllocator* allocator,
     bool* frame_decoded_out) {
+  DCHECK(av_frame_ptr);
   DCHECK(allocator);
   DCHECK(frame_decoded_out);
   DCHECK(context());
-  DCHECK(frame());
 
   int frame_decoded = 0;
   int input_bytes_used = avcodec_decode_video2(
     context().get(),
-    frame().get(),
+    av_frame_ptr.get(),
     &frame_decoded,
-    &packet());
+    &av_packet);
   *frame_decoded_out = frame_decoded != 0;
   return input_bytes_used;
 }
 
-PacketPtr FfmpegVideoDecoder::CreateOutputPacket(PayloadAllocator* allocator) {
+
+PacketPtr FfmpegVideoDecoder::CreateOutputPacket(
+    const AVFrame& av_frame,
+    PayloadAllocator* allocator) {
   DCHECK(allocator);
-  DCHECK(frame());
 
   // End of stream is indicated when we're draining and produce no packet.
   // TODO(dalesat): This is just a copy of the audio version.
   return Packet::Create(
-      frame()->pts,
-      frame()->pkt_duration,
+      av_frame.pts,
+      av_frame.pkt_duration,
       false,
       packet_size_,
-      frame()->data[0],
+      av_frame.data[0],
       allocator);
 }
 

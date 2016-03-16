@@ -15,7 +15,7 @@ MediaPipeBase::MediaPipeBase()
 MediaPipeBase::~MediaPipeBase() {
 }
 
-MojoResult MediaPipeBase::Init(InterfaceRequest<MediaPipe> request) {
+MojoResult MediaPipeBase::Init(InterfaceRequest<MediaConsumer> request) {
   // Double init?
   if (IsInitialized()) {
     return MOJO_RESULT_ALREADY_EXISTS;
@@ -39,12 +39,14 @@ void MediaPipeBase::Reset() {
   buffer_ = nullptr;
 }
 
-void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) {
+void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle,
+                              uint64_t size,
+                              const SetBufferCallback& cbk) {
   // Double init?  Close the connection.
   if (buffer_) {
     LOG(ERROR) << "Attempting to set a new buffer (size = "
                << size
-               << ") on a MediaPipe which already has a buffer (size = "
+               << ") on a MediaConsumer which already has a buffer (size = "
                << buffer_->size()
                << ")";
     Reset();
@@ -52,7 +54,7 @@ void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) {
   }
 
   // Invalid size?  Close the connection.
-  if (!size || (size > MediaPipe::kMaxBufferLen)) {
+  if (!size || (size > MediaConsumer::kMaxBufferLen)) {
     LOG(ERROR) << "Invalid shared buffer size (size = " << size << ")";
     Reset();
     return;
@@ -66,6 +68,8 @@ void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) {
     Reset();
     return;
   }
+
+  cbk.Run();
 }
 
 void MediaPipeBase::SendPacket(MediaPacketPtr packet,
@@ -85,6 +89,7 @@ void MediaPipeBase::SendPacket(MediaPacketPtr packet,
   size_t i = 0;
   size_t extra_payload_size =
       packet->extra_payload.is_null() ? 0 : packet->extra_payload.size();
+  size_t total_length = 0;
   while (true) {
     if ((*r).is_null()) {
       LOG(ERROR) << "Missing region structure at index " << i
@@ -105,6 +110,8 @@ void MediaPipeBase::SendPacket(MediaPacketPtr packet,
       return;
     }
 
+    total_length += length;
+
     if (i >= extra_payload_size) {
       break;
     }
@@ -116,6 +123,10 @@ void MediaPipeBase::SendPacket(MediaPacketPtr packet,
   // Looks good, send this packet up to the implementation layer.
   MediaPacketStatePtr ptr(new MediaPacketState(packet.Pass(), buffer_, cbk));
   OnPacketReceived(std::move(ptr));
+}
+
+void MediaPipeBase::Prime(const PrimeCallback& cbk) {
+  cbk.Run();
 }
 
 void MediaPipeBase::Flush(const FlushCallback& cbk) {
@@ -141,7 +152,7 @@ MediaPipeBase::MediaPacketState::MediaPacketState(
   : packet_(packet.Pass()),
     buffer_(buffer),
     cbk_(cbk),
-    result_(MediaPipe::SendResult::CONSUMED) {
+    result_(MediaConsumer::SendResult::CONSUMED) {
   DCHECK(packet_);
   DCHECK(packet_->payload);
 }
@@ -150,8 +161,9 @@ MediaPipeBase::MediaPacketState::~MediaPacketState() {
   cbk_.Run(result_);
 }
 
-void MediaPipeBase::MediaPacketState::SetResult(MediaPipe::SendResult result) {
-  MediaPipe::SendResult tmp = MediaPipe::SendResult::CONSUMED;
+void MediaPipeBase::MediaPacketState::SetResult(
+    MediaConsumer::SendResult result) {
+  MediaConsumer::SendResult tmp = MediaConsumer::SendResult::CONSUMED;
   result_.compare_exchange_strong(tmp, result);
 }
 

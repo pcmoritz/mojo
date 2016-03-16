@@ -193,12 +193,6 @@ void Graph::PrepareInput(const InputRef& input) {
   engine_.PrepareInput(input);
 }
 
-void Graph::PrimeSinks() {
-  for (Stage* sink : sinks_) {
-    sink->Prime();
-  }
-}
-
 void Graph::FlushOutput(const OutputRef& output) {
   DCHECK(output);
   engine_.FlushOutput(output);

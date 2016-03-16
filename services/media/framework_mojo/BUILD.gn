@@ -4,10 +4,6 @@
 
 source_set("framework_mojo") {
   sources = [
-    "audio_track_controller.cc",
-    "audio_track_controller.h",
-    "audio_track_producer.cc",
-    "audio_track_producer.h",
     "mojo_allocator.cc",
     "mojo_allocator.h",
     "mojo_consumer.cc",
@@ -20,8 +16,6 @@ source_set("framework_mojo") {
     "mojo_pull_mode_producer.h",
     "mojo_type_conversions.cc",
     "mojo_type_conversions.h",
-    "push_producer_base.cc",
-    "push_producer_base.h",
   ]
 
   deps = [

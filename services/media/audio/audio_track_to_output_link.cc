@@ -159,7 +159,7 @@ void AudioTrackToOutputLink::ReleaseQueue(const PacketQueuePtr& queue) {
   }
 
   for (auto iter = queue->begin(); iter != queue->end(); ++iter) {
-    (*iter)->SetResult(MediaPipe::SendResult::FLUSHED);
+    (*iter)->SetResult(MediaConsumer::SendResult::FLUSHED);
     (*iter).reset();
   }
 
@@ -169,4 +169,3 @@ void AudioTrackToOutputLink::ReleaseQueue(const PacketQueuePtr& queue) {
 }  // namespace audio
 }  // namespace media
 }  // namespace mojo
-

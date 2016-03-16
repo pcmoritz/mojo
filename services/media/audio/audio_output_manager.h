@@ -10,7 +10,7 @@
 #include "base/synchronization/lock.h"
 #include "base/threading/sequenced_worker_pool.h"
 #include "mojo/services/media/common/interfaces/media_common.mojom.h"
-#include "mojo/services/media/common/interfaces/media_pipe.mojom.h"
+#include "mojo/services/media/common/interfaces/media_transport.mojom.h"
 #include "services/media/audio/audio_output.h"
 #include "services/media/audio/fwd_decls.h"
 

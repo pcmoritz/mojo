@@ -235,6 +235,78 @@ class _MediaPlayerPauseParams extends bindings.Struct {
 }
 
 
+class _MediaPlayerSeekParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  int position = 0;
+
+  _MediaPlayerSeekParams() : super(kVersions.last.size);
+
+  static _MediaPlayerSeekParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaPlayerSeekParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaPlayerSeekParams result = new _MediaPlayerSeekParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.position = decoder0.decodeInt64(8);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInt64(position, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "position of struct _MediaPlayerSeekParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_MediaPlayerSeekParams("
+           "position: $position" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["position"] = position;
+    return map;
+  }
+}
+
+
 class _MediaPlayerGetStatusParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -395,7 +467,8 @@ class MediaPlayerGetStatusResponseParams extends bindings.Struct {
 
 const int _MediaPlayer_playName = 0;
 const int _MediaPlayer_pauseName = 1;
-const int _MediaPlayer_getStatusName = 2;
+const int _MediaPlayer_seekName = 2;
+const int _MediaPlayer_getStatusName = 3;
 
 class _MediaPlayerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -412,6 +485,7 @@ abstract class MediaPlayer {
   static const String serviceName = null;
   void play();
   void pause();
+  void seek(int position);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
 }
 
@@ -489,6 +563,15 @@ class _MediaPlayerProxyCalls implements MediaPlayer {
       }
       var params = new _MediaPlayerPauseParams();
       _proxyImpl.sendMessage(params, _MediaPlayer_pauseName);
+    }
+    void seek(int position) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _MediaPlayerSeekParams();
+      params.position = position;
+      _proxyImpl.sendMessage(params, _MediaPlayer_seekName);
     }
     dynamic getStatus(int versionLastSeen,[Function responseFactory = null]) {
       var params = new _MediaPlayerGetStatusParams();
@@ -600,6 +683,11 @@ class MediaPlayerStub extends bindings.Stub {
         break;
       case _MediaPlayer_pauseName:
         _impl.pause();
+        break;
+      case _MediaPlayer_seekName:
+        var params = _MediaPlayerSeekParams.deserialize(
+            message.payload);
+        _impl.seek(params.position);
         break;
       case _MediaPlayer_getStatusName:
         var params = _MediaPlayerGetStatusParams.deserialize(

@@ -5,6 +5,7 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_PACKET_H_
 #define SERVICES_MEDIA_FRAMEWORK_PACKET_H_
 
+#include <limits>
 #include <memory>
 
 #include "base/logging.h"
@@ -31,6 +32,9 @@ typedef std::unique_ptr<Packet, PacketDeleter> PacketPtr;
 // 2) The relationship to the allocator could be clearer.
 class Packet {
  public:
+  static const int64_t kUnknownPresentationTime =
+      std::numeric_limits<int64_t>::min();
+
   // Creates a packet. If size is 0, payload must be nullptr and vice-versa.
   // If payload is not nullptr, an allocator must be provided.
   static PacketPtr Create(

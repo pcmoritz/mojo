@@ -13,12 +13,12 @@
 #include "base/task_runner.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/system/buffer.h"
-#include "mojo/services/media/common/interfaces/media_pipe.mojom.h"
+#include "mojo/services/media/common/interfaces/media_transport.mojom.h"
 
 namespace mojo {
 namespace media {
 
-class MediaPipeBase : public MediaPipe {
+class MediaPipeBase : public MediaConsumer {
  protected:
   class MappedSharedBuffer;
   using MappedSharedBufferPtr = std::shared_ptr<MappedSharedBuffer>;
@@ -30,7 +30,7 @@ class MediaPipeBase : public MediaPipe {
 
     const MediaPacketPtr& packet() const { return packet_; }
     const MappedSharedBufferPtr& buffer() const { return buffer_; }
-    void SetResult(MediaPipe::SendResult result);
+    void SetResult(MediaConsumer::SendResult result);
 
    private:
     friend class MediaPipeBase;
@@ -41,7 +41,7 @@ class MediaPipeBase : public MediaPipe {
     MediaPacketPtr packet_;
     MappedSharedBufferPtr buffer_;
     SendPacketCallback cbk_;
-    std::atomic<MediaPipe::SendResult> result_;
+    std::atomic<MediaConsumer::SendResult> result_;
   };
   using MediaPacketStatePtr = std::unique_ptr<MediaPacketState>;
 
@@ -50,7 +50,7 @@ class MediaPipeBase : public MediaPipe {
   ~MediaPipeBase() override;
 
   // Initialize the internal state of the pipe (allocate resources, etc..)
-  MojoResult Init(InterfaceRequest<MediaPipe> request);
+  MojoResult Init(InterfaceRequest<MediaConsumer> request);
 
   bool IsInitialized() const;
   void Reset();
@@ -81,12 +81,15 @@ class MediaPipeBase : public MediaPipe {
   MappedSharedBufferPtr buffer_;
 
  private:
-  Binding<MediaPipe> binding_;
+  Binding<MediaConsumer> binding_;
 
-  // MediaPipe.mojom implementation.
-  void SetBuffer(ScopedSharedBufferHandle handle, uint64_t size) final;
+  // MediaConsumer.mojom implementation.
+  void SetBuffer(ScopedSharedBufferHandle handle,
+                uint64_t size,
+                const SetBufferCallback& cbk) final;
   void SendPacket(MediaPacketPtr packet,
                   const SendPacketCallback& cbk) final;
+  void Prime(const PrimeCallback& cbk) final;
   void Flush(const FlushCallback& cbk) final;
 };
 

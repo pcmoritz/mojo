@@ -109,11 +109,6 @@ void MojoPullModeProducer::SetDemandCallback(
   demand_callback_ = demand_callback;
 }
 
-void MojoPullModeProducer::Prime() {
-  DCHECK(demand_callback_);
-  demand_callback_(Demand::kNeutral);
-}
-
 Demand MojoPullModeProducer::SupplyPacket(PacketPtr packet) {
   base::AutoLock lock(lock_);
   DCHECK(demand_ != Demand::kNegative) << "packet pushed with negative demand";

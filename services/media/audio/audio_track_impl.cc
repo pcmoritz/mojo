@@ -132,7 +132,7 @@ void AudioTrackImpl::Describe(const DescribeCallback& cbk) {
 }
 
 void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
-                               InterfaceRequest<MediaPipe> req) {
+                               InterfaceRequest<MediaConsumer> req) {
   // Are we already configured?
   if (pipe_.IsInitialized()) {
     LOG(ERROR) << "Attempting to reconfigure a configured audio track.";
@@ -308,7 +308,7 @@ void AudioTrackImpl::OnPacketReceived(AudioPipe::AudioPacketRefPtr packet) {
   }
 }
 
-bool AudioTrackImpl::OnFlushRequested(const MediaPipe::FlushCallback& cbk) {
+bool AudioTrackImpl::OnFlushRequested(const MediaConsumer::FlushCallback& cbk) {
   for (const auto& output : outputs_) {
     DCHECK(output);
     output->FlushPendingQueue();

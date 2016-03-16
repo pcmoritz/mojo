@@ -40,31 +40,28 @@ class FfmpegDecoderBase : public Decoder {
     }
   };
 
-  // Decodes from av_packet_ into av_frame_. The result indicates how many
-  // bytes were consumed from av_packet_. *frame_decoded_out indicates whether
-  // av_frame_ contains a complete frame.
-  virtual int Decode(PayloadAllocator* allocator, bool* frame_decoded_out) = 0;
+  using AvFramePtr = std::unique_ptr<AVFrame, AVFrameDeleter>;
 
-  // Creates a Packet from av_frame_.
-  virtual PacketPtr CreateOutputPacket(PayloadAllocator* allocator) = 0;
+  // Decodes from av_packet into av_frame_ptr. The result indicates how many
+  // bytes were consumed from av_packet_. *frame_decoded_out indicates whether
+  // av_frame_ptr contains a complete frame.
+  virtual int Decode(
+      const AVPacket& av_packet,
+      const AvFramePtr& av_frame_ptr,
+      PayloadAllocator* allocator,
+      bool* frame_decoded_out) = 0;
+
+  // Creates a Packet from av_frame.
+  virtual PacketPtr CreateOutputPacket(
+      const AVFrame& av_frame,
+      PayloadAllocator* allocator) = 0;
 
   // Creates an end-of-stream packet with no payload.
   virtual PacketPtr CreateOutputEndOfStreamPacket() = 0;
 
- protected:
   // The ffmpeg codec context.
   const AvCodecContextPtr& context() {
     return av_codec_context_;
-  }
-
-  // Ffmpeg's representation of the input packet.
-  const AVPacket& packet() {
-    return av_packet_;
-  }
-
-  // Ffmpeg's representation of the output packet.
-  const std::unique_ptr<AVFrame, AVFrameDeleter>& frame() {
-    return av_frame_;
   }
 
  private:
@@ -78,7 +75,7 @@ class FfmpegDecoderBase : public Decoder {
 
   AvCodecContextPtr av_codec_context_;
   AVPacket av_packet_;
-  std::unique_ptr<AVFrame, AVFrameDeleter> av_frame_;
+  AvFramePtr av_frame_ptr_;
 };
 
 }  // namespace media

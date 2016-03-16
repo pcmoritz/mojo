@@ -39,9 +39,6 @@ class ActiveMultistreamSink : public Part {
   // Sets the host callback interface.
   virtual void SetHost(ActiveMultistreamSinkHost* host) = 0;
 
-  // Initiates demand.
-  virtual void Prime() = 0;
-
   // Supplies a packet to the sink, returning the new demand for the input.
   virtual Demand SupplyPacket(size_t input_index, PacketPtr packet) = 0;
 };

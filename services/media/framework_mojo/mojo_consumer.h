@@ -29,6 +29,7 @@ class MojoConsumerMediaConsumer : public MediaConsumer {
 // Implements MediaConsumer to receive a stream from across mojo.
 class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
  public:
+  using PrimeRequestedCallback = std::function<void(const PrimeCallback&)>;
   using FlushRequestedCallback = std::function<void(const FlushCallback&)>;
 
   static std::shared_ptr<MojoConsumer> Create() {
@@ -40,6 +41,10 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
   // Adds a binding.
   void AddBinding(InterfaceRequest<MediaConsumer> consumer);
 
+  // Sets a callback signalling that a prime has been requested from the
+  // MediaConsumer client.
+  void SetPrimeRequestedCallback(const PrimeRequestedCallback& callback);
+
   // Sets a callback signalling that a flush has been requested from the
   // MediaConsumer client.
   void SetFlushRequestedCallback(const FlushRequestedCallback& callback);
@@ -50,8 +55,10 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
       uint64_t size,
       const SetBufferCallback& callback) override;
 
-  void PushPacket(MediaPacketPtr packet, const PushPacketCallback& callback)
+  void SendPacket(MediaPacketPtr packet, const SendPacketCallback& callback)
       override;
+
+  void Prime(const PrimeCallback& callback) override;
 
   void MediaConsumerFlush(const FlushCallback& callback) override;
 
@@ -72,7 +79,7 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
    public:
     static PacketPtr Create(
         MediaPacketPtr media_packet,
-        const PushPacketCallback& callback,
+        const SendPacketCallback& callback,
         scoped_refptr<base::SingleThreadTaskRunner> task_runner,
         const MappedSharedBuffer& buffer) {
       return PacketPtr(new PacketImpl(
@@ -107,21 +114,22 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
    private:
     PacketImpl(
         MediaPacketPtr media_packet,
-        const PushPacketCallback& callback,
+        const SendPacketCallback& callback,
         scoped_refptr<base::SingleThreadTaskRunner> task_runner,
         const MappedSharedBuffer& buffer);
 
     ~PacketImpl() override;
 
-    static void RunCallback(const PushPacketCallback& callback);
+    static void RunCallback(const SendPacketCallback& callback);
 
     MediaPacketPtr media_packet_;
-    const PushPacketCallback callback_;
+    const SendPacketCallback callback_;
     scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
     void* payload_;
   };
 
   BindingSet<MediaConsumer> bindings_;
+  PrimeRequestedCallback prime_requested_callback_;
   FlushRequestedCallback flush_requested_callback_;
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
   MappedSharedBuffer buffer_;

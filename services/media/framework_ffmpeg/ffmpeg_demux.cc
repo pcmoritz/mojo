@@ -26,6 +26,8 @@ class FfmpegDemuxImpl : public FfmpegDemux {
 
   const std::vector<DemuxStream*>& streams() const override;
 
+  void Seek(int64_t position) override;
+
   // MultistreamSource implementation.
   size_t stream_count() const override;
 
@@ -104,7 +106,7 @@ class FfmpegDemuxImpl : public FfmpegDemux {
   std::vector<DemuxStream*> streams_;
   std::unique_ptr<Metadata> metadata_;
   int64_t next_presentation_time_;
-  int next_stream_to_end_; // -1 means don't end. streams_.size() means stop.
+  int next_stream_to_end_ = -1; // -1: don't end, streams_.size(): stop.
 };
 
 // static
@@ -112,7 +114,7 @@ std::shared_ptr<Demux> FfmpegDemux::Create() {
   return std::shared_ptr<Demux>(new FfmpegDemuxImpl());
 }
 
-FfmpegDemuxImpl::FfmpegDemuxImpl() : next_stream_to_end_(-1) {}
+FfmpegDemuxImpl::FfmpegDemuxImpl() {}
 
 FfmpegDemuxImpl::~FfmpegDemuxImpl() {}
 
@@ -172,6 +174,14 @@ std::unique_ptr<Metadata> FfmpegDemuxImpl::metadata() const {
 
 const std::vector<Demux::DemuxStream*>& FfmpegDemuxImpl::streams() const {
   return streams_;
+}
+
+void FfmpegDemuxImpl::Seek(int64_t position) {
+  int r = av_seek_frame(format_context_.get(), -1, position / 1000, 0);
+  if (r < 0) {
+    LOG(WARNING) << "av_seek_frame failed, result " << r;
+  }
+  next_stream_to_end_ = -1;
 }
 
 size_t FfmpegDemuxImpl::stream_count() const {

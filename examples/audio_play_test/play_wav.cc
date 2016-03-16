@@ -59,7 +59,7 @@ class PlayWAVApp : public ApplicationDelegate {
  private:
   using AudioPipePtr = std::unique_ptr<CircularBufferMediaPipeAdapter>;
   using AudioPacket  = CircularBufferMediaPipeAdapter::MappedPacket;
-  using PacketCbk    = MediaPipe::SendPacketCallback;
+  using PacketCbk    = MediaConsumer::SendPacketCallback;
 
   // TODO(johngro): endianness!
   struct PACKED RIFFChunkHeader {
@@ -102,7 +102,7 @@ class PlayWAVApp : public ApplicationDelegate {
   bool ReadAndValidateDATAHeader();
 
   void OnNeedsData(MediaResult res);
-  void OnPlayoutComplete(MediaPipe::SendResult res);
+  void OnPlayoutComplete(MediaConsumer::SendResult res);
   void OnConnectionError(const std::string& connection_name);
   void PostShutdown();
   void Shutdown();
@@ -172,7 +172,7 @@ void PlayWAVApp::Initialize(ApplicationImpl* app) {
     OnConnectionError("url_loader");
   });
 
-  playout_complete_cbk_ = PacketCbk([this](MediaPipe::SendResult res) {
+  playout_complete_cbk_ = PacketCbk([this](MediaConsumer::SendResult res) {
                                       this->OnPlayoutComplete(res);
                                     });
 
@@ -284,7 +284,7 @@ void PlayWAVApp::ProcessHTTPResponse(URLResponsePtr resp) {
   cfg->media_type->details->set_lpcm(pcm_cfg.Pass());
 
   // Configure the track based on the WAV header information.
-  MediaPipePtr media_pipe;
+  MediaConsumerPtr media_pipe;
   audio_track_->Configure(cfg.Pass(), GetProxy(&media_pipe));
 
   // Grab the rate control interface for our audio renderer.
@@ -504,7 +504,7 @@ void PlayWAVApp::OnNeedsData(MediaResult res) {
   }
 }
 
-void PlayWAVApp::OnPlayoutComplete(MediaPipe::SendResult res) {
+void PlayWAVApp::OnPlayoutComplete(MediaConsumer::SendResult res) {
   MOJO_DCHECK(!audio_pipe_->GetPending());
   audio_pipe_ = nullptr;
   PostShutdown();
