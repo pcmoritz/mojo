@@ -86,6 +86,9 @@ deps = {
   'src/third_party/skia':
    Var('chromium_git') + '/skia.git' + '@' +  Var('skia_revision'),
 
+  'src/third_party/glm':
+    Var('chromium_git') + '/external/github.com/g-truc/glm' + '@' + '93d09e0e93ca6fe3d9dc6398489a54a3f9cf76db',
+
   'src/third_party/yasm/source/patched-yasm':
    Var('chromium_git') + '/chromium/deps/yasm/patched-yasm.git' + '@' + '7da28c6c7c6a1387217352ce02b31754deb54d2a',
 
