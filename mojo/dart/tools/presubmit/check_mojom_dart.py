@@ -276,6 +276,13 @@ def is_bindings_machinery_path(filename):
   if (filename ==
         'mojo/public/tools/bindings/generators/mojom_dart_generator.py'):
     return True
+  # Mojom frontend changed
+  if (filename ==
+        'mojo/public/tools/bindings/mojom_tool/bin/linux64/mojom.sha1'):
+    return True
+  if (filename ==
+        'mojo/public/tools/bindings/mojom_tool/bin/mac64/mojom.sha1'):
+    return True
   return False
 
 
