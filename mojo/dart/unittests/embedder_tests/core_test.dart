@@ -65,7 +65,13 @@ invalidHandleTest() {
   // Shared buffer.
   MojoSharedBuffer sharedBuffer = new MojoSharedBuffer.create(10);
   Expect.isNotNull(sharedBuffer);
+  MojoSharedBufferInformation sharedBufferInformation =
+      sharedBuffer.information;
+  Expect.equals(sharedBufferInformation.flags, 0);
+  Expect.equals(sharedBufferInformation.sizeInBytes, 10);
   sharedBuffer.close();
+  sharedBufferInformation = sharedBuffer.information;
+  Expect.isNull(sharedBufferInformation);
   MojoSharedBuffer duplicate = new MojoSharedBuffer.duplicate(sharedBuffer);
   Expect.isNull(duplicate);
 
