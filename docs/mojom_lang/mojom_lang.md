@@ -221,15 +221,62 @@ entirely valid for Mojom files to be imported (transitively) multiple times
 
 ## Types in Mojom
 
+*Types* in Mojom are really only used in two ways:
+* first, in declaring additional types (recall that the Mojom language is nearly
+  entirely about defining types!); and
+* second, in declaring const values.
+The first way really covers a lot of ground, however. Type identifiers (i.e.,
+identifiers that resolve to some type definition) may occur in:
+* field declarations within struct and union declarations;
+* in message declarations (in both request and response parameters) in interface
+  declarations (this is really very similar to the use in struct field
+  declarations); and
+* in "composite" type specifiers (e.g., to specify an array of a given type).
+
 ### Reference and non-reference types
+
+There are two basic classes of types, *reference* types and *non-reference*
+types. The latter class is easier to understand, consisting of the built-in
+number (integer and floating-point) types, as well as user-defined enum types.
+All other types are reference types: they have some notion of *null* (i.e.,
+non-presence).
+
+#### Nullability
+
+When an identifier is used (in another type definition, including in message
+parameters) to refer to a reference type, by default the instance of the type is
+taken to be *non-nullable*, i.e., required to not be null. One may allow that
+instance to be null (i.e., specify a *nullable* instance) by appending `?` to
+the identifier. For example, if `Foo` is a reference type:
+```mojom
+struct MyStruct {
+  Foo foo1;
+  Foo? foo2;
+};
+```
+In an instance of `MyStruct`, the `foo1` field may never be null while the
+`foo2` field may be null.
+
+This also applies to composite type specifiers. For example:
+* `array<Foo>` is a non-nullable array of non-nullable `Foo` (the array itself
+  may not be null, nor can any element of the array);
+* `array<Foo?>` is a non-nullable array of nullable `Foo` (the array itself may
+  not be null, but any element of the array may be null);
+* `array<Foo>?` is a nullable array of non-nullable `Foo`; and
+* `array<Foo?>?` is a nullable array of nullable `Foo`.
+(See below for details on arrays.)
 
 ### Built-in types
 
-### Simple types
+#### Simple types
 
-### Arrays
+#### Strings
 
-### Maps
+#### Arrays
+
+#### Maps
+
+#### Raw handle types
 
 
 **TODO(vtl)**: The stuff below is old stuff to be reorganized/rewritten.
