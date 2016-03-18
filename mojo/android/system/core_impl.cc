@@ -406,6 +406,19 @@ static jint GetNativeBufferOffset(JNIEnv* env,
   return alignment - offset;
 }
 
+static jobject GetBufferInformation(JNIEnv* env,
+                                    jobject jcaller,
+                                    jint mojo_handle) {
+  MojoBufferInformation buffer_information;
+  MojoResult result =
+      MojoGetBufferInformation(static_cast<MojoHandle>(mojo_handle),
+                               &buffer_information, sizeof(buffer_information));
+  return Java_CoreImpl_newResultAndBufferInformation(
+             env, result, buffer_information.flags,
+             buffer_information.num_bytes)
+      .Release();
+}
+
 bool RegisterCoreImpl(JNIEnv* env) {
   return RegisterNativesImpl(env);
 }
