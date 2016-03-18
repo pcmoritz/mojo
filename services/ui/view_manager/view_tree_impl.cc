@@ -34,27 +34,42 @@ void ViewTreeImpl::RequestLayout() {
   registry_->RequestLayout(state_);
 }
 
-void ViewTreeImpl::SetRoot(
-    uint32_t root_key,
-    mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) {
-  registry_->SetRoot(state_, root_key, root_view_owner.Pass());
+void ViewTreeImpl::GetContainer(
+    mojo::InterfaceRequest<mojo::ui::ViewContainer> view_container_request) {
+  container_bindings_.AddBinding(this, view_container_request.Pass());
 }
 
-void ViewTreeImpl::ClearRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
-                                 transferred_view_owner_request) {
-  registry_->ClearRoot(state_, transferred_view_owner_request.Pass());
+void ViewTreeImpl::SetListener(
+    mojo::InterfaceHandle<mojo::ui::ViewContainerListener> listener) {
+  state_->set_view_container_listener(
+      mojo::ui::ViewContainerListenerPtr::Create(std::move(listener)));
 }
 
-static void RunLayoutRootCallback(
-    const ViewTreeImpl::LayoutRootCallback& callback,
+void ViewTreeImpl::AddChild(
+    uint32_t child_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) {
+  registry_->AddChild(state_, child_key, child_view_owner.Pass());
+}
+
+void ViewTreeImpl::RemoveChild(uint32_t child_key,
+                               mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                                   transferred_view_owner_request) {
+  registry_->RemoveChild(state_, child_key,
+                         transferred_view_owner_request.Pass());
+}
+
+static void RunLayoutChildCallback(
+    const ViewTreeImpl::LayoutChildCallback& callback,
     mojo::ui::ViewLayoutInfoPtr info) {
   callback.Run(info.Pass());
 }
 
-void ViewTreeImpl::LayoutRoot(mojo::ui::ViewLayoutParamsPtr root_layout_params,
-                              const LayoutRootCallback& callback) {
-  registry_->LayoutRoot(state_, root_layout_params.Pass(),
-                        base::Bind(&RunLayoutRootCallback, callback));
+void ViewTreeImpl::LayoutChild(
+    uint32_t child_key,
+    mojo::ui::ViewLayoutParamsPtr child_layout_params,
+    const LayoutChildCallback& callback) {
+  registry_->LayoutChild(state_, child_key, child_layout_params.Pass(),
+                         base::Bind(&RunLayoutChildCallback, callback));
 }
 
 void ViewTreeImpl::ConnectToService(

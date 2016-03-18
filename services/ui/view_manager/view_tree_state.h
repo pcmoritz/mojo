@@ -15,6 +15,7 @@
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "mojo/services/ui/views/interfaces/view_trees.mojom.h"
+#include "services/ui/view_manager/view_container_state.h"
 
 namespace view_manager {
 
@@ -25,14 +26,14 @@ class ViewTreeImpl;
 
 // Describes the state of a particular view tree.
 // This object is owned by the ViewRegistry that created it.
-class ViewTreeState {
+class ViewTreeState : public ViewContainerState {
  public:
   ViewTreeState(ViewRegistry* registry,
                 mojo::ui::ViewTreeTokenPtr view_tree_token,
                 mojo::InterfaceRequest<mojo::ui::ViewTree> view_tree_request,
                 mojo::ui::ViewTreeListenerPtr view_tree_listener,
                 const std::string& label);
-  ~ViewTreeState();
+  ~ViewTreeState() override;
 
   base::WeakPtr<ViewTreeState> GetWeakPtr() {
     return weak_factory_.GetWeakPtr();
@@ -82,7 +83,7 @@ class ViewTreeState {
       const mojo::ui::ViewInspector::GetHitTesterCallback& callback);
 
   const std::string& label() const { return label_; }
-  const std::string& FormattedLabel() const;
+  const std::string& FormattedLabel() const override;
 
  private:
   void ClearHitTesterCallbacks(bool renderer_changed);
@@ -109,8 +110,6 @@ class ViewTreeState {
 
   DISALLOW_COPY_AND_ASSIGN(ViewTreeState);
 };
-
-std::ostream& operator<<(std::ostream& os, ViewTreeState* view_tree_state);
 
 }  // namespace view_manager
 

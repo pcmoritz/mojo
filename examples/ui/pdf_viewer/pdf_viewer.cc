@@ -122,7 +122,7 @@ class PDFDocumentView : public mojo::ui::GaneshView,
       : GaneshView(app_impl, view_owner_request.Pass(), "PDFDocumentViewer"),
         pdf_document_(pdf_document),
         choreographer_(scene(), this),
-        input_handler_(view_service_provider(), this) {
+        input_handler_(GetViewServiceProvider(), this) {
     DCHECK(pdf_document_);
   }
 

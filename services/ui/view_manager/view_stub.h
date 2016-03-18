@@ -15,6 +15,7 @@
 
 namespace view_manager {
 
+class ViewContainerState;
 class ViewRegistry;
 class ViewState;
 class ViewTreeState;
@@ -63,6 +64,9 @@ class ViewStub {
 
   // Gets the parent view state, or null if none.
   ViewState* parent() const { return parent_; }
+
+  // Gets the container, or null if none.
+  ViewContainerState* container() const;
 
   // Gets the key that this child has in its container, or 0 if none.
   uint32_t key() const { return key_; }

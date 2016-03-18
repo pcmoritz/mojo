@@ -351,26 +351,26 @@ void ViewRegistry::RequestLayout(ViewTreeState* tree_state) {
   InvalidateLayoutForRoot(tree_state);
 }
 
-void ViewRegistry::SetRoot(
+void ViewRegistry::AddChild(
     ViewTreeState* tree_state,
-    uint32_t root_key,
-    mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) {
+    uint32_t child_key,
+    mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DCHECK(root_view_owner);
-  DVLOG(1) << "SetRoot: tree=" << tree_state << ", root_key=" << root_key;
+  DCHECK(child_view_owner);
+  DVLOG(1) << "AddChild: tree=" << tree_state << ", child_key=" << child_key;
 
   // Ensure there isn't already a root.
   if (tree_state->root()) {
     LOG(ERROR)
-        << "View tree attempted to set the root while one is already set: tree="
-        << tree_state << ", root_key=" << root_key;
+        << "View tree attempted to add the root while one is already set: tree="
+        << tree_state << ", child_key=" << child_key;
     UnregisterViewTree(tree_state);
     return;
   }
 
   // Set the root to a stub, pending resolution of the view owner.
-  tree_state->LinkRoot(root_key, std::unique_ptr<ViewStub>(new ViewStub(
-                                     this, root_view_owner.Pass())));
+  tree_state->LinkRoot(child_key, std::unique_ptr<ViewStub>(new ViewStub(
+                                      this, child_view_owner.Pass())));
   UpdateViewTreeRootScene(tree_state);
 
   // Schedule layout of the tree on behalf of its newly added root.
@@ -379,17 +379,18 @@ void ViewRegistry::SetRoot(
   InvalidateLayoutForRoot(tree_state);
 }
 
-void ViewRegistry::ClearRoot(ViewTreeState* tree_state,
-                             mojo::InterfaceRequest<mojo::ui::ViewOwner>
-                                 transferred_view_owner_request) {
+void ViewRegistry::RemoveChild(ViewTreeState* tree_state,
+                               uint32_t child_key,
+                               mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                                   transferred_view_owner_request) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DVLOG(1) << "ClearRoot: tree=" << tree_state;
+  DVLOG(1) << "RemoveChild: tree=" << tree_state << ", child_key=" << child_key;
 
   // Ensure there is a root.
-  if (!tree_state->root()) {
-    LOG(ERROR)
-        << "View tree attempted to reset the root but there is none: tree="
-        << tree_state;
+  if (!tree_state->root() || tree_state->root()->key() != child_key) {
+    LOG(ERROR) << "View tree attempted to remove the root but there is "
+                  "no child with the specified key: tree="
+               << tree_state << ", child_key=" << child_key;
     UnregisterViewTree(tree_state);
     return;
   }
@@ -404,20 +405,22 @@ void ViewRegistry::ClearRoot(ViewTreeState* tree_state,
   // either since it won't have any work to do.  So we're done.
 }
 
-void ViewRegistry::LayoutRoot(ViewTreeState* tree_state,
-                              mojo::ui::ViewLayoutParamsPtr root_layout_params,
-                              const ViewLayoutCallback& callback) {
+void ViewRegistry::LayoutChild(
+    ViewTreeState* tree_state,
+    uint32_t child_key,
+    mojo::ui::ViewLayoutParamsPtr child_layout_params,
+    const ViewLayoutCallback& callback) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DCHECK(root_layout_params);
-  DCHECK(root_layout_params->constraints);
-  DVLOG(1) << "LayoutRoot: tree=" << tree_state
-           << ", root_layout_params=" << root_layout_params;
+  DCHECK(child_layout_params);
+  DCHECK(child_layout_params->constraints);
+  DVLOG(1) << "LayoutRoot: tree=" << tree_state << ", child_key=" << child_key
+           << ", child_layout_params=" << child_layout_params;
 
   // Check whether the layout parameters are well-formed.
-  if (!AreViewLayoutParamsValid(root_layout_params.get())) {
+  if (!AreViewLayoutParamsValid(child_layout_params.get())) {
     LOG(ERROR) << "View tree provided invalid root layout parameters: "
-               << "tree=" << tree_state
-               << ", root_layout_params=" << root_layout_params;
+               << "tree=" << tree_state << ", child_key=" << child_key
+               << ", child_layout_params=" << child_layout_params;
     UnregisterViewTree(tree_state);
     callback.Run(nullptr);
     return;
@@ -425,16 +428,17 @@ void ViewRegistry::LayoutRoot(ViewTreeState* tree_state,
 
   // Check whether the client called LayoutRoot without first having actually
   // set a root.
-  if (!tree_state->root()) {
-    LOG(ERROR) << "View tree attempted to layout the root without having "
-                  "set one first: tree="
-               << tree_state << ", root_layout_params=" << root_layout_params;
+  if (!tree_state->root() || tree_state->root()->key() != child_key) {
+    LOG(ERROR) << "View tree attempted to layout the root but there is "
+                  "no child with the specified key: tree="
+               << tree_state << ", child_key=" << child_key
+               << ", child_layout_params=" << child_layout_params;
     UnregisterViewTree(tree_state);
     callback.Run(nullptr);
     return;
   }
 
-  SetLayout(tree_state->root(), root_layout_params.Pass(), callback);
+  SetLayout(tree_state->root(), child_layout_params.Pass(), callback);
 }
 
 void ViewRegistry::ConnectToViewTreeService(
@@ -521,6 +525,7 @@ void ViewRegistry::AttachViewStubAndNotify(ViewStub* view_stub,
                                            ViewState* view_state) {
   DCHECK(view_stub);
   DCHECK(IsViewStateRegisteredDebug(view_state));
+  DVLOG(2) << "AttachViewStubAndNotify: view_state=" << view_state;
 
   // TODO(jeffbrown): It would be really nice to have a way to pipeline
   // getting the scene token.
@@ -548,10 +553,8 @@ void ViewRegistry::ReleaseViewStubAndNotify(ViewStub* view_stub) {
 
   view_stub->ReleaseView();
 
-  if (view_stub->parent())
-    SendChildUnavailable(view_stub->parent(), view_stub->key());
-  else if (view_stub->tree())
-    SendRootUnavailable(view_stub->tree(), view_stub->key());
+  if (view_stub->container())
+    SendChildUnavailable(view_stub->container(), view_stub->key());
 
   // Note: We don't need to schedule layout for the previous owner.
   // We can simply wait for it to remove its unavailable child or root in
@@ -569,15 +572,19 @@ void ViewRegistry::OnViewAttached(
   if (!view_stub || view_stub->is_unavailable())
     return;
 
+  DVLOG(2) << "OnViewAttached: view_state=" << view_stub->state()
+           << ", scene_token=" << scene_token;
+
   DCHECK(view_stub->is_linked());
   view_stub->SetStubSceneToken(scene_token.Clone());
 
   auto view_info = mojo::ui::ViewInfo::New();
   view_info->scene_token = scene_token.Pass();
-  if (view_stub->parent()) {
-    SendChildAttached(view_stub->parent(), view_stub->key(), view_info.Pass());
-  } else if (view_stub->tree()) {
-    SendRootAttached(view_stub->tree(), view_stub->key(), view_info.Pass());
+  if (view_stub->container()) {
+    SendChildAttached(view_stub->container(), view_stub->key(),
+                      view_info.Pass());
+  }
+  if (view_stub->tree()) {
     UpdateViewTreeRootScene(view_stub->tree());
   }
 }
@@ -865,54 +872,35 @@ void ViewRegistry::OnRendererDied(ViewTreeState* tree_state) {
   SendRendererDied(tree_state);
 }
 
-void ViewRegistry::SendChildAttached(ViewState* parent_state,
+void ViewRegistry::SendChildAttached(ViewContainerState* container_state,
                                      uint32_t child_key,
                                      mojo::ui::ViewInfoPtr child_view_info) {
-  DCHECK(IsViewStateRegisteredDebug(parent_state));
+  DCHECK(container_state);
   DCHECK(child_view_info);
 
+  if (!container_state->view_container_listener())
+    return;
+
   // TODO: Detect ANRs
-  DVLOG(1) << "SendChildAttached: parent_state=" << parent_state
+  DVLOG(1) << "SendChildAttached: container_state=" << container_state
            << ", child_key=" << child_key
            << ", child_view_info=" << child_view_info;
-  parent_state->view_listener()->OnChildAttached(
+  container_state->view_container_listener()->OnChildAttached(
       child_key, child_view_info.Pass(), base::Bind(&base::DoNothing));
 }
 
-void ViewRegistry::SendChildUnavailable(ViewState* parent_state,
+void ViewRegistry::SendChildUnavailable(ViewContainerState* container_state,
                                         uint32_t child_key) {
-  DCHECK(IsViewStateRegisteredDebug(parent_state));
+  DCHECK(container_state);
+
+  if (!container_state->view_container_listener())
+    return;
 
   // TODO: Detect ANRs
-  DVLOG(1) << "SendChildUnavailable: parent_state=" << parent_state
+  DVLOG(1) << "SendChildUnavailable: container=" << container_state
            << ", child_key=" << child_key;
-  parent_state->view_listener()->OnChildUnavailable(
+  container_state->view_container_listener()->OnChildUnavailable(
       child_key, base::Bind(&base::DoNothing));
-}
-
-void ViewRegistry::SendRootAttached(ViewTreeState* tree_state,
-                                    uint32_t root_key,
-                                    mojo::ui::ViewInfoPtr root_view_info) {
-  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DCHECK(root_view_info);
-
-  // TODO: Detect ANRs
-  DVLOG(1) << "SendRootAttached: tree_state=" << tree_state
-           << ", root_key=" << root_key
-           << ", root_view_info=" << root_view_info;
-  tree_state->view_tree_listener()->OnRootAttached(
-      root_key, root_view_info.Pass(), base::Bind(&base::DoNothing));
-}
-
-void ViewRegistry::SendRootUnavailable(ViewTreeState* tree_state,
-                                       uint32_t root_key) {
-  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-
-  // TODO: Detect ANRs
-  DVLOG(1) << "SendRootUnavailable: tree_state=" << tree_state
-           << ", root_key=" << root_key;
-  tree_state->view_tree_listener()->OnRootUnavailable(
-      root_key, base::Bind(&base::DoNothing));
 }
 
 void ViewRegistry::SendRendererDied(ViewTreeState* tree_state) {

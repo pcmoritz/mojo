@@ -15,7 +15,8 @@
 
 namespace launcher {
 
-class LauncherViewTree : public mojo::ui::ViewTreeListener {
+class LauncherViewTree : public mojo::ui::ViewTreeListener,
+                         public mojo::ui::ViewContainerListener {
  public:
   LauncherViewTree(mojo::gfx::composition::Compositor* compositor,
                    mojo::ui::ViewManager* view_manager,
@@ -30,14 +31,16 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener {
   void DispatchEvent(mojo::EventPtr event);
 
  private:
-  // |ViewTree|:
+  // |ViewTreeListener|:
   void OnLayout(const OnLayoutCallback& callback) override;
-  void OnRootAttached(uint32_t root_key,
-                      mojo::ui::ViewInfoPtr root_view_info,
-                      const OnRootAttachedCallback& callback) override;
-  void OnRootUnavailable(uint32_t root_key,
-                         const OnRootUnavailableCallback& callback) override;
   void OnRendererDied(const OnRendererDiedCallback& callback) override;
+
+  // |ViewContainerListener|:
+  void OnChildAttached(uint32_t child_key,
+                       mojo::ui::ViewInfoPtr child_view_info,
+                       const OnChildAttachedCallback& callback) override;
+  void OnChildUnavailable(uint32_t child_key,
+                          const OnChildUnavailableCallback& callback) override;
 
   void OnViewTreeConnectionError();
   void OnInputDispatcherConnectionError();
@@ -55,8 +58,11 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener {
   base::Closure shutdown_callback_;
 
   mojo::Binding<mojo::ui::ViewTreeListener> view_tree_listener_binding_;
+  mojo::Binding<mojo::ui::ViewContainerListener>
+      view_container_listener_binding_;
 
   mojo::ui::ViewTreePtr view_tree_;
+  mojo::ui::ViewContainerPtr view_container_;
   mojo::ui::InputDispatcherPtr input_dispatcher_;
 
   uint32_t root_key_ = 0u;

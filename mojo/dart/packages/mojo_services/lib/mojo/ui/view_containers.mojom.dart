@@ -2,29 +2,26 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-library view_associates_mojom;
+library view_containers_mojom;
 import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
-import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
-import 'package:mojo_services/mojo/gfx/composition/hit_tests.mojom.dart' as hit_tests_mojom;
 import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
+import 'package:mojo_services/mojo/ui/layouts.mojom.dart' as layouts_mojom;
 import 'package:mojo_services/mojo/ui/view_token.mojom.dart' as view_token_mojom;
-import 'package:mojo_services/mojo/ui/view_tree_token.mojom.dart' as view_tree_token_mojom;
 
 
 
-class ViewAssociateInfo extends bindings.Struct {
+class ViewInfo extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
-  List<String> viewServiceNames = null;
-  List<String> viewTreeServiceNames = null;
+  scene_token_mojom.SceneToken sceneToken = null;
 
-  ViewAssociateInfo() : super(kVersions.last.size);
+  ViewInfo() : super(kVersions.last.size);
 
-  static ViewAssociateInfo deserialize(bindings.Message message) {
+  static ViewInfo deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -33,11 +30,410 @@ class ViewAssociateInfo extends bindings.Struct {
     return result;
   }
 
-  static ViewAssociateInfo decode(bindings.Decoder decoder0) {
+  static ViewInfo decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewAssociateInfo result = new ViewAssociateInfo();
+    ViewInfo result = new ViewInfo();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      result.sceneToken = scene_token_mojom.SceneToken.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeStruct(sceneToken, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "sceneToken of struct ViewInfo: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "ViewInfo("
+           "sceneToken: $sceneToken" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["sceneToken"] = sceneToken;
+    return map;
+  }
+}
+
+
+class _ViewContainerSetListenerParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  Object listener = null;
+
+  _ViewContainerSetListenerParams() : super(kVersions.last.size);
+
+  static _ViewContainerSetListenerParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewContainerSetListenerParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewContainerSetListenerParams result = new _ViewContainerSetListenerParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.listener = decoder0.decodeServiceInterface(8, true, ViewContainerListenerProxy.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInterface(listener, 8, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "listener of struct _ViewContainerSetListenerParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewContainerSetListenerParams("
+           "listener: $listener" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
+class _ViewContainerAddChildParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  int childKey = 0;
+  Object childViewOwner = null;
+
+  _ViewContainerAddChildParams() : super(kVersions.last.size);
+
+  static _ViewContainerAddChildParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewContainerAddChildParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewContainerAddChildParams result = new _ViewContainerAddChildParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.childKey = decoder0.decodeUint32(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.childViewOwner = decoder0.decodeServiceInterface(12, false, view_token_mojom.ViewOwnerProxy.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(childKey, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "childKey of struct _ViewContainerAddChildParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterface(childViewOwner, 12, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "childViewOwner of struct _ViewContainerAddChildParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewContainerAddChildParams("
+           "childKey: $childKey" ", "
+           "childViewOwner: $childViewOwner" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
+class _ViewContainerRemoveChildParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  int childKey = 0;
+  Object transferredViewOwner = null;
+
+  _ViewContainerRemoveChildParams() : super(kVersions.last.size);
+
+  static _ViewContainerRemoveChildParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewContainerRemoveChildParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewContainerRemoveChildParams result = new _ViewContainerRemoveChildParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.childKey = decoder0.decodeUint32(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.transferredViewOwner = decoder0.decodeInterfaceRequest(12, true, view_token_mojom.ViewOwnerStub.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(childKey, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "childKey of struct _ViewContainerRemoveChildParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterfaceRequest(transferredViewOwner, 12, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "transferredViewOwner of struct _ViewContainerRemoveChildParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewContainerRemoveChildParams("
+           "childKey: $childKey" ", "
+           "transferredViewOwner: $transferredViewOwner" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
+class _ViewContainerLayoutChildParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  int childKey = 0;
+  layouts_mojom.ViewLayoutParams childLayoutParams = null;
+
+  _ViewContainerLayoutChildParams() : super(kVersions.last.size);
+
+  static _ViewContainerLayoutChildParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewContainerLayoutChildParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewContainerLayoutChildParams result = new _ViewContainerLayoutChildParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.childKey = decoder0.decodeUint32(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(16, false);
+      result.childLayoutParams = layouts_mojom.ViewLayoutParams.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(childKey, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "childKey of struct _ViewContainerLayoutChildParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeStruct(childLayoutParams, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "childLayoutParams of struct _ViewContainerLayoutChildParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewContainerLayoutChildParams("
+           "childKey: $childKey" ", "
+           "childLayoutParams: $childLayoutParams" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["childKey"] = childKey;
+    map["childLayoutParams"] = childLayoutParams;
+    return map;
+  }
+}
+
+
+class ViewContainerLayoutChildResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  layouts_mojom.ViewLayoutInfo info = null;
+
+  ViewContainerLayoutChildResponseParams() : super(kVersions.last.size);
+
+  static ViewContainerLayoutChildResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewContainerLayoutChildResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewContainerLayoutChildResponseParams result = new ViewContainerLayoutChildResponseParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -60,30 +456,7 @@ class ViewAssociateInfo extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, true);
-      if (decoder1 == null) {
-        result.viewServiceNames = null;
-      } else {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.viewServiceNames = new List<String>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          result.viewServiceNames[i1] = decoder1.decodeString(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-        }
-      }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(16, true);
-      if (decoder1 == null) {
-        result.viewTreeServiceNames = null;
-      } else {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.viewTreeServiceNames = new List<String>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          result.viewTreeServiceNames[i1] = decoder1.decodeString(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-        }
-      }
+      result.info = layouts_mojom.ViewLayoutInfo.decode(decoder1);
     }
     return result;
   }
@@ -91,183 +464,16 @@ class ViewAssociateInfo extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      if (viewServiceNames == null) {
-        encoder0.encodeNullPointer(8, true);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(viewServiceNames.length, 8, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < viewServiceNames.length; ++i0) {
-          encoder1.encodeString(viewServiceNames[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-        }
-      }
+      encoder0.encodeStruct(info, 8, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewServiceNames of struct ViewAssociateInfo: $e";
-      rethrow;
-    }
-    try {
-      if (viewTreeServiceNames == null) {
-        encoder0.encodeNullPointer(16, true);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(viewTreeServiceNames.length, 16, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < viewTreeServiceNames.length; ++i0) {
-          encoder1.encodeString(viewTreeServiceNames[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-        }
-      }
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "viewTreeServiceNames of struct ViewAssociateInfo: $e";
+          "info of struct ViewContainerLayoutChildResponseParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "ViewAssociateInfo("
-           "viewServiceNames: $viewServiceNames" ", "
-           "viewTreeServiceNames: $viewTreeServiceNames" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["viewServiceNames"] = viewServiceNames;
-    map["viewTreeServiceNames"] = viewTreeServiceNames;
-    return map;
-  }
-}
-
-
-class _ViewAssociateConnectParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  Object inspector = null;
-
-  _ViewAssociateConnectParams() : super(kVersions.last.size);
-
-  static _ViewAssociateConnectParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewAssociateConnectParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewAssociateConnectParams result = new _ViewAssociateConnectParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.inspector = decoder0.decodeServiceInterface(8, false, ViewInspectorProxy.newFromEndpoint);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeInterface(inspector, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "inspector of struct _ViewAssociateConnectParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_ViewAssociateConnectParams("
-           "inspector: $inspector" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class ViewAssociateConnectResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  ViewAssociateInfo info = null;
-
-  ViewAssociateConnectResponseParams() : super(kVersions.last.size);
-
-  static ViewAssociateConnectResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewAssociateConnectResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewAssociateConnectResponseParams result = new ViewAssociateConnectResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.info = ViewAssociateInfo.decode(decoder1);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(info, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "info of struct ViewAssociateConnectResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "ViewAssociateConnectResponseParams("
+    return "ViewContainerLayoutChildResponseParams("
            "info: $info" ")";
   }
 
@@ -279,212 +485,16 @@ class ViewAssociateConnectResponseParams extends bindings.Struct {
 }
 
 
-class _ViewAssociateConnectToViewServiceParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
-  ];
-  view_token_mojom.ViewToken viewToken = null;
-  String serviceName_ = null;
-  core.MojoMessagePipeEndpoint pipe = null;
-
-  _ViewAssociateConnectToViewServiceParams() : super(kVersions.last.size);
-
-  static _ViewAssociateConnectToViewServiceParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewAssociateConnectToViewServiceParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewAssociateConnectToViewServiceParams result = new _ViewAssociateConnectToViewServiceParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.viewToken = view_token_mojom.ViewToken.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.serviceName_ = decoder0.decodeString(16, false);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.pipe = decoder0.decodeMessagePipeHandle(24, false);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(viewToken, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "viewToken of struct _ViewAssociateConnectToViewServiceParams: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeString(serviceName_, 16, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "serviceName_ of struct _ViewAssociateConnectToViewServiceParams: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeMessagePipeHandle(pipe, 24, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "pipe of struct _ViewAssociateConnectToViewServiceParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_ViewAssociateConnectToViewServiceParams("
-           "viewToken: $viewToken" ", "
-           "serviceName_: $serviceName_" ", "
-           "pipe: $pipe" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class _ViewAssociateConnectToViewTreeServiceParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
-  ];
-  view_tree_token_mojom.ViewTreeToken viewTreeToken = null;
-  String serviceName_ = null;
-  core.MojoMessagePipeEndpoint pipe = null;
-
-  _ViewAssociateConnectToViewTreeServiceParams() : super(kVersions.last.size);
-
-  static _ViewAssociateConnectToViewTreeServiceParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewAssociateConnectToViewTreeServiceParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewAssociateConnectToViewTreeServiceParams result = new _ViewAssociateConnectToViewTreeServiceParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.viewTreeToken = view_tree_token_mojom.ViewTreeToken.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.serviceName_ = decoder0.decodeString(16, false);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.pipe = decoder0.decodeMessagePipeHandle(24, false);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(viewTreeToken, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "viewTreeToken of struct _ViewAssociateConnectToViewTreeServiceParams: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeString(serviceName_, 16, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "serviceName_ of struct _ViewAssociateConnectToViewTreeServiceParams: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeMessagePipeHandle(pipe, 24, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "pipe of struct _ViewAssociateConnectToViewTreeServiceParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_ViewAssociateConnectToViewTreeServiceParams("
-           "viewTreeToken: $viewTreeToken" ", "
-           "serviceName_: $serviceName_" ", "
-           "pipe: $pipe" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class _ViewInspectorGetHitTesterParams extends bindings.Struct {
+class _ViewContainerListenerOnChildAttachedParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  view_tree_token_mojom.ViewTreeToken viewTreeToken = null;
-  Object hitTester = null;
+  int childKey = 0;
+  ViewInfo childViewInfo = null;
 
-  _ViewInspectorGetHitTesterParams() : super(kVersions.last.size);
+  _ViewContainerListenerOnChildAttachedParams() : super(kVersions.last.size);
 
-  static _ViewInspectorGetHitTesterParams deserialize(bindings.Message message) {
+  static _ViewContainerListenerOnChildAttachedParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -493,11 +503,11 @@ class _ViewInspectorGetHitTesterParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewInspectorGetHitTesterParams decode(bindings.Decoder decoder0) {
+  static _ViewContainerListenerOnChildAttachedParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewInspectorGetHitTesterParams result = new _ViewInspectorGetHitTesterParams();
+    _ViewContainerListenerOnChildAttachedParams result = new _ViewContainerListenerOnChildAttachedParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -519,12 +529,12 @@ class _ViewInspectorGetHitTesterParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.viewTreeToken = view_tree_token_mojom.ViewTreeToken.decode(decoder1);
+      result.childKey = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.hitTester = decoder0.decodeInterfaceRequest(16, false, hit_tests_mojom.HitTesterStub.newFromEndpoint);
+      var decoder1 = decoder0.decodePointer(16, false);
+      result.childViewInfo = ViewInfo.decode(decoder1);
     }
     return result;
   }
@@ -532,115 +542,44 @@ class _ViewInspectorGetHitTesterParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeStruct(viewTreeToken, 8, false);
+      encoder0.encodeUint32(childKey, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "viewTreeToken of struct _ViewInspectorGetHitTesterParams: $e";
+          "childKey of struct _ViewContainerListenerOnChildAttachedParams: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInterfaceRequest(hitTester, 16, false);
+      encoder0.encodeStruct(childViewInfo, 16, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "hitTester of struct _ViewInspectorGetHitTesterParams: $e";
+          "childViewInfo of struct _ViewContainerListenerOnChildAttachedParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewInspectorGetHitTesterParams("
-           "viewTreeToken: $viewTreeToken" ", "
-           "hitTester: $hitTester" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class ViewInspectorGetHitTesterResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  bool rendererChanged = false;
-
-  ViewInspectorGetHitTesterResponseParams() : super(kVersions.last.size);
-
-  static ViewInspectorGetHitTesterResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewInspectorGetHitTesterResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewInspectorGetHitTesterResponseParams result = new ViewInspectorGetHitTesterResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.rendererChanged = decoder0.decodeBool(8, 0);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeBool(rendererChanged, 8, 0);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "rendererChanged of struct ViewInspectorGetHitTesterResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "ViewInspectorGetHitTesterResponseParams("
-           "rendererChanged: $rendererChanged" ")";
+    return "_ViewContainerListenerOnChildAttachedParams("
+           "childKey: $childKey" ", "
+           "childViewInfo: $childViewInfo" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["rendererChanged"] = rendererChanged;
+    map["childKey"] = childKey;
+    map["childViewInfo"] = childViewInfo;
     return map;
   }
 }
 
 
-class _ViewInspectorResolveScenesParams extends bindings.Struct {
+class ViewContainerListenerOnChildAttachedResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
+    const bindings.StructDataHeader(8, 0)
   ];
-  List<scene_token_mojom.SceneToken> sceneTokens = null;
 
-  _ViewInspectorResolveScenesParams() : super(kVersions.last.size);
+  ViewContainerListenerOnChildAttachedResponseParams() : super(kVersions.last.size);
 
-  static _ViewInspectorResolveScenesParams deserialize(bindings.Message message) {
+  static ViewContainerListenerOnChildAttachedResponseParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -649,11 +588,70 @@ class _ViewInspectorResolveScenesParams extends bindings.Struct {
     return result;
   }
 
-  static _ViewInspectorResolveScenesParams decode(bindings.Decoder decoder0) {
+  static ViewContainerListenerOnChildAttachedResponseParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    _ViewInspectorResolveScenesParams result = new _ViewInspectorResolveScenesParams();
+    ViewContainerListenerOnChildAttachedResponseParams result = new ViewContainerListenerOnChildAttachedResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "ViewContainerListenerOnChildAttachedResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class _ViewContainerListenerOnChildUnavailableParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  int childKey = 0;
+
+  _ViewContainerListenerOnChildUnavailableParams() : super(kVersions.last.size);
+
+  static _ViewContainerListenerOnChildUnavailableParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewContainerListenerOnChildUnavailableParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewContainerListenerOnChildUnavailableParams result = new _ViewContainerListenerOnChildUnavailableParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -675,16 +673,7 @@ class _ViewInspectorResolveScenesParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(8, false);
-      {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.sceneTokens = new List<scene_token_mojom.SceneToken>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-          result.sceneTokens[i1] = scene_token_mojom.SceneToken.decode(decoder2);
-        }
-      }
+      result.childKey = decoder0.decodeUint32(8);
     }
     return result;
   }
@@ -692,43 +681,35 @@ class _ViewInspectorResolveScenesParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      if (sceneTokens == null) {
-        encoder0.encodeNullPointer(8, false);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(sceneTokens.length, 8, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < sceneTokens.length; ++i0) {
-          encoder1.encodeStruct(sceneTokens[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-        }
-      }
+      encoder0.encodeUint32(childKey, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "sceneTokens of struct _ViewInspectorResolveScenesParams: $e";
+          "childKey of struct _ViewContainerListenerOnChildUnavailableParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "_ViewInspectorResolveScenesParams("
-           "sceneTokens: $sceneTokens" ")";
+    return "_ViewContainerListenerOnChildUnavailableParams("
+           "childKey: $childKey" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["sceneTokens"] = sceneTokens;
+    map["childKey"] = childKey;
     return map;
   }
 }
 
 
-class ViewInspectorResolveScenesResponseParams extends bindings.Struct {
+class ViewContainerListenerOnChildUnavailableResponseParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
+    const bindings.StructDataHeader(8, 0)
   ];
-  List<view_token_mojom.ViewToken> viewTokens = null;
 
-  ViewInspectorResolveScenesResponseParams() : super(kVersions.last.size);
+  ViewContainerListenerOnChildUnavailableResponseParams() : super(kVersions.last.size);
 
-  static ViewInspectorResolveScenesResponseParams deserialize(bindings.Message message) {
+  static ViewContainerListenerOnChildUnavailableResponseParams deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -737,11 +718,11 @@ class ViewInspectorResolveScenesResponseParams extends bindings.Struct {
     return result;
   }
 
-  static ViewInspectorResolveScenesResponseParams decode(bindings.Decoder decoder0) {
+  static ViewContainerListenerOnChildUnavailableResponseParams decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewInspectorResolveScenesResponseParams result = new ViewInspectorResolveScenesResponseParams();
+    ViewContainerListenerOnChildUnavailableResponseParams result = new ViewContainerListenerOnChildUnavailableResponseParams();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -761,57 +742,29 @@ class ViewInspectorResolveScenesResponseParams extends bindings.Struct {
         'Message newer than the last known version cannot be shorter than '
         'required by the last known version.');
     }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.viewTokens = new List<view_token_mojom.ViewToken>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, true);
-          result.viewTokens[i1] = view_token_mojom.ViewToken.decode(decoder2);
-        }
-      }
-    }
     return result;
   }
 
   void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      if (viewTokens == null) {
-        encoder0.encodeNullPointer(8, false);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(viewTokens.length, 8, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < viewTokens.length; ++i0) {
-          encoder1.encodeStruct(viewTokens[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, true);
-        }
-      }
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "viewTokens of struct ViewInspectorResolveScenesResponseParams: $e";
-      rethrow;
-    }
+    encoder.getStructEncoderAtOffset(kVersions.last);
   }
 
   String toString() {
-    return "ViewInspectorResolveScenesResponseParams("
-           "viewTokens: $viewTokens" ")";
+    return "ViewContainerListenerOnChildUnavailableResponseParams("")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["viewTokens"] = viewTokens;
     return map;
   }
 }
 
-const int _ViewAssociate_connectName = 0;
-const int _ViewAssociate_connectToViewServiceName = 1;
-const int _ViewAssociate_connectToViewTreeServiceName = 2;
+const int _ViewContainer_setListenerName = 0;
+const int _ViewContainer_addChildName = 1;
+const int _ViewContainer_removeChildName = 2;
+const int _ViewContainer_layoutChildName = 3;
 
-class _ViewAssociateServiceDescription implements service_describer.ServiceDescription {
+class _ViewContainerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);
 
@@ -822,36 +775,37 @@ class _ViewAssociateServiceDescription implements service_describer.ServiceDescr
       responseFactory(null);
 }
 
-abstract class ViewAssociate {
-  static const String serviceName = "mojo::ui::ViewAssociate";
-  dynamic connect(Object inspector,[Function responseFactory = null]);
-  void connectToViewService(view_token_mojom.ViewToken viewToken, String serviceName_, core.MojoMessagePipeEndpoint pipe);
-  void connectToViewTreeService(view_tree_token_mojom.ViewTreeToken viewTreeToken, String serviceName_, core.MojoMessagePipeEndpoint pipe);
+abstract class ViewContainer {
+  static const String serviceName = null;
+  void setListener(Object listener);
+  void addChild(int childKey, Object childViewOwner);
+  void removeChild(int childKey, Object transferredViewOwner);
+  dynamic layoutChild(int childKey,layouts_mojom.ViewLayoutParams childLayoutParams,[Function responseFactory = null]);
 }
 
 
-class _ViewAssociateProxyImpl extends bindings.Proxy {
-  _ViewAssociateProxyImpl.fromEndpoint(
+class _ViewContainerProxyImpl extends bindings.Proxy {
+  _ViewContainerProxyImpl.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) : super.fromEndpoint(endpoint);
 
-  _ViewAssociateProxyImpl.fromHandle(core.MojoHandle handle) :
+  _ViewContainerProxyImpl.fromHandle(core.MojoHandle handle) :
       super.fromHandle(handle);
 
-  _ViewAssociateProxyImpl.unbound() : super.unbound();
+  _ViewContainerProxyImpl.unbound() : super.unbound();
 
-  static _ViewAssociateProxyImpl newFromEndpoint(
+  static _ViewContainerProxyImpl newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For _ViewAssociateProxyImpl"));
-    return new _ViewAssociateProxyImpl.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For _ViewContainerProxyImpl"));
+    return new _ViewContainerProxyImpl.fromEndpoint(endpoint);
   }
 
   service_describer.ServiceDescription get serviceDescription =>
-    new _ViewAssociateServiceDescription();
+    new _ViewContainerServiceDescription();
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewAssociate_connectName:
-        var r = ViewAssociateConnectResponseParams.deserialize(
+      case _ViewContainer_layoutChildName:
+        var r = ViewContainerLayoutChildResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -879,87 +833,95 @@ class _ViewAssociateProxyImpl extends bindings.Proxy {
 
   String toString() {
     var superString = super.toString();
-    return "_ViewAssociateProxyImpl($superString)";
+    return "_ViewContainerProxyImpl($superString)";
   }
 }
 
 
-class _ViewAssociateProxyCalls implements ViewAssociate {
-  _ViewAssociateProxyImpl _proxyImpl;
+class _ViewContainerProxyCalls implements ViewContainer {
+  _ViewContainerProxyImpl _proxyImpl;
 
-  _ViewAssociateProxyCalls(this._proxyImpl);
-    dynamic connect(Object inspector,[Function responseFactory = null]) {
-      var params = new _ViewAssociateConnectParams();
-      params.inspector = inspector;
+  _ViewContainerProxyCalls(this._proxyImpl);
+    void setListener(Object listener) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewContainerSetListenerParams();
+      params.listener = listener;
+      _proxyImpl.sendMessage(params, _ViewContainer_setListenerName);
+    }
+    void addChild(int childKey, Object childViewOwner) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewContainerAddChildParams();
+      params.childKey = childKey;
+      params.childViewOwner = childViewOwner;
+      _proxyImpl.sendMessage(params, _ViewContainer_addChildName);
+    }
+    void removeChild(int childKey, Object transferredViewOwner) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _ViewContainerRemoveChildParams();
+      params.childKey = childKey;
+      params.transferredViewOwner = transferredViewOwner;
+      _proxyImpl.sendMessage(params, _ViewContainer_removeChildName);
+    }
+    dynamic layoutChild(int childKey,layouts_mojom.ViewLayoutParams childLayoutParams,[Function responseFactory = null]) {
+      var params = new _ViewContainerLayoutChildParams();
+      params.childKey = childKey;
+      params.childLayoutParams = childLayoutParams;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewAssociate_connectName,
+          _ViewContainer_layoutChildName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    void connectToViewService(view_token_mojom.ViewToken viewToken, String serviceName_, core.MojoMessagePipeEndpoint pipe) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewAssociateConnectToViewServiceParams();
-      params.viewToken = viewToken;
-      params.serviceName_ = serviceName_;
-      params.pipe = pipe;
-      _proxyImpl.sendMessage(params, _ViewAssociate_connectToViewServiceName);
-    }
-    void connectToViewTreeService(view_tree_token_mojom.ViewTreeToken viewTreeToken, String serviceName_, core.MojoMessagePipeEndpoint pipe) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewAssociateConnectToViewTreeServiceParams();
-      params.viewTreeToken = viewTreeToken;
-      params.serviceName_ = serviceName_;
-      params.pipe = pipe;
-      _proxyImpl.sendMessage(params, _ViewAssociate_connectToViewTreeServiceName);
-    }
 }
 
 
-class ViewAssociateProxy implements bindings.ProxyBase {
+class ViewContainerProxy implements bindings.ProxyBase {
   final bindings.Proxy impl;
-  ViewAssociate ptr;
+  ViewContainer ptr;
 
-  ViewAssociateProxy(_ViewAssociateProxyImpl proxyImpl) :
+  ViewContainerProxy(_ViewContainerProxyImpl proxyImpl) :
       impl = proxyImpl,
-      ptr = new _ViewAssociateProxyCalls(proxyImpl);
+      ptr = new _ViewContainerProxyCalls(proxyImpl);
 
-  ViewAssociateProxy.fromEndpoint(
+  ViewContainerProxy.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) :
-      impl = new _ViewAssociateProxyImpl.fromEndpoint(endpoint) {
-    ptr = new _ViewAssociateProxyCalls(impl);
+      impl = new _ViewContainerProxyImpl.fromEndpoint(endpoint) {
+    ptr = new _ViewContainerProxyCalls(impl);
   }
 
-  ViewAssociateProxy.fromHandle(core.MojoHandle handle) :
-      impl = new _ViewAssociateProxyImpl.fromHandle(handle) {
-    ptr = new _ViewAssociateProxyCalls(impl);
+  ViewContainerProxy.fromHandle(core.MojoHandle handle) :
+      impl = new _ViewContainerProxyImpl.fromHandle(handle) {
+    ptr = new _ViewContainerProxyCalls(impl);
   }
 
-  ViewAssociateProxy.unbound() :
-      impl = new _ViewAssociateProxyImpl.unbound() {
-    ptr = new _ViewAssociateProxyCalls(impl);
+  ViewContainerProxy.unbound() :
+      impl = new _ViewContainerProxyImpl.unbound() {
+    ptr = new _ViewContainerProxyCalls(impl);
   }
 
-  factory ViewAssociateProxy.connectToService(
+  factory ViewContainerProxy.connectToService(
       bindings.ServiceConnector s, String url, [String serviceName]) {
-    ViewAssociateProxy p = new ViewAssociateProxy.unbound();
+    ViewContainerProxy p = new ViewContainerProxy.unbound();
     s.connectToService(url, p, serviceName);
     return p;
   }
 
-  static ViewAssociateProxy newFromEndpoint(
+  static ViewContainerProxy newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewAssociateProxy"));
-    return new ViewAssociateProxy.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewContainerProxy"));
+    return new ViewContainerProxy.fromEndpoint(endpoint);
   }
 
-  String get serviceName => ViewAssociate.serviceName;
+  String get serviceName => ViewContainer.serviceName;
 
   Future close({bool immediate: false}) => impl.close(immediate: immediate);
 
@@ -976,32 +938,32 @@ class ViewAssociateProxy implements bindings.ProxyBase {
   }
 
   String toString() {
-    return "ViewAssociateProxy($impl)";
+    return "ViewContainerProxy($impl)";
   }
 }
 
 
-class ViewAssociateStub extends bindings.Stub {
-  ViewAssociate _impl = null;
+class ViewContainerStub extends bindings.Stub {
+  ViewContainer _impl = null;
 
-  ViewAssociateStub.fromEndpoint(
+  ViewContainerStub.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint, [this._impl])
       : super.fromEndpoint(endpoint);
 
-  ViewAssociateStub.fromHandle(core.MojoHandle handle, [this._impl])
+  ViewContainerStub.fromHandle(core.MojoHandle handle, [this._impl])
       : super.fromHandle(handle);
 
-  ViewAssociateStub.unbound() : super.unbound();
+  ViewContainerStub.unbound() : super.unbound();
 
-  static ViewAssociateStub newFromEndpoint(
+  static ViewContainerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewAssociateStub"));
-    return new ViewAssociateStub.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewContainerStub"));
+    return new ViewContainerStub.fromEndpoint(endpoint);
   }
 
 
-  ViewAssociateConnectResponseParams _ViewAssociateConnectResponseParamsFactory(ViewAssociateInfo info) {
-    var mojo_factory_result = new ViewAssociateConnectResponseParams();
+  ViewContainerLayoutChildResponseParams _ViewContainerLayoutChildResponseParamsFactory(layouts_mojom.ViewLayoutInfo info) {
+    var mojo_factory_result = new ViewContainerLayoutChildResponseParams();
     mojo_factory_result.info = info;
     return mojo_factory_result;
   }
@@ -1014,16 +976,31 @@ class ViewAssociateStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewAssociate_connectName:
-        var params = _ViewAssociateConnectParams.deserialize(
+      case _ViewContainer_setListenerName:
+        var params = _ViewContainerSetListenerParams.deserialize(
             message.payload);
-        var response = _impl.connect(params.inspector,_ViewAssociateConnectResponseParamsFactory);
+        _impl.setListener(params.listener);
+        break;
+      case _ViewContainer_addChildName:
+        var params = _ViewContainerAddChildParams.deserialize(
+            message.payload);
+        _impl.addChild(params.childKey, params.childViewOwner);
+        break;
+      case _ViewContainer_removeChildName:
+        var params = _ViewContainerRemoveChildParams.deserialize(
+            message.payload);
+        _impl.removeChild(params.childKey, params.transferredViewOwner);
+        break;
+      case _ViewContainer_layoutChildName:
+        var params = _ViewContainerLayoutChildParams.deserialize(
+            message.payload);
+        var response = _impl.layoutChild(params.childKey,params.childLayoutParams,_ViewContainerLayoutChildResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewAssociate_connectName,
+                  _ViewContainer_layoutChildName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1031,20 +1008,10 @@ class ViewAssociateStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewAssociate_connectName,
+              _ViewContainer_layoutChildName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
-        break;
-      case _ViewAssociate_connectToViewServiceName:
-        var params = _ViewAssociateConnectToViewServiceParams.deserialize(
-            message.payload);
-        _impl.connectToViewService(params.viewToken, params.serviceName_, params.pipe);
-        break;
-      case _ViewAssociate_connectToViewTreeServiceName:
-        var params = _ViewAssociateConnectToViewTreeServiceParams.deserialize(
-            message.payload);
-        _impl.connectToViewTreeService(params.viewTreeToken, params.serviceName_, params.pipe);
         break;
       default:
         throw new bindings.MojoCodecError("Unexpected message name");
@@ -1053,15 +1020,15 @@ class ViewAssociateStub extends bindings.Stub {
     return null;
   }
 
-  ViewAssociate get impl => _impl;
-  set impl(ViewAssociate d) {
+  ViewContainer get impl => _impl;
+  set impl(ViewContainer d) {
     assert(_impl == null);
     _impl = d;
   }
 
   String toString() {
     var superString = super.toString();
-    return "ViewAssociateStub($superString)";
+    return "ViewContainerStub($superString)";
   }
 
   int get version => 0;
@@ -1069,16 +1036,16 @@ class ViewAssociateStub extends bindings.Stub {
   static service_describer.ServiceDescription _cachedServiceDescription;
   static service_describer.ServiceDescription get serviceDescription {
     if (_cachedServiceDescription == null) {
-      _cachedServiceDescription = new _ViewAssociateServiceDescription();
+      _cachedServiceDescription = new _ViewContainerServiceDescription();
     }
     return _cachedServiceDescription;
   }
 }
 
-const int _ViewInspector_getHitTesterName = 0;
-const int _ViewInspector_resolveScenesName = 1;
+const int _ViewContainerListener_onChildAttachedName = 0;
+const int _ViewContainerListener_onChildUnavailableName = 1;
 
-class _ViewInspectorServiceDescription implements service_describer.ServiceDescription {
+class _ViewContainerListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
       responseFactory(null);
 
@@ -1089,35 +1056,35 @@ class _ViewInspectorServiceDescription implements service_describer.ServiceDescr
       responseFactory(null);
 }
 
-abstract class ViewInspector {
+abstract class ViewContainerListener {
   static const String serviceName = null;
-  dynamic getHitTester(view_tree_token_mojom.ViewTreeToken viewTreeToken,Object hitTester,[Function responseFactory = null]);
-  dynamic resolveScenes(List<scene_token_mojom.SceneToken> sceneTokens,[Function responseFactory = null]);
+  dynamic onChildAttached(int childKey,ViewInfo childViewInfo,[Function responseFactory = null]);
+  dynamic onChildUnavailable(int childKey,[Function responseFactory = null]);
 }
 
 
-class _ViewInspectorProxyImpl extends bindings.Proxy {
-  _ViewInspectorProxyImpl.fromEndpoint(
+class _ViewContainerListenerProxyImpl extends bindings.Proxy {
+  _ViewContainerListenerProxyImpl.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) : super.fromEndpoint(endpoint);
 
-  _ViewInspectorProxyImpl.fromHandle(core.MojoHandle handle) :
+  _ViewContainerListenerProxyImpl.fromHandle(core.MojoHandle handle) :
       super.fromHandle(handle);
 
-  _ViewInspectorProxyImpl.unbound() : super.unbound();
+  _ViewContainerListenerProxyImpl.unbound() : super.unbound();
 
-  static _ViewInspectorProxyImpl newFromEndpoint(
+  static _ViewContainerListenerProxyImpl newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For _ViewInspectorProxyImpl"));
-    return new _ViewInspectorProxyImpl.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For _ViewContainerListenerProxyImpl"));
+    return new _ViewContainerListenerProxyImpl.fromEndpoint(endpoint);
   }
 
   service_describer.ServiceDescription get serviceDescription =>
-    new _ViewInspectorServiceDescription();
+    new _ViewContainerListenerServiceDescription();
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewInspector_getHitTesterName:
-        var r = ViewInspectorGetHitTesterResponseParams.deserialize(
+      case _ViewContainerListener_onChildAttachedName:
+        var r = ViewContainerListenerOnChildAttachedResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1136,8 +1103,8 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ViewInspector_resolveScenesName:
-        var r = ViewInspectorResolveScenesResponseParams.deserialize(
+      case _ViewContainerListener_onChildUnavailableName:
+        var r = ViewContainerListenerOnChildUnavailableResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1165,75 +1132,75 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
 
   String toString() {
     var superString = super.toString();
-    return "_ViewInspectorProxyImpl($superString)";
+    return "_ViewContainerListenerProxyImpl($superString)";
   }
 }
 
 
-class _ViewInspectorProxyCalls implements ViewInspector {
-  _ViewInspectorProxyImpl _proxyImpl;
+class _ViewContainerListenerProxyCalls implements ViewContainerListener {
+  _ViewContainerListenerProxyImpl _proxyImpl;
 
-  _ViewInspectorProxyCalls(this._proxyImpl);
-    dynamic getHitTester(view_tree_token_mojom.ViewTreeToken viewTreeToken,Object hitTester,[Function responseFactory = null]) {
-      var params = new _ViewInspectorGetHitTesterParams();
-      params.viewTreeToken = viewTreeToken;
-      params.hitTester = hitTester;
+  _ViewContainerListenerProxyCalls(this._proxyImpl);
+    dynamic onChildAttached(int childKey,ViewInfo childViewInfo,[Function responseFactory = null]) {
+      var params = new _ViewContainerListenerOnChildAttachedParams();
+      params.childKey = childKey;
+      params.childViewInfo = childViewInfo;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewInspector_getHitTesterName,
+          _ViewContainerListener_onChildAttachedName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
-    dynamic resolveScenes(List<scene_token_mojom.SceneToken> sceneTokens,[Function responseFactory = null]) {
-      var params = new _ViewInspectorResolveScenesParams();
-      params.sceneTokens = sceneTokens;
+    dynamic onChildUnavailable(int childKey,[Function responseFactory = null]) {
+      var params = new _ViewContainerListenerOnChildUnavailableParams();
+      params.childKey = childKey;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewInspector_resolveScenesName,
+          _ViewContainerListener_onChildUnavailableName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
 }
 
 
-class ViewInspectorProxy implements bindings.ProxyBase {
+class ViewContainerListenerProxy implements bindings.ProxyBase {
   final bindings.Proxy impl;
-  ViewInspector ptr;
+  ViewContainerListener ptr;
 
-  ViewInspectorProxy(_ViewInspectorProxyImpl proxyImpl) :
+  ViewContainerListenerProxy(_ViewContainerListenerProxyImpl proxyImpl) :
       impl = proxyImpl,
-      ptr = new _ViewInspectorProxyCalls(proxyImpl);
+      ptr = new _ViewContainerListenerProxyCalls(proxyImpl);
 
-  ViewInspectorProxy.fromEndpoint(
+  ViewContainerListenerProxy.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) :
-      impl = new _ViewInspectorProxyImpl.fromEndpoint(endpoint) {
-    ptr = new _ViewInspectorProxyCalls(impl);
+      impl = new _ViewContainerListenerProxyImpl.fromEndpoint(endpoint) {
+    ptr = new _ViewContainerListenerProxyCalls(impl);
   }
 
-  ViewInspectorProxy.fromHandle(core.MojoHandle handle) :
-      impl = new _ViewInspectorProxyImpl.fromHandle(handle) {
-    ptr = new _ViewInspectorProxyCalls(impl);
+  ViewContainerListenerProxy.fromHandle(core.MojoHandle handle) :
+      impl = new _ViewContainerListenerProxyImpl.fromHandle(handle) {
+    ptr = new _ViewContainerListenerProxyCalls(impl);
   }
 
-  ViewInspectorProxy.unbound() :
-      impl = new _ViewInspectorProxyImpl.unbound() {
-    ptr = new _ViewInspectorProxyCalls(impl);
+  ViewContainerListenerProxy.unbound() :
+      impl = new _ViewContainerListenerProxyImpl.unbound() {
+    ptr = new _ViewContainerListenerProxyCalls(impl);
   }
 
-  factory ViewInspectorProxy.connectToService(
+  factory ViewContainerListenerProxy.connectToService(
       bindings.ServiceConnector s, String url, [String serviceName]) {
-    ViewInspectorProxy p = new ViewInspectorProxy.unbound();
+    ViewContainerListenerProxy p = new ViewContainerListenerProxy.unbound();
     s.connectToService(url, p, serviceName);
     return p;
   }
 
-  static ViewInspectorProxy newFromEndpoint(
+  static ViewContainerListenerProxy newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewInspectorProxy"));
-    return new ViewInspectorProxy.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewContainerListenerProxy"));
+    return new ViewContainerListenerProxy.fromEndpoint(endpoint);
   }
 
-  String get serviceName => ViewInspector.serviceName;
+  String get serviceName => ViewContainerListener.serviceName;
 
   Future close({bool immediate: false}) => impl.close(immediate: immediate);
 
@@ -1250,38 +1217,36 @@ class ViewInspectorProxy implements bindings.ProxyBase {
   }
 
   String toString() {
-    return "ViewInspectorProxy($impl)";
+    return "ViewContainerListenerProxy($impl)";
   }
 }
 
 
-class ViewInspectorStub extends bindings.Stub {
-  ViewInspector _impl = null;
+class ViewContainerListenerStub extends bindings.Stub {
+  ViewContainerListener _impl = null;
 
-  ViewInspectorStub.fromEndpoint(
+  ViewContainerListenerStub.fromEndpoint(
       core.MojoMessagePipeEndpoint endpoint, [this._impl])
       : super.fromEndpoint(endpoint);
 
-  ViewInspectorStub.fromHandle(core.MojoHandle handle, [this._impl])
+  ViewContainerListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
       : super.fromHandle(handle);
 
-  ViewInspectorStub.unbound() : super.unbound();
+  ViewContainerListenerStub.unbound() : super.unbound();
 
-  static ViewInspectorStub newFromEndpoint(
+  static ViewContainerListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
-    assert(endpoint.setDescription("For ViewInspectorStub"));
-    return new ViewInspectorStub.fromEndpoint(endpoint);
+    assert(endpoint.setDescription("For ViewContainerListenerStub"));
+    return new ViewContainerListenerStub.fromEndpoint(endpoint);
   }
 
 
-  ViewInspectorGetHitTesterResponseParams _ViewInspectorGetHitTesterResponseParamsFactory(bool rendererChanged) {
-    var mojo_factory_result = new ViewInspectorGetHitTesterResponseParams();
-    mojo_factory_result.rendererChanged = rendererChanged;
+  ViewContainerListenerOnChildAttachedResponseParams _ViewContainerListenerOnChildAttachedResponseParamsFactory() {
+    var mojo_factory_result = new ViewContainerListenerOnChildAttachedResponseParams();
     return mojo_factory_result;
   }
-  ViewInspectorResolveScenesResponseParams _ViewInspectorResolveScenesResponseParamsFactory(List<view_token_mojom.ViewToken> viewTokens) {
-    var mojo_factory_result = new ViewInspectorResolveScenesResponseParams();
-    mojo_factory_result.viewTokens = viewTokens;
+  ViewContainerListenerOnChildUnavailableResponseParams _ViewContainerListenerOnChildUnavailableResponseParamsFactory() {
+    var mojo_factory_result = new ViewContainerListenerOnChildUnavailableResponseParams();
     return mojo_factory_result;
   }
 
@@ -1293,16 +1258,16 @@ class ViewInspectorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewInspector_getHitTesterName:
-        var params = _ViewInspectorGetHitTesterParams.deserialize(
+      case _ViewContainerListener_onChildAttachedName:
+        var params = _ViewContainerListenerOnChildAttachedParams.deserialize(
             message.payload);
-        var response = _impl.getHitTester(params.viewTreeToken,params.hitTester,_ViewInspectorGetHitTesterResponseParamsFactory);
+        var response = _impl.onChildAttached(params.childKey,params.childViewInfo,_ViewContainerListenerOnChildAttachedResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewInspector_getHitTesterName,
+                  _ViewContainerListener_onChildAttachedName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1310,21 +1275,21 @@ class ViewInspectorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewInspector_getHitTesterName,
+              _ViewContainerListener_onChildAttachedName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewInspector_resolveScenesName:
-        var params = _ViewInspectorResolveScenesParams.deserialize(
+      case _ViewContainerListener_onChildUnavailableName:
+        var params = _ViewContainerListenerOnChildUnavailableParams.deserialize(
             message.payload);
-        var response = _impl.resolveScenes(params.sceneTokens,_ViewInspectorResolveScenesResponseParamsFactory);
+        var response = _impl.onChildUnavailable(params.childKey,_ViewContainerListenerOnChildUnavailableResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewInspector_resolveScenesName,
+                  _ViewContainerListener_onChildUnavailableName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1332,7 +1297,7 @@ class ViewInspectorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewInspector_resolveScenesName,
+              _ViewContainerListener_onChildUnavailableName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1344,15 +1309,15 @@ class ViewInspectorStub extends bindings.Stub {
     return null;
   }
 
-  ViewInspector get impl => _impl;
-  set impl(ViewInspector d) {
+  ViewContainerListener get impl => _impl;
+  set impl(ViewContainerListener d) {
     assert(_impl == null);
     _impl = d;
   }
 
   String toString() {
     var superString = super.toString();
-    return "ViewInspectorStub($superString)";
+    return "ViewContainerListenerStub($superString)";
   }
 
   int get version => 0;
@@ -1360,7 +1325,7 @@ class ViewInspectorStub extends bindings.Stub {
   static service_describer.ServiceDescription _cachedServiceDescription;
   static service_describer.ServiceDescription get serviceDescription {
     if (_cachedServiceDescription == null) {
-      _cachedServiceDescription = new _ViewInspectorServiceDescription();
+      _cachedServiceDescription = new _ViewContainerListenerServiceDescription();
     }
     return _cachedServiceDescription;
   }

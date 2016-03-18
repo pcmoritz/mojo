@@ -111,21 +111,23 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   // Sets the root of the view tree.
   // Destroys |tree_state| if an error occurs.
-  void SetRoot(ViewTreeState* tree_state,
-               uint32_t root_key,
-               mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner);
+  void AddChild(ViewTreeState* tree_state,
+                uint32_t child_key,
+                mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner);
 
   // Removes the root of the view tree.
   // Destroys |tree_state| if an error occurs.
-  void ClearRoot(ViewTreeState* tree_state,
-                 mojo::InterfaceRequest<mojo::ui::ViewOwner>
-                     transferred_view_owner_request);
+  void RemoveChild(ViewTreeState* tree_state,
+                   uint32_t child_key,
+                   mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                       transferred_view_owner_request);
 
   // Lays out a view tree's root and optionally provides its size.
   // Destroys |tree_state| if an error occurs.
-  void LayoutRoot(ViewTreeState* tree_state,
-                  mojo::ui::ViewLayoutParamsPtr root_layout_params,
-                  const ViewLayoutCallback& callback);
+  void LayoutChild(ViewTreeState* tree_state,
+                   uint32_t child_key,
+                   mojo::ui::ViewLayoutParamsPtr child_layout_params,
+                   const ViewLayoutCallback& callback);
 
   // Connects to a view service.
   // Destroys |view_state| if an error occurs.
@@ -200,14 +202,11 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   // SIGNALING
 
-  void SendChildAttached(ViewState* parent_state,
+  void SendChildAttached(ViewContainerState* container_state,
                          uint32_t child_key,
                          mojo::ui::ViewInfoPtr child_view_info);
-  void SendChildUnavailable(ViewState* parent_state, uint32_t child_key);
-  void SendRootAttached(ViewTreeState* tree_state,
-                        uint32_t root_key,
-                        mojo::ui::ViewInfoPtr root_view_info);
-  void SendRootUnavailable(ViewTreeState* tree_state, uint32_t root_key);
+  void SendChildUnavailable(ViewContainerState* container_state,
+                            uint32_t child_key);
   void SendRendererDied(ViewTreeState* tree_state);
 
   bool IsViewStateRegisteredDebug(ViewState* view_state) {

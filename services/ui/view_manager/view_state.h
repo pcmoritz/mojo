@@ -15,6 +15,7 @@
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
+#include "services/ui/view_manager/view_container_state.h"
 #include "services/ui/view_manager/view_layout_request.h"
 
 namespace view_manager {
@@ -25,7 +26,7 @@ class ViewStub;
 
 // Describes the state of a particular view.
 // This object is owned by the ViewRegistry that created it.
-class ViewState {
+class ViewState : public ViewContainerState {
  public:
   using ChildrenMap = std::unordered_map<uint32_t, std::unique_ptr<ViewStub>>;
 
@@ -34,7 +35,7 @@ class ViewState {
             mojo::InterfaceRequest<mojo::ui::View> view_request,
             mojo::ui::ViewListenerPtr view_listener,
             const std::string& label);
-  ~ViewState();
+  ~ViewState() override;
 
   base::WeakPtr<ViewState> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
@@ -112,7 +113,7 @@ class ViewState {
   void ReleaseOwner();
 
   const std::string& label() const { return label_; }
-  const std::string& FormattedLabel() const;
+  const std::string& FormattedLabel() const override;
 
  private:
   mojo::ui::ViewTokenPtr view_token_;
@@ -138,8 +139,6 @@ class ViewState {
 
   DISALLOW_COPY_AND_ASSIGN(ViewState);
 };
-
-std::ostream& operator<<(std::ostream& os, ViewState* view_state);
 
 }  // namespace view_manager
 

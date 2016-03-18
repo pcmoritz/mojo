@@ -64,7 +64,7 @@ class _ViewManagerCreateViewParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.viewOwner = decoder0.decodeInterfaceRequest(12, false, views_mojom.ViewOwnerStub.newFromEndpoint);
+      result.viewOwner = decoder0.decodeInterfaceRequest(12, false, view_token_mojom.ViewOwnerStub.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       

@@ -86,10 +86,4 @@ const std::string& ViewTreeState::FormattedLabel() const {
   return formatted_label_cache_;
 }
 
-std::ostream& operator<<(std::ostream& os, ViewTreeState* view_tree_state) {
-  if (!view_tree_state)
-    return os << "null";
-  return os << view_tree_state->FormattedLabel();
-}
-
 }  // namespace view_manager

@@ -22,14 +22,24 @@ LauncherViewTree::LauncherViewTree(
       context_provider_(context_provider.Pass()),
       viewport_metrics_(viewport_metrics.Pass()),
       shutdown_callback_(shutdown_callback),
-      view_tree_listener_binding_(this) {
+      view_tree_listener_binding_(this),
+      view_container_listener_binding_(this) {
   // Register the view tree.
   mojo::ui::ViewTreeListenerPtr view_tree_listener;
   view_tree_listener_binding_.Bind(mojo::GetProxy(&view_tree_listener));
   view_manager_->CreateViewTree(mojo::GetProxy(&view_tree_),
-                                view_tree_listener.Pass(), "Launcher");
+                                view_tree_listener.Pass(), "LauncherTree");
   view_tree_.set_connection_error_handler(base::Bind(
       &LauncherViewTree::OnViewTreeConnectionError, base::Unretained(this)));
+
+  // Prepare the view container for the root.
+  view_tree_->GetContainer(mojo::GetProxy(&view_container_));
+  view_container_.set_connection_error_handler(base::Bind(
+      &LauncherViewTree::OnViewTreeConnectionError, base::Unretained(this)));
+  mojo::ui::ViewContainerListenerPtr view_container_listener;
+  view_container_listener_binding_.Bind(
+      mojo::GetProxy(&view_container_listener));
+  view_container_->SetListener(view_container_listener.Pass());
 
   // Get view tree services.
   mojo::ServiceProviderPtr view_tree_service_provider;
@@ -50,12 +60,13 @@ LauncherViewTree::LauncherViewTree(
 LauncherViewTree::~LauncherViewTree() {}
 
 void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
-  if (owner) {
-    view_tree_->SetRoot(++root_key_, owner.Pass());
-    root_was_set_ = true;
-  } else {
-    view_tree_->ClearRoot(nullptr);
+  if (root_was_set_) {
+    view_container_->RemoveChild(root_key_, nullptr);
     root_was_set_ = false;
+  }
+  if (owner) {
+    view_container_->AddChild(++root_key_, owner.Pass());
+    root_was_set_ = true;
   }
 }
 
@@ -87,22 +98,23 @@ void LauncherViewTree::OnLayout(const OnLayoutCallback& callback) {
   callback.Run();
 }
 
-void LauncherViewTree::OnRootAttached(uint32_t root_key,
-                                      mojo::ui::ViewInfoPtr root_view_info,
-                                      const OnRootAttachedCallback& callback) {
-  DCHECK(root_view_info);
+void LauncherViewTree::OnChildAttached(
+    uint32_t child_key,
+    mojo::ui::ViewInfoPtr child_view_info,
+    const OnChildAttachedCallback& callback) {
+  DCHECK(child_view_info);
 
-  if (root_key_ == root_key) {
-    DVLOG(1) << "OnRootAttached: root_view_info=" << root_view_info;
-    root_view_info_ = root_view_info.Pass();
+  if (root_key_ == child_key) {
+    DVLOG(1) << "OnChildAttached: child_view_info=" << child_view_info;
+    root_view_info_ = child_view_info.Pass();
   }
   callback.Run();
 }
 
-void LauncherViewTree::OnRootUnavailable(
-    uint32_t root_key,
-    const OnRootUnavailableCallback& callback) {
-  if (root_key_ == root_key) {
+void LauncherViewTree::OnChildUnavailable(
+    uint32_t child_key,
+    const OnChildUnavailableCallback& callback) {
+  if (root_key_ == child_key) {
     LOG(ERROR) << "Root view terminated unexpectedly.";
     Shutdown();
   }
@@ -126,8 +138,8 @@ void LauncherViewTree::LayoutRoot() {
   params->constraints->min_height = viewport_metrics_->size->height;
   params->constraints->max_height = viewport_metrics_->size->height;
   params->device_pixel_ratio = viewport_metrics_->device_pixel_ratio;
-  view_tree_->LayoutRoot(
-      params.Pass(),
+  view_container_->LayoutChild(
+      root_key_, params.Pass(),
       base::Bind(&LauncherViewTree::OnLayoutResult, base::Unretained(this)));
 }
 

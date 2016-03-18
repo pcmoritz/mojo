@@ -33,6 +33,17 @@ void ViewImpl::RequestLayout() {
   registry_->RequestLayout(state_);
 }
 
+void ViewImpl::GetContainer(
+    mojo::InterfaceRequest<mojo::ui::ViewContainer> view_container_request) {
+  container_bindings_.AddBinding(this, view_container_request.Pass());
+}
+
+void ViewImpl::SetListener(
+    mojo::InterfaceHandle<mojo::ui::ViewContainerListener> listener) {
+  state_->set_view_container_listener(
+      mojo::ui::ViewContainerListenerPtr::Create(std::move(listener)));
+}
+
 void ViewImpl::AddChild(
     uint32_t child_key,
     mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) {

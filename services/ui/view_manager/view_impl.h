@@ -17,6 +17,7 @@ class ViewState;
 // View interface implementation.
 // This object is owned by its associated ViewState.
 class ViewImpl : public mojo::ui::View,
+                 public mojo::ui::ViewContainer,
                  public mojo::ui::ViewOwner,
                  public mojo::ServiceProvider {
  public:
@@ -31,6 +32,12 @@ class ViewImpl : public mojo::ui::View,
   void CreateScene(
       mojo::InterfaceRequest<mojo::gfx::composition::Scene> scene) override;
   void RequestLayout() override;
+  void GetContainer(mojo::InterfaceRequest<mojo::ui::ViewContainer>
+                        view_container_request) override;
+
+  // |ViewContainer|:
+  void SetListener(
+      mojo::InterfaceHandle<mojo::ui::ViewContainerListener> listener) override;
   void AddChild(
       uint32_t child_key,
       mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) override;
@@ -48,6 +55,7 @@ class ViewImpl : public mojo::ui::View,
   ViewRegistry* const registry_;
   ViewState* const state_;
   mojo::BindingSet<mojo::ServiceProvider> service_provider_bindings_;
+  mojo::BindingSet<mojo::ui::ViewContainer> container_bindings_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewImpl);
 };

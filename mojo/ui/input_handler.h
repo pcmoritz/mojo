@@ -24,7 +24,7 @@ namespace ui {
 //          const mojo::ui::ViewProvider::CreateViewCallback&
 //              create_view_callback)
 //          : BaseView(app_impl, "MyView", create_view_callback),
-//            input_handler_(view_service_provider(), this) {}
+//            input_handler_(GetViewServiceProvider(), this) {}
 //   ~MyView() override {}
 //
 //  private:

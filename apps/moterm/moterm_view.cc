@@ -43,7 +43,7 @@ MotermView::MotermView(
     mojo::InterfaceRequest<mojo::ServiceProvider> service_provider_request)
     : GaneshView(app_impl, view_owner_request.Pass(), "Moterm"),
       choreographer_(scene(), this),
-      input_handler_(view_service_provider(), this),
+      input_handler_(GetViewServiceProvider(), this),
       model_(MotermModel::Size(240, 160), MotermModel::Size(24, 80), this),
       force_next_draw_(false),
       ascent_(0),

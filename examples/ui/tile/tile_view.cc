@@ -42,7 +42,7 @@ void TileView::ConnectViews() {
     mojo::ui::ViewOwnerPtr child_view_owner;
     provider->CreateView(mojo::GetProxy(&child_view_owner), nullptr, nullptr);
 
-    view()->AddChild(child_key, child_view_owner.Pass());
+    GetViewContainer()->AddChild(child_key, child_view_owner.Pass());
     views_.emplace(std::make_pair(
         child_key, std::unique_ptr<ViewData>(new ViewData(url, child_key))));
 
@@ -74,7 +74,7 @@ void TileView::OnChildUnavailable(uint32_t child_key,
   std::unique_ptr<ViewData> view_data = std::move(it->second);
   views_.erase(it);
 
-  view()->RemoveChild(child_key, nullptr);
+  GetViewContainer()->RemoveChild(child_key, nullptr);
   callback.Run();
 }
 
@@ -120,9 +120,10 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
         continue;  // no layout work to do
 
       view_data->layout_params = params.Clone();
-      view()->LayoutChild(it->first, params.Pass(),
-                          base::Bind(&TileView::OnChildLayoutFinished,
-                                     base::Unretained(this), it->first));
+      GetViewContainer()->LayoutChild(
+          it->first, params.Pass(),
+          base::Bind(&TileView::OnChildLayoutFinished, base::Unretained(this),
+                     it->first));
     }
   }
 
@@ -191,9 +192,6 @@ void TileView::UpdateScene() {
       scene_node->op->get_scene()->scene_resource_id = scene_resource_id;
       update->nodes.insert(scene_node_id, scene_node.Pass());
       container_node->child_node_ids.push_back(scene_node_id);
-    } else {
-      update->resources.insert(fallback_node_id, nullptr);
-      update->nodes.insert(scene_node_id, nullptr);
     }
 
     // Add the fallback content.

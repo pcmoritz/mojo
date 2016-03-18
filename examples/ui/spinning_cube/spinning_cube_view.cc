@@ -58,7 +58,7 @@ SpinningCubeView::SpinningCubeView(
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
     : GLView(app_impl, view_owner_request.Pass(), "SpinningCube"),
       choreographer_(scene(), this),
-      input_handler_(view_service_provider(), this),
+      input_handler_(GetViewServiceProvider(), this),
       weak_ptr_factory_(this) {
   gl_renderer()->gl_context()->MakeCurrent();
   cube_.Init();

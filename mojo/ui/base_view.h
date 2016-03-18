@@ -8,6 +8,7 @@
 #include <string>
 
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/interfaces/application/service_provider.mojom.h"
@@ -24,7 +25,8 @@ namespace ui {
 //
 // It is not necessary to use this class to implement all Views.
 // This class is merely intended to make the simple apps easier to write.
-class BaseView : public mojo::ui::ViewListener {
+class BaseView : public mojo::ui::ViewListener,
+                 public mojo::ui::ViewContainerListener {
  public:
   // TODO(jeffbrown): Consider switching this over to an ApplicationConnector
   // but having ApplicationImpl is handy for simple examples.
@@ -44,9 +46,10 @@ class BaseView : public mojo::ui::ViewListener {
   mojo::ui::View* view() { return view_.get(); }
 
   // Gets the service provider for the view.
-  mojo::ServiceProvider* view_service_provider() {
-    return view_service_provider_.get();
-  }
+  mojo::ServiceProvider* GetViewServiceProvider();
+
+  // Gets the underlying view container interface.
+  mojo::ui::ViewContainer* GetViewContainer();
 
   // Gets the scene for the view.
   // Returns nullptr if the |TakeScene| was called.
@@ -56,7 +59,7 @@ class BaseView : public mojo::ui::ViewListener {
   // This is useful if the scene will be rendered by a separate component.
   mojo::gfx::composition::ScenePtr TakeScene() { return scene_.Pass(); }
 
-  // |ViewListener|:
+  // |ViewContainerListener|:
   void OnChildAttached(uint32_t child_key,
                        mojo::ui::ViewInfoPtr child_view_info,
                        const OnChildUnavailableCallback& callback) override;
@@ -67,9 +70,12 @@ class BaseView : public mojo::ui::ViewListener {
   mojo::ApplicationImpl* app_impl_;
 
   mojo::StrongBinding<mojo::ui::ViewListener> view_listener_binding_;
+  mojo::Binding<mojo::ui::ViewContainerListener>
+      view_container_listener_binding_;
   mojo::ui::ViewManagerPtr view_manager_;
   mojo::ui::ViewPtr view_;
   mojo::ServiceProviderPtr view_service_provider_;
+  mojo::ui::ViewContainerPtr view_container_;
   mojo::gfx::composition::ScenePtr scene_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(BaseView);

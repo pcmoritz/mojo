@@ -12,6 +12,8 @@ mojo_native_application("view_manager") {
     "main.cc",
     "view_associate_table.cc",
     "view_associate_table.h",
+    "view_container_state.cc",
+    "view_container_state.h",
     "view_impl.cc",
     "view_impl.h",
     "view_layout_request.cc",

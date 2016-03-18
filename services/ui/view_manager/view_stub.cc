@@ -36,6 +36,10 @@ ViewStub::~ViewStub() {
   DCHECK(is_unavailable());
 }
 
+ViewContainerState* ViewStub::container() const {
+  return parent_ ? static_cast<ViewContainerState*>(parent_) : tree_;
+}
+
 void ViewStub::AttachView(ViewState* state,
                           mojo::gfx::composition::ScenePtr stub_scene) {
   DCHECK(state);

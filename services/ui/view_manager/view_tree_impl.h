@@ -16,7 +16,9 @@ class ViewTreeState;
 
 // ViewTree interface implementation.
 // This object is owned by its associated ViewTreeState.
-class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
+class ViewTreeImpl : public mojo::ui::ViewTree,
+                     public mojo::ui::ViewContainer,
+                     public mojo::ServiceProvider {
  public:
   ViewTreeImpl(ViewRegistry* registry, ViewTreeState* state);
   ~ViewTreeImpl() override;
@@ -29,13 +31,21 @@ class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
   void SetRenderer(mojo::InterfaceHandle<mojo::gfx::composition::Renderer>
                        renderer) override;
   void RequestLayout() override;
-  void SetRoot(
-      uint32_t root_key,
-      mojo::InterfaceHandle<mojo::ui::ViewOwner> root_view_owner) override;
-  void ClearRoot(mojo::InterfaceRequest<mojo::ui::ViewOwner>
-                     transferred_view_owner_request) override;
-  void LayoutRoot(mojo::ui::ViewLayoutParamsPtr root_layout_params,
-                  const LayoutRootCallback& callback) override;
+  void GetContainer(mojo::InterfaceRequest<mojo::ui::ViewContainer>
+                        view_container_request) override;
+
+  // |ViewContainer|:
+  void SetListener(
+      mojo::InterfaceHandle<mojo::ui::ViewContainerListener> listener) override;
+  void AddChild(
+      uint32_t child_key,
+      mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner) override;
+  void RemoveChild(uint32_t child_key,
+                   mojo::InterfaceRequest<mojo::ui::ViewOwner>
+                       transferred_view_owner_request) override;
+  void LayoutChild(uint32_t child_key,
+                   mojo::ui::ViewLayoutParamsPtr child_layout_params,
+                   const LayoutChildCallback& callback) override;
 
   // |ServiceProvider|:
   void ConnectToService(const mojo::String& service_name,
@@ -44,6 +54,7 @@ class ViewTreeImpl : public mojo::ui::ViewTree, public mojo::ServiceProvider {
   ViewRegistry* const registry_;
   ViewTreeState* const state_;
   mojo::BindingSet<mojo::ServiceProvider> service_provider_bindings_;
+  mojo::BindingSet<mojo::ui::ViewContainer> container_bindings_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewTreeImpl);
 };
