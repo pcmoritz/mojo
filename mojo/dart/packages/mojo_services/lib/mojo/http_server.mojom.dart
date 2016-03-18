@@ -94,7 +94,7 @@ class _HttpServerDelegateOnConnectedParams extends bindings.Struct {
   }
 }
 
-const int _HttpServerDelegate_onConnectedName = 0;
+const int _httpServerDelegateMethodOnConnectedName = 0;
 
 class _HttpServerDelegateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -159,7 +159,7 @@ class _HttpServerDelegateProxyCalls implements HttpServerDelegate {
       var params = new _HttpServerDelegateOnConnectedParams();
       params.connection = connection;
       params.delegate = delegate;
-      _proxyImpl.sendMessage(params, _HttpServerDelegate_onConnectedName);
+      _proxyImpl.sendMessage(params, _httpServerDelegateMethodOnConnectedName);
     }
 }
 
@@ -251,7 +251,7 @@ class HttpServerDelegateStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HttpServerDelegate_onConnectedName:
+      case _httpServerDelegateMethodOnConnectedName:
         var params = _HttpServerDelegateOnConnectedParams.deserialize(
             message.payload);
         _impl.onConnected(params.connection, params.delegate);

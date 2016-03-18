@@ -2845,7 +2845,7 @@ enum UnionATag {
 }
 
 class UnionA extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     UnionATag.a: 0,
     UnionATag.b: 1,
     UnionATag.c: 2,
@@ -2858,7 +2858,7 @@ class UnionA extends bindings.Union {
     UnionATag.j: 9,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: UnionATag.a,
     1: UnionATag.b,
     2: UnionATag.c,
@@ -2994,7 +2994,7 @@ class UnionA extends bindings.Union {
     UnionA result = new UnionA();
 
     
-    UnionATag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    UnionATag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionATag.a:
         
@@ -3096,7 +3096,7 @@ class UnionA extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case UnionATag.a:
         encoder0.encodeUint16(a, offset + 8);
@@ -3212,14 +3212,14 @@ enum UnionBTag {
 }
 
 class UnionB extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     UnionBTag.a: 0,
     UnionBTag.b: 1,
     UnionBTag.c: 2,
     UnionBTag.d: 3,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: UnionBTag.a,
     1: UnionBTag.b,
     2: UnionBTag.c,
@@ -3283,7 +3283,7 @@ class UnionB extends bindings.Union {
     UnionB result = new UnionB();
 
     
-    UnionBTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    UnionBTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case UnionBTag.a:
         
@@ -3311,7 +3311,7 @@ class UnionB extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case UnionBTag.a:
         encoder0.encodeUint16(a, offset + 8);
@@ -3524,8 +3524,8 @@ class InterfaceAStub extends bindings.Stub {
   }
 }
 
-const int _BoundsCheckTestInterface_method0Name = 0;
-const int _BoundsCheckTestInterface_method1Name = 1;
+const int _boundsCheckTestInterfaceMethodMethod0Name = 0;
+const int _boundsCheckTestInterfaceMethodMethod1Name = 1;
 
 class _BoundsCheckTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -3568,7 +3568,7 @@ class _BoundsCheckTestInterfaceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _BoundsCheckTestInterface_method0Name:
+      case _boundsCheckTestInterfaceMethodMethod0Name:
         var r = BoundsCheckTestInterfaceMethod0ResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -3611,7 +3611,7 @@ class _BoundsCheckTestInterfaceProxyCalls implements BoundsCheckTestInterface {
       params.param0 = param0;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _BoundsCheckTestInterface_method0Name,
+          _boundsCheckTestInterfaceMethodMethod0Name,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -3622,7 +3622,7 @@ class _BoundsCheckTestInterfaceProxyCalls implements BoundsCheckTestInterface {
       }
       var params = new _BoundsCheckTestInterfaceMethod1Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _BoundsCheckTestInterface_method1Name);
+      _proxyImpl.sendMessage(params, _boundsCheckTestInterfaceMethodMethod1Name);
     }
 }
 
@@ -3705,10 +3705,10 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
   }
 
 
-  BoundsCheckTestInterfaceMethod0ResponseParams _BoundsCheckTestInterfaceMethod0ResponseParamsFactory(int param0) {
-    var mojo_factory_result = new BoundsCheckTestInterfaceMethod0ResponseParams();
-    mojo_factory_result.param0 = param0;
-    return mojo_factory_result;
+  BoundsCheckTestInterfaceMethod0ResponseParams _boundsCheckTestInterfaceMethod0ResponseParamsFactory(int param0) {
+    var result = new BoundsCheckTestInterfaceMethod0ResponseParams();
+    result.param0 = param0;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -3719,16 +3719,16 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _BoundsCheckTestInterface_method0Name:
+      case _boundsCheckTestInterfaceMethodMethod0Name:
         var params = _BoundsCheckTestInterfaceMethod0Params.deserialize(
             message.payload);
-        var response = _impl.method0(params.param0,_BoundsCheckTestInterfaceMethod0ResponseParamsFactory);
+        var response = _impl.method0(params.param0,_boundsCheckTestInterfaceMethod0ResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _BoundsCheckTestInterface_method0Name,
+                  _boundsCheckTestInterfaceMethodMethod0Name,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3736,12 +3736,12 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _BoundsCheckTestInterface_method0Name,
+              _boundsCheckTestInterfaceMethodMethod0Name,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _BoundsCheckTestInterface_method1Name:
+      case _boundsCheckTestInterfaceMethodMethod1Name:
         var params = _BoundsCheckTestInterfaceMethod1Params.deserialize(
             message.payload);
         _impl.method1(params.param0);
@@ -3775,22 +3775,22 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
   }
 }
 
-const int _ConformanceTestInterface_method0Name = 0;
-const int _ConformanceTestInterface_method1Name = 1;
-const int _ConformanceTestInterface_method2Name = 2;
-const int _ConformanceTestInterface_method3Name = 3;
-const int _ConformanceTestInterface_method4Name = 4;
-const int _ConformanceTestInterface_method5Name = 5;
-const int _ConformanceTestInterface_method6Name = 6;
-const int _ConformanceTestInterface_method7Name = 7;
-const int _ConformanceTestInterface_method8Name = 8;
-const int _ConformanceTestInterface_method9Name = 9;
-const int _ConformanceTestInterface_method10Name = 10;
-const int _ConformanceTestInterface_method11Name = 11;
-const int _ConformanceTestInterface_method12Name = 12;
-const int _ConformanceTestInterface_method13Name = 13;
-const int _ConformanceTestInterface_method14Name = 14;
-const int _ConformanceTestInterface_method15Name = 15;
+const int _conformanceTestInterfaceMethodMethod0Name = 0;
+const int _conformanceTestInterfaceMethodMethod1Name = 1;
+const int _conformanceTestInterfaceMethodMethod2Name = 2;
+const int _conformanceTestInterfaceMethodMethod3Name = 3;
+const int _conformanceTestInterfaceMethodMethod4Name = 4;
+const int _conformanceTestInterfaceMethodMethod5Name = 5;
+const int _conformanceTestInterfaceMethodMethod6Name = 6;
+const int _conformanceTestInterfaceMethodMethod7Name = 7;
+const int _conformanceTestInterfaceMethodMethod8Name = 8;
+const int _conformanceTestInterfaceMethodMethod9Name = 9;
+const int _conformanceTestInterfaceMethodMethod10Name = 10;
+const int _conformanceTestInterfaceMethodMethod11Name = 11;
+const int _conformanceTestInterfaceMethodMethod12Name = 12;
+const int _conformanceTestInterfaceMethodMethod13Name = 13;
+const int _conformanceTestInterfaceMethodMethod14Name = 14;
+const int _conformanceTestInterfaceMethodMethod15Name = 15;
 
 class _ConformanceTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -3844,7 +3844,7 @@ class _ConformanceTestInterfaceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ConformanceTestInterface_method12Name:
+      case _conformanceTestInterfaceMethodMethod12Name:
         var r = ConformanceTestInterfaceMethod12ResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -3889,7 +3889,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod0Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method0Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod0Name);
     }
     void method1(StructA param0) {
       if (!_proxyImpl.isBound) {
@@ -3898,7 +3898,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod1Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method1Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod1Name);
     }
     void method2(StructB param0, StructA param1) {
       if (!_proxyImpl.isBound) {
@@ -3908,7 +3908,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       var params = new _ConformanceTestInterfaceMethod2Params();
       params.param0 = param0;
       params.param1 = param1;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method2Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod2Name);
     }
     void method3(List<bool> param0) {
       if (!_proxyImpl.isBound) {
@@ -3917,7 +3917,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod3Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method3Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod3Name);
     }
     void method4(StructC param0, List<int> param1) {
       if (!_proxyImpl.isBound) {
@@ -3927,7 +3927,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       var params = new _ConformanceTestInterfaceMethod4Params();
       params.param0 = param0;
       params.param1 = param1;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method4Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod4Name);
     }
     void method5(StructE param0, core.MojoDataPipeProducer param1) {
       if (!_proxyImpl.isBound) {
@@ -3937,7 +3937,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       var params = new _ConformanceTestInterfaceMethod5Params();
       params.param0 = param0;
       params.param1 = param1;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method5Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod5Name);
     }
     void method6(List<List<int>> param0) {
       if (!_proxyImpl.isBound) {
@@ -3946,7 +3946,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod6Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method6Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod6Name);
     }
     void method7(StructF param0, List<List<int>> param1) {
       if (!_proxyImpl.isBound) {
@@ -3956,7 +3956,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       var params = new _ConformanceTestInterfaceMethod7Params();
       params.param0 = param0;
       params.param1 = param1;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method7Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod7Name);
     }
     void method8(List<List<String>> param0) {
       if (!_proxyImpl.isBound) {
@@ -3965,7 +3965,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod8Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method8Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod8Name);
     }
     void method9(List<List<core.MojoHandle>> param0) {
       if (!_proxyImpl.isBound) {
@@ -3974,7 +3974,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod9Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method9Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod9Name);
     }
     void method10(Map<String, int> param0) {
       if (!_proxyImpl.isBound) {
@@ -3983,7 +3983,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod10Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method10Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod10Name);
     }
     void method11(StructG param0) {
       if (!_proxyImpl.isBound) {
@@ -3992,14 +3992,14 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod11Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method11Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod11Name);
     }
     dynamic method12(double param0,[Function responseFactory = null]) {
       var params = new _ConformanceTestInterfaceMethod12Params();
       params.param0 = param0;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ConformanceTestInterface_method12Name,
+          _conformanceTestInterfaceMethodMethod12Name,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -4012,7 +4012,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       params.param0 = param0;
       params.param1 = param1;
       params.param2 = param2;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method13Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod13Name);
     }
     void method14(UnionA param0) {
       if (!_proxyImpl.isBound) {
@@ -4021,7 +4021,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod14Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method14Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod14Name);
     }
     void method15(StructH param0) {
       if (!_proxyImpl.isBound) {
@@ -4030,7 +4030,7 @@ class _ConformanceTestInterfaceProxyCalls implements ConformanceTestInterface {
       }
       var params = new _ConformanceTestInterfaceMethod15Params();
       params.param0 = param0;
-      _proxyImpl.sendMessage(params, _ConformanceTestInterface_method15Name);
+      _proxyImpl.sendMessage(params, _conformanceTestInterfaceMethodMethod15Name);
     }
 }
 
@@ -4113,10 +4113,10 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
   }
 
 
-  ConformanceTestInterfaceMethod12ResponseParams _ConformanceTestInterfaceMethod12ResponseParamsFactory(double param0) {
-    var mojo_factory_result = new ConformanceTestInterfaceMethod12ResponseParams();
-    mojo_factory_result.param0 = param0;
-    return mojo_factory_result;
+  ConformanceTestInterfaceMethod12ResponseParams _conformanceTestInterfaceMethod12ResponseParamsFactory(double param0) {
+    var result = new ConformanceTestInterfaceMethod12ResponseParams();
+    result.param0 = param0;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -4127,76 +4127,76 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ConformanceTestInterface_method0Name:
+      case _conformanceTestInterfaceMethodMethod0Name:
         var params = _ConformanceTestInterfaceMethod0Params.deserialize(
             message.payload);
         _impl.method0(params.param0);
         break;
-      case _ConformanceTestInterface_method1Name:
+      case _conformanceTestInterfaceMethodMethod1Name:
         var params = _ConformanceTestInterfaceMethod1Params.deserialize(
             message.payload);
         _impl.method1(params.param0);
         break;
-      case _ConformanceTestInterface_method2Name:
+      case _conformanceTestInterfaceMethodMethod2Name:
         var params = _ConformanceTestInterfaceMethod2Params.deserialize(
             message.payload);
         _impl.method2(params.param0, params.param1);
         break;
-      case _ConformanceTestInterface_method3Name:
+      case _conformanceTestInterfaceMethodMethod3Name:
         var params = _ConformanceTestInterfaceMethod3Params.deserialize(
             message.payload);
         _impl.method3(params.param0);
         break;
-      case _ConformanceTestInterface_method4Name:
+      case _conformanceTestInterfaceMethodMethod4Name:
         var params = _ConformanceTestInterfaceMethod4Params.deserialize(
             message.payload);
         _impl.method4(params.param0, params.param1);
         break;
-      case _ConformanceTestInterface_method5Name:
+      case _conformanceTestInterfaceMethodMethod5Name:
         var params = _ConformanceTestInterfaceMethod5Params.deserialize(
             message.payload);
         _impl.method5(params.param0, params.param1);
         break;
-      case _ConformanceTestInterface_method6Name:
+      case _conformanceTestInterfaceMethodMethod6Name:
         var params = _ConformanceTestInterfaceMethod6Params.deserialize(
             message.payload);
         _impl.method6(params.param0);
         break;
-      case _ConformanceTestInterface_method7Name:
+      case _conformanceTestInterfaceMethodMethod7Name:
         var params = _ConformanceTestInterfaceMethod7Params.deserialize(
             message.payload);
         _impl.method7(params.param0, params.param1);
         break;
-      case _ConformanceTestInterface_method8Name:
+      case _conformanceTestInterfaceMethodMethod8Name:
         var params = _ConformanceTestInterfaceMethod8Params.deserialize(
             message.payload);
         _impl.method8(params.param0);
         break;
-      case _ConformanceTestInterface_method9Name:
+      case _conformanceTestInterfaceMethodMethod9Name:
         var params = _ConformanceTestInterfaceMethod9Params.deserialize(
             message.payload);
         _impl.method9(params.param0);
         break;
-      case _ConformanceTestInterface_method10Name:
+      case _conformanceTestInterfaceMethodMethod10Name:
         var params = _ConformanceTestInterfaceMethod10Params.deserialize(
             message.payload);
         _impl.method10(params.param0);
         break;
-      case _ConformanceTestInterface_method11Name:
+      case _conformanceTestInterfaceMethodMethod11Name:
         var params = _ConformanceTestInterfaceMethod11Params.deserialize(
             message.payload);
         _impl.method11(params.param0);
         break;
-      case _ConformanceTestInterface_method12Name:
+      case _conformanceTestInterfaceMethodMethod12Name:
         var params = _ConformanceTestInterfaceMethod12Params.deserialize(
             message.payload);
-        var response = _impl.method12(params.param0,_ConformanceTestInterfaceMethod12ResponseParamsFactory);
+        var response = _impl.method12(params.param0,_conformanceTestInterfaceMethod12ResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ConformanceTestInterface_method12Name,
+                  _conformanceTestInterfaceMethodMethod12Name,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -4204,22 +4204,22 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ConformanceTestInterface_method12Name,
+              _conformanceTestInterfaceMethodMethod12Name,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ConformanceTestInterface_method13Name:
+      case _conformanceTestInterfaceMethodMethod13Name:
         var params = _ConformanceTestInterfaceMethod13Params.deserialize(
             message.payload);
         _impl.method13(params.param0, params.param1, params.param2);
         break;
-      case _ConformanceTestInterface_method14Name:
+      case _conformanceTestInterfaceMethodMethod14Name:
         var params = _ConformanceTestInterfaceMethod14Params.deserialize(
             message.payload);
         _impl.method14(params.param0);
         break;
-      case _ConformanceTestInterface_method15Name:
+      case _conformanceTestInterfaceMethodMethod15Name:
         var params = _ConformanceTestInterfaceMethod15Params.deserialize(
             message.payload);
         _impl.method15(params.param0);
@@ -4253,7 +4253,7 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
   }
 }
 
-const int _IntegrationTestInterface_method0Name = 0;
+const int _integrationTestInterfaceMethodMethod0Name = 0;
 
 class _IntegrationTestInterfaceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -4292,7 +4292,7 @@ class _IntegrationTestInterfaceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _IntegrationTestInterface_method0Name:
+      case _integrationTestInterfaceMethodMethod0Name:
         var r = IntegrationTestInterfaceMethod0ResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -4335,7 +4335,7 @@ class _IntegrationTestInterfaceProxyCalls implements IntegrationTestInterface {
       params.param0 = param0;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _IntegrationTestInterface_method0Name,
+          _integrationTestInterfaceMethodMethod0Name,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -4420,10 +4420,10 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
   }
 
 
-  IntegrationTestInterfaceMethod0ResponseParams _IntegrationTestInterfaceMethod0ResponseParamsFactory(List<int> param0) {
-    var mojo_factory_result = new IntegrationTestInterfaceMethod0ResponseParams();
-    mojo_factory_result.param0 = param0;
-    return mojo_factory_result;
+  IntegrationTestInterfaceMethod0ResponseParams _integrationTestInterfaceMethod0ResponseParamsFactory(List<int> param0) {
+    var result = new IntegrationTestInterfaceMethod0ResponseParams();
+    result.param0 = param0;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -4434,16 +4434,16 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _IntegrationTestInterface_method0Name:
+      case _integrationTestInterfaceMethodMethod0Name:
         var params = _IntegrationTestInterfaceMethod0Params.deserialize(
             message.payload);
-        var response = _impl.method0(params.param0,_IntegrationTestInterfaceMethod0ResponseParamsFactory);
+        var response = _impl.method0(params.param0,_integrationTestInterfaceMethod0ResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _IntegrationTestInterface_method0Name,
+                  _integrationTestInterfaceMethodMethod0Name,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -4451,7 +4451,7 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _IntegrationTestInterface_method0Name,
+              _integrationTestInterfaceMethodMethod0Name,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -4498,7 +4498,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "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";
+  var serializedRuntimeTypeInfo = "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";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

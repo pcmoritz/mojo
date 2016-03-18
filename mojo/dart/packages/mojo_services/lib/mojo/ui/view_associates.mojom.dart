@@ -807,9 +807,9 @@ class ViewInspectorResolveScenesResponseParams extends bindings.Struct {
   }
 }
 
-const int _ViewAssociate_connectName = 0;
-const int _ViewAssociate_connectToViewServiceName = 1;
-const int _ViewAssociate_connectToViewTreeServiceName = 2;
+const int _viewAssociateMethodConnectName = 0;
+const int _viewAssociateMethodConnectToViewServiceName = 1;
+const int _viewAssociateMethodConnectToViewTreeServiceName = 2;
 
 class _ViewAssociateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -850,7 +850,7 @@ class _ViewAssociateProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewAssociate_connectName:
+      case _viewAssociateMethodConnectName:
         var r = ViewAssociateConnectResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -893,7 +893,7 @@ class _ViewAssociateProxyCalls implements ViewAssociate {
       params.inspector = inspector;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewAssociate_connectName,
+          _viewAssociateMethodConnectName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -906,7 +906,7 @@ class _ViewAssociateProxyCalls implements ViewAssociate {
       params.viewToken = viewToken;
       params.serviceName_ = serviceName_;
       params.pipe = pipe;
-      _proxyImpl.sendMessage(params, _ViewAssociate_connectToViewServiceName);
+      _proxyImpl.sendMessage(params, _viewAssociateMethodConnectToViewServiceName);
     }
     void connectToViewTreeService(view_tree_token_mojom.ViewTreeToken viewTreeToken, String serviceName_, core.MojoMessagePipeEndpoint pipe) {
       if (!_proxyImpl.isBound) {
@@ -917,7 +917,7 @@ class _ViewAssociateProxyCalls implements ViewAssociate {
       params.viewTreeToken = viewTreeToken;
       params.serviceName_ = serviceName_;
       params.pipe = pipe;
-      _proxyImpl.sendMessage(params, _ViewAssociate_connectToViewTreeServiceName);
+      _proxyImpl.sendMessage(params, _viewAssociateMethodConnectToViewTreeServiceName);
     }
 }
 
@@ -1000,10 +1000,10 @@ class ViewAssociateStub extends bindings.Stub {
   }
 
 
-  ViewAssociateConnectResponseParams _ViewAssociateConnectResponseParamsFactory(ViewAssociateInfo info) {
-    var mojo_factory_result = new ViewAssociateConnectResponseParams();
-    mojo_factory_result.info = info;
-    return mojo_factory_result;
+  ViewAssociateConnectResponseParams _viewAssociateConnectResponseParamsFactory(ViewAssociateInfo info) {
+    var result = new ViewAssociateConnectResponseParams();
+    result.info = info;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1014,16 +1014,16 @@ class ViewAssociateStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewAssociate_connectName:
+      case _viewAssociateMethodConnectName:
         var params = _ViewAssociateConnectParams.deserialize(
             message.payload);
-        var response = _impl.connect(params.inspector,_ViewAssociateConnectResponseParamsFactory);
+        var response = _impl.connect(params.inspector,_viewAssociateConnectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewAssociate_connectName,
+                  _viewAssociateMethodConnectName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1031,17 +1031,17 @@ class ViewAssociateStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewAssociate_connectName,
+              _viewAssociateMethodConnectName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewAssociate_connectToViewServiceName:
+      case _viewAssociateMethodConnectToViewServiceName:
         var params = _ViewAssociateConnectToViewServiceParams.deserialize(
             message.payload);
         _impl.connectToViewService(params.viewToken, params.serviceName_, params.pipe);
         break;
-      case _ViewAssociate_connectToViewTreeServiceName:
+      case _viewAssociateMethodConnectToViewTreeServiceName:
         var params = _ViewAssociateConnectToViewTreeServiceParams.deserialize(
             message.payload);
         _impl.connectToViewTreeService(params.viewTreeToken, params.serviceName_, params.pipe);
@@ -1075,8 +1075,8 @@ class ViewAssociateStub extends bindings.Stub {
   }
 }
 
-const int _ViewInspector_getHitTesterName = 0;
-const int _ViewInspector_resolveScenesName = 1;
+const int _viewInspectorMethodGetHitTesterName = 0;
+const int _viewInspectorMethodResolveScenesName = 1;
 
 class _ViewInspectorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1116,7 +1116,7 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewInspector_getHitTesterName:
+      case _viewInspectorMethodGetHitTesterName:
         var r = ViewInspectorGetHitTesterResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1136,7 +1136,7 @@ class _ViewInspectorProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ViewInspector_resolveScenesName:
+      case _viewInspectorMethodResolveScenesName:
         var r = ViewInspectorResolveScenesResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1180,7 +1180,7 @@ class _ViewInspectorProxyCalls implements ViewInspector {
       params.hitTester = hitTester;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewInspector_getHitTesterName,
+          _viewInspectorMethodGetHitTesterName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1189,7 +1189,7 @@ class _ViewInspectorProxyCalls implements ViewInspector {
       params.sceneTokens = sceneTokens;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewInspector_resolveScenesName,
+          _viewInspectorMethodResolveScenesName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1274,15 +1274,15 @@ class ViewInspectorStub extends bindings.Stub {
   }
 
 
-  ViewInspectorGetHitTesterResponseParams _ViewInspectorGetHitTesterResponseParamsFactory(bool rendererChanged) {
-    var mojo_factory_result = new ViewInspectorGetHitTesterResponseParams();
-    mojo_factory_result.rendererChanged = rendererChanged;
-    return mojo_factory_result;
+  ViewInspectorGetHitTesterResponseParams _viewInspectorGetHitTesterResponseParamsFactory(bool rendererChanged) {
+    var result = new ViewInspectorGetHitTesterResponseParams();
+    result.rendererChanged = rendererChanged;
+    return result;
   }
-  ViewInspectorResolveScenesResponseParams _ViewInspectorResolveScenesResponseParamsFactory(List<view_token_mojom.ViewToken> viewTokens) {
-    var mojo_factory_result = new ViewInspectorResolveScenesResponseParams();
-    mojo_factory_result.viewTokens = viewTokens;
-    return mojo_factory_result;
+  ViewInspectorResolveScenesResponseParams _viewInspectorResolveScenesResponseParamsFactory(List<view_token_mojom.ViewToken> viewTokens) {
+    var result = new ViewInspectorResolveScenesResponseParams();
+    result.viewTokens = viewTokens;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1293,16 +1293,16 @@ class ViewInspectorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewInspector_getHitTesterName:
+      case _viewInspectorMethodGetHitTesterName:
         var params = _ViewInspectorGetHitTesterParams.deserialize(
             message.payload);
-        var response = _impl.getHitTester(params.viewTreeToken,params.hitTester,_ViewInspectorGetHitTesterResponseParamsFactory);
+        var response = _impl.getHitTester(params.viewTreeToken,params.hitTester,_viewInspectorGetHitTesterResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewInspector_getHitTesterName,
+                  _viewInspectorMethodGetHitTesterName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1310,21 +1310,21 @@ class ViewInspectorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewInspector_getHitTesterName,
+              _viewInspectorMethodGetHitTesterName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewInspector_resolveScenesName:
+      case _viewInspectorMethodResolveScenesName:
         var params = _ViewInspectorResolveScenesParams.deserialize(
             message.payload);
-        var response = _impl.resolveScenes(params.sceneTokens,_ViewInspectorResolveScenesResponseParamsFactory);
+        var response = _impl.resolveScenes(params.sceneTokens,_viewInspectorResolveScenesResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewInspector_resolveScenesName,
+                  _viewInspectorMethodResolveScenesName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1332,7 +1332,7 @@ class ViewInspectorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewInspector_resolveScenesName,
+              _viewInspectorMethodResolveScenesName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

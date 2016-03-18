@@ -226,7 +226,7 @@ class InputListenerOnEventResponseParams extends bindings.Struct {
   }
 }
 
-const int _InputConnection_setListenerName = 0;
+const int _inputConnectionMethodSetListenerName = 0;
 
 class _InputConnectionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -290,7 +290,7 @@ class _InputConnectionProxyCalls implements InputConnection {
       }
       var params = new _InputConnectionSetListenerParams();
       params.listener = listener;
-      _proxyImpl.sendMessage(params, _InputConnection_setListenerName);
+      _proxyImpl.sendMessage(params, _inputConnectionMethodSetListenerName);
     }
 }
 
@@ -382,7 +382,7 @@ class InputConnectionStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _InputConnection_setListenerName:
+      case _inputConnectionMethodSetListenerName:
         var params = _InputConnectionSetListenerParams.deserialize(
             message.payload);
         _impl.setListener(params.listener);
@@ -416,7 +416,7 @@ class InputConnectionStub extends bindings.Stub {
   }
 }
 
-const int _InputListener_onEventName = 0;
+const int _inputListenerMethodOnEventName = 0;
 
 class _InputListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -455,7 +455,7 @@ class _InputListenerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _InputListener_onEventName:
+      case _inputListenerMethodOnEventName:
         var r = InputListenerOnEventResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -498,7 +498,7 @@ class _InputListenerProxyCalls implements InputListener {
       params.event = event;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _InputListener_onEventName,
+          _inputListenerMethodOnEventName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -583,10 +583,10 @@ class InputListenerStub extends bindings.Stub {
   }
 
 
-  InputListenerOnEventResponseParams _InputListenerOnEventResponseParamsFactory(bool consumed) {
-    var mojo_factory_result = new InputListenerOnEventResponseParams();
-    mojo_factory_result.consumed = consumed;
-    return mojo_factory_result;
+  InputListenerOnEventResponseParams _inputListenerOnEventResponseParamsFactory(bool consumed) {
+    var result = new InputListenerOnEventResponseParams();
+    result.consumed = consumed;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -597,16 +597,16 @@ class InputListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _InputListener_onEventName:
+      case _inputListenerMethodOnEventName:
         var params = _InputListenerOnEventParams.deserialize(
             message.payload);
-        var response = _impl.onEvent(params.event,_InputListenerOnEventResponseParamsFactory);
+        var response = _impl.onEvent(params.event,_inputListenerOnEventResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _InputListener_onEventName,
+                  _inputListenerMethodOnEventName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -614,7 +614,7 @@ class InputListenerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _InputListener_onEventName,
+              _inputListenerMethodOnEventName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

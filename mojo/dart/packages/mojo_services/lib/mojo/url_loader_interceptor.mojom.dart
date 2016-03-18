@@ -586,7 +586,7 @@ class UrlLoaderInterceptorInterceptResponseResponseParams extends bindings.Struc
   }
 }
 
-const int _UrlLoaderInterceptorFactory_createName = 0;
+const int _urlLoaderInterceptorFactoryMethodCreateName = 0;
 
 class _UrlLoaderInterceptorFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -650,7 +650,7 @@ class _UrlLoaderInterceptorFactoryProxyCalls implements UrlLoaderInterceptorFact
       }
       var params = new _UrlLoaderInterceptorFactoryCreateParams();
       params.interceptor = interceptor;
-      _proxyImpl.sendMessage(params, _UrlLoaderInterceptorFactory_createName);
+      _proxyImpl.sendMessage(params, _urlLoaderInterceptorFactoryMethodCreateName);
     }
 }
 
@@ -742,7 +742,7 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _UrlLoaderInterceptorFactory_createName:
+      case _urlLoaderInterceptorFactoryMethodCreateName:
         var params = _UrlLoaderInterceptorFactoryCreateParams.deserialize(
             message.payload);
         _impl.create(params.interceptor);
@@ -776,9 +776,9 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
   }
 }
 
-const int _UrlLoaderInterceptor_interceptRequestName = 0;
-const int _UrlLoaderInterceptor_interceptFollowRedirectName = 1;
-const int _UrlLoaderInterceptor_interceptResponseName = 2;
+const int _urlLoaderInterceptorMethodInterceptRequestName = 0;
+const int _urlLoaderInterceptorMethodInterceptFollowRedirectName = 1;
+const int _urlLoaderInterceptorMethodInterceptResponseName = 2;
 
 class _UrlLoaderInterceptorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -819,7 +819,7 @@ class _UrlLoaderInterceptorProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _UrlLoaderInterceptor_interceptRequestName:
+      case _urlLoaderInterceptorMethodInterceptRequestName:
         var r = UrlLoaderInterceptorInterceptRequestResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -839,7 +839,7 @@ class _UrlLoaderInterceptorProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _UrlLoaderInterceptor_interceptFollowRedirectName:
+      case _urlLoaderInterceptorMethodInterceptFollowRedirectName:
         var r = UrlLoaderInterceptorInterceptFollowRedirectResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -859,7 +859,7 @@ class _UrlLoaderInterceptorProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _UrlLoaderInterceptor_interceptResponseName:
+      case _urlLoaderInterceptorMethodInterceptResponseName:
         var r = UrlLoaderInterceptorInterceptResponseResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -902,7 +902,7 @@ class _UrlLoaderInterceptorProxyCalls implements UrlLoaderInterceptor {
       params.request = request;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoaderInterceptor_interceptRequestName,
+          _urlLoaderInterceptorMethodInterceptRequestName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -910,7 +910,7 @@ class _UrlLoaderInterceptorProxyCalls implements UrlLoaderInterceptor {
       var params = new _UrlLoaderInterceptorInterceptFollowRedirectParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoaderInterceptor_interceptFollowRedirectName,
+          _urlLoaderInterceptorMethodInterceptFollowRedirectName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -919,7 +919,7 @@ class _UrlLoaderInterceptorProxyCalls implements UrlLoaderInterceptor {
       params.response = response;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoaderInterceptor_interceptResponseName,
+          _urlLoaderInterceptorMethodInterceptResponseName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1004,20 +1004,20 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
   }
 
 
-  UrlLoaderInterceptorInterceptRequestResponseParams _UrlLoaderInterceptorInterceptRequestResponseParamsFactory(UrlLoaderInterceptorResponse response) {
-    var mojo_factory_result = new UrlLoaderInterceptorInterceptRequestResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  UrlLoaderInterceptorInterceptRequestResponseParams _urlLoaderInterceptorInterceptRequestResponseParamsFactory(UrlLoaderInterceptorResponse response) {
+    var result = new UrlLoaderInterceptorInterceptRequestResponseParams();
+    result.response = response;
+    return result;
   }
-  UrlLoaderInterceptorInterceptFollowRedirectResponseParams _UrlLoaderInterceptorInterceptFollowRedirectResponseParamsFactory(UrlLoaderInterceptorResponse response) {
-    var mojo_factory_result = new UrlLoaderInterceptorInterceptFollowRedirectResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  UrlLoaderInterceptorInterceptFollowRedirectResponseParams _urlLoaderInterceptorInterceptFollowRedirectResponseParamsFactory(UrlLoaderInterceptorResponse response) {
+    var result = new UrlLoaderInterceptorInterceptFollowRedirectResponseParams();
+    result.response = response;
+    return result;
   }
-  UrlLoaderInterceptorInterceptResponseResponseParams _UrlLoaderInterceptorInterceptResponseResponseParamsFactory(UrlLoaderInterceptorResponse response) {
-    var mojo_factory_result = new UrlLoaderInterceptorInterceptResponseResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  UrlLoaderInterceptorInterceptResponseResponseParams _urlLoaderInterceptorInterceptResponseResponseParamsFactory(UrlLoaderInterceptorResponse response) {
+    var result = new UrlLoaderInterceptorInterceptResponseResponseParams();
+    result.response = response;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1028,16 +1028,16 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _UrlLoaderInterceptor_interceptRequestName:
+      case _urlLoaderInterceptorMethodInterceptRequestName:
         var params = _UrlLoaderInterceptorInterceptRequestParams.deserialize(
             message.payload);
-        var response = _impl.interceptRequest(params.request,_UrlLoaderInterceptorInterceptRequestResponseParamsFactory);
+        var response = _impl.interceptRequest(params.request,_urlLoaderInterceptorInterceptRequestResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoaderInterceptor_interceptRequestName,
+                  _urlLoaderInterceptorMethodInterceptRequestName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1045,19 +1045,19 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoaderInterceptor_interceptRequestName,
+              _urlLoaderInterceptorMethodInterceptRequestName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _UrlLoaderInterceptor_interceptFollowRedirectName:
-        var response = _impl.interceptFollowRedirect(_UrlLoaderInterceptorInterceptFollowRedirectResponseParamsFactory);
+      case _urlLoaderInterceptorMethodInterceptFollowRedirectName:
+        var response = _impl.interceptFollowRedirect(_urlLoaderInterceptorInterceptFollowRedirectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoaderInterceptor_interceptFollowRedirectName,
+                  _urlLoaderInterceptorMethodInterceptFollowRedirectName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1065,21 +1065,21 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoaderInterceptor_interceptFollowRedirectName,
+              _urlLoaderInterceptorMethodInterceptFollowRedirectName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _UrlLoaderInterceptor_interceptResponseName:
+      case _urlLoaderInterceptorMethodInterceptResponseName:
         var params = _UrlLoaderInterceptorInterceptResponseParams.deserialize(
             message.payload);
-        var response = _impl.interceptResponse(params.response,_UrlLoaderInterceptorInterceptResponseResponseParamsFactory);
+        var response = _impl.interceptResponse(params.response,_urlLoaderInterceptorInterceptResponseResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoaderInterceptor_interceptResponseName,
+                  _urlLoaderInterceptorMethodInterceptResponseName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1087,7 +1087,7 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoaderInterceptor_interceptResponseName,
+              _urlLoaderInterceptorMethodInterceptResponseName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

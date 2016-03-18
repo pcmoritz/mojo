@@ -171,7 +171,7 @@ class FilesOpenFileSystemResponseParams extends bindings.Struct {
   }
 }
 
-const int _Files_openFileSystemName = 0;
+const int _filesMethodOpenFileSystemName = 0;
 
 class _FilesServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -210,7 +210,7 @@ class _FilesProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Files_openFileSystemName:
+      case _filesMethodOpenFileSystemName:
         var r = FilesOpenFileSystemResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -254,7 +254,7 @@ class _FilesProxyCalls implements Files {
       params.directory = directory;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Files_openFileSystemName,
+          _filesMethodOpenFileSystemName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -339,10 +339,10 @@ class FilesStub extends bindings.Stub {
   }
 
 
-  FilesOpenFileSystemResponseParams _FilesOpenFileSystemResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FilesOpenFileSystemResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FilesOpenFileSystemResponseParams _filesOpenFileSystemResponseParamsFactory(types_mojom.Error error) {
+    var result = new FilesOpenFileSystemResponseParams();
+    result.error = error;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -353,16 +353,16 @@ class FilesStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Files_openFileSystemName:
+      case _filesMethodOpenFileSystemName:
         var params = _FilesOpenFileSystemParams.deserialize(
             message.payload);
-        var response = _impl.openFileSystem(params.fileSystem,params.directory,_FilesOpenFileSystemResponseParamsFactory);
+        var response = _impl.openFileSystem(params.fileSystem,params.directory,_filesOpenFileSystemResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Files_openFileSystemName,
+                  _filesMethodOpenFileSystemName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -370,7 +370,7 @@ class FilesStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Files_openFileSystemName,
+              _filesMethodOpenFileSystemName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

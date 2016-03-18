@@ -95,7 +95,7 @@ class _AuthenticatingUrlLoaderInterceptorMetaFactoryCreateUrlLoaderInterceptorFa
   }
 }
 
-const int _AuthenticatingUrlLoaderInterceptorMetaFactory_createUrlLoaderInterceptorFactoryName = 0;
+const int _authenticatingUrlLoaderInterceptorMetaFactoryMethodCreateUrlLoaderInterceptorFactoryName = 0;
 
 class _AuthenticatingUrlLoaderInterceptorMetaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -160,7 +160,7 @@ class _AuthenticatingUrlLoaderInterceptorMetaFactoryProxyCalls implements Authen
       var params = new _AuthenticatingUrlLoaderInterceptorMetaFactoryCreateUrlLoaderInterceptorFactoryParams();
       params.factoryRequest = factoryRequest;
       params.authenticationService = authenticationService;
-      _proxyImpl.sendMessage(params, _AuthenticatingUrlLoaderInterceptorMetaFactory_createUrlLoaderInterceptorFactoryName);
+      _proxyImpl.sendMessage(params, _authenticatingUrlLoaderInterceptorMetaFactoryMethodCreateUrlLoaderInterceptorFactoryName);
     }
 }
 
@@ -252,7 +252,7 @@ class AuthenticatingUrlLoaderInterceptorMetaFactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _AuthenticatingUrlLoaderInterceptorMetaFactory_createUrlLoaderInterceptorFactoryName:
+      case _authenticatingUrlLoaderInterceptorMetaFactoryMethodCreateUrlLoaderInterceptorFactoryName:
         var params = _AuthenticatingUrlLoaderInterceptorMetaFactoryCreateUrlLoaderInterceptorFactoryParams.deserialize(
             message.payload);
         _impl.createUrlLoaderInterceptorFactory(params.factoryRequest, params.authenticationService);

@@ -778,10 +778,10 @@ class HumanResourceDatabaseListEmployeeIdsResponseParams extends bindings.Struct
   }
 }
 
-const int _HumanResourceDatabase_addEmployeeName = 0;
-const int _HumanResourceDatabase_queryEmployeeName = 1;
-const int _HumanResourceDatabase_attachFingerPrintName = 2;
-const int _HumanResourceDatabase_listEmployeeIdsName = 3;
+const int _humanResourceDatabaseMethodAddEmployeeName = 0;
+const int _humanResourceDatabaseMethodQueryEmployeeName = 1;
+const int _humanResourceDatabaseMethodAttachFingerPrintName = 2;
+const int _humanResourceDatabaseMethodListEmployeeIdsName = 3;
 
 class _HumanResourceDatabaseServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -826,7 +826,7 @@ class _HumanResourceDatabaseProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _HumanResourceDatabase_addEmployeeName:
+      case _humanResourceDatabaseMethodAddEmployeeName:
         var r = HumanResourceDatabaseAddEmployeeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -846,7 +846,7 @@ class _HumanResourceDatabaseProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _HumanResourceDatabase_queryEmployeeName:
+      case _humanResourceDatabaseMethodQueryEmployeeName:
         var r = HumanResourceDatabaseQueryEmployeeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -866,7 +866,7 @@ class _HumanResourceDatabaseProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _HumanResourceDatabase_attachFingerPrintName:
+      case _humanResourceDatabaseMethodAttachFingerPrintName:
         var r = HumanResourceDatabaseAttachFingerPrintResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -886,7 +886,7 @@ class _HumanResourceDatabaseProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _HumanResourceDatabase_listEmployeeIdsName:
+      case _humanResourceDatabaseMethodListEmployeeIdsName:
         var r = HumanResourceDatabaseListEmployeeIdsResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -929,7 +929,7 @@ class _HumanResourceDatabaseProxyCalls implements HumanResourceDatabase {
       params.employee = employee;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HumanResourceDatabase_addEmployeeName,
+          _humanResourceDatabaseMethodAddEmployeeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -939,7 +939,7 @@ class _HumanResourceDatabaseProxyCalls implements HumanResourceDatabase {
       params.retrieveFingerPrint = retrieveFingerPrint;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HumanResourceDatabase_queryEmployeeName,
+          _humanResourceDatabaseMethodQueryEmployeeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -949,7 +949,7 @@ class _HumanResourceDatabaseProxyCalls implements HumanResourceDatabase {
       params.fingerPrint = fingerPrint;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HumanResourceDatabase_attachFingerPrintName,
+          _humanResourceDatabaseMethodAttachFingerPrintName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -957,7 +957,7 @@ class _HumanResourceDatabaseProxyCalls implements HumanResourceDatabase {
       var params = new _HumanResourceDatabaseListEmployeeIdsParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HumanResourceDatabase_listEmployeeIdsName,
+          _humanResourceDatabaseMethodListEmployeeIdsName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1042,26 +1042,26 @@ class HumanResourceDatabaseStub extends bindings.Stub {
   }
 
 
-  HumanResourceDatabaseAddEmployeeResponseParams _HumanResourceDatabaseAddEmployeeResponseParamsFactory(bool success) {
-    var mojo_factory_result = new HumanResourceDatabaseAddEmployeeResponseParams();
-    mojo_factory_result.success = success;
-    return mojo_factory_result;
+  HumanResourceDatabaseAddEmployeeResponseParams _humanResourceDatabaseAddEmployeeResponseParamsFactory(bool success) {
+    var result = new HumanResourceDatabaseAddEmployeeResponseParams();
+    result.success = success;
+    return result;
   }
-  HumanResourceDatabaseQueryEmployeeResponseParams _HumanResourceDatabaseQueryEmployeeResponseParamsFactory(Employee employee, List<int> fingerPrint) {
-    var mojo_factory_result = new HumanResourceDatabaseQueryEmployeeResponseParams();
-    mojo_factory_result.employee = employee;
-    mojo_factory_result.fingerPrint = fingerPrint;
-    return mojo_factory_result;
+  HumanResourceDatabaseQueryEmployeeResponseParams _humanResourceDatabaseQueryEmployeeResponseParamsFactory(Employee employee, List<int> fingerPrint) {
+    var result = new HumanResourceDatabaseQueryEmployeeResponseParams();
+    result.employee = employee;
+    result.fingerPrint = fingerPrint;
+    return result;
   }
-  HumanResourceDatabaseAttachFingerPrintResponseParams _HumanResourceDatabaseAttachFingerPrintResponseParamsFactory(bool success) {
-    var mojo_factory_result = new HumanResourceDatabaseAttachFingerPrintResponseParams();
-    mojo_factory_result.success = success;
-    return mojo_factory_result;
+  HumanResourceDatabaseAttachFingerPrintResponseParams _humanResourceDatabaseAttachFingerPrintResponseParamsFactory(bool success) {
+    var result = new HumanResourceDatabaseAttachFingerPrintResponseParams();
+    result.success = success;
+    return result;
   }
-  HumanResourceDatabaseListEmployeeIdsResponseParams _HumanResourceDatabaseListEmployeeIdsResponseParamsFactory(List<int> ids) {
-    var mojo_factory_result = new HumanResourceDatabaseListEmployeeIdsResponseParams();
-    mojo_factory_result.ids = ids;
-    return mojo_factory_result;
+  HumanResourceDatabaseListEmployeeIdsResponseParams _humanResourceDatabaseListEmployeeIdsResponseParamsFactory(List<int> ids) {
+    var result = new HumanResourceDatabaseListEmployeeIdsResponseParams();
+    result.ids = ids;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1072,16 +1072,16 @@ class HumanResourceDatabaseStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HumanResourceDatabase_addEmployeeName:
+      case _humanResourceDatabaseMethodAddEmployeeName:
         var params = _HumanResourceDatabaseAddEmployeeParams.deserialize(
             message.payload);
-        var response = _impl.addEmployee(params.employee,_HumanResourceDatabaseAddEmployeeResponseParamsFactory);
+        var response = _impl.addEmployee(params.employee,_humanResourceDatabaseAddEmployeeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HumanResourceDatabase_addEmployeeName,
+                  _humanResourceDatabaseMethodAddEmployeeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1089,21 +1089,21 @@ class HumanResourceDatabaseStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HumanResourceDatabase_addEmployeeName,
+              _humanResourceDatabaseMethodAddEmployeeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _HumanResourceDatabase_queryEmployeeName:
+      case _humanResourceDatabaseMethodQueryEmployeeName:
         var params = _HumanResourceDatabaseQueryEmployeeParams.deserialize(
             message.payload);
-        var response = _impl.queryEmployee(params.id,params.retrieveFingerPrint,_HumanResourceDatabaseQueryEmployeeResponseParamsFactory);
+        var response = _impl.queryEmployee(params.id,params.retrieveFingerPrint,_humanResourceDatabaseQueryEmployeeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HumanResourceDatabase_queryEmployeeName,
+                  _humanResourceDatabaseMethodQueryEmployeeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1111,21 +1111,21 @@ class HumanResourceDatabaseStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HumanResourceDatabase_queryEmployeeName,
+              _humanResourceDatabaseMethodQueryEmployeeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _HumanResourceDatabase_attachFingerPrintName:
+      case _humanResourceDatabaseMethodAttachFingerPrintName:
         var params = _HumanResourceDatabaseAttachFingerPrintParams.deserialize(
             message.payload);
-        var response = _impl.attachFingerPrint(params.id,params.fingerPrint,_HumanResourceDatabaseAttachFingerPrintResponseParamsFactory);
+        var response = _impl.attachFingerPrint(params.id,params.fingerPrint,_humanResourceDatabaseAttachFingerPrintResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HumanResourceDatabase_attachFingerPrintName,
+                  _humanResourceDatabaseMethodAttachFingerPrintName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1133,19 +1133,19 @@ class HumanResourceDatabaseStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HumanResourceDatabase_attachFingerPrintName,
+              _humanResourceDatabaseMethodAttachFingerPrintName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _HumanResourceDatabase_listEmployeeIdsName:
-        var response = _impl.listEmployeeIds(_HumanResourceDatabaseListEmployeeIdsResponseParamsFactory);
+      case _humanResourceDatabaseMethodListEmployeeIdsName:
+        var response = _impl.listEmployeeIds(_humanResourceDatabaseListEmployeeIdsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HumanResourceDatabase_listEmployeeIdsName,
+                  _humanResourceDatabaseMethodListEmployeeIdsName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1153,7 +1153,7 @@ class HumanResourceDatabaseStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HumanResourceDatabase_listEmployeeIdsName,
+              _humanResourceDatabaseMethodListEmployeeIdsName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1200,7 +1200,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xa3U7bSBS2ExB/y26Wn0122YUsq92N2CVGrSpF4SZIpKIqrdJSoaJeRMYZiitsp7aD4I7H6CP0kkfoZR+hlzxCL7lrZ8gZ4oxn4iRObECMdDR4MnjmfHPOd84ZOSM1Wwr6L9Cz4xXPs4xlHJ4fYVnFYljvrGLRRY5bLB4j29EtUzffFotbDUM1XyLHatga2lRddV91EOc97Hpb0K9jeYjl1V6lXH1a3iuShfJknXxrmbxoFfH7P0OfxZL0/F6C/hD6NSy5wPU3UV21XQOZbh7P/SdwftmoH1mnCIXXrwD7p3rlmHPKjrSeybzsBB+PlNyOu7d9w22NwYeMkf61xG8zWCaxtJBpjv+LZQnspQOMvv1NYRnFomF5g0U5tAyk2I2aZegmshXyPsWxteYf9cb+ka4puuki+0DVkKPs62YNL+EoZE1HaS1aJQNV7Ugnh0f+2bjGJ+FZvy637MGLc06WOrYgPAtd4jkN+u9sbJd3wOf+DsYxT+ezeP4A+kWFZ69+1C3O8oBxngI/2SzvXj3/h+WvLnCm81mcp284zlmWH+Vw9lsR4JoCLqbMR2z3DxGuLXr08xSWsQjxZOPDGuBTSbTzYYHZ56TUXQvCl22i8VmwXQTQVfUa1x5/xjIRIX48fGSv4w4IH5nhC7YRviOh0FQNxMNlJmJcUsz+eDgRvh8fME6JADuicbvGxG0Wr1ngtij9kOUT77go3wjLh+eA/wWTH5UYnM+ZvJLy4dcOfOjNf7OcPHXMM079ewfZx7qGnoMZ951/E+6dJ/oIfn+AZUXEz+J01GcnaTiXqOykXzwyArvKAG9QjklAPMjBOJ13MdrsP/4IdjPfzkd03iX0Z8n+/JfaVVAc2KjVPFHUr18m4ryEte9LKZz+BYH+C4CBR/9VG71v4E1xcaAtSt73+r2I9wcdH6WA+EjzM5o/8OwlfQP4PiPIJ3utu6Oyx9+xzPns0albpoNuiz320gZljz9B/HMaGlbL4fLXSoQ4iXj8w0hvdWi3PD4P+dWLBrJPO9RDv91RHqf5SZv+HiaP22/Y+6GsHE89KPKfSdgflIFcu0nHXAf2wyts3n0iqAPPQuTdSc97aF3xTDd3mzq226eNXFtHx6h6gHVHdrVu66YrwFu5g366iOUXjp/SCHfT/PRMvl151wLkD1HbjTykvIuHOzmfijwcHjgZMg/Mwd0S4/4S7xzXYzpHgg/dx5jEr0u3QNFPI+33RN3iTXli2Lz7K9xhbriuqh0+vkK9QkHn4L4Yc34kyeF4tyTA80/AwodDW7V7nyeFzZMWwXfjzJMSQ7gHlgPugbvlNYLP/zHdC/B4LSr/W4acjud/rer+vr7vt75fgjlx1fclet8PgTDZZzwMm38kAuJhGnDa1h2XZllPan48l+/oPcESYMDofx0F4/Y/0fkOC48srOHHo8lKt4GPEjHUYfS7Dx37Do+3l+Hbpbjzd5offQ8AAP//Qixd1rgnAAA=";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+ya3U4jNxTHZxIoX0WkfCUtLaRUbREtmahVpSjcgEQqqtIqu6wQXGWHiSGzSmbCfCC44xF4FB5hL/dyL3kM3mDXJsebicfO5JOZCCwdmRgT2z8f/8+xRUpqlATU91Cz7UXPZxnbJHz+C9sWtpr5zsznHWQ7+fwlsmzdNHTjPJ/fd2uq8RrZpmtpaE911FPVRpzvYcfbh3ob25/Y3pwUC6V/Cyd5MlCGjJNpDpMRjSL+/g9Qp7HFPb/fgboCdRbbRuD4e6iuWk4NGU4G9/0lsH+hVq+a1wj1v74czJ+ua4PZp+JY8zPpdzvF55GWW7l7yydcsgwf0kbqY4lf5rFNY2uSabT/im0N/KUNRt/8ZrCNY3PJ32JTXNtSqqamVpVz0zyvIqVi1pCiq0bV1DXFuVDICIptaY0f6u5pFbfrhoOsM1VDtnKqG2U8qK2QWdhKcxol0lDSqjrZTvLHNeAV88znRm76h5d7TpbaliC+uQ75zgKPw92DwiGcwZ+DuWZof5bv17C+sPh2e8465S4PmPsMnKO9wtHj59+w/dQBd9qf5T47YtzTjJ6m5f78uyjgnADtpkpJfPsHEeemnPr4knoiRL6++AK86rFWPc0x856WOitBvNkial8A30aAsqSXuf76DbapEHnyeBGkCXmwvGRGX9hC9JKEVkOtIR6n+ZA5JZj58riR+JEaMLdYgJ/RvKDM5AUsvwXQxjDPLatHkqddlN/0q6fvYT8emHxsh+F+x+SxVE8f2uipN99Oc/LiCU871YNDZF3qGvof3LznfJ9o9xJZj+D3f2DbFOm7OP31+U0S9iUsv+mVT0rgZynQGapJMYgnG9BO+2W/gnvLXKP+uNyqX7TfJPjVXby38039LCiO7JbLnqjsX18q5LyH9f9JuT8eOQGPFWDi4bFloQsXT4nLhZYw44ZXJ0RxY9DxVgqItzQfpPkJz5+SEYwXKUE+2+07wVP56/fYFn3+atdNw0aj6q/dlEH56xzEU9vV8KJsrv5thshNFBfux7q7N3caF5Ygn3vlIuu6zX3tu2cSF2g+1MLDExmids7Y96+sHM79VXTepmF+cG3l+lUyYvfWXnSJvQdcCe6tN33cA+Ke76H3nP9046ixwlb/tZBj6egSlc7wypFVqlu64Qj4K8/gXK9iW+acaxpBo36ub+XRyvtWIF8J26/kIeV9vH0g+/VWHo5uXA1ZNxbh7YyRC4m3r9sR2VfCi85rQuLfq4/pwsdb38E65U91Zdi6/S284e46jqpV/n7chSLdBM4+rEYsH0v0qds7Ar4/Ahsfl5bb+kteNui8bBXOepTystgQ3sXlgHfxTnWR8Po9Iu8cPF18qvO6Djkl77w2Xyte3isG9V6xBn2i8l5RBL+qQKCN9xhv+813YgHxNgncDnTboVndP2U/3/Vn8u6xBkwYHl+ibNTOq2j/h8UnDWP4+TRUbRT1LBbCvZH+n46OzxovDqzD/6JF7X5B87PPAQAA//9D9UXsmCkAAA==";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

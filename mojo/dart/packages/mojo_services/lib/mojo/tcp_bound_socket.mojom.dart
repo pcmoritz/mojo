@@ -341,8 +341,8 @@ class TcpBoundSocketConnectResponseParams extends bindings.Struct {
   }
 }
 
-const int _TcpBoundSocket_startListeningName = 0;
-const int _TcpBoundSocket_connectName = 1;
+const int _tcpBoundSocketMethodStartListeningName = 0;
+const int _tcpBoundSocketMethodConnectName = 1;
 
 class _TcpBoundSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -382,7 +382,7 @@ class _TcpBoundSocketProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _TcpBoundSocket_startListeningName:
+      case _tcpBoundSocketMethodStartListeningName:
         var r = TcpBoundSocketStartListeningResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -402,7 +402,7 @@ class _TcpBoundSocketProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _TcpBoundSocket_connectName:
+      case _tcpBoundSocketMethodConnectName:
         var r = TcpBoundSocketConnectResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -445,7 +445,7 @@ class _TcpBoundSocketProxyCalls implements TcpBoundSocket {
       params.server = server;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _TcpBoundSocket_startListeningName,
+          _tcpBoundSocketMethodStartListeningName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -457,7 +457,7 @@ class _TcpBoundSocketProxyCalls implements TcpBoundSocket {
       params.clientSocket = clientSocket;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _TcpBoundSocket_connectName,
+          _tcpBoundSocketMethodConnectName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -542,15 +542,15 @@ class TcpBoundSocketStub extends bindings.Stub {
   }
 
 
-  TcpBoundSocketStartListeningResponseParams _TcpBoundSocketStartListeningResponseParamsFactory(network_error_mojom.NetworkError result) {
-    var mojo_factory_result = new TcpBoundSocketStartListeningResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  TcpBoundSocketStartListeningResponseParams _tcpBoundSocketStartListeningResponseParamsFactory(network_error_mojom.NetworkError result) {
+    var result = new TcpBoundSocketStartListeningResponseParams();
+    result.result = result;
+    return result;
   }
-  TcpBoundSocketConnectResponseParams _TcpBoundSocketConnectResponseParamsFactory(network_error_mojom.NetworkError result) {
-    var mojo_factory_result = new TcpBoundSocketConnectResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  TcpBoundSocketConnectResponseParams _tcpBoundSocketConnectResponseParamsFactory(network_error_mojom.NetworkError result) {
+    var result = new TcpBoundSocketConnectResponseParams();
+    result.result = result;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -561,16 +561,16 @@ class TcpBoundSocketStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TcpBoundSocket_startListeningName:
+      case _tcpBoundSocketMethodStartListeningName:
         var params = _TcpBoundSocketStartListeningParams.deserialize(
             message.payload);
-        var response = _impl.startListening(params.server,_TcpBoundSocketStartListeningResponseParamsFactory);
+        var response = _impl.startListening(params.server,_tcpBoundSocketStartListeningResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _TcpBoundSocket_startListeningName,
+                  _tcpBoundSocketMethodStartListeningName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -578,21 +578,21 @@ class TcpBoundSocketStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _TcpBoundSocket_startListeningName,
+              _tcpBoundSocketMethodStartListeningName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _TcpBoundSocket_connectName:
+      case _tcpBoundSocketMethodConnectName:
         var params = _TcpBoundSocketConnectParams.deserialize(
             message.payload);
-        var response = _impl.connect(params.remoteAddress,params.sendStream,params.receiveStream,params.clientSocket,_TcpBoundSocketConnectResponseParamsFactory);
+        var response = _impl.connect(params.remoteAddress,params.sendStream,params.receiveStream,params.clientSocket,_tcpBoundSocketConnectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _TcpBoundSocket_connectName,
+                  _tcpBoundSocketMethodConnectName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -600,7 +600,7 @@ class TcpBoundSocketStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _TcpBoundSocket_connectName,
+              _tcpBoundSocketMethodConnectName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

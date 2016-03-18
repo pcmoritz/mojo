@@ -869,10 +869,10 @@ class _DartSideEchoParams extends bindings.Struct {
   }
 }
 
-const int _CppSide_startTestName = 88888888;
-const int _CppSide_testFinishedName = 99999999;
-const int _CppSide_pingResponseName = 100000000;
-const int _CppSide_echoResponseName = 100000001;
+const int _cppSideMethodStartTestName = 88888888;
+const int _cppSideMethodTestFinishedName = 99999999;
+const int _cppSideMethodPingResponseName = 100000000;
+const int _cppSideMethodEchoResponseName = 100000001;
 
 class _CppSideServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -938,7 +938,7 @@ class _CppSideProxyCalls implements CppSide {
         return;
       }
       var params = new _CppSideStartTestParams();
-      _proxyImpl.sendMessage(params, _CppSide_startTestName);
+      _proxyImpl.sendMessage(params, _cppSideMethodStartTestName);
     }
     void testFinished() {
       if (!_proxyImpl.isBound) {
@@ -946,7 +946,7 @@ class _CppSideProxyCalls implements CppSide {
         return;
       }
       var params = new _CppSideTestFinishedParams();
-      _proxyImpl.sendMessage(params, _CppSide_testFinishedName);
+      _proxyImpl.sendMessage(params, _cppSideMethodTestFinishedName);
     }
     void pingResponse() {
       if (!_proxyImpl.isBound) {
@@ -954,7 +954,7 @@ class _CppSideProxyCalls implements CppSide {
         return;
       }
       var params = new _CppSidePingResponseParams();
-      _proxyImpl.sendMessage(params, _CppSide_pingResponseName);
+      _proxyImpl.sendMessage(params, _cppSideMethodPingResponseName);
     }
     void echoResponse(EchoArgsList list) {
       if (!_proxyImpl.isBound) {
@@ -963,7 +963,7 @@ class _CppSideProxyCalls implements CppSide {
       }
       var params = new _CppSideEchoResponseParams();
       params.list = list;
-      _proxyImpl.sendMessage(params, _CppSide_echoResponseName);
+      _proxyImpl.sendMessage(params, _cppSideMethodEchoResponseName);
     }
 }
 
@@ -1055,16 +1055,16 @@ class CppSideStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _CppSide_startTestName:
+      case _cppSideMethodStartTestName:
         _impl.startTest();
         break;
-      case _CppSide_testFinishedName:
+      case _cppSideMethodTestFinishedName:
         _impl.testFinished();
         break;
-      case _CppSide_pingResponseName:
+      case _cppSideMethodPingResponseName:
         _impl.pingResponse();
         break;
-      case _CppSide_echoResponseName:
+      case _cppSideMethodEchoResponseName:
         var params = _CppSideEchoResponseParams.deserialize(
             message.payload);
         _impl.echoResponse(params.list);
@@ -1098,9 +1098,9 @@ class CppSideStub extends bindings.Stub {
   }
 }
 
-const int _DartSide_setClientName = 0;
-const int _DartSide_pingName = 1;
-const int _DartSide_echoName = 2;
+const int _dartSideMethodSetClientName = 0;
+const int _dartSideMethodPingName = 1;
+const int _dartSideMethodEchoName = 2;
 
 class _DartSideServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1166,7 +1166,7 @@ class _DartSideProxyCalls implements DartSide {
       }
       var params = new _DartSideSetClientParams();
       params.cppSide = cppSide;
-      _proxyImpl.sendMessage(params, _DartSide_setClientName);
+      _proxyImpl.sendMessage(params, _dartSideMethodSetClientName);
     }
     void ping() {
       if (!_proxyImpl.isBound) {
@@ -1174,7 +1174,7 @@ class _DartSideProxyCalls implements DartSide {
         return;
       }
       var params = new _DartSidePingParams();
-      _proxyImpl.sendMessage(params, _DartSide_pingName);
+      _proxyImpl.sendMessage(params, _dartSideMethodPingName);
     }
     void echo(int numIterations, EchoArgs arg) {
       if (!_proxyImpl.isBound) {
@@ -1184,7 +1184,7 @@ class _DartSideProxyCalls implements DartSide {
       var params = new _DartSideEchoParams();
       params.numIterations = numIterations;
       params.arg = arg;
-      _proxyImpl.sendMessage(params, _DartSide_echoName);
+      _proxyImpl.sendMessage(params, _dartSideMethodEchoName);
     }
 }
 
@@ -1276,15 +1276,15 @@ class DartSideStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _DartSide_setClientName:
+      case _dartSideMethodSetClientName:
         var params = _DartSideSetClientParams.deserialize(
             message.payload);
         _impl.setClient(params.cppSide);
         break;
-      case _DartSide_pingName:
+      case _dartSideMethodPingName:
         _impl.ping();
         break;
-      case _DartSide_echoName:
+      case _dartSideMethodEchoName:
         var params = _DartSideEchoParams.deserialize(
             message.payload);
         _impl.echo(params.numIterations, params.arg);
@@ -1331,7 +1331,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/9yaT4/bRBTAbW+ym+wmu9k/LQuUskhUQKVu+k9VxKmoLAJRoYhWlXoKbjxNjGI72A4qNz5Cjj32yJEjRz4CR47hxpFLJW5lBr/JDpOZtb31eEJGenp2MrL9fu/Nm+cZHxpJa4G+Dpr/neoap/l+v4P+EEsFyxGc3wX9DegfQb+P5RKWh4+7J70vTx5/7Nhh3IuDXn88Pr43Hj9wHUT6XcHyjqzfp/gYOp7Z76Q/DD4JBxH+/yMs76X1u+9GMTzn52APsXMNS4exm5zPNk/PTcLhwn/PX1xNzo84brT9xdyHb69wo37pML/J+pO2g2UDC0X4Nj7exyLBu+BHwpGY9AjLV1jaw8BD7XDiBJ7ro7DtBd8G7SjsJwfkqu2J78YxiuKojbwnyHFQ2COnuDN7U9LfW7wfy4Vw7jy6X301e1k1/nhZNbHw8dSy4KAC/Kqnccde70+OC7mujBv577qAPTsu+LaLpY7lQYxtfIjm8cLb9wEWSyFPPq54u9Piire3I7H3TbB5bu+1EH03kdtNmyq7a0Y2v/8bSzIO+L+8fj/A0iD5Az/ZZ67vRkPkiOy/uiJ+vwQ2s/ayrl9Wv5P8cR4OaX7vuv7gaxSNAz9CIvuvrZjfWXv/D343FfmdlAZn+f14xfzO2qvT77SOqnH1JFuHVZk6Kq1l5WRw8ca3BpQgI1fM5RhYqo4HQ1JPsXHLlrR569+y6tYW+JiW9DQOJeX+Au8bmurWA3gPMCBOLeb/NeY5x9Cpm7FePe+4Tq1XUXxv5CJfVrfdXLV6ldqruV5d1jxG3xf78E4oiocDDXnsUPI+m3XdgB9fM75OOGe8pc0HpF4SxdetksfVTFEeYevgZawHebstRX4mU6XI7tsr5mdip04/HwLPeV4w5fnTgByqIn/KfifLfU0s/sT7Aptgxy6umCVx0VTIqaz5xEyZT7ag7rHDgSEbH1c0zie0zqSlbtZ1Y37c/Z2TX946mN5aVAczj7XAtw7zpSq+z/E197BM4X5TCIgpJNop1LlTWJ+dwoCcroPeAA0J/Hk90S9gHf2nrUT/3Ej0L81E/7qd6N92YB9iF/L+3tn5YF3Te2Hk3rkt8s8m+LfMPKAiL5qZOdy6KeKwpYlDpWAOVmYON+6IODQ0cVgrmMNaxnkhcjvCeaGpicNmwRwqGeNhIskP25DDy+ZQL5hDNTMHcX7Y0cShVjCH9cwcxPmhpYnDRsEcNjLmh4kkP+xq4mAVzKGW8j5B7Xw6Cuy49709kqxX7WnKl0XzqOfi4fpPJTz2V4THZi4evu1LeBxo4mEWzGMrhcceMHOCyZMROh0wPI8LmvJH0Twa+XjMBwzP4+KK8Gjm4zEfMDyPNzTwMBWsz2xnrDd82xPuox0q3kfj40DExRKsr7wul52UOKHrnVEcuv6gZ4eh/YOID91XUr1+ZYId/L4Rv+4q4ldRwK+Vwu8ixJ6HosgeoN7Q9p0RWuT3FjAtI77MEvnspvDZh7nMsWN7DkcQX+R7zcsl8bFE+/tmPvvvcuua3Qz7CewnBkdwb9lnCDyfy4rXN/n9hmfmcn534qNnwv2Yd+G4jPyk8ruTZdnPoLzdGHki3kfQp2zer7uf8U8AAAD//6VzxigAMAAA";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/9yaTW/bNhjHLcVObMdOnJe22dZ1GbBi3YBE6QsKY6cOXYYN6yFYi2E9earF2hz04krysN167HHHHfsR9hH2EXbcsfsGuRTYrSPrhw7LkJHU6oUxgQe0bMLU89OfDx+S2qnNSg/qA6jF71ndFGqx3T9QXyNWJ7YL13eg/gnqp1B/QuwysQcPjw4H3x0+/MKxw3gQB4PhZLJ/dzK5jx1E210l9qGq3VfkMzQ8s93hcBx8GY4i8vtnxD5OancPRzHc5zfgD/VziVif85teP109uTYol0tvXvf2Zte7Ard5MU76EcsrUthz6XPfqdrTsk5shRhD+AH5vEVMgffUc6Qc28TG8MysaRRabjC0XWsUBCMXWePAQxa2fTfAQyt+YnnBz4EVhcPZB9qPNfVxHKMojizkPUKOg8IBvUShxd8Gbe+J/fOcKPf+D/car168bNT+fdkwiIn6OjBBZ/VZfbR8okP+//4TONH/VXGkvx1IngU/TsSyQaxF7H5MPHyA5voR/fuUmFkiX1F3Iock3Yn+9xX+vwcM5v7vhejJVM2BlbI4NGvpdPFaayou5Lesutgm1qHxhtzX19jH0Rg5Mh6fL6guLgMD3n9eGudFFzT+vA2XJF0cYX/0PYomgR8hGY+9BdcF7/951IVRkC5oKnKWLvYXXBe8/zrpguV1TSG/5fPCBpfXJZW03GqCHsXSgbzIxXJO+8C2bL3UFPkdr3M+5c6an5eVV/fgmbMlB9OpYjlyiv91TfLqbVi3MEQm9/sSd9/PodHzRsr58S3jQGI+jeK7Lka+Ko+8sej5NPNfs3xa1zjI1r9DWOPK9LKtQRzcUazX0+6LiOPxWB7+MusxaX6h+ZpMfzcrHofHBcUhPk8/D/mpyMEsSAd0KpZxuLXgOqB+66SDHeDN+r9mqONxjcXkAuKx6vsLxLrE/Kn3LXHAjjHJ6BW66ZbIraz5ykiYr1Yh77LDUU01nq5qNF+xPJil4mn33cVx2jSy8cyap7OuZXk6d1uneLdgPi6L9x+kj01iv7O8G7j8CYH7L8jD/4b97RcwgI+X3zyQ6bVAZ20Y/3Au8WNnVk+6s/rZGvSzDv8Pjjc3YRxvnR0/lmvVrGsjfPuW7Hm1AUGVcaOIuGqk5nLzhozLqiZc6jlzMVNzuX5bxqWjCZelnLkspZxnItyXzjNdTbi0c+ZST6mXqSK+rMGcUDWXVs5cGqm5yOPLuiZcmjlzWU7NRR5feppwWcmZy0rK+DJVxJcNTbiYOXNpJqx/mN+P3cCOB7/YrmL/blOT+Js3n1YmPth/rOCztaB82pn4+Lav4LOtCR8jZz6rCXw2gaETTB+56GSAiXwuaBJ/8ubTycZnPsBEPhcXlE83G5/5ABP5XNKAj1HA/tRaynzHtz3pueZOyeeaok5knEzJ/tK7clpP0BHbH47iEPujgR2G9m8yXuxcr+z9PAP8Es/txH1rGc96ATx7CTwvgjY9FEX2CA3Gtu+46DTP94FxFfozSuS1kcBrC+ZKx47tOSyJ/uj7wFcq4mVK9oF7GfeB7wj7wEcpzmv4V0Z2oW/VayUirysl7weL5znPDD3fM/LRr9Lzr4/gcxXxrcj3jHQ5L2L8cYw8Gf9daFM1/3c9L/o/AAD//+S9zaugMgAA";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

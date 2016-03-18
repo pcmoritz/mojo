@@ -1944,14 +1944,14 @@ enum MediaTypeDetailsTag {
 }
 
 class MediaTypeDetails extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     MediaTypeDetailsTag.multiplexed: 0,
     MediaTypeDetailsTag.lpcm: 1,
     MediaTypeDetailsTag.compressedAudio: 2,
     MediaTypeDetailsTag.video: 3,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: MediaTypeDetailsTag.multiplexed,
     1: MediaTypeDetailsTag.lpcm,
     2: MediaTypeDetailsTag.compressedAudio,
@@ -2015,7 +2015,7 @@ class MediaTypeDetails extends bindings.Union {
     MediaTypeDetails result = new MediaTypeDetails();
 
     
-    MediaTypeDetailsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    MediaTypeDetailsTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case MediaTypeDetailsTag.multiplexed:
         
@@ -2047,7 +2047,7 @@ class MediaTypeDetails extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case MediaTypeDetailsTag.multiplexed:
         encoder0.encodeStruct(multiplexed, offset + 8, false);
@@ -2099,14 +2099,14 @@ enum MediaTypeSetDetailsTag {
 }
 
 class MediaTypeSetDetails extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     MediaTypeSetDetailsTag.multiplexed: 0,
     MediaTypeSetDetailsTag.lpcm: 1,
     MediaTypeSetDetailsTag.compressedAudio: 2,
     MediaTypeSetDetailsTag.video: 3,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: MediaTypeSetDetailsTag.multiplexed,
     1: MediaTypeSetDetailsTag.lpcm,
     2: MediaTypeSetDetailsTag.compressedAudio,
@@ -2170,7 +2170,7 @@ class MediaTypeSetDetails extends bindings.Union {
     MediaTypeSetDetails result = new MediaTypeSetDetails();
 
     
-    MediaTypeSetDetailsTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    MediaTypeSetDetailsTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case MediaTypeSetDetailsTag.multiplexed:
         
@@ -2202,7 +2202,7 @@ class MediaTypeSetDetails extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case MediaTypeSetDetailsTag.multiplexed:
         encoder0.encodeStruct(multiplexed, offset + 8, false);

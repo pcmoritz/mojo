@@ -331,12 +331,12 @@ enum ResourceTag {
 }
 
 class Resource extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     ResourceTag.scene: 0,
     ResourceTag.mailboxTexture: 1,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: ResourceTag.scene,
     1: ResourceTag.mailboxTexture,
   };
@@ -376,7 +376,7 @@ class Resource extends bindings.Union {
     Resource result = new Resource();
 
     
-    ResourceTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    ResourceTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ResourceTag.scene:
         
@@ -398,7 +398,7 @@ class Resource extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case ResourceTag.scene:
         encoder0.encodeStruct(scene, offset + 8, false);
@@ -427,7 +427,7 @@ class Resource extends bindings.Union {
     return result;
   }
 }
-const int _MailboxTextureCallback_onMailboxTextureReleasedName = 0;
+const int _mailboxTextureCallbackMethodOnMailboxTextureReleasedName = 0;
 
 class _MailboxTextureCallbackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -490,7 +490,7 @@ class _MailboxTextureCallbackProxyCalls implements MailboxTextureCallback {
         return;
       }
       var params = new _MailboxTextureCallbackOnMailboxTextureReleasedParams();
-      _proxyImpl.sendMessage(params, _MailboxTextureCallback_onMailboxTextureReleasedName);
+      _proxyImpl.sendMessage(params, _mailboxTextureCallbackMethodOnMailboxTextureReleasedName);
     }
 }
 
@@ -582,7 +582,7 @@ class MailboxTextureCallbackStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MailboxTextureCallback_onMailboxTextureReleasedName:
+      case _mailboxTextureCallbackMethodOnMailboxTextureReleasedName:
         _impl.onMailboxTextureReleased();
         break;
       default:

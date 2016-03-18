@@ -561,10 +561,10 @@ class _AudioTrackSetGainParams extends bindings.Struct {
   }
 }
 
-const int _AudioTrack_describeName = 0;
-const int _AudioTrack_configureName = 1;
-const int _AudioTrack_getRateControlName = 2;
-const int _AudioTrack_setGainName = 3;
+const int _audioTrackMethodDescribeName = 0;
+const int _audioTrackMethodConfigureName = 1;
+const int _audioTrackMethodGetRateControlName = 2;
+const int _audioTrackMethodSetGainName = 3;
 
 class _AudioTrackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -608,7 +608,7 @@ class _AudioTrackProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _AudioTrack_describeName:
+      case _audioTrackMethodDescribeName:
         var r = AudioTrackDescribeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -650,7 +650,7 @@ class _AudioTrackProxyCalls implements AudioTrack {
       var params = new _AudioTrackDescribeParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _AudioTrack_describeName,
+          _audioTrackMethodDescribeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -662,7 +662,7 @@ class _AudioTrackProxyCalls implements AudioTrack {
       var params = new _AudioTrackConfigureParams();
       params.configuration = configuration;
       params.pipe = pipe;
-      _proxyImpl.sendMessage(params, _AudioTrack_configureName);
+      _proxyImpl.sendMessage(params, _audioTrackMethodConfigureName);
     }
     void getRateControl(Object rateControl) {
       if (!_proxyImpl.isBound) {
@@ -671,7 +671,7 @@ class _AudioTrackProxyCalls implements AudioTrack {
       }
       var params = new _AudioTrackGetRateControlParams();
       params.rateControl = rateControl;
-      _proxyImpl.sendMessage(params, _AudioTrack_getRateControlName);
+      _proxyImpl.sendMessage(params, _audioTrackMethodGetRateControlName);
     }
     void setGain(double dbGain) {
       if (!_proxyImpl.isBound) {
@@ -680,7 +680,7 @@ class _AudioTrackProxyCalls implements AudioTrack {
       }
       var params = new _AudioTrackSetGainParams();
       params.dbGain = dbGain;
-      _proxyImpl.sendMessage(params, _AudioTrack_setGainName);
+      _proxyImpl.sendMessage(params, _audioTrackMethodSetGainName);
     }
 }
 
@@ -763,10 +763,10 @@ class AudioTrackStub extends bindings.Stub {
   }
 
 
-  AudioTrackDescribeResponseParams _AudioTrackDescribeResponseParamsFactory(AudioTrackDescriptor descriptor) {
-    var mojo_factory_result = new AudioTrackDescribeResponseParams();
-    mojo_factory_result.descriptor = descriptor;
-    return mojo_factory_result;
+  AudioTrackDescribeResponseParams _audioTrackDescribeResponseParamsFactory(AudioTrackDescriptor descriptor) {
+    var result = new AudioTrackDescribeResponseParams();
+    result.descriptor = descriptor;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -777,14 +777,14 @@ class AudioTrackStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _AudioTrack_describeName:
-        var response = _impl.describe(_AudioTrackDescribeResponseParamsFactory);
+      case _audioTrackMethodDescribeName:
+        var response = _impl.describe(_audioTrackDescribeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _AudioTrack_describeName,
+                  _audioTrackMethodDescribeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -792,22 +792,22 @@ class AudioTrackStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _AudioTrack_describeName,
+              _audioTrackMethodDescribeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _AudioTrack_configureName:
+      case _audioTrackMethodConfigureName:
         var params = _AudioTrackConfigureParams.deserialize(
             message.payload);
         _impl.configure(params.configuration, params.pipe);
         break;
-      case _AudioTrack_getRateControlName:
+      case _audioTrackMethodGetRateControlName:
         var params = _AudioTrackGetRateControlParams.deserialize(
             message.payload);
         _impl.getRateControl(params.rateControl);
         break;
-      case _AudioTrack_setGainName:
+      case _audioTrackMethodSetGainName:
         var params = _AudioTrackSetGainParams.deserialize(
             message.payload);
         _impl.setGain(params.dbGain);

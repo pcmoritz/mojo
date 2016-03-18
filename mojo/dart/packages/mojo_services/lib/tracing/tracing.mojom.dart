@@ -365,8 +365,8 @@ class _TraceCollectorStopAndFlushParams extends bindings.Struct {
   }
 }
 
-const int _TraceProvider_startTracingName = 0;
-const int _TraceProvider_stopTracingName = 1;
+const int _traceProviderMethodStartTracingName = 0;
+const int _traceProviderMethodStopTracingName = 1;
 
 class _TraceProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -432,7 +432,7 @@ class _TraceProviderProxyCalls implements TraceProvider {
       var params = new _TraceProviderStartTracingParams();
       params.categories = categories;
       params.recorder = recorder;
-      _proxyImpl.sendMessage(params, _TraceProvider_startTracingName);
+      _proxyImpl.sendMessage(params, _traceProviderMethodStartTracingName);
     }
     void stopTracing() {
       if (!_proxyImpl.isBound) {
@@ -440,7 +440,7 @@ class _TraceProviderProxyCalls implements TraceProvider {
         return;
       }
       var params = new _TraceProviderStopTracingParams();
-      _proxyImpl.sendMessage(params, _TraceProvider_stopTracingName);
+      _proxyImpl.sendMessage(params, _traceProviderMethodStopTracingName);
     }
 }
 
@@ -532,12 +532,12 @@ class TraceProviderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TraceProvider_startTracingName:
+      case _traceProviderMethodStartTracingName:
         var params = _TraceProviderStartTracingParams.deserialize(
             message.payload);
         _impl.startTracing(params.categories, params.recorder);
         break;
-      case _TraceProvider_stopTracingName:
+      case _traceProviderMethodStopTracingName:
         _impl.stopTracing();
         break;
       default:
@@ -569,7 +569,7 @@ class TraceProviderStub extends bindings.Stub {
   }
 }
 
-const int _TraceRecorder_recordName = 0;
+const int _traceRecorderMethodRecordName = 0;
 
 class _TraceRecorderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -633,7 +633,7 @@ class _TraceRecorderProxyCalls implements TraceRecorder {
       }
       var params = new _TraceRecorderRecordParams();
       params.json = json;
-      _proxyImpl.sendMessage(params, _TraceRecorder_recordName);
+      _proxyImpl.sendMessage(params, _traceRecorderMethodRecordName);
     }
 }
 
@@ -725,7 +725,7 @@ class TraceRecorderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TraceRecorder_recordName:
+      case _traceRecorderMethodRecordName:
         var params = _TraceRecorderRecordParams.deserialize(
             message.payload);
         _impl.record(params.json);
@@ -759,8 +759,8 @@ class TraceRecorderStub extends bindings.Stub {
   }
 }
 
-const int _TraceCollector_startName = 0;
-const int _TraceCollector_stopAndFlushName = 1;
+const int _traceCollectorMethodStartName = 0;
+const int _traceCollectorMethodStopAndFlushName = 1;
 
 class _TraceCollectorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -826,7 +826,7 @@ class _TraceCollectorProxyCalls implements TraceCollector {
       var params = new _TraceCollectorStartParams();
       params.stream = stream;
       params.categories = categories;
-      _proxyImpl.sendMessage(params, _TraceCollector_startName);
+      _proxyImpl.sendMessage(params, _traceCollectorMethodStartName);
     }
     void stopAndFlush() {
       if (!_proxyImpl.isBound) {
@@ -834,7 +834,7 @@ class _TraceCollectorProxyCalls implements TraceCollector {
         return;
       }
       var params = new _TraceCollectorStopAndFlushParams();
-      _proxyImpl.sendMessage(params, _TraceCollector_stopAndFlushName);
+      _proxyImpl.sendMessage(params, _traceCollectorMethodStopAndFlushName);
     }
 }
 
@@ -926,12 +926,12 @@ class TraceCollectorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TraceCollector_startName:
+      case _traceCollectorMethodStartName:
         var params = _TraceCollectorStartParams.deserialize(
             message.payload);
         _impl.start(params.stream, params.categories);
         break;
-      case _TraceCollector_stopAndFlushName:
+      case _traceCollectorMethodStopAndFlushName:
         _impl.stopAndFlush();
         break;
       default:

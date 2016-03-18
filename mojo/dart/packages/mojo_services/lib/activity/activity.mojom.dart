@@ -1661,12 +1661,12 @@ class _UserFeedbackPerformAuralFeedbackParams extends bindings.Struct {
   }
 }
 
-const int _Activity_getUserFeedbackName = 0;
-const int _Activity_startActivityName = 1;
-const int _Activity_finishCurrentActivityName = 2;
-const int _Activity_setTaskDescriptionName = 3;
-const int _Activity_setSystemUiVisibilityName = 4;
-const int _Activity_setRequestedOrientationName = 5;
+const int _activityMethodGetUserFeedbackName = 0;
+const int _activityMethodStartActivityName = 1;
+const int _activityMethodFinishCurrentActivityName = 2;
+const int _activityMethodSetTaskDescriptionName = 3;
+const int _activityMethodSetSystemUiVisibilityName = 4;
+const int _activityMethodSetRequestedOrientationName = 5;
 
 class _ActivityServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1735,7 +1735,7 @@ class _ActivityProxyCalls implements Activity {
       }
       var params = new _ActivityGetUserFeedbackParams();
       params.userFeedback = userFeedback;
-      _proxyImpl.sendMessage(params, _Activity_getUserFeedbackName);
+      _proxyImpl.sendMessage(params, _activityMethodGetUserFeedbackName);
     }
     void startActivity(Intent intent) {
       if (!_proxyImpl.isBound) {
@@ -1744,7 +1744,7 @@ class _ActivityProxyCalls implements Activity {
       }
       var params = new _ActivityStartActivityParams();
       params.intent = intent;
-      _proxyImpl.sendMessage(params, _Activity_startActivityName);
+      _proxyImpl.sendMessage(params, _activityMethodStartActivityName);
     }
     void finishCurrentActivity() {
       if (!_proxyImpl.isBound) {
@@ -1752,7 +1752,7 @@ class _ActivityProxyCalls implements Activity {
         return;
       }
       var params = new _ActivityFinishCurrentActivityParams();
-      _proxyImpl.sendMessage(params, _Activity_finishCurrentActivityName);
+      _proxyImpl.sendMessage(params, _activityMethodFinishCurrentActivityName);
     }
     void setTaskDescription(TaskDescription description) {
       if (!_proxyImpl.isBound) {
@@ -1761,7 +1761,7 @@ class _ActivityProxyCalls implements Activity {
       }
       var params = new _ActivitySetTaskDescriptionParams();
       params.description = description;
-      _proxyImpl.sendMessage(params, _Activity_setTaskDescriptionName);
+      _proxyImpl.sendMessage(params, _activityMethodSetTaskDescriptionName);
     }
     void setSystemUiVisibility(SystemUiVisibility visibility) {
       if (!_proxyImpl.isBound) {
@@ -1770,7 +1770,7 @@ class _ActivityProxyCalls implements Activity {
       }
       var params = new _ActivitySetSystemUiVisibilityParams();
       params.visibility = visibility;
-      _proxyImpl.sendMessage(params, _Activity_setSystemUiVisibilityName);
+      _proxyImpl.sendMessage(params, _activityMethodSetSystemUiVisibilityName);
     }
     void setRequestedOrientation(ScreenOrientation orientation) {
       if (!_proxyImpl.isBound) {
@@ -1779,7 +1779,7 @@ class _ActivityProxyCalls implements Activity {
       }
       var params = new _ActivitySetRequestedOrientationParams();
       params.orientation = orientation;
-      _proxyImpl.sendMessage(params, _Activity_setRequestedOrientationName);
+      _proxyImpl.sendMessage(params, _activityMethodSetRequestedOrientationName);
     }
 }
 
@@ -1871,30 +1871,30 @@ class ActivityStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Activity_getUserFeedbackName:
+      case _activityMethodGetUserFeedbackName:
         var params = _ActivityGetUserFeedbackParams.deserialize(
             message.payload);
         _impl.getUserFeedback(params.userFeedback);
         break;
-      case _Activity_startActivityName:
+      case _activityMethodStartActivityName:
         var params = _ActivityStartActivityParams.deserialize(
             message.payload);
         _impl.startActivity(params.intent);
         break;
-      case _Activity_finishCurrentActivityName:
+      case _activityMethodFinishCurrentActivityName:
         _impl.finishCurrentActivity();
         break;
-      case _Activity_setTaskDescriptionName:
+      case _activityMethodSetTaskDescriptionName:
         var params = _ActivitySetTaskDescriptionParams.deserialize(
             message.payload);
         _impl.setTaskDescription(params.description);
         break;
-      case _Activity_setSystemUiVisibilityName:
+      case _activityMethodSetSystemUiVisibilityName:
         var params = _ActivitySetSystemUiVisibilityParams.deserialize(
             message.payload);
         _impl.setSystemUiVisibility(params.visibility);
         break;
-      case _Activity_setRequestedOrientationName:
+      case _activityMethodSetRequestedOrientationName:
         var params = _ActivitySetRequestedOrientationParams.deserialize(
             message.payload);
         _impl.setRequestedOrientation(params.orientation);
@@ -1928,9 +1928,9 @@ class ActivityStub extends bindings.Stub {
   }
 }
 
-const int _PathService_getAppDataDirName = 0;
-const int _PathService_getFilesDirName = 1;
-const int _PathService_getCacheDirName = 2;
+const int _pathServiceMethodGetAppDataDirName = 0;
+const int _pathServiceMethodGetFilesDirName = 1;
+const int _pathServiceMethodGetCacheDirName = 2;
 
 class _PathServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1971,7 +1971,7 @@ class _PathServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _PathService_getAppDataDirName:
+      case _pathServiceMethodGetAppDataDirName:
         var r = PathServiceGetAppDataDirResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1991,7 +1991,7 @@ class _PathServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _PathService_getFilesDirName:
+      case _pathServiceMethodGetFilesDirName:
         var r = PathServiceGetFilesDirResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2011,7 +2011,7 @@ class _PathServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _PathService_getCacheDirName:
+      case _pathServiceMethodGetCacheDirName:
         var r = PathServiceGetCacheDirResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2053,7 +2053,7 @@ class _PathServiceProxyCalls implements PathService {
       var params = new _PathServiceGetAppDataDirParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _PathService_getAppDataDirName,
+          _pathServiceMethodGetAppDataDirName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2061,7 +2061,7 @@ class _PathServiceProxyCalls implements PathService {
       var params = new _PathServiceGetFilesDirParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _PathService_getFilesDirName,
+          _pathServiceMethodGetFilesDirName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2069,7 +2069,7 @@ class _PathServiceProxyCalls implements PathService {
       var params = new _PathServiceGetCacheDirParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _PathService_getCacheDirName,
+          _pathServiceMethodGetCacheDirName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2154,20 +2154,20 @@ class PathServiceStub extends bindings.Stub {
   }
 
 
-  PathServiceGetAppDataDirResponseParams _PathServiceGetAppDataDirResponseParamsFactory(String path) {
-    var mojo_factory_result = new PathServiceGetAppDataDirResponseParams();
-    mojo_factory_result.path = path;
-    return mojo_factory_result;
+  PathServiceGetAppDataDirResponseParams _pathServiceGetAppDataDirResponseParamsFactory(String path) {
+    var result = new PathServiceGetAppDataDirResponseParams();
+    result.path = path;
+    return result;
   }
-  PathServiceGetFilesDirResponseParams _PathServiceGetFilesDirResponseParamsFactory(String path) {
-    var mojo_factory_result = new PathServiceGetFilesDirResponseParams();
-    mojo_factory_result.path = path;
-    return mojo_factory_result;
+  PathServiceGetFilesDirResponseParams _pathServiceGetFilesDirResponseParamsFactory(String path) {
+    var result = new PathServiceGetFilesDirResponseParams();
+    result.path = path;
+    return result;
   }
-  PathServiceGetCacheDirResponseParams _PathServiceGetCacheDirResponseParamsFactory(String path) {
-    var mojo_factory_result = new PathServiceGetCacheDirResponseParams();
-    mojo_factory_result.path = path;
-    return mojo_factory_result;
+  PathServiceGetCacheDirResponseParams _pathServiceGetCacheDirResponseParamsFactory(String path) {
+    var result = new PathServiceGetCacheDirResponseParams();
+    result.path = path;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -2178,14 +2178,14 @@ class PathServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _PathService_getAppDataDirName:
-        var response = _impl.getAppDataDir(_PathServiceGetAppDataDirResponseParamsFactory);
+      case _pathServiceMethodGetAppDataDirName:
+        var response = _impl.getAppDataDir(_pathServiceGetAppDataDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _PathService_getAppDataDirName,
+                  _pathServiceMethodGetAppDataDirName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2193,19 +2193,19 @@ class PathServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _PathService_getAppDataDirName,
+              _pathServiceMethodGetAppDataDirName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _PathService_getFilesDirName:
-        var response = _impl.getFilesDir(_PathServiceGetFilesDirResponseParamsFactory);
+      case _pathServiceMethodGetFilesDirName:
+        var response = _impl.getFilesDir(_pathServiceGetFilesDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _PathService_getFilesDirName,
+                  _pathServiceMethodGetFilesDirName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2213,19 +2213,19 @@ class PathServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _PathService_getFilesDirName,
+              _pathServiceMethodGetFilesDirName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _PathService_getCacheDirName:
-        var response = _impl.getCacheDir(_PathServiceGetCacheDirResponseParamsFactory);
+      case _pathServiceMethodGetCacheDirName:
+        var response = _impl.getCacheDir(_pathServiceGetCacheDirResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _PathService_getCacheDirName,
+                  _pathServiceMethodGetCacheDirName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2233,7 +2233,7 @@ class PathServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _PathService_getCacheDirName,
+              _pathServiceMethodGetCacheDirName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -2267,8 +2267,8 @@ class PathServiceStub extends bindings.Stub {
   }
 }
 
-const int _UserFeedback_performHapticFeedbackName = 0;
-const int _UserFeedback_performAuralFeedbackName = 1;
+const int _userFeedbackMethodPerformHapticFeedbackName = 0;
+const int _userFeedbackMethodPerformAuralFeedbackName = 1;
 
 class _UserFeedbackServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -2333,7 +2333,7 @@ class _UserFeedbackProxyCalls implements UserFeedback {
       }
       var params = new _UserFeedbackPerformHapticFeedbackParams();
       params.type = type;
-      _proxyImpl.sendMessage(params, _UserFeedback_performHapticFeedbackName);
+      _proxyImpl.sendMessage(params, _userFeedbackMethodPerformHapticFeedbackName);
     }
     void performAuralFeedback(AuralFeedbackType type) {
       if (!_proxyImpl.isBound) {
@@ -2342,7 +2342,7 @@ class _UserFeedbackProxyCalls implements UserFeedback {
       }
       var params = new _UserFeedbackPerformAuralFeedbackParams();
       params.type = type;
-      _proxyImpl.sendMessage(params, _UserFeedback_performAuralFeedbackName);
+      _proxyImpl.sendMessage(params, _userFeedbackMethodPerformAuralFeedbackName);
     }
 }
 
@@ -2434,12 +2434,12 @@ class UserFeedbackStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _UserFeedback_performHapticFeedbackName:
+      case _userFeedbackMethodPerformHapticFeedbackName:
         var params = _UserFeedbackPerformHapticFeedbackParams.deserialize(
             message.payload);
         _impl.performHapticFeedback(params.type);
         break;
-      case _UserFeedback_performAuralFeedbackName:
+      case _userFeedbackMethodPerformAuralFeedbackName:
         var params = _UserFeedbackPerformAuralFeedbackParams.deserialize(
             message.payload);
         _impl.performAuralFeedback(params.type);

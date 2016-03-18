@@ -158,7 +158,7 @@ class EchoEchoStringResponseParams extends bindings.Struct {
   }
 }
 
-const int _Echo_echoStringName = 0;
+const int _echoMethodEchoStringName = 0;
 
 class _EchoServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -200,7 +200,7 @@ class _EchoProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Echo_echoStringName:
+      case _echoMethodEchoStringName:
         var r = EchoEchoStringResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -243,7 +243,7 @@ class _EchoProxyCalls implements Echo {
       params.value = value;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Echo_echoStringName,
+          _echoMethodEchoStringName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -328,10 +328,10 @@ class EchoStub extends bindings.Stub {
   }
 
 
-  EchoEchoStringResponseParams _EchoEchoStringResponseParamsFactory(String value) {
-    var mojo_factory_result = new EchoEchoStringResponseParams();
-    mojo_factory_result.value = value;
-    return mojo_factory_result;
+  EchoEchoStringResponseParams _echoEchoStringResponseParamsFactory(String value) {
+    var result = new EchoEchoStringResponseParams();
+    result.value = value;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -342,16 +342,16 @@ class EchoStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Echo_echoStringName:
+      case _echoMethodEchoStringName:
         var params = _EchoEchoStringParams.deserialize(
             message.payload);
-        var response = _impl.echoString(params.value,_EchoEchoStringResponseParamsFactory);
+        var response = _impl.echoString(params.value,_echoEchoStringResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Echo_echoStringName,
+                  _echoMethodEchoStringName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -359,7 +359,7 @@ class EchoStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Echo_echoStringName,
+              _echoMethodEchoStringName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -406,7 +406,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/5JggAABKL0CSqOLWyDxGYGYA8qXAWIRIM7Nz8q3skqtSMwtyEkttrJyTc7Ix6Ye3VwDKK0MxNJAHBIZ4Brv7RppBTJQD2aeHsw4nOY44HAfseZKQPWB9DMj6VdAs8+DEUInQGkPNPtB4D8QzICyFyCJgegNDNgBursVsPiTHUlcGIi5gTg4tagsMznVLzE3laj44AFiFiCG8aWAWAiqHkuwYIQzyH1cQGwJxIZArJ+Rn5uqX1Sakp+bmZdapA8yR7+4KFkfZpZ+KtAsMKEHksslMt2g2wvj80DDCVe4aaCF3wUovYMJNbw9sMQBKI4MsIghp1N0IAQND5C7g0uKMvPSsYcbJxAzUSHc0NPFBQbK/GWBw1+wdIHwl25RamFpanEJdv/BAKX+Q49PBxzlzw0G4gCx4cGAln7QAS8QswJxWWJOaSqO+BWlkv8ZkNI4veJbGlqmoMR3cUF+XnHqaHzjiG8NGsQ3IAAA//8JkrngkAcAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xUT2v6QBCN/n6l/ywU24LUHoRevNT1KDkJRRCEUrCHeiohDJqSuJoY6Ufpscce+5E8+i3a2TpL43QDC62eOvAcd82+zLx5bsVZxTHlV8p8v5VZFxB7tL5AnCIi+ShdF568aBJC4rodfyRNz3PeJuVLRBVxN7jtPPQ6A1cRNjRfQ9Pl8rRz6rPlrdA5df5f5nyNve++sMoTyl32fhXvGM/0/SWzp/KbYw5ed83Q525m/wRxiOhDPA98uPEisJpHCfEfodfniDI9b5Dlm86qvgNED3GNEGkSi1D6XiiGUg5DECMZgQi8cSgDX8ymQjGLJPaFZheA7J8fDfVbZFU3r0OvS6Rbno51pueC8rK4rn/XMBM1s6ZhL+tbHmXSR9Xdn8XBeGjWcR9R3ICO3DcL52d9tnL61L756vMqhmkKyczcr47f7pfPu51zXy0du7DVx2H+4nGE2EHMvTCFnPmfbUgPJ/Of2JYfqnQnrfkhmchxAn9+sPRDfQt++AgAAP//upqHH/AHAAA=";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

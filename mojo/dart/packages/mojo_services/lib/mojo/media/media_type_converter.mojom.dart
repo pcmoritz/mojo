@@ -284,9 +284,9 @@ class _MediaTypeConverterGetProducerParams extends bindings.Struct {
   }
 }
 
-const int _MediaTypeConverter_getOutputTypeName = 0;
-const int _MediaTypeConverter_getConsumerName = 1;
-const int _MediaTypeConverter_getProducerName = 2;
+const int _mediaTypeConverterMethodGetOutputTypeName = 0;
+const int _mediaTypeConverterMethodGetConsumerName = 1;
+const int _mediaTypeConverterMethodGetProducerName = 2;
 
 class _MediaTypeConverterServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -327,7 +327,7 @@ class _MediaTypeConverterProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _MediaTypeConverter_getOutputTypeName:
+      case _mediaTypeConverterMethodGetOutputTypeName:
         var r = MediaTypeConverterGetOutputTypeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -369,7 +369,7 @@ class _MediaTypeConverterProxyCalls implements MediaTypeConverter {
       var params = new _MediaTypeConverterGetOutputTypeParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaTypeConverter_getOutputTypeName,
+          _mediaTypeConverterMethodGetOutputTypeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -380,7 +380,7 @@ class _MediaTypeConverterProxyCalls implements MediaTypeConverter {
       }
       var params = new _MediaTypeConverterGetConsumerParams();
       params.consumer = consumer;
-      _proxyImpl.sendMessage(params, _MediaTypeConverter_getConsumerName);
+      _proxyImpl.sendMessage(params, _mediaTypeConverterMethodGetConsumerName);
     }
     void getProducer(Object producer) {
       if (!_proxyImpl.isBound) {
@@ -389,7 +389,7 @@ class _MediaTypeConverterProxyCalls implements MediaTypeConverter {
       }
       var params = new _MediaTypeConverterGetProducerParams();
       params.producer = producer;
-      _proxyImpl.sendMessage(params, _MediaTypeConverter_getProducerName);
+      _proxyImpl.sendMessage(params, _mediaTypeConverterMethodGetProducerName);
     }
 }
 
@@ -472,10 +472,10 @@ class MediaTypeConverterStub extends bindings.Stub {
   }
 
 
-  MediaTypeConverterGetOutputTypeResponseParams _MediaTypeConverterGetOutputTypeResponseParamsFactory(media_types_mojom.MediaType outputType) {
-    var mojo_factory_result = new MediaTypeConverterGetOutputTypeResponseParams();
-    mojo_factory_result.outputType = outputType;
-    return mojo_factory_result;
+  MediaTypeConverterGetOutputTypeResponseParams _mediaTypeConverterGetOutputTypeResponseParamsFactory(media_types_mojom.MediaType outputType) {
+    var result = new MediaTypeConverterGetOutputTypeResponseParams();
+    result.outputType = outputType;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -486,14 +486,14 @@ class MediaTypeConverterStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaTypeConverter_getOutputTypeName:
-        var response = _impl.getOutputType(_MediaTypeConverterGetOutputTypeResponseParamsFactory);
+      case _mediaTypeConverterMethodGetOutputTypeName:
+        var response = _impl.getOutputType(_mediaTypeConverterGetOutputTypeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaTypeConverter_getOutputTypeName,
+                  _mediaTypeConverterMethodGetOutputTypeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -501,17 +501,17 @@ class MediaTypeConverterStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaTypeConverter_getOutputTypeName,
+              _mediaTypeConverterMethodGetOutputTypeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaTypeConverter_getConsumerName:
+      case _mediaTypeConverterMethodGetConsumerName:
         var params = _MediaTypeConverterGetConsumerParams.deserialize(
             message.payload);
         _impl.getConsumer(params.consumer);
         break;
-      case _MediaTypeConverter_getProducerName:
+      case _mediaTypeConverterMethodGetProducerName:
         var params = _MediaTypeConverterGetProducerParams.deserialize(
             message.payload);
         _impl.getProducer(params.producer);

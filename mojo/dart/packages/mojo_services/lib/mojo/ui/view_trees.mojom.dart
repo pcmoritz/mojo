@@ -647,11 +647,11 @@ class ViewTreeListenerOnRendererDiedResponseParams extends bindings.Struct {
   }
 }
 
-const int _ViewTree_getTokenName = 0;
-const int _ViewTree_getServiceProviderName = 1;
-const int _ViewTree_setRendererName = 2;
-const int _ViewTree_requestLayoutName = 3;
-const int _ViewTree_getContainerName = 4;
+const int _viewTreeMethodGetTokenName = 0;
+const int _viewTreeMethodGetServiceProviderName = 1;
+const int _viewTreeMethodSetRendererName = 2;
+const int _viewTreeMethodRequestLayoutName = 3;
+const int _viewTreeMethodGetContainerName = 4;
 
 class _ViewTreeServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -694,7 +694,7 @@ class _ViewTreeProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewTree_getTokenName:
+      case _viewTreeMethodGetTokenName:
         var r = ViewTreeGetTokenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -736,7 +736,7 @@ class _ViewTreeProxyCalls implements ViewTree {
       var params = new _ViewTreeGetTokenParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTree_getTokenName,
+          _viewTreeMethodGetTokenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -747,7 +747,7 @@ class _ViewTreeProxyCalls implements ViewTree {
       }
       var params = new _ViewTreeGetServiceProviderParams();
       params.serviceProvider = serviceProvider;
-      _proxyImpl.sendMessage(params, _ViewTree_getServiceProviderName);
+      _proxyImpl.sendMessage(params, _viewTreeMethodGetServiceProviderName);
     }
     void setRenderer(Object renderer) {
       if (!_proxyImpl.isBound) {
@@ -756,7 +756,7 @@ class _ViewTreeProxyCalls implements ViewTree {
       }
       var params = new _ViewTreeSetRendererParams();
       params.renderer = renderer;
-      _proxyImpl.sendMessage(params, _ViewTree_setRendererName);
+      _proxyImpl.sendMessage(params, _viewTreeMethodSetRendererName);
     }
     void requestLayout() {
       if (!_proxyImpl.isBound) {
@@ -764,7 +764,7 @@ class _ViewTreeProxyCalls implements ViewTree {
         return;
       }
       var params = new _ViewTreeRequestLayoutParams();
-      _proxyImpl.sendMessage(params, _ViewTree_requestLayoutName);
+      _proxyImpl.sendMessage(params, _viewTreeMethodRequestLayoutName);
     }
     void getContainer(Object container) {
       if (!_proxyImpl.isBound) {
@@ -773,7 +773,7 @@ class _ViewTreeProxyCalls implements ViewTree {
       }
       var params = new _ViewTreeGetContainerParams();
       params.container = container;
-      _proxyImpl.sendMessage(params, _ViewTree_getContainerName);
+      _proxyImpl.sendMessage(params, _viewTreeMethodGetContainerName);
     }
 }
 
@@ -856,10 +856,10 @@ class ViewTreeStub extends bindings.Stub {
   }
 
 
-  ViewTreeGetTokenResponseParams _ViewTreeGetTokenResponseParamsFactory(view_tree_token_mojom.ViewTreeToken token) {
-    var mojo_factory_result = new ViewTreeGetTokenResponseParams();
-    mojo_factory_result.token = token;
-    return mojo_factory_result;
+  ViewTreeGetTokenResponseParams _viewTreeGetTokenResponseParamsFactory(view_tree_token_mojom.ViewTreeToken token) {
+    var result = new ViewTreeGetTokenResponseParams();
+    result.token = token;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -870,14 +870,14 @@ class ViewTreeStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewTree_getTokenName:
-        var response = _impl.getToken(_ViewTreeGetTokenResponseParamsFactory);
+      case _viewTreeMethodGetTokenName:
+        var response = _impl.getToken(_viewTreeGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTree_getTokenName,
+                  _viewTreeMethodGetTokenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -885,25 +885,25 @@ class ViewTreeStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTree_getTokenName,
+              _viewTreeMethodGetTokenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewTree_getServiceProviderName:
+      case _viewTreeMethodGetServiceProviderName:
         var params = _ViewTreeGetServiceProviderParams.deserialize(
             message.payload);
         _impl.getServiceProvider(params.serviceProvider);
         break;
-      case _ViewTree_setRendererName:
+      case _viewTreeMethodSetRendererName:
         var params = _ViewTreeSetRendererParams.deserialize(
             message.payload);
         _impl.setRenderer(params.renderer);
         break;
-      case _ViewTree_requestLayoutName:
+      case _viewTreeMethodRequestLayoutName:
         _impl.requestLayout();
         break;
-      case _ViewTree_getContainerName:
+      case _viewTreeMethodGetContainerName:
         var params = _ViewTreeGetContainerParams.deserialize(
             message.payload);
         _impl.getContainer(params.container);
@@ -937,8 +937,8 @@ class ViewTreeStub extends bindings.Stub {
   }
 }
 
-const int _ViewTreeListener_onLayoutName = 0;
-const int _ViewTreeListener_onRendererDiedName = 1;
+const int _viewTreeListenerMethodOnLayoutName = 0;
+const int _viewTreeListenerMethodOnRendererDiedName = 1;
 
 class _ViewTreeListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -978,7 +978,7 @@ class _ViewTreeListenerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewTreeListener_onLayoutName:
+      case _viewTreeListenerMethodOnLayoutName:
         var r = ViewTreeListenerOnLayoutResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -998,7 +998,7 @@ class _ViewTreeListenerProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ViewTreeListener_onRendererDiedName:
+      case _viewTreeListenerMethodOnRendererDiedName:
         var r = ViewTreeListenerOnRendererDiedResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1040,7 +1040,7 @@ class _ViewTreeListenerProxyCalls implements ViewTreeListener {
       var params = new _ViewTreeListenerOnLayoutParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTreeListener_onLayoutName,
+          _viewTreeListenerMethodOnLayoutName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1048,7 +1048,7 @@ class _ViewTreeListenerProxyCalls implements ViewTreeListener {
       var params = new _ViewTreeListenerOnRendererDiedParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewTreeListener_onRendererDiedName,
+          _viewTreeListenerMethodOnRendererDiedName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1133,13 +1133,13 @@ class ViewTreeListenerStub extends bindings.Stub {
   }
 
 
-  ViewTreeListenerOnLayoutResponseParams _ViewTreeListenerOnLayoutResponseParamsFactory() {
-    var mojo_factory_result = new ViewTreeListenerOnLayoutResponseParams();
-    return mojo_factory_result;
+  ViewTreeListenerOnLayoutResponseParams _viewTreeListenerOnLayoutResponseParamsFactory() {
+    var result = new ViewTreeListenerOnLayoutResponseParams();
+    return result;
   }
-  ViewTreeListenerOnRendererDiedResponseParams _ViewTreeListenerOnRendererDiedResponseParamsFactory() {
-    var mojo_factory_result = new ViewTreeListenerOnRendererDiedResponseParams();
-    return mojo_factory_result;
+  ViewTreeListenerOnRendererDiedResponseParams _viewTreeListenerOnRendererDiedResponseParamsFactory() {
+    var result = new ViewTreeListenerOnRendererDiedResponseParams();
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1150,14 +1150,14 @@ class ViewTreeListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewTreeListener_onLayoutName:
-        var response = _impl.onLayout(_ViewTreeListenerOnLayoutResponseParamsFactory);
+      case _viewTreeListenerMethodOnLayoutName:
+        var response = _impl.onLayout(_viewTreeListenerOnLayoutResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTreeListener_onLayoutName,
+                  _viewTreeListenerMethodOnLayoutName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1165,19 +1165,19 @@ class ViewTreeListenerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTreeListener_onLayoutName,
+              _viewTreeListenerMethodOnLayoutName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ViewTreeListener_onRendererDiedName:
-        var response = _impl.onRendererDied(_ViewTreeListenerOnRendererDiedResponseParamsFactory);
+      case _viewTreeListenerMethodOnRendererDiedName:
+        var response = _impl.onRendererDied(_viewTreeListenerOnRendererDiedResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewTreeListener_onRendererDiedName,
+                  _viewTreeListenerMethodOnRendererDiedName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1185,7 +1185,7 @@ class ViewTreeListenerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewTreeListener_onRendererDiedName,
+              _viewTreeListenerMethodOnRendererDiedName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

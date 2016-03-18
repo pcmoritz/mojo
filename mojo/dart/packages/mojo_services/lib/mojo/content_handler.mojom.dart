@@ -96,7 +96,7 @@ class _ContentHandlerStartApplicationParams extends bindings.Struct {
   }
 }
 
-const int _ContentHandler_startApplicationName = 0;
+const int _contentHandlerMethodStartApplicationName = 0;
 
 class _ContentHandlerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -161,7 +161,7 @@ class _ContentHandlerProxyCalls implements ContentHandler {
       var params = new _ContentHandlerStartApplicationParams();
       params.application = application;
       params.response = response;
-      _proxyImpl.sendMessage(params, _ContentHandler_startApplicationName);
+      _proxyImpl.sendMessage(params, _contentHandlerMethodStartApplicationName);
     }
 }
 
@@ -253,7 +253,7 @@ class ContentHandlerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ContentHandler_startApplicationName:
+      case _contentHandlerMethodStartApplicationName:
         var params = _ContentHandlerStartApplicationParams.deserialize(
             message.payload);
         _impl.startApplication(params.application, params.response);

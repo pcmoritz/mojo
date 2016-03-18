@@ -159,7 +159,7 @@ class LocationServiceGetNextLocationResponseParams extends bindings.Struct {
   }
 }
 
-const int _LocationService_getNextLocationName = 0;
+const int _locationServiceMethodGetNextLocationName = 0;
   
 class LocationServiceUpdatePriority extends bindings.MojoEnum {
   static const LocationServiceUpdatePriority priorityBalancedPowerAccuracy = const LocationServiceUpdatePriority._(0);
@@ -264,7 +264,7 @@ class _LocationServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _LocationService_getNextLocationName:
+      case _locationServiceMethodGetNextLocationName:
         var r = LocationServiceGetNextLocationResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -307,7 +307,7 @@ class _LocationServiceProxyCalls implements LocationService {
       params.priority = priority;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _LocationService_getNextLocationName,
+          _locationServiceMethodGetNextLocationName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -392,10 +392,10 @@ class LocationServiceStub extends bindings.Stub {
   }
 
 
-  LocationServiceGetNextLocationResponseParams _LocationServiceGetNextLocationResponseParamsFactory(location_mojom.Location location) {
-    var mojo_factory_result = new LocationServiceGetNextLocationResponseParams();
-    mojo_factory_result.location = location;
-    return mojo_factory_result;
+  LocationServiceGetNextLocationResponseParams _locationServiceGetNextLocationResponseParamsFactory(location_mojom.Location location) {
+    var result = new LocationServiceGetNextLocationResponseParams();
+    result.location = location;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -406,16 +406,16 @@ class LocationServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _LocationService_getNextLocationName:
+      case _locationServiceMethodGetNextLocationName:
         var params = _LocationServiceGetNextLocationParams.deserialize(
             message.payload);
-        var response = _impl.getNextLocation(params.priority,_LocationServiceGetNextLocationResponseParamsFactory);
+        var response = _impl.getNextLocation(params.priority,_locationServiceGetNextLocationResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _LocationService_getNextLocationName,
+                  _locationServiceMethodGetNextLocationName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -423,7 +423,7 @@ class LocationServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _LocationService_getNextLocationName,
+              _locationServiceMethodGetNextLocationName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

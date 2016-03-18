@@ -81,7 +81,7 @@ class _TerminalClientConnectToTerminalParams extends bindings.Struct {
   }
 }
 
-const int _TerminalClient_connectToTerminalName = 0;
+const int _terminalClientMethodConnectToTerminalName = 0;
 
 class _TerminalClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -145,7 +145,7 @@ class _TerminalClientProxyCalls implements TerminalClient {
       }
       var params = new _TerminalClientConnectToTerminalParams();
       params.terminal = terminal;
-      _proxyImpl.sendMessage(params, _TerminalClient_connectToTerminalName);
+      _proxyImpl.sendMessage(params, _terminalClientMethodConnectToTerminalName);
     }
 }
 
@@ -237,7 +237,7 @@ class TerminalClientStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TerminalClient_connectToTerminalName:
+      case _terminalClientMethodConnectToTerminalName:
         var params = _TerminalClientConnectToTerminalParams.deserialize(
             message.payload);
         _impl.connectToTerminal(params.terminal);

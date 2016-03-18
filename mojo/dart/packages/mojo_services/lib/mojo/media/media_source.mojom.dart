@@ -1435,17 +1435,17 @@ class MediaSourceSeekResponseParams extends bindings.Struct {
   }
 }
 
-const int _MediaSource_getStreamsName = 0;
-const int _MediaSource_getClockDispositionName = 1;
-const int _MediaSource_getMasterClockName = 2;
-const int _MediaSource_setMasterClockName = 3;
-const int _MediaSource_getProducerName = 4;
-const int _MediaSource_getPullModeProducerName = 5;
-const int _MediaSource_getStatusName = 6;
-const int _MediaSource_prepareName = 7;
-const int _MediaSource_primeName = 8;
-const int _MediaSource_flushName = 9;
-const int _MediaSource_seekName = 10;
+const int _mediaSourceMethodGetStreamsName = 0;
+const int _mediaSourceMethodGetClockDispositionName = 1;
+const int _mediaSourceMethodGetMasterClockName = 2;
+const int _mediaSourceMethodSetMasterClockName = 3;
+const int _mediaSourceMethodGetProducerName = 4;
+const int _mediaSourceMethodGetPullModeProducerName = 5;
+const int _mediaSourceMethodGetStatusName = 6;
+const int _mediaSourceMethodPrepareName = 7;
+const int _mediaSourceMethodPrimeName = 8;
+const int _mediaSourceMethodFlushName = 9;
+const int _mediaSourceMethodSeekName = 10;
 
 class _MediaSourceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1494,7 +1494,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _MediaSource_getStreamsName:
+      case _mediaSourceMethodGetStreamsName:
         var r = MediaSourceGetStreamsResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1514,7 +1514,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_getClockDispositionName:
+      case _mediaSourceMethodGetClockDispositionName:
         var r = MediaSourceGetClockDispositionResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1534,7 +1534,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_getStatusName:
+      case _mediaSourceMethodGetStatusName:
         var r = MediaSourceGetStatusResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1554,7 +1554,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_prepareName:
+      case _mediaSourceMethodPrepareName:
         var r = MediaSourcePrepareResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1574,7 +1574,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_primeName:
+      case _mediaSourceMethodPrimeName:
         var r = MediaSourcePrimeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1594,7 +1594,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_flushName:
+      case _mediaSourceMethodFlushName:
         var r = MediaSourceFlushResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1614,7 +1614,7 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSource_seekName:
+      case _mediaSourceMethodSeekName:
         var r = MediaSourceSeekResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1656,7 +1656,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourceGetStreamsParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_getStreamsName,
+          _mediaSourceMethodGetStreamsName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1664,7 +1664,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourceGetClockDispositionParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_getClockDispositionName,
+          _mediaSourceMethodGetClockDispositionName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1675,7 +1675,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       }
       var params = new _MediaSourceGetMasterClockParams();
       params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _MediaSource_getMasterClockName);
+      _proxyImpl.sendMessage(params, _mediaSourceMethodGetMasterClockName);
     }
     void setMasterClock(Object masterClock) {
       if (!_proxyImpl.isBound) {
@@ -1684,7 +1684,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       }
       var params = new _MediaSourceSetMasterClockParams();
       params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _MediaSource_setMasterClockName);
+      _proxyImpl.sendMessage(params, _mediaSourceMethodSetMasterClockName);
     }
     void getProducer(int streamIndex, Object producer) {
       if (!_proxyImpl.isBound) {
@@ -1694,7 +1694,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourceGetProducerParams();
       params.streamIndex = streamIndex;
       params.producer = producer;
-      _proxyImpl.sendMessage(params, _MediaSource_getProducerName);
+      _proxyImpl.sendMessage(params, _mediaSourceMethodGetProducerName);
     }
     void getPullModeProducer(int streamIndex, Object producer) {
       if (!_proxyImpl.isBound) {
@@ -1704,14 +1704,14 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourceGetPullModeProducerParams();
       params.streamIndex = streamIndex;
       params.producer = producer;
-      _proxyImpl.sendMessage(params, _MediaSource_getPullModeProducerName);
+      _proxyImpl.sendMessage(params, _mediaSourceMethodGetPullModeProducerName);
     }
     dynamic getStatus(int versionLastSeen,[Function responseFactory = null]) {
       var params = new _MediaSourceGetStatusParams();
       params.versionLastSeen = versionLastSeen;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_getStatusName,
+          _mediaSourceMethodGetStatusName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1719,7 +1719,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourcePrepareParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_prepareName,
+          _mediaSourceMethodPrepareName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1727,7 +1727,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourcePrimeParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_primeName,
+          _mediaSourceMethodPrimeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1735,7 +1735,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       var params = new _MediaSourceFlushParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_flushName,
+          _mediaSourceMethodFlushName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1744,7 +1744,7 @@ class _MediaSourceProxyCalls implements MediaSource {
       params.position = position;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSource_seekName,
+          _mediaSourceMethodSeekName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1829,37 +1829,37 @@ class MediaSourceStub extends bindings.Stub {
   }
 
 
-  MediaSourceGetStreamsResponseParams _MediaSourceGetStreamsResponseParamsFactory(List<MediaSourceStreamDescriptor> streams) {
-    var mojo_factory_result = new MediaSourceGetStreamsResponseParams();
-    mojo_factory_result.streams = streams;
-    return mojo_factory_result;
+  MediaSourceGetStreamsResponseParams _mediaSourceGetStreamsResponseParamsFactory(List<MediaSourceStreamDescriptor> streams) {
+    var result = new MediaSourceGetStreamsResponseParams();
+    result.streams = streams;
+    return result;
   }
-  MediaSourceGetClockDispositionResponseParams _MediaSourceGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
-    var mojo_factory_result = new MediaSourceGetClockDispositionResponseParams();
-    mojo_factory_result.clockDisposition = clockDisposition;
-    return mojo_factory_result;
+  MediaSourceGetClockDispositionResponseParams _mediaSourceGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
+    var result = new MediaSourceGetClockDispositionResponseParams();
+    result.clockDisposition = clockDisposition;
+    return result;
   }
-  MediaSourceGetStatusResponseParams _MediaSourceGetStatusResponseParamsFactory(int version, MediaSourceStatus status) {
-    var mojo_factory_result = new MediaSourceGetStatusResponseParams();
-    mojo_factory_result.version = version;
-    mojo_factory_result.status = status;
-    return mojo_factory_result;
+  MediaSourceGetStatusResponseParams _mediaSourceGetStatusResponseParamsFactory(int version, MediaSourceStatus status) {
+    var result = new MediaSourceGetStatusResponseParams();
+    result.version = version;
+    result.status = status;
+    return result;
   }
-  MediaSourcePrepareResponseParams _MediaSourcePrepareResponseParamsFactory() {
-    var mojo_factory_result = new MediaSourcePrepareResponseParams();
-    return mojo_factory_result;
+  MediaSourcePrepareResponseParams _mediaSourcePrepareResponseParamsFactory() {
+    var result = new MediaSourcePrepareResponseParams();
+    return result;
   }
-  MediaSourcePrimeResponseParams _MediaSourcePrimeResponseParamsFactory() {
-    var mojo_factory_result = new MediaSourcePrimeResponseParams();
-    return mojo_factory_result;
+  MediaSourcePrimeResponseParams _mediaSourcePrimeResponseParamsFactory() {
+    var result = new MediaSourcePrimeResponseParams();
+    return result;
   }
-  MediaSourceFlushResponseParams _MediaSourceFlushResponseParamsFactory() {
-    var mojo_factory_result = new MediaSourceFlushResponseParams();
-    return mojo_factory_result;
+  MediaSourceFlushResponseParams _mediaSourceFlushResponseParamsFactory() {
+    var result = new MediaSourceFlushResponseParams();
+    return result;
   }
-  MediaSourceSeekResponseParams _MediaSourceSeekResponseParamsFactory() {
-    var mojo_factory_result = new MediaSourceSeekResponseParams();
-    return mojo_factory_result;
+  MediaSourceSeekResponseParams _mediaSourceSeekResponseParamsFactory() {
+    var result = new MediaSourceSeekResponseParams();
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1870,14 +1870,14 @@ class MediaSourceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaSource_getStreamsName:
-        var response = _impl.getStreams(_MediaSourceGetStreamsResponseParamsFactory);
+      case _mediaSourceMethodGetStreamsName:
+        var response = _impl.getStreams(_mediaSourceGetStreamsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_getStreamsName,
+                  _mediaSourceMethodGetStreamsName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1885,19 +1885,19 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_getStreamsName,
+              _mediaSourceMethodGetStreamsName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_getClockDispositionName:
-        var response = _impl.getClockDisposition(_MediaSourceGetClockDispositionResponseParamsFactory);
+      case _mediaSourceMethodGetClockDispositionName:
+        var response = _impl.getClockDisposition(_mediaSourceGetClockDispositionResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_getClockDispositionName,
+                  _mediaSourceMethodGetClockDispositionName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1905,41 +1905,41 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_getClockDispositionName,
+              _mediaSourceMethodGetClockDispositionName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_getMasterClockName:
+      case _mediaSourceMethodGetMasterClockName:
         var params = _MediaSourceGetMasterClockParams.deserialize(
             message.payload);
         _impl.getMasterClock(params.masterClock);
         break;
-      case _MediaSource_setMasterClockName:
+      case _mediaSourceMethodSetMasterClockName:
         var params = _MediaSourceSetMasterClockParams.deserialize(
             message.payload);
         _impl.setMasterClock(params.masterClock);
         break;
-      case _MediaSource_getProducerName:
+      case _mediaSourceMethodGetProducerName:
         var params = _MediaSourceGetProducerParams.deserialize(
             message.payload);
         _impl.getProducer(params.streamIndex, params.producer);
         break;
-      case _MediaSource_getPullModeProducerName:
+      case _mediaSourceMethodGetPullModeProducerName:
         var params = _MediaSourceGetPullModeProducerParams.deserialize(
             message.payload);
         _impl.getPullModeProducer(params.streamIndex, params.producer);
         break;
-      case _MediaSource_getStatusName:
+      case _mediaSourceMethodGetStatusName:
         var params = _MediaSourceGetStatusParams.deserialize(
             message.payload);
-        var response = _impl.getStatus(params.versionLastSeen,_MediaSourceGetStatusResponseParamsFactory);
+        var response = _impl.getStatus(params.versionLastSeen,_mediaSourceGetStatusResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_getStatusName,
+                  _mediaSourceMethodGetStatusName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1947,19 +1947,19 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_getStatusName,
+              _mediaSourceMethodGetStatusName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_prepareName:
-        var response = _impl.prepare(_MediaSourcePrepareResponseParamsFactory);
+      case _mediaSourceMethodPrepareName:
+        var response = _impl.prepare(_mediaSourcePrepareResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_prepareName,
+                  _mediaSourceMethodPrepareName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1967,19 +1967,19 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_prepareName,
+              _mediaSourceMethodPrepareName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_primeName:
-        var response = _impl.prime(_MediaSourcePrimeResponseParamsFactory);
+      case _mediaSourceMethodPrimeName:
+        var response = _impl.prime(_mediaSourcePrimeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_primeName,
+                  _mediaSourceMethodPrimeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1987,19 +1987,19 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_primeName,
+              _mediaSourceMethodPrimeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_flushName:
-        var response = _impl.flush(_MediaSourceFlushResponseParamsFactory);
+      case _mediaSourceMethodFlushName:
+        var response = _impl.flush(_mediaSourceFlushResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_flushName,
+                  _mediaSourceMethodFlushName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2007,21 +2007,21 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_flushName,
+              _mediaSourceMethodFlushName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSource_seekName:
+      case _mediaSourceMethodSeekName:
         var params = _MediaSourceSeekParams.deserialize(
             message.payload);
-        var response = _impl.seek(params.position,_MediaSourceSeekResponseParamsFactory);
+        var response = _impl.seek(params.position,_mediaSourceSeekResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSource_seekName,
+                  _mediaSourceMethodSeekName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2029,7 +2029,7 @@ class MediaSourceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSource_seekName,
+              _mediaSourceMethodSeekName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

@@ -212,7 +212,7 @@ class ViewOwnerGetTokenResponseParams extends bindings.Struct {
   }
 }
 
-const int _ViewOwner_getTokenName = 0;
+const int _viewOwnerMethodGetTokenName = 0;
 
 class _ViewOwnerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -251,7 +251,7 @@ class _ViewOwnerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewOwner_getTokenName:
+      case _viewOwnerMethodGetTokenName:
         var r = ViewOwnerGetTokenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -293,7 +293,7 @@ class _ViewOwnerProxyCalls implements ViewOwner {
       var params = new _ViewOwnerGetTokenParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewOwner_getTokenName,
+          _viewOwnerMethodGetTokenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -378,10 +378,10 @@ class ViewOwnerStub extends bindings.Stub {
   }
 
 
-  ViewOwnerGetTokenResponseParams _ViewOwnerGetTokenResponseParamsFactory(ViewToken token) {
-    var mojo_factory_result = new ViewOwnerGetTokenResponseParams();
-    mojo_factory_result.token = token;
-    return mojo_factory_result;
+  ViewOwnerGetTokenResponseParams _viewOwnerGetTokenResponseParamsFactory(ViewToken token) {
+    var result = new ViewOwnerGetTokenResponseParams();
+    result.token = token;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -392,14 +392,14 @@ class ViewOwnerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewOwner_getTokenName:
-        var response = _impl.getToken(_ViewOwnerGetTokenResponseParamsFactory);
+      case _viewOwnerMethodGetTokenName:
+        var response = _impl.getToken(_viewOwnerGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewOwner_getTokenName,
+                  _viewOwnerMethodGetTokenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -407,7 +407,7 @@ class ViewOwnerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewOwner_getTokenName,
+              _viewOwnerMethodGetTokenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

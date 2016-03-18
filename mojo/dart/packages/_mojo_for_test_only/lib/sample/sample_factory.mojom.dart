@@ -1079,8 +1079,8 @@ class FactoryTakeImportedInterfaceResponseParams extends bindings.Struct {
   }
 }
 
-const int _NamedObject_setNameName = 0;
-const int _NamedObject_getNameName = 1;
+const int _namedObjectMethodSetNameName = 0;
+const int _namedObjectMethodGetNameName = 1;
 
 class _NamedObjectServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -1123,7 +1123,7 @@ class _NamedObjectProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _NamedObject_getNameName:
+      case _namedObjectMethodGetNameName:
         var r = NamedObjectGetNameResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1168,13 +1168,13 @@ class _NamedObjectProxyCalls implements NamedObject {
       }
       var params = new _NamedObjectSetNameParams();
       params.name = name;
-      _proxyImpl.sendMessage(params, _NamedObject_setNameName);
+      _proxyImpl.sendMessage(params, _namedObjectMethodSetNameName);
     }
     dynamic getName([Function responseFactory = null]) {
       var params = new _NamedObjectGetNameParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _NamedObject_getNameName,
+          _namedObjectMethodGetNameName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1259,10 +1259,10 @@ class NamedObjectStub extends bindings.Stub {
   }
 
 
-  NamedObjectGetNameResponseParams _NamedObjectGetNameResponseParamsFactory(String name) {
-    var mojo_factory_result = new NamedObjectGetNameResponseParams();
-    mojo_factory_result.name = name;
-    return mojo_factory_result;
+  NamedObjectGetNameResponseParams _namedObjectGetNameResponseParamsFactory(String name) {
+    var result = new NamedObjectGetNameResponseParams();
+    result.name = name;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1273,19 +1273,19 @@ class NamedObjectStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NamedObject_setNameName:
+      case _namedObjectMethodSetNameName:
         var params = _NamedObjectSetNameParams.deserialize(
             message.payload);
         _impl.setName(params.name);
         break;
-      case _NamedObject_getNameName:
-        var response = _impl.getName(_NamedObjectGetNameResponseParamsFactory);
+      case _namedObjectMethodGetNameName:
+        var response = _impl.getName(_namedObjectGetNameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _NamedObject_getNameName,
+                  _namedObjectMethodGetNameName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1293,7 +1293,7 @@ class NamedObjectStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _NamedObject_getNameName,
+              _namedObjectMethodGetNameName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1327,11 +1327,11 @@ class NamedObjectStub extends bindings.Stub {
   }
 }
 
-const int _Factory_doStuffName = 0;
-const int _Factory_doStuff2Name = 1;
-const int _Factory_createNamedObjectName = 2;
-const int _Factory_requestImportedInterfaceName = 3;
-const int _Factory_takeImportedInterfaceName = 4;
+const int _factoryMethodDoStuffName = 0;
+const int _factoryMethodDoStuff2Name = 1;
+const int _factoryMethodCreateNamedObjectName = 2;
+const int _factoryMethodRequestImportedInterfaceName = 3;
+const int _factoryMethodTakeImportedInterfaceName = 4;
 
 class _FactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1374,7 +1374,7 @@ class _FactoryProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Factory_doStuffName:
+      case _factoryMethodDoStuffName:
         var r = FactoryDoStuffResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1394,7 +1394,7 @@ class _FactoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Factory_doStuff2Name:
+      case _factoryMethodDoStuff2Name:
         var r = FactoryDoStuff2ResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1414,7 +1414,7 @@ class _FactoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Factory_requestImportedInterfaceName:
+      case _factoryMethodRequestImportedInterfaceName:
         var r = FactoryRequestImportedInterfaceResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1434,7 +1434,7 @@ class _FactoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Factory_takeImportedInterfaceName:
+      case _factoryMethodTakeImportedInterfaceName:
         var r = FactoryTakeImportedInterfaceResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1478,7 +1478,7 @@ class _FactoryProxyCalls implements Factory {
       params.pipe = pipe;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Factory_doStuffName,
+          _factoryMethodDoStuffName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1487,7 +1487,7 @@ class _FactoryProxyCalls implements Factory {
       params.pipe = pipe;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Factory_doStuff2Name,
+          _factoryMethodDoStuff2Name,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1498,14 +1498,14 @@ class _FactoryProxyCalls implements Factory {
       }
       var params = new _FactoryCreateNamedObjectParams();
       params.obj = obj;
-      _proxyImpl.sendMessage(params, _Factory_createNamedObjectName);
+      _proxyImpl.sendMessage(params, _factoryMethodCreateNamedObjectName);
     }
     dynamic requestImportedInterface(Object obj,[Function responseFactory = null]) {
       var params = new _FactoryRequestImportedInterfaceParams();
       params.obj = obj;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Factory_requestImportedInterfaceName,
+          _factoryMethodRequestImportedInterfaceName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1514,7 +1514,7 @@ class _FactoryProxyCalls implements Factory {
       params.obj = obj;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Factory_takeImportedInterfaceName,
+          _factoryMethodTakeImportedInterfaceName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1599,26 +1599,26 @@ class FactoryStub extends bindings.Stub {
   }
 
 
-  FactoryDoStuffResponseParams _FactoryDoStuffResponseParamsFactory(Response response, String text) {
-    var mojo_factory_result = new FactoryDoStuffResponseParams();
-    mojo_factory_result.response = response;
-    mojo_factory_result.text = text;
-    return mojo_factory_result;
+  FactoryDoStuffResponseParams _factoryDoStuffResponseParamsFactory(Response response, String text) {
+    var result = new FactoryDoStuffResponseParams();
+    result.response = response;
+    result.text = text;
+    return result;
   }
-  FactoryDoStuff2ResponseParams _FactoryDoStuff2ResponseParamsFactory(String text) {
-    var mojo_factory_result = new FactoryDoStuff2ResponseParams();
-    mojo_factory_result.text = text;
-    return mojo_factory_result;
+  FactoryDoStuff2ResponseParams _factoryDoStuff2ResponseParamsFactory(String text) {
+    var result = new FactoryDoStuff2ResponseParams();
+    result.text = text;
+    return result;
   }
-  FactoryRequestImportedInterfaceResponseParams _FactoryRequestImportedInterfaceResponseParamsFactory(Object obj) {
-    var mojo_factory_result = new FactoryRequestImportedInterfaceResponseParams();
-    mojo_factory_result.obj = obj;
-    return mojo_factory_result;
+  FactoryRequestImportedInterfaceResponseParams _factoryRequestImportedInterfaceResponseParamsFactory(Object obj) {
+    var result = new FactoryRequestImportedInterfaceResponseParams();
+    result.obj = obj;
+    return result;
   }
-  FactoryTakeImportedInterfaceResponseParams _FactoryTakeImportedInterfaceResponseParamsFactory(Object obj) {
-    var mojo_factory_result = new FactoryTakeImportedInterfaceResponseParams();
-    mojo_factory_result.obj = obj;
-    return mojo_factory_result;
+  FactoryTakeImportedInterfaceResponseParams _factoryTakeImportedInterfaceResponseParamsFactory(Object obj) {
+    var result = new FactoryTakeImportedInterfaceResponseParams();
+    result.obj = obj;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1629,16 +1629,16 @@ class FactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Factory_doStuffName:
+      case _factoryMethodDoStuffName:
         var params = _FactoryDoStuffParams.deserialize(
             message.payload);
-        var response = _impl.doStuff(params.request,params.pipe,_FactoryDoStuffResponseParamsFactory);
+        var response = _impl.doStuff(params.request,params.pipe,_factoryDoStuffResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Factory_doStuffName,
+                  _factoryMethodDoStuffName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1646,21 +1646,21 @@ class FactoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Factory_doStuffName,
+              _factoryMethodDoStuffName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Factory_doStuff2Name:
+      case _factoryMethodDoStuff2Name:
         var params = _FactoryDoStuff2Params.deserialize(
             message.payload);
-        var response = _impl.doStuff2(params.pipe,_FactoryDoStuff2ResponseParamsFactory);
+        var response = _impl.doStuff2(params.pipe,_factoryDoStuff2ResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Factory_doStuff2Name,
+                  _factoryMethodDoStuff2Name,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1668,26 +1668,26 @@ class FactoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Factory_doStuff2Name,
+              _factoryMethodDoStuff2Name,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Factory_createNamedObjectName:
+      case _factoryMethodCreateNamedObjectName:
         var params = _FactoryCreateNamedObjectParams.deserialize(
             message.payload);
         _impl.createNamedObject(params.obj);
         break;
-      case _Factory_requestImportedInterfaceName:
+      case _factoryMethodRequestImportedInterfaceName:
         var params = _FactoryRequestImportedInterfaceParams.deserialize(
             message.payload);
-        var response = _impl.requestImportedInterface(params.obj,_FactoryRequestImportedInterfaceResponseParamsFactory);
+        var response = _impl.requestImportedInterface(params.obj,_factoryRequestImportedInterfaceResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Factory_requestImportedInterfaceName,
+                  _factoryMethodRequestImportedInterfaceName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1695,21 +1695,21 @@ class FactoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Factory_requestImportedInterfaceName,
+              _factoryMethodRequestImportedInterfaceName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Factory_takeImportedInterfaceName:
+      case _factoryMethodTakeImportedInterfaceName:
         var params = _FactoryTakeImportedInterfaceParams.deserialize(
             message.payload);
-        var response = _impl.takeImportedInterface(params.obj,_FactoryTakeImportedInterfaceResponseParamsFactory);
+        var response = _impl.takeImportedInterface(params.obj,_factoryTakeImportedInterfaceResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Factory_takeImportedInterfaceName,
+                  _factoryMethodTakeImportedInterfaceName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1717,7 +1717,7 @@ class FactoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Factory_takeImportedInterfaceName,
+              _factoryMethodTakeImportedInterfaceName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1764,7 +1764,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xaT3PcNBSXvdtpgLYkYdosbUOSlhYzDHHohUxOmYGQdJiBDsuhHQ6Z/aOlDvXa2F6m3HrkyJGPwEfox+HYY4+5gRQ/bexnab0Zx7J3Wc28ke1kJb2ffk/vPUktEpdlqP+GGn/fTbwbTJbg/Q6TD5iEHdd/Qff2vuu4tP9994T2Iun/43Z3oL4Pbf347MnB8bcHz/biBrdxe6p2XkNtMWky2UTjfgq1D/UGkzVJf990epEX/D71eFTt/EB/HdEwOhtHS/r30PeGIT2C8XI9Gghn/m5tpHHftdLvT7fj902EiyhvoT4i2fIvKzsIJ/6N1/tEXt5ncpWJwOkWe74xnv8xfJn54eN7l8lPTNpM7OeeS+1g1PdcZ0gD2/VOPDsMevGDP+q+cHq2M4xoMOj0aGh3nWHfGf4c2hFDNbTj7o4HcXfb/EeulBcAF7nL5Ao8c9xMwLeZ4OGVxP/vAtFeXY/rpZW4frKWblfg/kbwq5nGKw93gnC3cnD/2mtHo8Ego+cW6FQ2vphnb0gxfXcU+q6BzqDv5wHYE9ZbFB28MhP9Pjfiel+yPnIenZLpyrR4EcRnFT9UOHF+rGrkB0H9t9A4xfqYt37K8G2WgK+Rg+816Nd3fCpbZzi+X2jAdzkxXkOjPbag73N7jP3Xwh7lZRliFRVO9+C5ansU4xTxSF68sq+IB6uyx4i+jGT2eA9sUpc9Yj7guGCpkdbrsuICMX9gl48wDvfnLC5A69AjERhUtQ7h/EaXvyIF/RXnxUPN9mFKePK2IE92Ffp/yGQlzZN4AVPkj3Xii1EhX1TrKefLlzVYTzEuZkm8+SqgnYjibD+Ly8cVra+nBe1Gld9vAQYZ/ccZWP3tp4p47z3YT/C6J0qebGnkiSnZfyGwV8fHipk97X6Xyh7/hPimccn2KOJRyAcfu74XRLT/WCCDcX4wZ/ZoQV8q/Wch/qmjPT6EHKEqe9xJ5Cm3mTgwsduZGY7/7zOw0bF95vwgsx9sFOPnkQLnT2Fdm8DPmYm76srTwznmaZ4/aV6yP1lncpOPr/MLlY0I4//JnPmTB4CBVP9EjLew04vZqaU5viMV+5Oy+MnXu48m8FM4kwU/L87Pg/8RP32Id/4w0jjvI5z/QvceBD9fT9hvTc7/piSuuSrJt9o0+M3pnSXUU92bUOVpt+EcT5GeZeb9jqZz9zx9WhPOH8xEiIrPdazG5H11Qso9b2/T6GzO8Pjvzul5O+hb+Xl73fdJh2DIMl6s1Ojc6R+jnHMnYR+HCvtYn1P7OKyJfaj8T9nnbuf6V3v+P6vrwzpwSff6UDR+v+j9QHF/B90PFJ8zuFyD35WNC74faol7IxCEvGqo+UTI+R1CXXx6B3j8UrF/dh1soGzcZuUe1g34pvselgwfU7LvWhQfE+VTuKxCvO96AT3mIIVy3nA73dDonw3QR/BmSeI3DI35dKNgPr0K+xQ68Zul/Z5p/QW+fybiLHTtLIP/TU3+AuejLWO2/MOthX9I4bFWkX/4LwAA//8gr0lSaDMAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xaz1P7RBRP0n7ni/oVC84XKj+kgGDVkVQuMpw6owiMM+qIBzhhWrYYbJuSpA7e/BM88idw5MjRI38SN90lb0v6stvUCe2mtDuzszS0ydvPfj773r68vBa0HIw3MOLrO6HPOu1T8HmR9g9p96xGq052d3+wGuTsx8oFqfrC7+P7lmBch3v9cvLT3un3eye7wQ238P1k97mDsUh7lvYCsvsYxhaMK7TPC573nVX1HffPvu2R3ednctkmnv9oR174f6/lND1yAPayeWQQzuzzfaEb9+PPuz/fA4AFhEun6cFwoEXbv7SVEE7sGhvLmrh9QPtr2jlOc/Tv6c76d+CLrA+z713aG7QT2s2255p1p2rVzXPHOa8T8zenQUzbatYdu2r6l2bDuXBMz60Gf7TalTq9bjd94tasKvHMit08s5vnnulTnD0zMOC0FhiwxX7UEPCkCOMS7a9CEBmAdzbEy1eh798A8crTwfgwE4x/57vvy9fhAcbbbDd+ceugoXUoxqzDt86R367VIvNchTkNG2/Mwwct2fxLkvnPAwYw/y9d0BvGgTcVvDNCdlyBDsuC/ZTxbErX+mr94qchvsv4I8ON8WdWIX80ZE8e2c3317j9V4R3dgB46zF4v4HntuwWEfkvhvdXCvDOhezXh6jfPDz7Sb+BP5zotz/95iAWkuG2Bn+nTb/cbh7/xMVHZVn8qUi/PrnyRfpdAw2r0i/mC45DdjLd83yuOISvJ+h4G+Oy/sLjELSPbfNAJC37GD5/Dcsfagn9IePNpmI9GaJzlZ6MRzsSPD6ifaabR8EGKDnvpplPukI+yfZnxqevU7g/Y5yMAfHqG5dYPsHZiyhOn6Rkv55KqDNZ/mIVMIng0TlBjp7eVMSf70G+xKlcSHm0qpBHhiD/pEGuktmOldBvvk+m338gvso8s355fAzn2cNGy3F9cnbIccG4b7xw/RbhWTI8RjH+SqN+N+FMkxb9lkLnrAXabVj4rQgDgu99AZru6DnmB5i/uYT8PZDg/hnsiz34O7JxX1p5vD9GPI7zT9ln9k/LtL9l9lm/E5FFeD0+feH+aQMwEeIRijEnuk6m66Li+FJT7J8GxV+2X37cg7/cOU34m5y/e2PM379gPa5RfUIZ4X6N6lI4f+965KPDfCgI4qjXgvPgEXH/sKuPCYG+6lpk58gFeG8qOT5GeLCoqC4ibn75Hu9vjFAqFL8nO870fg+haYOthzgi/uMaYvuXxqQeAuafunqItOeNmyB8EW9mUvxej4tRH5Ce9iV6Wh4TPe2nVE8y/zbo95xPeKSrXmNU95dl4Jrq/SXp+eL/1o/y+ixUP8ovR3B6A78bNk6RemLA5VfYd28zcr5p2lON6bD49g7w/EqSP3wfNDJsHEelDm8arqmuwxPhZQjy0knxMtD5D7dZfj5xXHLKQPPEvGK6XlEYD+gwvw6vBH5JH2J+IJMwPzALeRiVeI5Sfqtf/4PrD3mch8oOI+vxVpH/wefroj5a/mZu4m96+pv5lPib/wIAAP//74JzfAg2AAA=";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

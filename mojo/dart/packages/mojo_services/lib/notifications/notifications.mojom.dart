@@ -482,8 +482,8 @@ class _NotificationServicePostParams extends bindings.Struct {
   }
 }
 
-const int _NotificationClient_onSelectedName = 0;
-const int _NotificationClient_onDismissedName = 1;
+const int _notificationClientMethodOnSelectedName = 0;
+const int _notificationClientMethodOnDismissedName = 1;
 
 class _NotificationClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -547,7 +547,7 @@ class _NotificationClientProxyCalls implements NotificationClient {
         return;
       }
       var params = new _NotificationClientOnSelectedParams();
-      _proxyImpl.sendMessage(params, _NotificationClient_onSelectedName);
+      _proxyImpl.sendMessage(params, _notificationClientMethodOnSelectedName);
     }
     void onDismissed() {
       if (!_proxyImpl.isBound) {
@@ -555,7 +555,7 @@ class _NotificationClientProxyCalls implements NotificationClient {
         return;
       }
       var params = new _NotificationClientOnDismissedParams();
-      _proxyImpl.sendMessage(params, _NotificationClient_onDismissedName);
+      _proxyImpl.sendMessage(params, _notificationClientMethodOnDismissedName);
     }
 }
 
@@ -647,10 +647,10 @@ class NotificationClientStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NotificationClient_onSelectedName:
+      case _notificationClientMethodOnSelectedName:
         _impl.onSelected();
         break;
-      case _NotificationClient_onDismissedName:
+      case _notificationClientMethodOnDismissedName:
         _impl.onDismissed();
         break;
       default:
@@ -682,8 +682,8 @@ class NotificationClientStub extends bindings.Stub {
   }
 }
 
-const int _Notification_updateName = 0;
-const int _Notification_cancelName = 1;
+const int _notificationMethodUpdateName = 0;
+const int _notificationMethodCancelName = 1;
 
 class _NotificationServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -748,7 +748,7 @@ class _NotificationProxyCalls implements Notification {
       }
       var params = new _NotificationUpdateParams();
       params.notificationData = notificationData;
-      _proxyImpl.sendMessage(params, _Notification_updateName);
+      _proxyImpl.sendMessage(params, _notificationMethodUpdateName);
     }
     void cancel() {
       if (!_proxyImpl.isBound) {
@@ -756,7 +756,7 @@ class _NotificationProxyCalls implements Notification {
         return;
       }
       var params = new _NotificationCancelParams();
-      _proxyImpl.sendMessage(params, _Notification_cancelName);
+      _proxyImpl.sendMessage(params, _notificationMethodCancelName);
     }
 }
 
@@ -848,12 +848,12 @@ class NotificationStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Notification_updateName:
+      case _notificationMethodUpdateName:
         var params = _NotificationUpdateParams.deserialize(
             message.payload);
         _impl.update(params.notificationData);
         break;
-      case _Notification_cancelName:
+      case _notificationMethodCancelName:
         _impl.cancel();
         break;
       default:
@@ -885,7 +885,7 @@ class NotificationStub extends bindings.Stub {
   }
 }
 
-const int _NotificationService_postName = 0;
+const int _notificationServiceMethodPostName = 0;
 
 class _NotificationServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -951,7 +951,7 @@ class _NotificationServiceProxyCalls implements NotificationService {
       params.notificationData = notificationData;
       params.client = client;
       params.notification = notification;
-      _proxyImpl.sendMessage(params, _NotificationService_postName);
+      _proxyImpl.sendMessage(params, _notificationServiceMethodPostName);
     }
 }
 
@@ -1043,7 +1043,7 @@ class NotificationServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NotificationService_postName:
+      case _notificationServiceMethodPostName:
         var params = _NotificationServicePostParams.deserialize(
             message.payload);
         _impl.post(params.notificationData, params.client, params.notification);

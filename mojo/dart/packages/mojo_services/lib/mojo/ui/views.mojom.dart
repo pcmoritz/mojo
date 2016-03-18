@@ -576,11 +576,11 @@ class ViewListenerOnLayoutResponseParams extends bindings.Struct {
   }
 }
 
-const int _View_getTokenName = 0;
-const int _View_getServiceProviderName = 1;
-const int _View_createSceneName = 2;
-const int _View_requestLayoutName = 3;
-const int _View_getContainerName = 4;
+const int _viewMethodGetTokenName = 0;
+const int _viewMethodGetServiceProviderName = 1;
+const int _viewMethodCreateSceneName = 2;
+const int _viewMethodRequestLayoutName = 3;
+const int _viewMethodGetContainerName = 4;
 
 class _ViewServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -623,7 +623,7 @@ class _ViewProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _View_getTokenName:
+      case _viewMethodGetTokenName:
         var r = ViewGetTokenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -665,7 +665,7 @@ class _ViewProxyCalls implements View {
       var params = new _ViewGetTokenParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _View_getTokenName,
+          _viewMethodGetTokenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -676,7 +676,7 @@ class _ViewProxyCalls implements View {
       }
       var params = new _ViewGetServiceProviderParams();
       params.serviceProvider = serviceProvider;
-      _proxyImpl.sendMessage(params, _View_getServiceProviderName);
+      _proxyImpl.sendMessage(params, _viewMethodGetServiceProviderName);
     }
     void createScene(Object scene) {
       if (!_proxyImpl.isBound) {
@@ -685,7 +685,7 @@ class _ViewProxyCalls implements View {
       }
       var params = new _ViewCreateSceneParams();
       params.scene = scene;
-      _proxyImpl.sendMessage(params, _View_createSceneName);
+      _proxyImpl.sendMessage(params, _viewMethodCreateSceneName);
     }
     void requestLayout() {
       if (!_proxyImpl.isBound) {
@@ -693,7 +693,7 @@ class _ViewProxyCalls implements View {
         return;
       }
       var params = new _ViewRequestLayoutParams();
-      _proxyImpl.sendMessage(params, _View_requestLayoutName);
+      _proxyImpl.sendMessage(params, _viewMethodRequestLayoutName);
     }
     void getContainer(Object container) {
       if (!_proxyImpl.isBound) {
@@ -702,7 +702,7 @@ class _ViewProxyCalls implements View {
       }
       var params = new _ViewGetContainerParams();
       params.container = container;
-      _proxyImpl.sendMessage(params, _View_getContainerName);
+      _proxyImpl.sendMessage(params, _viewMethodGetContainerName);
     }
 }
 
@@ -785,10 +785,10 @@ class ViewStub extends bindings.Stub {
   }
 
 
-  ViewGetTokenResponseParams _ViewGetTokenResponseParamsFactory(view_token_mojom.ViewToken token) {
-    var mojo_factory_result = new ViewGetTokenResponseParams();
-    mojo_factory_result.token = token;
-    return mojo_factory_result;
+  ViewGetTokenResponseParams _viewGetTokenResponseParamsFactory(view_token_mojom.ViewToken token) {
+    var result = new ViewGetTokenResponseParams();
+    result.token = token;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -799,14 +799,14 @@ class ViewStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _View_getTokenName:
-        var response = _impl.getToken(_ViewGetTokenResponseParamsFactory);
+      case _viewMethodGetTokenName:
+        var response = _impl.getToken(_viewGetTokenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _View_getTokenName,
+                  _viewMethodGetTokenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -814,25 +814,25 @@ class ViewStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _View_getTokenName,
+              _viewMethodGetTokenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _View_getServiceProviderName:
+      case _viewMethodGetServiceProviderName:
         var params = _ViewGetServiceProviderParams.deserialize(
             message.payload);
         _impl.getServiceProvider(params.serviceProvider);
         break;
-      case _View_createSceneName:
+      case _viewMethodCreateSceneName:
         var params = _ViewCreateSceneParams.deserialize(
             message.payload);
         _impl.createScene(params.scene);
         break;
-      case _View_requestLayoutName:
+      case _viewMethodRequestLayoutName:
         _impl.requestLayout();
         break;
-      case _View_getContainerName:
+      case _viewMethodGetContainerName:
         var params = _ViewGetContainerParams.deserialize(
             message.payload);
         _impl.getContainer(params.container);
@@ -866,7 +866,7 @@ class ViewStub extends bindings.Stub {
   }
 }
 
-const int _ViewListener_onLayoutName = 0;
+const int _viewListenerMethodOnLayoutName = 0;
 
 class _ViewListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -905,7 +905,7 @@ class _ViewListenerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ViewListener_onLayoutName:
+      case _viewListenerMethodOnLayoutName:
         var r = ViewListenerOnLayoutResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -949,7 +949,7 @@ class _ViewListenerProxyCalls implements ViewListener {
       params.childrenNeedingLayout = childrenNeedingLayout;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ViewListener_onLayoutName,
+          _viewListenerMethodOnLayoutName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1034,10 +1034,10 @@ class ViewListenerStub extends bindings.Stub {
   }
 
 
-  ViewListenerOnLayoutResponseParams _ViewListenerOnLayoutResponseParamsFactory(layouts_mojom.ViewLayoutResult result) {
-    var mojo_factory_result = new ViewListenerOnLayoutResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  ViewListenerOnLayoutResponseParams _viewListenerOnLayoutResponseParamsFactory(layouts_mojom.ViewLayoutResult result) {
+    var result = new ViewListenerOnLayoutResponseParams();
+    result.result = result;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1048,16 +1048,16 @@ class ViewListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewListener_onLayoutName:
+      case _viewListenerMethodOnLayoutName:
         var params = _ViewListenerOnLayoutParams.deserialize(
             message.payload);
-        var response = _impl.onLayout(params.layoutParams,params.childrenNeedingLayout,_ViewListenerOnLayoutResponseParamsFactory);
+        var response = _impl.onLayout(params.layoutParams,params.childrenNeedingLayout,_viewListenerOnLayoutResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ViewListener_onLayoutName,
+                  _viewListenerMethodOnLayoutName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1065,7 +1065,7 @@ class ViewListenerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ViewListener_onLayoutName,
+              _viewListenerMethodOnLayoutName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

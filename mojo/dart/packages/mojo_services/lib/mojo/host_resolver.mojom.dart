@@ -206,7 +206,7 @@ class HostResolverGetHostAddressesResponseParams extends bindings.Struct {
   }
 }
 
-const int _HostResolver_getHostAddressesName = 0;
+const int _hostResolverMethodGetHostAddressesName = 0;
 
 class _HostResolverServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -245,7 +245,7 @@ class _HostResolverProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _HostResolver_getHostAddressesName:
+      case _hostResolverMethodGetHostAddressesName:
         var r = HostResolverGetHostAddressesResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -289,7 +289,7 @@ class _HostResolverProxyCalls implements HostResolver {
       params.family = family;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HostResolver_getHostAddressesName,
+          _hostResolverMethodGetHostAddressesName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -374,11 +374,11 @@ class HostResolverStub extends bindings.Stub {
   }
 
 
-  HostResolverGetHostAddressesResponseParams _HostResolverGetHostAddressesResponseParamsFactory(network_error_mojom.NetworkError result, List<net_address_mojom.NetAddress> addresses) {
-    var mojo_factory_result = new HostResolverGetHostAddressesResponseParams();
-    mojo_factory_result.result = result;
-    mojo_factory_result.addresses = addresses;
-    return mojo_factory_result;
+  HostResolverGetHostAddressesResponseParams _hostResolverGetHostAddressesResponseParamsFactory(network_error_mojom.NetworkError result, List<net_address_mojom.NetAddress> addresses) {
+    var result = new HostResolverGetHostAddressesResponseParams();
+    result.result = result;
+    result.addresses = addresses;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -389,16 +389,16 @@ class HostResolverStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HostResolver_getHostAddressesName:
+      case _hostResolverMethodGetHostAddressesName:
         var params = _HostResolverGetHostAddressesParams.deserialize(
             message.payload);
-        var response = _impl.getHostAddresses(params.host,params.family,_HostResolverGetHostAddressesResponseParamsFactory);
+        var response = _impl.getHostAddresses(params.host,params.family,_hostResolverGetHostAddressesResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HostResolver_getHostAddressesName,
+                  _hostResolverMethodGetHostAddressesName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -406,7 +406,7 @@ class HostResolverStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HostResolver_getHostAddressesName,
+              _hostResolverMethodGetHostAddressesName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

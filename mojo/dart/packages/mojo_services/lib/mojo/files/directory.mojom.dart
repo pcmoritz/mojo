@@ -1160,13 +1160,13 @@ class DirectoryDeleteResponseParams extends bindings.Struct {
   }
 }
 
-const int _Directory_readName = 0;
-const int _Directory_statName = 1;
-const int _Directory_touchName = 2;
-const int _Directory_openFileName = 3;
-const int _Directory_openDirectoryName = 4;
-const int _Directory_renameName = 5;
-const int _Directory_deleteName = 6;
+const int _directoryMethodReadName = 0;
+const int _directoryMethodStatName = 1;
+const int _directoryMethodTouchName = 2;
+const int _directoryMethodOpenFileName = 3;
+const int _directoryMethodOpenDirectoryName = 4;
+const int _directoryMethodRenameName = 5;
+const int _directoryMethodDeleteName = 6;
 
 class _DirectoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1211,7 +1211,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Directory_readName:
+      case _directoryMethodReadName:
         var r = DirectoryReadResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1231,7 +1231,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_statName:
+      case _directoryMethodStatName:
         var r = DirectoryStatResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1251,7 +1251,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_touchName:
+      case _directoryMethodTouchName:
         var r = DirectoryTouchResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1271,7 +1271,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_openFileName:
+      case _directoryMethodOpenFileName:
         var r = DirectoryOpenFileResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1291,7 +1291,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_openDirectoryName:
+      case _directoryMethodOpenDirectoryName:
         var r = DirectoryOpenDirectoryResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1311,7 +1311,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_renameName:
+      case _directoryMethodRenameName:
         var r = DirectoryRenameResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1331,7 +1331,7 @@ class _DirectoryProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Directory_deleteName:
+      case _directoryMethodDeleteName:
         var r = DirectoryDeleteResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1373,7 +1373,7 @@ class _DirectoryProxyCalls implements Directory {
       var params = new _DirectoryReadParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_readName,
+          _directoryMethodReadName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1381,7 +1381,7 @@ class _DirectoryProxyCalls implements Directory {
       var params = new _DirectoryStatParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_statName,
+          _directoryMethodStatName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1391,7 +1391,7 @@ class _DirectoryProxyCalls implements Directory {
       params.mtime = mtime;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_touchName,
+          _directoryMethodTouchName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1402,7 +1402,7 @@ class _DirectoryProxyCalls implements Directory {
       params.openFlags = openFlags;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_openFileName,
+          _directoryMethodOpenFileName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1413,7 +1413,7 @@ class _DirectoryProxyCalls implements Directory {
       params.openFlags = openFlags;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_openDirectoryName,
+          _directoryMethodOpenDirectoryName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1423,7 +1423,7 @@ class _DirectoryProxyCalls implements Directory {
       params.newPath = newPath;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_renameName,
+          _directoryMethodRenameName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1433,7 +1433,7 @@ class _DirectoryProxyCalls implements Directory {
       params.deleteFlags = deleteFlags;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Directory_deleteName,
+          _directoryMethodDeleteName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1518,42 +1518,42 @@ class DirectoryStub extends bindings.Stub {
   }
 
 
-  DirectoryReadResponseParams _DirectoryReadResponseParamsFactory(types_mojom.Error error, List<types_mojom.DirectoryEntry> directoryContents) {
-    var mojo_factory_result = new DirectoryReadResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.directoryContents = directoryContents;
-    return mojo_factory_result;
+  DirectoryReadResponseParams _directoryReadResponseParamsFactory(types_mojom.Error error, List<types_mojom.DirectoryEntry> directoryContents) {
+    var result = new DirectoryReadResponseParams();
+    result.error = error;
+    result.directoryContents = directoryContents;
+    return result;
   }
-  DirectoryStatResponseParams _DirectoryStatResponseParamsFactory(types_mojom.Error error, types_mojom.FileInformation fileInformation) {
-    var mojo_factory_result = new DirectoryStatResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.fileInformation = fileInformation;
-    return mojo_factory_result;
+  DirectoryStatResponseParams _directoryStatResponseParamsFactory(types_mojom.Error error, types_mojom.FileInformation fileInformation) {
+    var result = new DirectoryStatResponseParams();
+    result.error = error;
+    result.fileInformation = fileInformation;
+    return result;
   }
-  DirectoryTouchResponseParams _DirectoryTouchResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new DirectoryTouchResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  DirectoryTouchResponseParams _directoryTouchResponseParamsFactory(types_mojom.Error error) {
+    var result = new DirectoryTouchResponseParams();
+    result.error = error;
+    return result;
   }
-  DirectoryOpenFileResponseParams _DirectoryOpenFileResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new DirectoryOpenFileResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  DirectoryOpenFileResponseParams _directoryOpenFileResponseParamsFactory(types_mojom.Error error) {
+    var result = new DirectoryOpenFileResponseParams();
+    result.error = error;
+    return result;
   }
-  DirectoryOpenDirectoryResponseParams _DirectoryOpenDirectoryResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new DirectoryOpenDirectoryResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  DirectoryOpenDirectoryResponseParams _directoryOpenDirectoryResponseParamsFactory(types_mojom.Error error) {
+    var result = new DirectoryOpenDirectoryResponseParams();
+    result.error = error;
+    return result;
   }
-  DirectoryRenameResponseParams _DirectoryRenameResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new DirectoryRenameResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  DirectoryRenameResponseParams _directoryRenameResponseParamsFactory(types_mojom.Error error) {
+    var result = new DirectoryRenameResponseParams();
+    result.error = error;
+    return result;
   }
-  DirectoryDeleteResponseParams _DirectoryDeleteResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new DirectoryDeleteResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  DirectoryDeleteResponseParams _directoryDeleteResponseParamsFactory(types_mojom.Error error) {
+    var result = new DirectoryDeleteResponseParams();
+    result.error = error;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1564,14 +1564,14 @@ class DirectoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Directory_readName:
-        var response = _impl.read(_DirectoryReadResponseParamsFactory);
+      case _directoryMethodReadName:
+        var response = _impl.read(_directoryReadResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_readName,
+                  _directoryMethodReadName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1579,19 +1579,19 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_readName,
+              _directoryMethodReadName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_statName:
-        var response = _impl.stat(_DirectoryStatResponseParamsFactory);
+      case _directoryMethodStatName:
+        var response = _impl.stat(_directoryStatResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_statName,
+                  _directoryMethodStatName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1599,21 +1599,21 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_statName,
+              _directoryMethodStatName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_touchName:
+      case _directoryMethodTouchName:
         var params = _DirectoryTouchParams.deserialize(
             message.payload);
-        var response = _impl.touch(params.atime,params.mtime,_DirectoryTouchResponseParamsFactory);
+        var response = _impl.touch(params.atime,params.mtime,_directoryTouchResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_touchName,
+                  _directoryMethodTouchName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1621,21 +1621,21 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_touchName,
+              _directoryMethodTouchName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_openFileName:
+      case _directoryMethodOpenFileName:
         var params = _DirectoryOpenFileParams.deserialize(
             message.payload);
-        var response = _impl.openFile(params.path,params.file,params.openFlags,_DirectoryOpenFileResponseParamsFactory);
+        var response = _impl.openFile(params.path,params.file,params.openFlags,_directoryOpenFileResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_openFileName,
+                  _directoryMethodOpenFileName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1643,21 +1643,21 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_openFileName,
+              _directoryMethodOpenFileName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_openDirectoryName:
+      case _directoryMethodOpenDirectoryName:
         var params = _DirectoryOpenDirectoryParams.deserialize(
             message.payload);
-        var response = _impl.openDirectory(params.path,params.directory,params.openFlags,_DirectoryOpenDirectoryResponseParamsFactory);
+        var response = _impl.openDirectory(params.path,params.directory,params.openFlags,_directoryOpenDirectoryResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_openDirectoryName,
+                  _directoryMethodOpenDirectoryName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1665,21 +1665,21 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_openDirectoryName,
+              _directoryMethodOpenDirectoryName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_renameName:
+      case _directoryMethodRenameName:
         var params = _DirectoryRenameParams.deserialize(
             message.payload);
-        var response = _impl.rename(params.path,params.newPath,_DirectoryRenameResponseParamsFactory);
+        var response = _impl.rename(params.path,params.newPath,_directoryRenameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_renameName,
+                  _directoryMethodRenameName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1687,21 +1687,21 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_renameName,
+              _directoryMethodRenameName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Directory_deleteName:
+      case _directoryMethodDeleteName:
         var params = _DirectoryDeleteParams.deserialize(
             message.payload);
-        var response = _impl.delete(params.path,params.deleteFlags,_DirectoryDeleteResponseParamsFactory);
+        var response = _impl.delete(params.path,params.deleteFlags,_directoryDeleteResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Directory_deleteName,
+                  _directoryMethodDeleteName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1709,7 +1709,7 @@ class DirectoryStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Directory_deleteName,
+              _directoryMethodDeleteName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

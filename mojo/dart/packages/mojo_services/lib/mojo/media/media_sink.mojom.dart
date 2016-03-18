@@ -728,13 +728,13 @@ class _MediaSinkPauseParams extends bindings.Struct {
   }
 }
 
-const int _MediaSink_getClockDispositionName = 0;
-const int _MediaSink_getMasterClockName = 1;
-const int _MediaSink_setMasterClockName = 2;
-const int _MediaSink_getConsumerName = 3;
-const int _MediaSink_getStatusName = 4;
-const int _MediaSink_playName = 5;
-const int _MediaSink_pauseName = 6;
+const int _mediaSinkMethodGetClockDispositionName = 0;
+const int _mediaSinkMethodGetMasterClockName = 1;
+const int _mediaSinkMethodSetMasterClockName = 2;
+const int _mediaSinkMethodGetConsumerName = 3;
+const int _mediaSinkMethodGetStatusName = 4;
+const int _mediaSinkMethodPlayName = 5;
+const int _mediaSinkMethodPauseName = 6;
 
 class _MediaSinkServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -779,7 +779,7 @@ class _MediaSinkProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _MediaSink_getClockDispositionName:
+      case _mediaSinkMethodGetClockDispositionName:
         var r = MediaSinkGetClockDispositionResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -799,7 +799,7 @@ class _MediaSinkProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _MediaSink_getStatusName:
+      case _mediaSinkMethodGetStatusName:
         var r = MediaSinkGetStatusResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -841,7 +841,7 @@ class _MediaSinkProxyCalls implements MediaSink {
       var params = new _MediaSinkGetClockDispositionParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSink_getClockDispositionName,
+          _mediaSinkMethodGetClockDispositionName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -852,7 +852,7 @@ class _MediaSinkProxyCalls implements MediaSink {
       }
       var params = new _MediaSinkGetMasterClockParams();
       params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _MediaSink_getMasterClockName);
+      _proxyImpl.sendMessage(params, _mediaSinkMethodGetMasterClockName);
     }
     void setMasterClock(Object masterClock) {
       if (!_proxyImpl.isBound) {
@@ -861,7 +861,7 @@ class _MediaSinkProxyCalls implements MediaSink {
       }
       var params = new _MediaSinkSetMasterClockParams();
       params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _MediaSink_setMasterClockName);
+      _proxyImpl.sendMessage(params, _mediaSinkMethodSetMasterClockName);
     }
     void getConsumer(Object consumer) {
       if (!_proxyImpl.isBound) {
@@ -870,14 +870,14 @@ class _MediaSinkProxyCalls implements MediaSink {
       }
       var params = new _MediaSinkGetConsumerParams();
       params.consumer = consumer;
-      _proxyImpl.sendMessage(params, _MediaSink_getConsumerName);
+      _proxyImpl.sendMessage(params, _mediaSinkMethodGetConsumerName);
     }
     dynamic getStatus(int versionLastSeen,[Function responseFactory = null]) {
       var params = new _MediaSinkGetStatusParams();
       params.versionLastSeen = versionLastSeen;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaSink_getStatusName,
+          _mediaSinkMethodGetStatusName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -887,7 +887,7 @@ class _MediaSinkProxyCalls implements MediaSink {
         return;
       }
       var params = new _MediaSinkPlayParams();
-      _proxyImpl.sendMessage(params, _MediaSink_playName);
+      _proxyImpl.sendMessage(params, _mediaSinkMethodPlayName);
     }
     void pause() {
       if (!_proxyImpl.isBound) {
@@ -895,7 +895,7 @@ class _MediaSinkProxyCalls implements MediaSink {
         return;
       }
       var params = new _MediaSinkPauseParams();
-      _proxyImpl.sendMessage(params, _MediaSink_pauseName);
+      _proxyImpl.sendMessage(params, _mediaSinkMethodPauseName);
     }
 }
 
@@ -978,16 +978,16 @@ class MediaSinkStub extends bindings.Stub {
   }
 
 
-  MediaSinkGetClockDispositionResponseParams _MediaSinkGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
-    var mojo_factory_result = new MediaSinkGetClockDispositionResponseParams();
-    mojo_factory_result.clockDisposition = clockDisposition;
-    return mojo_factory_result;
+  MediaSinkGetClockDispositionResponseParams _mediaSinkGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
+    var result = new MediaSinkGetClockDispositionResponseParams();
+    result.clockDisposition = clockDisposition;
+    return result;
   }
-  MediaSinkGetStatusResponseParams _MediaSinkGetStatusResponseParamsFactory(int version, MediaSinkStatus status) {
-    var mojo_factory_result = new MediaSinkGetStatusResponseParams();
-    mojo_factory_result.version = version;
-    mojo_factory_result.status = status;
-    return mojo_factory_result;
+  MediaSinkGetStatusResponseParams _mediaSinkGetStatusResponseParamsFactory(int version, MediaSinkStatus status) {
+    var result = new MediaSinkGetStatusResponseParams();
+    result.version = version;
+    result.status = status;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -998,14 +998,14 @@ class MediaSinkStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaSink_getClockDispositionName:
-        var response = _impl.getClockDisposition(_MediaSinkGetClockDispositionResponseParamsFactory);
+      case _mediaSinkMethodGetClockDispositionName:
+        var response = _impl.getClockDisposition(_mediaSinkGetClockDispositionResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSink_getClockDispositionName,
+                  _mediaSinkMethodGetClockDispositionName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1013,36 +1013,36 @@ class MediaSinkStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSink_getClockDispositionName,
+              _mediaSinkMethodGetClockDispositionName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSink_getMasterClockName:
+      case _mediaSinkMethodGetMasterClockName:
         var params = _MediaSinkGetMasterClockParams.deserialize(
             message.payload);
         _impl.getMasterClock(params.masterClock);
         break;
-      case _MediaSink_setMasterClockName:
+      case _mediaSinkMethodSetMasterClockName:
         var params = _MediaSinkSetMasterClockParams.deserialize(
             message.payload);
         _impl.setMasterClock(params.masterClock);
         break;
-      case _MediaSink_getConsumerName:
+      case _mediaSinkMethodGetConsumerName:
         var params = _MediaSinkGetConsumerParams.deserialize(
             message.payload);
         _impl.getConsumer(params.consumer);
         break;
-      case _MediaSink_getStatusName:
+      case _mediaSinkMethodGetStatusName:
         var params = _MediaSinkGetStatusParams.deserialize(
             message.payload);
-        var response = _impl.getStatus(params.versionLastSeen,_MediaSinkGetStatusResponseParamsFactory);
+        var response = _impl.getStatus(params.versionLastSeen,_mediaSinkGetStatusResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaSink_getStatusName,
+                  _mediaSinkMethodGetStatusName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1050,15 +1050,15 @@ class MediaSinkStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaSink_getStatusName,
+              _mediaSinkMethodGetStatusName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _MediaSink_playName:
+      case _mediaSinkMethodPlayName:
         _impl.play();
         break;
-      case _MediaSink_pauseName:
+      case _mediaSinkMethodPauseName:
         _impl.pause();
         break;
       default:

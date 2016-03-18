@@ -513,8 +513,8 @@ class _SensorServiceAddListenerParams extends bindings.Struct {
   }
 }
 
-const int _SensorListener_onAccuracyChangedName = 0;
-const int _SensorListener_onSensorChangedName = 1;
+const int _sensorListenerMethodOnAccuracyChangedName = 0;
+const int _sensorListenerMethodOnSensorChangedName = 1;
 
 class _SensorListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -579,7 +579,7 @@ class _SensorListenerProxyCalls implements SensorListener {
       }
       var params = new _SensorListenerOnAccuracyChangedParams();
       params.accuracy = accuracy;
-      _proxyImpl.sendMessage(params, _SensorListener_onAccuracyChangedName);
+      _proxyImpl.sendMessage(params, _sensorListenerMethodOnAccuracyChangedName);
     }
     void onSensorChanged(SensorData data) {
       if (!_proxyImpl.isBound) {
@@ -588,7 +588,7 @@ class _SensorListenerProxyCalls implements SensorListener {
       }
       var params = new _SensorListenerOnSensorChangedParams();
       params.data = data;
-      _proxyImpl.sendMessage(params, _SensorListener_onSensorChangedName);
+      _proxyImpl.sendMessage(params, _sensorListenerMethodOnSensorChangedName);
     }
 }
 
@@ -680,12 +680,12 @@ class SensorListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SensorListener_onAccuracyChangedName:
+      case _sensorListenerMethodOnAccuracyChangedName:
         var params = _SensorListenerOnAccuracyChangedParams.deserialize(
             message.payload);
         _impl.onAccuracyChanged(params.accuracy);
         break;
-      case _SensorListener_onSensorChangedName:
+      case _sensorListenerMethodOnSensorChangedName:
         var params = _SensorListenerOnSensorChangedParams.deserialize(
             message.payload);
         _impl.onSensorChanged(params.data);
@@ -719,7 +719,7 @@ class SensorListenerStub extends bindings.Stub {
   }
 }
 
-const int _SensorService_addListenerName = 0;
+const int _sensorServiceMethodAddListenerName = 0;
 
 class _SensorServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -784,7 +784,7 @@ class _SensorServiceProxyCalls implements SensorService {
       var params = new _SensorServiceAddListenerParams();
       params.type = type;
       params.listener = listener;
-      _proxyImpl.sendMessage(params, _SensorService_addListenerName);
+      _proxyImpl.sendMessage(params, _sensorServiceMethodAddListenerName);
     }
 }
 
@@ -876,7 +876,7 @@ class SensorServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SensorService_addListenerName:
+      case _sensorServiceMethodAddListenerName:
         var params = _SensorServiceAddListenerParams.deserialize(
             message.payload);
         _impl.addListener(params.type, params.listener);

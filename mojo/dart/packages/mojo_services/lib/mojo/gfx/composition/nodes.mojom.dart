@@ -793,14 +793,14 @@ enum NodeOpTag {
 }
 
 class NodeOp extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     NodeOpTag.rect: 0,
     NodeOpTag.image: 1,
     NodeOpTag.scene: 2,
     NodeOpTag.layer: 3,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: NodeOpTag.rect,
     1: NodeOpTag.image,
     2: NodeOpTag.scene,
@@ -864,7 +864,7 @@ class NodeOp extends bindings.Union {
     NodeOp result = new NodeOp();
 
     
-    NodeOpTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    NodeOpTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case NodeOpTag.rect:
         
@@ -896,7 +896,7 @@ class NodeOp extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case NodeOpTag.rect:
         encoder0.encodeStruct(rect, offset + 8, false);

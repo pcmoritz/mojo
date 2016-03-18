@@ -20,11 +20,11 @@ enum IncludedUnionTag {
 }
 
 class IncludedUnion extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     IncludedUnionTag.a: 0,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: IncludedUnionTag.a,
   };
 
@@ -52,7 +52,7 @@ class IncludedUnion extends bindings.Union {
     IncludedUnion result = new IncludedUnion();
 
     
-    IncludedUnionTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    IncludedUnionTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case IncludedUnionTag.a:
         
@@ -68,7 +68,7 @@ class IncludedUnion extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case IncludedUnionTag.a:
         encoder0.encodeInt8(a, offset + 8);
@@ -104,7 +104,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/5JggAABKG0ApdHFYTQHGo2uzgGJz4ikTgOIFYA4JDLANd7bNdIqNz8rX68ktbhEzzMvOac0JTUlNC8zP08Cqg+knwmPPRyMENqDARP8BwIDNPeAxEB0AAN2IArEvECM4hggXx6IxYEYh3Mx3MUOxGxAnAjEkUCsn5Gfm6pfVJqSn5uZl1qkDzJHv7goGcIoKE3KyUzWz8wrSS1KS0xOLdZPysxLycxLL9YH2QUh4zOhNsaXgqws1gNpzcUTzgzQsEZ2FzOafwmFGzrQwCHOCbU/EVc8QcOEXuEBCAAA//98lSXf0AIAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/8SRMU/DMBCFXZCgDEgsiGwwdsp1ZmKpBGLpAEOmyHFMMDg+iO3fD2fZSMHBMHLS11effLmXl4rFOku6TZr3v3SdaX7vZnZeze5tiCviodnv2vtdcz3iC9ZOWlffGaF9L/tHo9BUaS7MH/yyp1pFvWXL+qDaZn5CL+ie/VznxCnxzQydL4kLomB34euYOCIs8UqAtxNoFFzDgDhoCc84SlDcaFQC3DuEJ4OdRPzz5jtNfWWcnJ64kBY6ZXplBgthe/xtVfLQ+mDC1mF0LObOUvZzn4fZ+/+VY16bQv8k7eeF77ZOGf1XPp8BAAD//x7xS8HwAgAA";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

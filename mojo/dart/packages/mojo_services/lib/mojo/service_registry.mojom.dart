@@ -109,7 +109,7 @@ class _ServiceRegistryAddServicesParams extends bindings.Struct {
   }
 }
 
-const int _ServiceRegistry_addServicesName = 0;
+const int _serviceRegistryMethodAddServicesName = 0;
 
 class _ServiceRegistryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -174,7 +174,7 @@ class _ServiceRegistryProxyCalls implements ServiceRegistry {
       var params = new _ServiceRegistryAddServicesParams();
       params.interfaceNames = interfaceNames;
       params.serviceProvider = serviceProvider;
-      _proxyImpl.sendMessage(params, _ServiceRegistry_addServicesName);
+      _proxyImpl.sendMessage(params, _serviceRegistryMethodAddServicesName);
     }
 }
 
@@ -266,7 +266,7 @@ class ServiceRegistryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ServiceRegistry_addServicesName:
+      case _serviceRegistryMethodAddServicesName:
         var params = _ServiceRegistryAddServicesParams.deserialize(
             message.payload);
         _impl.addServices(params.interfaceNames, params.serviceProvider);

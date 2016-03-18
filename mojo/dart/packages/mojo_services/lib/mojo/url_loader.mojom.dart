@@ -504,9 +504,9 @@ class UrlLoaderQueryStatusResponseParams extends bindings.Struct {
   }
 }
 
-const int _UrlLoader_startName = 0;
-const int _UrlLoader_followRedirectName = 1;
-const int _UrlLoader_queryStatusName = 2;
+const int _urlLoaderMethodStartName = 0;
+const int _urlLoaderMethodFollowRedirectName = 1;
+const int _urlLoaderMethodQueryStatusName = 2;
 
 class _UrlLoaderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -547,7 +547,7 @@ class _UrlLoaderProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _UrlLoader_startName:
+      case _urlLoaderMethodStartName:
         var r = UrlLoaderStartResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -567,7 +567,7 @@ class _UrlLoaderProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _UrlLoader_followRedirectName:
+      case _urlLoaderMethodFollowRedirectName:
         var r = UrlLoaderFollowRedirectResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -587,7 +587,7 @@ class _UrlLoaderProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _UrlLoader_queryStatusName:
+      case _urlLoaderMethodQueryStatusName:
         var r = UrlLoaderQueryStatusResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -630,7 +630,7 @@ class _UrlLoaderProxyCalls implements UrlLoader {
       params.request = request;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoader_startName,
+          _urlLoaderMethodStartName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -638,7 +638,7 @@ class _UrlLoaderProxyCalls implements UrlLoader {
       var params = new _UrlLoaderFollowRedirectParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoader_followRedirectName,
+          _urlLoaderMethodFollowRedirectName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -646,7 +646,7 @@ class _UrlLoaderProxyCalls implements UrlLoader {
       var params = new _UrlLoaderQueryStatusParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _UrlLoader_queryStatusName,
+          _urlLoaderMethodQueryStatusName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -731,20 +731,20 @@ class UrlLoaderStub extends bindings.Stub {
   }
 
 
-  UrlLoaderStartResponseParams _UrlLoaderStartResponseParamsFactory(url_response_mojom.UrlResponse response) {
-    var mojo_factory_result = new UrlLoaderStartResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  UrlLoaderStartResponseParams _urlLoaderStartResponseParamsFactory(url_response_mojom.UrlResponse response) {
+    var result = new UrlLoaderStartResponseParams();
+    result.response = response;
+    return result;
   }
-  UrlLoaderFollowRedirectResponseParams _UrlLoaderFollowRedirectResponseParamsFactory(url_response_mojom.UrlResponse response) {
-    var mojo_factory_result = new UrlLoaderFollowRedirectResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  UrlLoaderFollowRedirectResponseParams _urlLoaderFollowRedirectResponseParamsFactory(url_response_mojom.UrlResponse response) {
+    var result = new UrlLoaderFollowRedirectResponseParams();
+    result.response = response;
+    return result;
   }
-  UrlLoaderQueryStatusResponseParams _UrlLoaderQueryStatusResponseParamsFactory(UrlLoaderStatus status) {
-    var mojo_factory_result = new UrlLoaderQueryStatusResponseParams();
-    mojo_factory_result.status = status;
-    return mojo_factory_result;
+  UrlLoaderQueryStatusResponseParams _urlLoaderQueryStatusResponseParamsFactory(UrlLoaderStatus status) {
+    var result = new UrlLoaderQueryStatusResponseParams();
+    result.status = status;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -755,16 +755,16 @@ class UrlLoaderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _UrlLoader_startName:
+      case _urlLoaderMethodStartName:
         var params = _UrlLoaderStartParams.deserialize(
             message.payload);
-        var response = _impl.start(params.request,_UrlLoaderStartResponseParamsFactory);
+        var response = _impl.start(params.request,_urlLoaderStartResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoader_startName,
+                  _urlLoaderMethodStartName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -772,19 +772,19 @@ class UrlLoaderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoader_startName,
+              _urlLoaderMethodStartName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _UrlLoader_followRedirectName:
-        var response = _impl.followRedirect(_UrlLoaderFollowRedirectResponseParamsFactory);
+      case _urlLoaderMethodFollowRedirectName:
+        var response = _impl.followRedirect(_urlLoaderFollowRedirectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoader_followRedirectName,
+                  _urlLoaderMethodFollowRedirectName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -792,19 +792,19 @@ class UrlLoaderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoader_followRedirectName,
+              _urlLoaderMethodFollowRedirectName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _UrlLoader_queryStatusName:
-        var response = _impl.queryStatus(_UrlLoaderQueryStatusResponseParamsFactory);
+      case _urlLoaderMethodQueryStatusName:
+        var response = _impl.queryStatus(_urlLoaderQueryStatusResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _UrlLoader_queryStatusName,
+                  _urlLoaderMethodQueryStatusName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -812,7 +812,7 @@ class UrlLoaderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _UrlLoader_queryStatusName,
+              _urlLoaderMethodQueryStatusName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

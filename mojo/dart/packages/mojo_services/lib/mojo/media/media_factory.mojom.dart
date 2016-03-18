@@ -396,10 +396,10 @@ class _MediaFactoryCreateDecoderParams extends bindings.Struct {
   }
 }
 
-const int _MediaFactory_createPlayerName = 0;
-const int _MediaFactory_createSourceName = 1;
-const int _MediaFactory_createSinkName = 2;
-const int _MediaFactory_createDecoderName = 3;
+const int _mediaFactoryMethodCreatePlayerName = 0;
+const int _mediaFactoryMethodCreateSourceName = 1;
+const int _mediaFactoryMethodCreateSinkName = 2;
+const int _mediaFactoryMethodCreateDecoderName = 3;
 
 class _MediaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -467,7 +467,7 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       var params = new _MediaFactoryCreatePlayerParams();
       params.originUrl = originUrl;
       params.player = player;
-      _proxyImpl.sendMessage(params, _MediaFactory_createPlayerName);
+      _proxyImpl.sendMessage(params, _mediaFactoryMethodCreatePlayerName);
     }
     void createSource(String originUrl, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source) {
       if (!_proxyImpl.isBound) {
@@ -478,7 +478,7 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       params.originUrl = originUrl;
       params.allowedMediaTypes = allowedMediaTypes;
       params.source = source;
-      _proxyImpl.sendMessage(params, _MediaFactory_createSourceName);
+      _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateSourceName);
     }
     void createSink(String destinationUrl, media_types_mojom.MediaType mediaType, Object sink) {
       if (!_proxyImpl.isBound) {
@@ -489,7 +489,7 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       params.destinationUrl = destinationUrl;
       params.mediaType = mediaType;
       params.sink = sink;
-      _proxyImpl.sendMessage(params, _MediaFactory_createSinkName);
+      _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateSinkName);
     }
     void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder) {
       if (!_proxyImpl.isBound) {
@@ -499,7 +499,7 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       var params = new _MediaFactoryCreateDecoderParams();
       params.inputMediaType = inputMediaType;
       params.decoder = decoder;
-      _proxyImpl.sendMessage(params, _MediaFactory_createDecoderName);
+      _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateDecoderName);
     }
 }
 
@@ -591,22 +591,22 @@ class MediaFactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaFactory_createPlayerName:
+      case _mediaFactoryMethodCreatePlayerName:
         var params = _MediaFactoryCreatePlayerParams.deserialize(
             message.payload);
         _impl.createPlayer(params.originUrl, params.player);
         break;
-      case _MediaFactory_createSourceName:
+      case _mediaFactoryMethodCreateSourceName:
         var params = _MediaFactoryCreateSourceParams.deserialize(
             message.payload);
         _impl.createSource(params.originUrl, params.allowedMediaTypes, params.source);
         break;
-      case _MediaFactory_createSinkName:
+      case _mediaFactoryMethodCreateSinkName:
         var params = _MediaFactoryCreateSinkParams.deserialize(
             message.payload);
         _impl.createSink(params.destinationUrl, params.mediaType, params.sink);
         break;
-      case _MediaFactory_createDecoderName:
+      case _mediaFactoryMethodCreateDecoderName:
         var params = _MediaFactoryCreateDecoderParams.deserialize(
             message.payload);
         _impl.createDecoder(params.inputMediaType, params.decoder);

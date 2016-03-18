@@ -236,7 +236,7 @@ class _AssetUnpackerUnpackZipStreamParams extends bindings.Struct {
   }
 }
 
-const int _AssetBundle_getAsStreamName = 0;
+const int _assetBundleMethodGetAsStreamName = 0;
 
 class _AssetBundleServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -275,7 +275,7 @@ class _AssetBundleProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _AssetBundle_getAsStreamName:
+      case _assetBundleMethodGetAsStreamName:
         var r = AssetBundleGetAsStreamResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -318,7 +318,7 @@ class _AssetBundleProxyCalls implements AssetBundle {
       params.assetName = assetName;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _AssetBundle_getAsStreamName,
+          _assetBundleMethodGetAsStreamName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -403,10 +403,10 @@ class AssetBundleStub extends bindings.Stub {
   }
 
 
-  AssetBundleGetAsStreamResponseParams _AssetBundleGetAsStreamResponseParamsFactory(core.MojoDataPipeConsumer assetData) {
-    var mojo_factory_result = new AssetBundleGetAsStreamResponseParams();
-    mojo_factory_result.assetData = assetData;
-    return mojo_factory_result;
+  AssetBundleGetAsStreamResponseParams _assetBundleGetAsStreamResponseParamsFactory(core.MojoDataPipeConsumer assetData) {
+    var result = new AssetBundleGetAsStreamResponseParams();
+    result.assetData = assetData;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -417,16 +417,16 @@ class AssetBundleStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _AssetBundle_getAsStreamName:
+      case _assetBundleMethodGetAsStreamName:
         var params = _AssetBundleGetAsStreamParams.deserialize(
             message.payload);
-        var response = _impl.getAsStream(params.assetName,_AssetBundleGetAsStreamResponseParamsFactory);
+        var response = _impl.getAsStream(params.assetName,_assetBundleGetAsStreamResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _AssetBundle_getAsStreamName,
+                  _assetBundleMethodGetAsStreamName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -434,7 +434,7 @@ class AssetBundleStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _AssetBundle_getAsStreamName,
+              _assetBundleMethodGetAsStreamName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -468,7 +468,7 @@ class AssetBundleStub extends bindings.Stub {
   }
 }
 
-const int _AssetUnpacker_unpackZipStreamName = 0;
+const int _assetUnpackerMethodUnpackZipStreamName = 0;
 
 class _AssetUnpackerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -533,7 +533,7 @@ class _AssetUnpackerProxyCalls implements AssetUnpacker {
       var params = new _AssetUnpackerUnpackZipStreamParams();
       params.zippedAssets = zippedAssets;
       params.assetBundle = assetBundle;
-      _proxyImpl.sendMessage(params, _AssetUnpacker_unpackZipStreamName);
+      _proxyImpl.sendMessage(params, _assetUnpackerMethodUnpackZipStreamName);
     }
 }
 
@@ -625,7 +625,7 @@ class AssetUnpackerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _AssetUnpacker_unpackZipStreamName:
+      case _assetUnpackerMethodUnpackZipStreamName:
         var params = _AssetUnpackerUnpackZipStreamParams.deserialize(
             message.payload);
         _impl.unpackZipStream(params.zippedAssets, params.assetBundle);

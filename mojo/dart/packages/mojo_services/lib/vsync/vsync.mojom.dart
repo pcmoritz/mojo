@@ -139,7 +139,7 @@ class VSyncProviderAwaitVSyncResponseParams extends bindings.Struct {
   }
 }
 
-const int _VSyncProvider_awaitVSyncName = 0;
+const int _vSyncProviderMethodAwaitVSyncName = 0;
 
 class _VSyncProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -178,7 +178,7 @@ class _VSyncProviderProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _VSyncProvider_awaitVSyncName:
+      case _vSyncProviderMethodAwaitVSyncName:
         var r = VSyncProviderAwaitVSyncResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -220,7 +220,7 @@ class _VSyncProviderProxyCalls implements VSyncProvider {
       var params = new _VSyncProviderAwaitVSyncParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _VSyncProvider_awaitVSyncName,
+          _vSyncProviderMethodAwaitVSyncName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -305,10 +305,10 @@ class VSyncProviderStub extends bindings.Stub {
   }
 
 
-  VSyncProviderAwaitVSyncResponseParams _VSyncProviderAwaitVSyncResponseParamsFactory(int timeStamp) {
-    var mojo_factory_result = new VSyncProviderAwaitVSyncResponseParams();
-    mojo_factory_result.timeStamp = timeStamp;
-    return mojo_factory_result;
+  VSyncProviderAwaitVSyncResponseParams _vSyncProviderAwaitVSyncResponseParamsFactory(int timeStamp) {
+    var result = new VSyncProviderAwaitVSyncResponseParams();
+    result.timeStamp = timeStamp;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -319,14 +319,14 @@ class VSyncProviderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _VSyncProvider_awaitVSyncName:
-        var response = _impl.awaitVSync(_VSyncProviderAwaitVSyncResponseParamsFactory);
+      case _vSyncProviderMethodAwaitVSyncName:
+        var response = _impl.awaitVSync(_vSyncProviderAwaitVSyncResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _VSyncProvider_awaitVSyncName,
+                  _vSyncProviderMethodAwaitVSyncName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -334,7 +334,7 @@ class VSyncProviderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _VSyncProvider_awaitVSyncName,
+              _vSyncProviderMethodAwaitVSyncName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

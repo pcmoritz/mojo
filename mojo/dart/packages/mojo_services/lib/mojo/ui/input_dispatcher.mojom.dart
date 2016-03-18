@@ -83,7 +83,7 @@ class _InputDispatcherDispatchEventParams extends bindings.Struct {
   }
 }
 
-const int _InputDispatcher_dispatchEventName = 0;
+const int _inputDispatcherMethodDispatchEventName = 0;
 
 class _InputDispatcherServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -147,7 +147,7 @@ class _InputDispatcherProxyCalls implements InputDispatcher {
       }
       var params = new _InputDispatcherDispatchEventParams();
       params.event = event;
-      _proxyImpl.sendMessage(params, _InputDispatcher_dispatchEventName);
+      _proxyImpl.sendMessage(params, _inputDispatcherMethodDispatchEventName);
     }
 }
 
@@ -239,7 +239,7 @@ class InputDispatcherStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _InputDispatcher_dispatchEventName:
+      case _inputDispatcherMethodDispatchEventName:
         var params = _InputDispatcherDispatchEventParams.deserialize(
             message.payload);
         _impl.dispatchEvent(params.event);

@@ -196,7 +196,7 @@ class _InputServiceSetClientParams extends bindings.Struct {
   }
 }
 
-const int _InputClient_onBackButtonName = 0;
+const int _inputClientMethodOnBackButtonName = 0;
 
 class _InputClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -235,7 +235,7 @@ class _InputClientProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _InputClient_onBackButtonName:
+      case _inputClientMethodOnBackButtonName:
         var r = InputClientOnBackButtonResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -277,7 +277,7 @@ class _InputClientProxyCalls implements InputClient {
       var params = new _InputClientOnBackButtonParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _InputClient_onBackButtonName,
+          _inputClientMethodOnBackButtonName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -362,9 +362,9 @@ class InputClientStub extends bindings.Stub {
   }
 
 
-  InputClientOnBackButtonResponseParams _InputClientOnBackButtonResponseParamsFactory() {
-    var mojo_factory_result = new InputClientOnBackButtonResponseParams();
-    return mojo_factory_result;
+  InputClientOnBackButtonResponseParams _inputClientOnBackButtonResponseParamsFactory() {
+    var result = new InputClientOnBackButtonResponseParams();
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -375,14 +375,14 @@ class InputClientStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _InputClient_onBackButtonName:
-        var response = _impl.onBackButton(_InputClientOnBackButtonResponseParamsFactory);
+      case _inputClientMethodOnBackButtonName:
+        var response = _impl.onBackButton(_inputClientOnBackButtonResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _InputClient_onBackButtonName,
+                  _inputClientMethodOnBackButtonName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -390,7 +390,7 @@ class InputClientStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _InputClient_onBackButtonName,
+              _inputClientMethodOnBackButtonName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -424,7 +424,7 @@ class InputClientStub extends bindings.Stub {
   }
 }
 
-const int _InputService_setClientName = 0;
+const int _inputServiceMethodSetClientName = 0;
 
 class _InputServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -488,7 +488,7 @@ class _InputServiceProxyCalls implements InputService {
       }
       var params = new _InputServiceSetClientParams();
       params.client = client;
-      _proxyImpl.sendMessage(params, _InputService_setClientName);
+      _proxyImpl.sendMessage(params, _inputServiceMethodSetClientName);
     }
 }
 
@@ -580,7 +580,7 @@ class InputServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _InputService_setClientName:
+      case _inputServiceMethodSetClientName:
         var params = _InputServiceSetClientParams.deserialize(
             message.payload);
         _impl.setClient(params.client);

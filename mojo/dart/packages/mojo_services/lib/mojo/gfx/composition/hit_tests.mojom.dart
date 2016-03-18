@@ -610,12 +610,12 @@ enum HitTag {
 }
 
 class Hit extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     HitTag.scene: 0,
     HitTag.node: 1,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: HitTag.scene,
     1: HitTag.node,
   };
@@ -655,7 +655,7 @@ class Hit extends bindings.Union {
     Hit result = new Hit();
 
     
-    HitTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    HitTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case HitTag.scene:
         
@@ -677,7 +677,7 @@ class Hit extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case HitTag.scene:
         encoder0.encodeStruct(scene, offset + 8, false);
@@ -706,7 +706,7 @@ class Hit extends bindings.Union {
     return result;
   }
 }
-const int _HitTester_hitTestName = 0;
+const int _hitTesterMethodHitTestName = 0;
 
 class _HitTesterServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -745,7 +745,7 @@ class _HitTesterProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _HitTester_hitTestName:
+      case _hitTesterMethodHitTestName:
         var r = HitTesterHitTestResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -788,7 +788,7 @@ class _HitTesterProxyCalls implements HitTester {
       params.point = point;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HitTester_hitTestName,
+          _hitTesterMethodHitTestName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -873,10 +873,10 @@ class HitTesterStub extends bindings.Stub {
   }
 
 
-  HitTesterHitTestResponseParams _HitTesterHitTestResponseParamsFactory(HitTestResult result) {
-    var mojo_factory_result = new HitTesterHitTestResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  HitTesterHitTestResponseParams _hitTesterHitTestResponseParamsFactory(HitTestResult result) {
+    var result = new HitTesterHitTestResponseParams();
+    result.result = result;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -887,16 +887,16 @@ class HitTesterStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HitTester_hitTestName:
+      case _hitTesterMethodHitTestName:
         var params = _HitTesterHitTestParams.deserialize(
             message.payload);
-        var response = _impl.hitTest(params.point,_HitTesterHitTestResponseParamsFactory);
+        var response = _impl.hitTest(params.point,_hitTesterHitTestResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HitTester_hitTestName,
+                  _hitTesterMethodHitTestName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -904,7 +904,7 @@ class HitTesterStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HitTester_hitTestName,
+              _hitTesterMethodHitTestName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 library authentication_impl_db_mojom;
-
 import 'package:mojo/bindings.dart' as bindings;
+
+
+
 
 class Db extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
@@ -45,50 +47,46 @@ class Db extends bindings.Struct {
       }
     } else if (mainDataHeader.size < kVersions.last.size) {
       throw new bindings.MojoCodecError(
-          'Message newer than the last known version cannot be shorter than '
-          'required by the last known version.');
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
     }
     if (mainDataHeader.version >= 0) {
+      
       result.version = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
+      
       var decoder1 = decoder0.decodePointer(16, false);
       {
         decoder1.decodeDataHeaderForMap();
         List<String> keys0;
         List<String> values0;
         {
-          var decoder2 = decoder1.decodePointer(
-              bindings.ArrayDataHeader.kHeaderSize, false);
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize, false);
           {
-            var si2 = decoder2.decodeDataHeaderForPointerArray(
-                bindings.kUnspecifiedArrayLength);
+            var si2 = decoder2.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
             keys0 = new List<String>(si2.numElements);
             for (int i2 = 0; i2 < si2.numElements; ++i2) {
-              keys0[i2] = decoder2.decodeString(
-                  bindings.ArrayDataHeader.kHeaderSize +
-                      bindings.kPointerSize * i2,
-                  false);
+              
+              keys0[i2] = decoder2.decodeString(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i2, false);
             }
           }
         }
         {
-          var decoder2 = decoder1.decodePointer(
-              bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize,
-              false);
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize, false);
           {
             var si2 = decoder2.decodeDataHeaderForPointerArray(keys0.length);
             values0 = new List<String>(si2.numElements);
             for (int i2 = 0; i2 < si2.numElements; ++i2) {
-              values0[i2] = decoder2.decodeString(
-                  bindings.ArrayDataHeader.kHeaderSize +
-                      bindings.kPointerSize * i2,
-                  false);
+              
+              values0[i2] = decoder2.decodeString(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i2, false);
             }
           }
         }
-        result.lastSelectedAccounts =
-            new Map<String, String>.fromIterables(keys0, values0);
+        result.lastSelectedAccounts = new Map<String, String>.fromIterables(
+            keys0, values0);
       }
     }
     return result;
@@ -98,7 +96,7 @@ class Db extends bindings.Struct {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
       encoder0.encodeUint32(version, 8);
-    } on bindings.MojoCodecError catch (e) {
+    } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "version of struct Db: $e";
       rethrow;
@@ -110,36 +108,22 @@ class Db extends bindings.Struct {
         var encoder1 = encoder0.encoderForMap(16);
         var keys0 = lastSelectedAccounts.keys.toList();
         var values0 = lastSelectedAccounts.values.toList();
-
+        
         {
-          var encoder2 = encoder1.encodePointerArray(
-              keys0.length,
-              bindings.ArrayDataHeader.kHeaderSize,
-              bindings.kUnspecifiedArrayLength);
+          var encoder2 = encoder1.encodePointerArray(keys0.length, bindings.ArrayDataHeader.kHeaderSize, bindings.kUnspecifiedArrayLength);
           for (int i1 = 0; i1 < keys0.length; ++i1) {
-            encoder2.encodeString(
-                keys0[i1],
-                bindings.ArrayDataHeader.kHeaderSize +
-                    bindings.kPointerSize * i1,
-                false);
+            encoder2.encodeString(keys0[i1], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
           }
         }
-
+        
         {
-          var encoder2 = encoder1.encodePointerArray(
-              values0.length,
-              bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize,
-              bindings.kUnspecifiedArrayLength);
+          var encoder2 = encoder1.encodePointerArray(values0.length, bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize, bindings.kUnspecifiedArrayLength);
           for (int i1 = 0; i1 < values0.length; ++i1) {
-            encoder2.encodeString(
-                values0[i1],
-                bindings.ArrayDataHeader.kHeaderSize +
-                    bindings.kPointerSize * i1,
-                false);
+            encoder2.encodeString(values0[i1], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
           }
         }
       }
-    } on bindings.MojoCodecError catch (e) {
+    } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "lastSelectedAccounts of struct Db: $e";
       rethrow;
@@ -148,10 +132,8 @@ class Db extends bindings.Struct {
 
   String toString() {
     return "Db("
-        "version: $version"
-        ", "
-        "lastSelectedAccounts: $lastSelectedAccounts"
-        ")";
+           "version: $version" ", "
+           "lastSelectedAccounts: $lastSelectedAccounts" ")";
   }
 
   Map toJson() {
@@ -161,3 +143,6 @@ class Db extends bindings.Struct {
     return map;
   }
 }
+
+
+

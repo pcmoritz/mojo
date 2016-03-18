@@ -254,7 +254,7 @@ class SceneSchedulerScheduleFrameResponseParams extends bindings.Struct {
   }
 }
 
-const int _SceneScheduler_scheduleFrameName = 0;
+const int _sceneSchedulerMethodScheduleFrameName = 0;
 
 class _SceneSchedulerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -293,7 +293,7 @@ class _SceneSchedulerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _SceneScheduler_scheduleFrameName:
+      case _sceneSchedulerMethodScheduleFrameName:
         var r = SceneSchedulerScheduleFrameResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -335,7 +335,7 @@ class _SceneSchedulerProxyCalls implements SceneScheduler {
       var params = new _SceneSchedulerScheduleFrameParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _SceneScheduler_scheduleFrameName,
+          _sceneSchedulerMethodScheduleFrameName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -420,10 +420,10 @@ class SceneSchedulerStub extends bindings.Stub {
   }
 
 
-  SceneSchedulerScheduleFrameResponseParams _SceneSchedulerScheduleFrameResponseParamsFactory(FrameInfo frameInfo) {
-    var mojo_factory_result = new SceneSchedulerScheduleFrameResponseParams();
-    mojo_factory_result.frameInfo = frameInfo;
-    return mojo_factory_result;
+  SceneSchedulerScheduleFrameResponseParams _sceneSchedulerScheduleFrameResponseParamsFactory(FrameInfo frameInfo) {
+    var result = new SceneSchedulerScheduleFrameResponseParams();
+    result.frameInfo = frameInfo;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -434,14 +434,14 @@ class SceneSchedulerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SceneScheduler_scheduleFrameName:
-        var response = _impl.scheduleFrame(_SceneSchedulerScheduleFrameResponseParamsFactory);
+      case _sceneSchedulerMethodScheduleFrameName:
+        var response = _impl.scheduleFrame(_sceneSchedulerScheduleFrameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _SceneScheduler_scheduleFrameName,
+                  _sceneSchedulerMethodScheduleFrameName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -449,7 +449,7 @@ class SceneSchedulerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _SceneScheduler_scheduleFrameName,
+              _sceneSchedulerMethodScheduleFrameName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

@@ -243,9 +243,9 @@ class _RendererGetHitTesterParams extends bindings.Struct {
   }
 }
 
-const int _Renderer_setRootSceneName = 0;
-const int _Renderer_clearRootSceneName = 1;
-const int _Renderer_getHitTesterName = 2;
+const int _rendererMethodSetRootSceneName = 0;
+const int _rendererMethodClearRootSceneName = 1;
+const int _rendererMethodGetHitTesterName = 2;
 
 class _RendererServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -313,7 +313,7 @@ class _RendererProxyCalls implements Renderer {
       params.sceneToken = sceneToken;
       params.sceneVersion = sceneVersion;
       params.viewport = viewport;
-      _proxyImpl.sendMessage(params, _Renderer_setRootSceneName);
+      _proxyImpl.sendMessage(params, _rendererMethodSetRootSceneName);
     }
     void clearRootScene() {
       if (!_proxyImpl.isBound) {
@@ -321,7 +321,7 @@ class _RendererProxyCalls implements Renderer {
         return;
       }
       var params = new _RendererClearRootSceneParams();
-      _proxyImpl.sendMessage(params, _Renderer_clearRootSceneName);
+      _proxyImpl.sendMessage(params, _rendererMethodClearRootSceneName);
     }
     void getHitTester(Object hitTester) {
       if (!_proxyImpl.isBound) {
@@ -330,7 +330,7 @@ class _RendererProxyCalls implements Renderer {
       }
       var params = new _RendererGetHitTesterParams();
       params.hitTester = hitTester;
-      _proxyImpl.sendMessage(params, _Renderer_getHitTesterName);
+      _proxyImpl.sendMessage(params, _rendererMethodGetHitTesterName);
     }
 }
 
@@ -422,15 +422,15 @@ class RendererStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Renderer_setRootSceneName:
+      case _rendererMethodSetRootSceneName:
         var params = _RendererSetRootSceneParams.deserialize(
             message.payload);
         _impl.setRootScene(params.sceneToken, params.sceneVersion, params.viewport);
         break;
-      case _Renderer_clearRootSceneName:
+      case _rendererMethodClearRootSceneName:
         _impl.clearRootScene();
         break;
-      case _Renderer_getHitTesterName:
+      case _rendererMethodGetHitTesterName:
         var params = _RendererGetHitTesterParams.deserialize(
             message.payload);
         _impl.getHitTester(params.hitTester);

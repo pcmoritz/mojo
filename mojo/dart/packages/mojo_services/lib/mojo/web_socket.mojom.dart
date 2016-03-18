@@ -855,10 +855,10 @@ class _WebSocketClientDidCloseParams extends bindings.Struct {
   }
 }
 
-const int _WebSocket_connectName = 0;
-const int _WebSocket_sendName = 1;
-const int _WebSocket_flowControlName = 2;
-const int _WebSocket_closeName = 3;
+const int _webSocketMethodConnectName = 0;
+const int _webSocketMethodSendName = 1;
+const int _webSocketMethodFlowControlName = 2;
+const int _webSocketMethodCloseName = 3;
   
 class WebSocketMessageType extends bindings.MojoEnum {
   static const WebSocketMessageType continuation = const WebSocketMessageType._(0);
@@ -989,7 +989,7 @@ class _WebSocketProxyCalls implements WebSocket {
       params.origin = origin;
       params.sendStream = sendStream;
       params.client = client;
-      _proxyImpl.sendMessage(params, _WebSocket_connectName);
+      _proxyImpl.sendMessage(params, _webSocketMethodConnectName);
     }
     void send(bool fin, WebSocketMessageType type, int numBytes) {
       if (!_proxyImpl.isBound) {
@@ -1000,7 +1000,7 @@ class _WebSocketProxyCalls implements WebSocket {
       params.fin = fin;
       params.type = type;
       params.numBytes = numBytes;
-      _proxyImpl.sendMessage(params, _WebSocket_sendName);
+      _proxyImpl.sendMessage(params, _webSocketMethodSendName);
     }
     void flowControl(int quota) {
       if (!_proxyImpl.isBound) {
@@ -1009,7 +1009,7 @@ class _WebSocketProxyCalls implements WebSocket {
       }
       var params = new _WebSocketFlowControlParams();
       params.quota = quota;
-      _proxyImpl.sendMessage(params, _WebSocket_flowControlName);
+      _proxyImpl.sendMessage(params, _webSocketMethodFlowControlName);
     }
     void close(int code, String reason) {
       if (!_proxyImpl.isBound) {
@@ -1019,7 +1019,7 @@ class _WebSocketProxyCalls implements WebSocket {
       var params = new _WebSocketCloseParams();
       params.code = code;
       params.reason = reason;
-      _proxyImpl.sendMessage(params, _WebSocket_closeName);
+      _proxyImpl.sendMessage(params, _webSocketMethodCloseName);
     }
 }
 
@@ -1111,22 +1111,22 @@ class WebSocketStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _WebSocket_connectName:
+      case _webSocketMethodConnectName:
         var params = _WebSocketConnectParams.deserialize(
             message.payload);
         _impl.connect(params.url, params.protocols, params.origin, params.sendStream, params.client);
         break;
-      case _WebSocket_sendName:
+      case _webSocketMethodSendName:
         var params = _WebSocketSendParams.deserialize(
             message.payload);
         _impl.send(params.fin, params.type, params.numBytes);
         break;
-      case _WebSocket_flowControlName:
+      case _webSocketMethodFlowControlName:
         var params = _WebSocketFlowControlParams.deserialize(
             message.payload);
         _impl.flowControl(params.quota);
         break;
-      case _WebSocket_closeName:
+      case _webSocketMethodCloseName:
         var params = _WebSocketCloseParams.deserialize(
             message.payload);
         _impl.close(params.code, params.reason);
@@ -1160,11 +1160,11 @@ class WebSocketStub extends bindings.Stub {
   }
 }
 
-const int _WebSocketClient_didConnectName = 0;
-const int _WebSocketClient_didReceiveDataName = 1;
-const int _WebSocketClient_didReceiveFlowControlName = 2;
-const int _WebSocketClient_didFailName = 3;
-const int _WebSocketClient_didCloseName = 4;
+const int _webSocketClientMethodDidConnectName = 0;
+const int _webSocketClientMethodDidReceiveDataName = 1;
+const int _webSocketClientMethodDidReceiveFlowControlName = 2;
+const int _webSocketClientMethodDidFailName = 3;
+const int _webSocketClientMethodDidCloseName = 4;
 
 class _WebSocketClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1234,7 +1234,7 @@ class _WebSocketClientProxyCalls implements WebSocketClient {
       params.selectedSubprotocol = selectedSubprotocol;
       params.extensions = extensions;
       params.receiveStream = receiveStream;
-      _proxyImpl.sendMessage(params, _WebSocketClient_didConnectName);
+      _proxyImpl.sendMessage(params, _webSocketClientMethodDidConnectName);
     }
     void didReceiveData(bool fin, WebSocketMessageType type, int numBytes) {
       if (!_proxyImpl.isBound) {
@@ -1245,7 +1245,7 @@ class _WebSocketClientProxyCalls implements WebSocketClient {
       params.fin = fin;
       params.type = type;
       params.numBytes = numBytes;
-      _proxyImpl.sendMessage(params, _WebSocketClient_didReceiveDataName);
+      _proxyImpl.sendMessage(params, _webSocketClientMethodDidReceiveDataName);
     }
     void didReceiveFlowControl(int quota) {
       if (!_proxyImpl.isBound) {
@@ -1254,7 +1254,7 @@ class _WebSocketClientProxyCalls implements WebSocketClient {
       }
       var params = new _WebSocketClientDidReceiveFlowControlParams();
       params.quota = quota;
-      _proxyImpl.sendMessage(params, _WebSocketClient_didReceiveFlowControlName);
+      _proxyImpl.sendMessage(params, _webSocketClientMethodDidReceiveFlowControlName);
     }
     void didFail(String message) {
       if (!_proxyImpl.isBound) {
@@ -1263,7 +1263,7 @@ class _WebSocketClientProxyCalls implements WebSocketClient {
       }
       var params = new _WebSocketClientDidFailParams();
       params.message = message;
-      _proxyImpl.sendMessage(params, _WebSocketClient_didFailName);
+      _proxyImpl.sendMessage(params, _webSocketClientMethodDidFailName);
     }
     void didClose(bool wasClean, int code, String reason) {
       if (!_proxyImpl.isBound) {
@@ -1274,7 +1274,7 @@ class _WebSocketClientProxyCalls implements WebSocketClient {
       params.wasClean = wasClean;
       params.code = code;
       params.reason = reason;
-      _proxyImpl.sendMessage(params, _WebSocketClient_didCloseName);
+      _proxyImpl.sendMessage(params, _webSocketClientMethodDidCloseName);
     }
 }
 
@@ -1366,27 +1366,27 @@ class WebSocketClientStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _WebSocketClient_didConnectName:
+      case _webSocketClientMethodDidConnectName:
         var params = _WebSocketClientDidConnectParams.deserialize(
             message.payload);
         _impl.didConnect(params.selectedSubprotocol, params.extensions, params.receiveStream);
         break;
-      case _WebSocketClient_didReceiveDataName:
+      case _webSocketClientMethodDidReceiveDataName:
         var params = _WebSocketClientDidReceiveDataParams.deserialize(
             message.payload);
         _impl.didReceiveData(params.fin, params.type, params.numBytes);
         break;
-      case _WebSocketClient_didReceiveFlowControlName:
+      case _webSocketClientMethodDidReceiveFlowControlName:
         var params = _WebSocketClientDidReceiveFlowControlParams.deserialize(
             message.payload);
         _impl.didReceiveFlowControl(params.quota);
         break;
-      case _WebSocketClient_didFailName:
+      case _webSocketClientMethodDidFailName:
         var params = _WebSocketClientDidFailParams.deserialize(
             message.payload);
         _impl.didFail(params.message);
         break;
-      case _WebSocketClient_didCloseName:
+      case _webSocketClientMethodDidCloseName:
         var params = _WebSocketClientDidCloseParams.deserialize(
             message.payload);
         _impl.didClose(params.wasClean, params.code, params.reason);

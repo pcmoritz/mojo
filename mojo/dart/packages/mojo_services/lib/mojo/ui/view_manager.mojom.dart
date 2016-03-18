@@ -220,8 +220,8 @@ class _ViewManagerCreateViewTreeParams extends bindings.Struct {
   }
 }
 
-const int _ViewManager_createViewName = 0;
-const int _ViewManager_createViewTreeName = 1;
+const int _viewManagerMethodCreateViewName = 0;
+const int _viewManagerMethodCreateViewTreeName = 1;
 
 class _ViewManagerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -289,7 +289,7 @@ class _ViewManagerProxyCalls implements ViewManager {
       params.viewOwner = viewOwner;
       params.viewListener = viewListener;
       params.label = label;
-      _proxyImpl.sendMessage(params, _ViewManager_createViewName);
+      _proxyImpl.sendMessage(params, _viewManagerMethodCreateViewName);
     }
     void createViewTree(Object viewTree, Object viewTreeListener, String label) {
       if (!_proxyImpl.isBound) {
@@ -300,7 +300,7 @@ class _ViewManagerProxyCalls implements ViewManager {
       params.viewTree = viewTree;
       params.viewTreeListener = viewTreeListener;
       params.label = label;
-      _proxyImpl.sendMessage(params, _ViewManager_createViewTreeName);
+      _proxyImpl.sendMessage(params, _viewManagerMethodCreateViewTreeName);
     }
 }
 
@@ -392,12 +392,12 @@ class ViewManagerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewManager_createViewName:
+      case _viewManagerMethodCreateViewName:
         var params = _ViewManagerCreateViewParams.deserialize(
             message.payload);
         _impl.createView(params.view, params.viewOwner, params.viewListener, params.label);
         break;
-      case _ViewManager_createViewTreeName:
+      case _viewManagerMethodCreateViewTreeName:
         var params = _ViewManagerCreateViewTreeParams.deserialize(
             message.payload);
         _impl.createViewTree(params.viewTree, params.viewTreeListener, params.label);

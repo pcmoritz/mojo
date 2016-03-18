@@ -1688,8 +1688,8 @@ class _PortPostMessageParams extends bindings.Struct {
   }
 }
 
-const int _Service_frobinateName = 0;
-const int _Service_getPortName = 1;
+const int _serviceMethodFrobinateName = 0;
+const int _serviceMethodGetPortName = 1;
   
 class ServiceBazOptions extends bindings.MojoEnum {
   static const ServiceBazOptions regular = const ServiceBazOptions._(0);
@@ -1782,7 +1782,7 @@ class _ServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Service_frobinateName:
+      case _serviceMethodFrobinateName:
         var r = ServiceFrobinateResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1827,7 +1827,7 @@ class _ServiceProxyCalls implements Service {
       params.port = port;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Service_frobinateName,
+          _serviceMethodFrobinateName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1838,7 +1838,7 @@ class _ServiceProxyCalls implements Service {
       }
       var params = new _ServiceGetPortParams();
       params.port = port;
-      _proxyImpl.sendMessage(params, _Service_getPortName);
+      _proxyImpl.sendMessage(params, _serviceMethodGetPortName);
     }
 }
 
@@ -1921,10 +1921,10 @@ class ServiceStub extends bindings.Stub {
   }
 
 
-  ServiceFrobinateResponseParams _ServiceFrobinateResponseParamsFactory(int result) {
-    var mojo_factory_result = new ServiceFrobinateResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  ServiceFrobinateResponseParams _serviceFrobinateResponseParamsFactory(int result) {
+    var result = new ServiceFrobinateResponseParams();
+    result.result = result;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1935,16 +1935,16 @@ class ServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Service_frobinateName:
+      case _serviceMethodFrobinateName:
         var params = _ServiceFrobinateParams.deserialize(
             message.payload);
-        var response = _impl.frobinate(params.foo,params.baz,params.port,_ServiceFrobinateResponseParamsFactory);
+        var response = _impl.frobinate(params.foo,params.baz,params.port,_serviceFrobinateResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Service_frobinateName,
+                  _serviceMethodFrobinateName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1952,12 +1952,12 @@ class ServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Service_frobinateName,
+              _serviceMethodFrobinateName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Service_getPortName:
+      case _serviceMethodGetPortName:
         var params = _ServiceGetPortParams.deserialize(
             message.payload);
         _impl.getPort(params.port);
@@ -1991,7 +1991,7 @@ class ServiceStub extends bindings.Stub {
   }
 }
 
-const int _Port_postMessageName = 0;
+const int _portMethodPostMessageName = 0;
 
 class _PortServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -2056,7 +2056,7 @@ class _PortProxyCalls implements Port {
       var params = new _PortPostMessageParams();
       params.messageText = messageText;
       params.port = port;
-      _proxyImpl.sendMessage(params, _Port_postMessageName);
+      _proxyImpl.sendMessage(params, _portMethodPostMessageName);
     }
 }
 
@@ -2148,7 +2148,7 @@ class PortStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Port_postMessageName:
+      case _portMethodPostMessageName:
         var params = _PortPostMessageParams.deserialize(
             message.payload);
         _impl.postMessage(params.messageText, params.port);
@@ -2195,7 +2195,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "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";
+  var serializedRuntimeTypeInfo = "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";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

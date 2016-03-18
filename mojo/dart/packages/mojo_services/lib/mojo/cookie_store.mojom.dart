@@ -311,8 +311,8 @@ class CookieStoreSetResponseParams extends bindings.Struct {
   }
 }
 
-const int _CookieStore_getName = 0;
-const int _CookieStore_setName = 1;
+const int _cookieStoreMethodGetName = 0;
+const int _cookieStoreMethodSetName = 1;
 
 class _CookieStoreServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -352,7 +352,7 @@ class _CookieStoreProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _CookieStore_getName:
+      case _cookieStoreMethodGetName:
         var r = CookieStoreGetResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -372,7 +372,7 @@ class _CookieStoreProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _CookieStore_setName:
+      case _cookieStoreMethodSetName:
         var r = CookieStoreSetResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -415,7 +415,7 @@ class _CookieStoreProxyCalls implements CookieStore {
       params.url = url;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _CookieStore_getName,
+          _cookieStoreMethodGetName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -425,7 +425,7 @@ class _CookieStoreProxyCalls implements CookieStore {
       params.cookie = cookie;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _CookieStore_setName,
+          _cookieStoreMethodSetName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -510,15 +510,15 @@ class CookieStoreStub extends bindings.Stub {
   }
 
 
-  CookieStoreGetResponseParams _CookieStoreGetResponseParamsFactory(String cookies) {
-    var mojo_factory_result = new CookieStoreGetResponseParams();
-    mojo_factory_result.cookies = cookies;
-    return mojo_factory_result;
+  CookieStoreGetResponseParams _cookieStoreGetResponseParamsFactory(String cookies) {
+    var result = new CookieStoreGetResponseParams();
+    result.cookies = cookies;
+    return result;
   }
-  CookieStoreSetResponseParams _CookieStoreSetResponseParamsFactory(bool success) {
-    var mojo_factory_result = new CookieStoreSetResponseParams();
-    mojo_factory_result.success = success;
-    return mojo_factory_result;
+  CookieStoreSetResponseParams _cookieStoreSetResponseParamsFactory(bool success) {
+    var result = new CookieStoreSetResponseParams();
+    result.success = success;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -529,16 +529,16 @@ class CookieStoreStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _CookieStore_getName:
+      case _cookieStoreMethodGetName:
         var params = _CookieStoreGetParams.deserialize(
             message.payload);
-        var response = _impl.get(params.url,_CookieStoreGetResponseParamsFactory);
+        var response = _impl.get(params.url,_cookieStoreGetResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _CookieStore_getName,
+                  _cookieStoreMethodGetName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -546,21 +546,21 @@ class CookieStoreStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _CookieStore_getName,
+              _cookieStoreMethodGetName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _CookieStore_setName:
+      case _cookieStoreMethodSetName:
         var params = _CookieStoreSetParams.deserialize(
             message.payload);
-        var response = _impl.set(params.url,params.cookie,_CookieStoreSetResponseParamsFactory);
+        var response = _impl.set(params.url,params.cookie,_cookieStoreSetResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _CookieStore_setName,
+                  _cookieStoreMethodSetName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -568,7 +568,7 @@ class CookieStoreStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _CookieStore_setName,
+              _cookieStoreMethodSetName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

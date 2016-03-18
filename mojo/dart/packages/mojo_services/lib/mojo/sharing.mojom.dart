@@ -81,7 +81,7 @@ class _SharingServiceShareTextParams extends bindings.Struct {
   }
 }
 
-const int _SharingService_shareTextName = 0;
+const int _sharingServiceMethodShareTextName = 0;
 
 class _SharingServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -145,7 +145,7 @@ class _SharingServiceProxyCalls implements SharingService {
       }
       var params = new _SharingServiceShareTextParams();
       params.text = text;
-      _proxyImpl.sendMessage(params, _SharingService_shareTextName);
+      _proxyImpl.sendMessage(params, _sharingServiceMethodShareTextName);
     }
 }
 
@@ -237,7 +237,7 @@ class SharingServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SharingService_shareTextName:
+      case _sharingServiceMethodShareTextName:
         var params = _SharingServiceShareTextParams.deserialize(
             message.payload);
         _impl.shareText(params.text);

@@ -96,7 +96,7 @@ class _HttpServerFactoryCreateHttpServerParams extends bindings.Struct {
   }
 }
 
-const int _HttpServerFactory_createHttpServerName = 0;
+const int _httpServerFactoryMethodCreateHttpServerName = 0;
 
 class _HttpServerFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -161,7 +161,7 @@ class _HttpServerFactoryProxyCalls implements HttpServerFactory {
       var params = new _HttpServerFactoryCreateHttpServerParams();
       params.serverRequest = serverRequest;
       params.localAddress = localAddress;
-      _proxyImpl.sendMessage(params, _HttpServerFactory_createHttpServerName);
+      _proxyImpl.sendMessage(params, _httpServerFactoryMethodCreateHttpServerName);
     }
 }
 
@@ -253,7 +253,7 @@ class HttpServerFactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HttpServerFactory_createHttpServerName:
+      case _httpServerFactoryMethodCreateHttpServerName:
         var params = _HttpServerFactoryCreateHttpServerParams.deserialize(
             message.payload);
         _impl.createHttpServer(params.serverRequest, params.localAddress);

@@ -359,7 +359,7 @@ class PredictionServiceGetPredictionListResponseParams extends bindings.Struct {
   }
 }
 
-const int _PredictionService_getPredictionListName = 0;
+const int _predictionServiceMethodGetPredictionListName = 0;
 
 class _PredictionServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -398,7 +398,7 @@ class _PredictionServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _PredictionService_getPredictionListName:
+      case _predictionServiceMethodGetPredictionListName:
         var r = PredictionServiceGetPredictionListResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -441,7 +441,7 @@ class _PredictionServiceProxyCalls implements PredictionService {
       params.predictionInfo = predictionInfo;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _PredictionService_getPredictionListName,
+          _predictionServiceMethodGetPredictionListName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -526,10 +526,10 @@ class PredictionServiceStub extends bindings.Stub {
   }
 
 
-  PredictionServiceGetPredictionListResponseParams _PredictionServiceGetPredictionListResponseParamsFactory(List<String> predictionList) {
-    var mojo_factory_result = new PredictionServiceGetPredictionListResponseParams();
-    mojo_factory_result.predictionList = predictionList;
-    return mojo_factory_result;
+  PredictionServiceGetPredictionListResponseParams _predictionServiceGetPredictionListResponseParamsFactory(List<String> predictionList) {
+    var result = new PredictionServiceGetPredictionListResponseParams();
+    result.predictionList = predictionList;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -540,16 +540,16 @@ class PredictionServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _PredictionService_getPredictionListName:
+      case _predictionServiceMethodGetPredictionListName:
         var params = _PredictionServiceGetPredictionListParams.deserialize(
             message.payload);
-        var response = _impl.getPredictionList(params.predictionInfo,_PredictionServiceGetPredictionListResponseParamsFactory);
+        var response = _impl.getPredictionList(params.predictionInfo,_predictionServiceGetPredictionListResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _PredictionService_getPredictionListName,
+                  _predictionServiceMethodGetPredictionListName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -557,7 +557,7 @@ class PredictionServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _PredictionService_getPredictionListName,
+              _predictionServiceMethodGetPredictionListName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

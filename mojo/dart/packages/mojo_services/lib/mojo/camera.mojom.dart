@@ -554,9 +554,9 @@ class CameraServiceGetLatestFrameResponseParams extends bindings.Struct {
   }
 }
 
-const int _CameraRollService_updateName = 0;
-const int _CameraRollService_getCountName = 1;
-const int _CameraRollService_getPhotoName = 2;
+const int _cameraRollServiceMethodUpdateName = 0;
+const int _cameraRollServiceMethodGetCountName = 1;
+const int _cameraRollServiceMethodGetPhotoName = 2;
 
 class _CameraRollServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -597,7 +597,7 @@ class _CameraRollServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _CameraRollService_getCountName:
+      case _cameraRollServiceMethodGetCountName:
         var r = CameraRollServiceGetCountResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -617,7 +617,7 @@ class _CameraRollServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _CameraRollService_getPhotoName:
+      case _cameraRollServiceMethodGetPhotoName:
         var r = CameraRollServiceGetPhotoResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -661,13 +661,13 @@ class _CameraRollServiceProxyCalls implements CameraRollService {
         return;
       }
       var params = new _CameraRollServiceUpdateParams();
-      _proxyImpl.sendMessage(params, _CameraRollService_updateName);
+      _proxyImpl.sendMessage(params, _cameraRollServiceMethodUpdateName);
     }
     dynamic getCount([Function responseFactory = null]) {
       var params = new _CameraRollServiceGetCountParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _CameraRollService_getCountName,
+          _cameraRollServiceMethodGetCountName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -676,7 +676,7 @@ class _CameraRollServiceProxyCalls implements CameraRollService {
       params.index = index;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _CameraRollService_getPhotoName,
+          _cameraRollServiceMethodGetPhotoName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -761,15 +761,15 @@ class CameraRollServiceStub extends bindings.Stub {
   }
 
 
-  CameraRollServiceGetCountResponseParams _CameraRollServiceGetCountResponseParamsFactory(int numPhotos) {
-    var mojo_factory_result = new CameraRollServiceGetCountResponseParams();
-    mojo_factory_result.numPhotos = numPhotos;
-    return mojo_factory_result;
+  CameraRollServiceGetCountResponseParams _cameraRollServiceGetCountResponseParamsFactory(int numPhotos) {
+    var result = new CameraRollServiceGetCountResponseParams();
+    result.numPhotos = numPhotos;
+    return result;
   }
-  CameraRollServiceGetPhotoResponseParams _CameraRollServiceGetPhotoResponseParamsFactory(Photo photo) {
-    var mojo_factory_result = new CameraRollServiceGetPhotoResponseParams();
-    mojo_factory_result.photo = photo;
-    return mojo_factory_result;
+  CameraRollServiceGetPhotoResponseParams _cameraRollServiceGetPhotoResponseParamsFactory(Photo photo) {
+    var result = new CameraRollServiceGetPhotoResponseParams();
+    result.photo = photo;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -780,17 +780,17 @@ class CameraRollServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _CameraRollService_updateName:
+      case _cameraRollServiceMethodUpdateName:
         _impl.update();
         break;
-      case _CameraRollService_getCountName:
-        var response = _impl.getCount(_CameraRollServiceGetCountResponseParamsFactory);
+      case _cameraRollServiceMethodGetCountName:
+        var response = _impl.getCount(_cameraRollServiceGetCountResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _CameraRollService_getCountName,
+                  _cameraRollServiceMethodGetCountName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -798,21 +798,21 @@ class CameraRollServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _CameraRollService_getCountName,
+              _cameraRollServiceMethodGetCountName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _CameraRollService_getPhotoName:
+      case _cameraRollServiceMethodGetPhotoName:
         var params = _CameraRollServiceGetPhotoParams.deserialize(
             message.payload);
-        var response = _impl.getPhoto(params.index,_CameraRollServiceGetPhotoResponseParamsFactory);
+        var response = _impl.getPhoto(params.index,_cameraRollServiceGetPhotoResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _CameraRollService_getPhotoName,
+                  _cameraRollServiceMethodGetPhotoName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -820,7 +820,7 @@ class CameraRollServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _CameraRollService_getPhotoName,
+              _cameraRollServiceMethodGetPhotoName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -854,7 +854,7 @@ class CameraRollServiceStub extends bindings.Stub {
   }
 }
 
-const int _CameraService_getLatestFrameName = 0;
+const int _cameraServiceMethodGetLatestFrameName = 0;
 
 class _CameraServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -893,7 +893,7 @@ class _CameraServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _CameraService_getLatestFrameName:
+      case _cameraServiceMethodGetLatestFrameName:
         var r = CameraServiceGetLatestFrameResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -935,7 +935,7 @@ class _CameraServiceProxyCalls implements CameraService {
       var params = new _CameraServiceGetLatestFrameParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _CameraService_getLatestFrameName,
+          _cameraServiceMethodGetLatestFrameName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1020,10 +1020,10 @@ class CameraServiceStub extends bindings.Stub {
   }
 
 
-  CameraServiceGetLatestFrameResponseParams _CameraServiceGetLatestFrameResponseParamsFactory(core.MojoDataPipeConsumer content) {
-    var mojo_factory_result = new CameraServiceGetLatestFrameResponseParams();
-    mojo_factory_result.content = content;
-    return mojo_factory_result;
+  CameraServiceGetLatestFrameResponseParams _cameraServiceGetLatestFrameResponseParamsFactory(core.MojoDataPipeConsumer content) {
+    var result = new CameraServiceGetLatestFrameResponseParams();
+    result.content = content;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1034,14 +1034,14 @@ class CameraServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _CameraService_getLatestFrameName:
-        var response = _impl.getLatestFrame(_CameraServiceGetLatestFrameResponseParamsFactory);
+      case _cameraServiceMethodGetLatestFrameName:
+        var response = _impl.getLatestFrame(_cameraServiceGetLatestFrameResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _CameraService_getLatestFrameName,
+                  _cameraServiceMethodGetLatestFrameName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1049,7 +1049,7 @@ class CameraServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _CameraService_getLatestFrameName,
+              _cameraServiceMethodGetLatestFrameName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

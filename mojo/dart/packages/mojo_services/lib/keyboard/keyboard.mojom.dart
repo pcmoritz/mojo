@@ -1433,14 +1433,14 @@ class _KeyboardServiceFactoryCreateKeyboardServiceParams extends bindings.Struct
   }
 }
 
-const int _KeyboardClient_commitCompletionName = 0;
-const int _KeyboardClient_commitCorrectionName = 1;
-const int _KeyboardClient_commitTextName = 2;
-const int _KeyboardClient_deleteSurroundingTextName = 3;
-const int _KeyboardClient_setComposingRegionName = 4;
-const int _KeyboardClient_setComposingTextName = 5;
-const int _KeyboardClient_setSelectionName = 6;
-const int _KeyboardClient_submitName = 7;
+const int _keyboardClientMethodCommitCompletionName = 0;
+const int _keyboardClientMethodCommitCorrectionName = 1;
+const int _keyboardClientMethodCommitTextName = 2;
+const int _keyboardClientMethodDeleteSurroundingTextName = 3;
+const int _keyboardClientMethodSetComposingRegionName = 4;
+const int _keyboardClientMethodSetComposingTextName = 5;
+const int _keyboardClientMethodSetSelectionName = 6;
+const int _keyboardClientMethodSubmitName = 7;
 
 class _KeyboardClientServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1511,7 +1511,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       }
       var params = new _KeyboardClientCommitCompletionParams();
       params.completion = completion;
-      _proxyImpl.sendMessage(params, _KeyboardClient_commitCompletionName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodCommitCompletionName);
     }
     void commitCorrection(CorrectionData correction) {
       if (!_proxyImpl.isBound) {
@@ -1520,7 +1520,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       }
       var params = new _KeyboardClientCommitCorrectionParams();
       params.correction = correction;
-      _proxyImpl.sendMessage(params, _KeyboardClient_commitCorrectionName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodCommitCorrectionName);
     }
     void commitText(String text, int newCursorPosition) {
       if (!_proxyImpl.isBound) {
@@ -1530,7 +1530,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       var params = new _KeyboardClientCommitTextParams();
       params.text = text;
       params.newCursorPosition = newCursorPosition;
-      _proxyImpl.sendMessage(params, _KeyboardClient_commitTextName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodCommitTextName);
     }
     void deleteSurroundingText(int beforeLength, int afterLength) {
       if (!_proxyImpl.isBound) {
@@ -1540,7 +1540,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       var params = new _KeyboardClientDeleteSurroundingTextParams();
       params.beforeLength = beforeLength;
       params.afterLength = afterLength;
-      _proxyImpl.sendMessage(params, _KeyboardClient_deleteSurroundingTextName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodDeleteSurroundingTextName);
     }
     void setComposingRegion(int start, int end) {
       if (!_proxyImpl.isBound) {
@@ -1550,7 +1550,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       var params = new _KeyboardClientSetComposingRegionParams();
       params.start = start;
       params.end = end;
-      _proxyImpl.sendMessage(params, _KeyboardClient_setComposingRegionName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodSetComposingRegionName);
     }
     void setComposingText(String text, int newCursorPosition) {
       if (!_proxyImpl.isBound) {
@@ -1560,7 +1560,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       var params = new _KeyboardClientSetComposingTextParams();
       params.text = text;
       params.newCursorPosition = newCursorPosition;
-      _proxyImpl.sendMessage(params, _KeyboardClient_setComposingTextName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodSetComposingTextName);
     }
     void setSelection(int start, int end) {
       if (!_proxyImpl.isBound) {
@@ -1570,7 +1570,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       var params = new _KeyboardClientSetSelectionParams();
       params.start = start;
       params.end = end;
-      _proxyImpl.sendMessage(params, _KeyboardClient_setSelectionName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodSetSelectionName);
     }
     void submit(SubmitAction action) {
       if (!_proxyImpl.isBound) {
@@ -1579,7 +1579,7 @@ class _KeyboardClientProxyCalls implements KeyboardClient {
       }
       var params = new _KeyboardClientSubmitParams();
       params.action = action;
-      _proxyImpl.sendMessage(params, _KeyboardClient_submitName);
+      _proxyImpl.sendMessage(params, _keyboardClientMethodSubmitName);
     }
 }
 
@@ -1671,42 +1671,42 @@ class KeyboardClientStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _KeyboardClient_commitCompletionName:
+      case _keyboardClientMethodCommitCompletionName:
         var params = _KeyboardClientCommitCompletionParams.deserialize(
             message.payload);
         _impl.commitCompletion(params.completion);
         break;
-      case _KeyboardClient_commitCorrectionName:
+      case _keyboardClientMethodCommitCorrectionName:
         var params = _KeyboardClientCommitCorrectionParams.deserialize(
             message.payload);
         _impl.commitCorrection(params.correction);
         break;
-      case _KeyboardClient_commitTextName:
+      case _keyboardClientMethodCommitTextName:
         var params = _KeyboardClientCommitTextParams.deserialize(
             message.payload);
         _impl.commitText(params.text, params.newCursorPosition);
         break;
-      case _KeyboardClient_deleteSurroundingTextName:
+      case _keyboardClientMethodDeleteSurroundingTextName:
         var params = _KeyboardClientDeleteSurroundingTextParams.deserialize(
             message.payload);
         _impl.deleteSurroundingText(params.beforeLength, params.afterLength);
         break;
-      case _KeyboardClient_setComposingRegionName:
+      case _keyboardClientMethodSetComposingRegionName:
         var params = _KeyboardClientSetComposingRegionParams.deserialize(
             message.payload);
         _impl.setComposingRegion(params.start, params.end);
         break;
-      case _KeyboardClient_setComposingTextName:
+      case _keyboardClientMethodSetComposingTextName:
         var params = _KeyboardClientSetComposingTextParams.deserialize(
             message.payload);
         _impl.setComposingText(params.text, params.newCursorPosition);
         break;
-      case _KeyboardClient_setSelectionName:
+      case _keyboardClientMethodSetSelectionName:
         var params = _KeyboardClientSetSelectionParams.deserialize(
             message.payload);
         _impl.setSelection(params.start, params.end);
         break;
-      case _KeyboardClient_submitName:
+      case _keyboardClientMethodSubmitName:
         var params = _KeyboardClientSubmitParams.deserialize(
             message.payload);
         _impl.submit(params.action);
@@ -1740,11 +1740,11 @@ class KeyboardClientStub extends bindings.Stub {
   }
 }
 
-const int _KeyboardService_showName = 0;
-const int _KeyboardService_showByRequestName = 1;
-const int _KeyboardService_hideName = 2;
-const int _KeyboardService_setTextName = 3;
-const int _KeyboardService_setSelectionName = 4;
+const int _keyboardServiceMethodShowName = 0;
+const int _keyboardServiceMethodShowByRequestName = 1;
+const int _keyboardServiceMethodHideName = 2;
+const int _keyboardServiceMethodSetTextName = 3;
+const int _keyboardServiceMethodSetSelectionName = 4;
 
 class _KeyboardServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1813,7 +1813,7 @@ class _KeyboardServiceProxyCalls implements KeyboardService {
       var params = new _KeyboardServiceShowParams();
       params.client = client;
       params.type = type;
-      _proxyImpl.sendMessage(params, _KeyboardService_showName);
+      _proxyImpl.sendMessage(params, _keyboardServiceMethodShowName);
     }
     void showByRequest() {
       if (!_proxyImpl.isBound) {
@@ -1821,7 +1821,7 @@ class _KeyboardServiceProxyCalls implements KeyboardService {
         return;
       }
       var params = new _KeyboardServiceShowByRequestParams();
-      _proxyImpl.sendMessage(params, _KeyboardService_showByRequestName);
+      _proxyImpl.sendMessage(params, _keyboardServiceMethodShowByRequestName);
     }
     void hide() {
       if (!_proxyImpl.isBound) {
@@ -1829,7 +1829,7 @@ class _KeyboardServiceProxyCalls implements KeyboardService {
         return;
       }
       var params = new _KeyboardServiceHideParams();
-      _proxyImpl.sendMessage(params, _KeyboardService_hideName);
+      _proxyImpl.sendMessage(params, _keyboardServiceMethodHideName);
     }
     void setText(String text) {
       if (!_proxyImpl.isBound) {
@@ -1838,7 +1838,7 @@ class _KeyboardServiceProxyCalls implements KeyboardService {
       }
       var params = new _KeyboardServiceSetTextParams();
       params.text = text;
-      _proxyImpl.sendMessage(params, _KeyboardService_setTextName);
+      _proxyImpl.sendMessage(params, _keyboardServiceMethodSetTextName);
     }
     void setSelection(int start, int end) {
       if (!_proxyImpl.isBound) {
@@ -1848,7 +1848,7 @@ class _KeyboardServiceProxyCalls implements KeyboardService {
       var params = new _KeyboardServiceSetSelectionParams();
       params.start = start;
       params.end = end;
-      _proxyImpl.sendMessage(params, _KeyboardService_setSelectionName);
+      _proxyImpl.sendMessage(params, _keyboardServiceMethodSetSelectionName);
     }
 }
 
@@ -1940,23 +1940,23 @@ class KeyboardServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _KeyboardService_showName:
+      case _keyboardServiceMethodShowName:
         var params = _KeyboardServiceShowParams.deserialize(
             message.payload);
         _impl.show(params.client, params.type);
         break;
-      case _KeyboardService_showByRequestName:
+      case _keyboardServiceMethodShowByRequestName:
         _impl.showByRequest();
         break;
-      case _KeyboardService_hideName:
+      case _keyboardServiceMethodHideName:
         _impl.hide();
         break;
-      case _KeyboardService_setTextName:
+      case _keyboardServiceMethodSetTextName:
         var params = _KeyboardServiceSetTextParams.deserialize(
             message.payload);
         _impl.setText(params.text);
         break;
-      case _KeyboardService_setSelectionName:
+      case _keyboardServiceMethodSetSelectionName:
         var params = _KeyboardServiceSetSelectionParams.deserialize(
             message.payload);
         _impl.setSelection(params.start, params.end);
@@ -1990,7 +1990,7 @@ class KeyboardServiceStub extends bindings.Stub {
   }
 }
 
-const int _KeyboardServiceFactory_createKeyboardServiceName = 0;
+const int _keyboardServiceFactoryMethodCreateKeyboardServiceName = 0;
 
 class _KeyboardServiceFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -2055,7 +2055,7 @@ class _KeyboardServiceFactoryProxyCalls implements KeyboardServiceFactory {
       var params = new _KeyboardServiceFactoryCreateKeyboardServiceParams();
       params.keyEventDispatcher = keyEventDispatcher;
       params.serviceRequest = serviceRequest;
-      _proxyImpl.sendMessage(params, _KeyboardServiceFactory_createKeyboardServiceName);
+      _proxyImpl.sendMessage(params, _keyboardServiceFactoryMethodCreateKeyboardServiceName);
     }
 }
 
@@ -2147,7 +2147,7 @@ class KeyboardServiceFactoryStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _KeyboardServiceFactory_createKeyboardServiceName:
+      case _keyboardServiceFactoryMethodCreateKeyboardServiceName:
         var params = _KeyboardServiceFactoryCreateKeyboardServiceParams.deserialize(
             message.payload);
         _impl.createKeyboardService(params.keyEventDispatcher, params.serviceRequest);

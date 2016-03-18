@@ -81,7 +81,7 @@ class _AudioServerCreateTrackParams extends bindings.Struct {
   }
 }
 
-const int _AudioServer_createTrackName = 0;
+const int _audioServerMethodCreateTrackName = 0;
 
 class _AudioServerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -145,7 +145,7 @@ class _AudioServerProxyCalls implements AudioServer {
       }
       var params = new _AudioServerCreateTrackParams();
       params.track = track;
-      _proxyImpl.sendMessage(params, _AudioServer_createTrackName);
+      _proxyImpl.sendMessage(params, _audioServerMethodCreateTrackName);
     }
 }
 
@@ -237,7 +237,7 @@ class AudioServerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _AudioServer_createTrackName:
+      case _audioServerMethodCreateTrackName:
         var params = _AudioServerCreateTrackParams.deserialize(
             message.payload);
         _impl.createTrack(params.track);

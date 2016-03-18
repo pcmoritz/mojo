@@ -269,8 +269,8 @@ class _CompositorCreateRendererParams extends bindings.Struct {
   }
 }
 
-const int _Compositor_createSceneName = 0;
-const int _Compositor_createRendererName = 1;
+const int _compositorMethodCreateSceneName = 0;
+const int _compositorMethodCreateRendererName = 1;
 
 class _CompositorServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -310,7 +310,7 @@ class _CompositorProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Compositor_createSceneName:
+      case _compositorMethodCreateSceneName:
         var r = CompositorCreateSceneResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -354,7 +354,7 @@ class _CompositorProxyCalls implements Compositor {
       params.label = label;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Compositor_createSceneName,
+          _compositorMethodCreateSceneName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -367,7 +367,7 @@ class _CompositorProxyCalls implements Compositor {
       params.contextProvider = contextProvider;
       params.renderer = renderer;
       params.label = label;
-      _proxyImpl.sendMessage(params, _Compositor_createRendererName);
+      _proxyImpl.sendMessage(params, _compositorMethodCreateRendererName);
     }
 }
 
@@ -450,10 +450,10 @@ class CompositorStub extends bindings.Stub {
   }
 
 
-  CompositorCreateSceneResponseParams _CompositorCreateSceneResponseParamsFactory(scene_token_mojom.SceneToken sceneToken) {
-    var mojo_factory_result = new CompositorCreateSceneResponseParams();
-    mojo_factory_result.sceneToken = sceneToken;
-    return mojo_factory_result;
+  CompositorCreateSceneResponseParams _compositorCreateSceneResponseParamsFactory(scene_token_mojom.SceneToken sceneToken) {
+    var result = new CompositorCreateSceneResponseParams();
+    result.sceneToken = sceneToken;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -464,16 +464,16 @@ class CompositorStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Compositor_createSceneName:
+      case _compositorMethodCreateSceneName:
         var params = _CompositorCreateSceneParams.deserialize(
             message.payload);
-        var response = _impl.createScene(params.scene,params.label,_CompositorCreateSceneResponseParamsFactory);
+        var response = _impl.createScene(params.scene,params.label,_compositorCreateSceneResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Compositor_createSceneName,
+                  _compositorMethodCreateSceneName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -481,12 +481,12 @@ class CompositorStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Compositor_createSceneName,
+              _compositorMethodCreateSceneName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Compositor_createRendererName:
+      case _compositorMethodCreateRendererName:
         var params = _CompositorCreateRendererParams.deserialize(
             message.payload);
         _impl.createRenderer(params.contextProvider, params.renderer, params.label);

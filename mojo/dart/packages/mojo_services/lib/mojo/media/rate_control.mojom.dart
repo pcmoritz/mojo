@@ -846,13 +846,13 @@ class _RateControlCancelPendingChangesParams extends bindings.Struct {
   }
 }
 
-const int _RateControl_getCurrentTransformName = 0;
-const int _RateControl_setCurrentQuadName = 1;
-const int _RateControl_setTargetTimelineIdName = 2;
-const int _RateControl_setRateName = 3;
-const int _RateControl_setRateAtReferenceTimeName = 4;
-const int _RateControl_setRateAtTargetTimeName = 5;
-const int _RateControl_cancelPendingChangesName = 6;
+const int _rateControlMethodGetCurrentTransformName = 0;
+const int _rateControlMethodSetCurrentQuadName = 1;
+const int _rateControlMethodSetTargetTimelineIdName = 2;
+const int _rateControlMethodSetRateName = 3;
+const int _rateControlMethodSetRateAtReferenceTimeName = 4;
+const int _rateControlMethodSetRateAtTargetTimeName = 5;
+const int _rateControlMethodCancelPendingChangesName = 6;
 
 class _RateControlServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -897,7 +897,7 @@ class _RateControlProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _RateControl_getCurrentTransformName:
+      case _rateControlMethodGetCurrentTransformName:
         var r = RateControlGetCurrentTransformResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -939,7 +939,7 @@ class _RateControlProxyCalls implements RateControl {
       var params = new _RateControlGetCurrentTransformParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _RateControl_getCurrentTransformName,
+          _rateControlMethodGetCurrentTransformName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -950,7 +950,7 @@ class _RateControlProxyCalls implements RateControl {
       }
       var params = new _RateControlSetCurrentQuadParams();
       params.quad = quad;
-      _proxyImpl.sendMessage(params, _RateControl_setCurrentQuadName);
+      _proxyImpl.sendMessage(params, _rateControlMethodSetCurrentQuadName);
     }
     void setTargetTimelineId(int id) {
       if (!_proxyImpl.isBound) {
@@ -959,7 +959,7 @@ class _RateControlProxyCalls implements RateControl {
       }
       var params = new _RateControlSetTargetTimelineIdParams();
       params.id = id;
-      _proxyImpl.sendMessage(params, _RateControl_setTargetTimelineIdName);
+      _proxyImpl.sendMessage(params, _rateControlMethodSetTargetTimelineIdName);
     }
     void setRate(int referenceDelta, int targetDelta) {
       if (!_proxyImpl.isBound) {
@@ -969,7 +969,7 @@ class _RateControlProxyCalls implements RateControl {
       var params = new _RateControlSetRateParams();
       params.referenceDelta = referenceDelta;
       params.targetDelta = targetDelta;
-      _proxyImpl.sendMessage(params, _RateControl_setRateName);
+      _proxyImpl.sendMessage(params, _rateControlMethodSetRateName);
     }
     void setRateAtReferenceTime(int referenceDelta, int targetDelta, int referenceTime) {
       if (!_proxyImpl.isBound) {
@@ -980,7 +980,7 @@ class _RateControlProxyCalls implements RateControl {
       params.referenceDelta = referenceDelta;
       params.targetDelta = targetDelta;
       params.referenceTime = referenceTime;
-      _proxyImpl.sendMessage(params, _RateControl_setRateAtReferenceTimeName);
+      _proxyImpl.sendMessage(params, _rateControlMethodSetRateAtReferenceTimeName);
     }
     void setRateAtTargetTime(int referenceDelta, int targetDelta, int targetTime) {
       if (!_proxyImpl.isBound) {
@@ -991,7 +991,7 @@ class _RateControlProxyCalls implements RateControl {
       params.referenceDelta = referenceDelta;
       params.targetDelta = targetDelta;
       params.targetTime = targetTime;
-      _proxyImpl.sendMessage(params, _RateControl_setRateAtTargetTimeName);
+      _proxyImpl.sendMessage(params, _rateControlMethodSetRateAtTargetTimeName);
     }
     void cancelPendingChanges() {
       if (!_proxyImpl.isBound) {
@@ -999,7 +999,7 @@ class _RateControlProxyCalls implements RateControl {
         return;
       }
       var params = new _RateControlCancelPendingChangesParams();
-      _proxyImpl.sendMessage(params, _RateControl_cancelPendingChangesName);
+      _proxyImpl.sendMessage(params, _rateControlMethodCancelPendingChangesName);
     }
 }
 
@@ -1082,10 +1082,10 @@ class RateControlStub extends bindings.Stub {
   }
 
 
-  RateControlGetCurrentTransformResponseParams _RateControlGetCurrentTransformResponseParamsFactory(TimelineTransform trans) {
-    var mojo_factory_result = new RateControlGetCurrentTransformResponseParams();
-    mojo_factory_result.trans = trans;
-    return mojo_factory_result;
+  RateControlGetCurrentTransformResponseParams _rateControlGetCurrentTransformResponseParamsFactory(TimelineTransform trans) {
+    var result = new RateControlGetCurrentTransformResponseParams();
+    result.trans = trans;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1096,14 +1096,14 @@ class RateControlStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _RateControl_getCurrentTransformName:
-        var response = _impl.getCurrentTransform(_RateControlGetCurrentTransformResponseParamsFactory);
+      case _rateControlMethodGetCurrentTransformName:
+        var response = _impl.getCurrentTransform(_rateControlGetCurrentTransformResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _RateControl_getCurrentTransformName,
+                  _rateControlMethodGetCurrentTransformName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1111,37 +1111,37 @@ class RateControlStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _RateControl_getCurrentTransformName,
+              _rateControlMethodGetCurrentTransformName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _RateControl_setCurrentQuadName:
+      case _rateControlMethodSetCurrentQuadName:
         var params = _RateControlSetCurrentQuadParams.deserialize(
             message.payload);
         _impl.setCurrentQuad(params.quad);
         break;
-      case _RateControl_setTargetTimelineIdName:
+      case _rateControlMethodSetTargetTimelineIdName:
         var params = _RateControlSetTargetTimelineIdParams.deserialize(
             message.payload);
         _impl.setTargetTimelineId(params.id);
         break;
-      case _RateControl_setRateName:
+      case _rateControlMethodSetRateName:
         var params = _RateControlSetRateParams.deserialize(
             message.payload);
         _impl.setRate(params.referenceDelta, params.targetDelta);
         break;
-      case _RateControl_setRateAtReferenceTimeName:
+      case _rateControlMethodSetRateAtReferenceTimeName:
         var params = _RateControlSetRateAtReferenceTimeParams.deserialize(
             message.payload);
         _impl.setRateAtReferenceTime(params.referenceDelta, params.targetDelta, params.referenceTime);
         break;
-      case _RateControl_setRateAtTargetTimeName:
+      case _rateControlMethodSetRateAtTargetTimeName:
         var params = _RateControlSetRateAtTargetTimeParams.deserialize(
             message.payload);
         _impl.setRateAtTargetTime(params.referenceDelta, params.targetDelta, params.targetTime);
         break;
-      case _RateControl_cancelPendingChangesName:
+      case _rateControlMethodCancelPendingChangesName:
         _impl.cancelPendingChanges();
         break;
       default:

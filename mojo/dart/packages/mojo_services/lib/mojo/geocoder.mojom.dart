@@ -1084,8 +1084,8 @@ class GeocoderLocationToAddressResponseParams extends bindings.Struct {
   }
 }
 
-const int _Geocoder_addressToLocationName = 0;
-const int _Geocoder_locationToAddressName = 1;
+const int _geocoderMethodAddressToLocationName = 0;
+const int _geocoderMethodLocationToAddressName = 1;
 
 class _GeocoderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1125,7 +1125,7 @@ class _GeocoderProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Geocoder_addressToLocationName:
+      case _geocoderMethodAddressToLocationName:
         var r = GeocoderAddressToLocationResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1145,7 +1145,7 @@ class _GeocoderProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Geocoder_locationToAddressName:
+      case _geocoderMethodLocationToAddressName:
         var r = GeocoderLocationToAddressResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1189,7 +1189,7 @@ class _GeocoderProxyCalls implements Geocoder {
       params.options = options;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Geocoder_addressToLocationName,
+          _geocoderMethodAddressToLocationName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1199,7 +1199,7 @@ class _GeocoderProxyCalls implements Geocoder {
       params.options = options;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Geocoder_locationToAddressName,
+          _geocoderMethodLocationToAddressName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1284,17 +1284,17 @@ class GeocoderStub extends bindings.Stub {
   }
 
 
-  GeocoderAddressToLocationResponseParams _GeocoderAddressToLocationResponseParamsFactory(String status, List<Result> results) {
-    var mojo_factory_result = new GeocoderAddressToLocationResponseParams();
-    mojo_factory_result.status = status;
-    mojo_factory_result.results = results;
-    return mojo_factory_result;
+  GeocoderAddressToLocationResponseParams _geocoderAddressToLocationResponseParamsFactory(String status, List<Result> results) {
+    var result = new GeocoderAddressToLocationResponseParams();
+    result.status = status;
+    result.results = results;
+    return result;
   }
-  GeocoderLocationToAddressResponseParams _GeocoderLocationToAddressResponseParamsFactory(String status, List<Result> results) {
-    var mojo_factory_result = new GeocoderLocationToAddressResponseParams();
-    mojo_factory_result.status = status;
-    mojo_factory_result.results = results;
-    return mojo_factory_result;
+  GeocoderLocationToAddressResponseParams _geocoderLocationToAddressResponseParamsFactory(String status, List<Result> results) {
+    var result = new GeocoderLocationToAddressResponseParams();
+    result.status = status;
+    result.results = results;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1305,16 +1305,16 @@ class GeocoderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Geocoder_addressToLocationName:
+      case _geocoderMethodAddressToLocationName:
         var params = _GeocoderAddressToLocationParams.deserialize(
             message.payload);
-        var response = _impl.addressToLocation(params.address,params.options,_GeocoderAddressToLocationResponseParamsFactory);
+        var response = _impl.addressToLocation(params.address,params.options,_geocoderAddressToLocationResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Geocoder_addressToLocationName,
+                  _geocoderMethodAddressToLocationName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1322,21 +1322,21 @@ class GeocoderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Geocoder_addressToLocationName,
+              _geocoderMethodAddressToLocationName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Geocoder_locationToAddressName:
+      case _geocoderMethodLocationToAddressName:
         var params = _GeocoderLocationToAddressParams.deserialize(
             message.payload);
-        var response = _impl.locationToAddress(params.location,params.options,_GeocoderLocationToAddressResponseParamsFactory);
+        var response = _impl.locationToAddress(params.location,params.options,_geocoderLocationToAddressResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Geocoder_locationToAddressName,
+                  _geocoderMethodLocationToAddressName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1344,7 +1344,7 @@ class GeocoderStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Geocoder_locationToAddressName,
+              _geocoderMethodLocationToAddressName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

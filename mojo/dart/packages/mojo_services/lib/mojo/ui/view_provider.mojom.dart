@@ -108,7 +108,7 @@ class _ViewProviderCreateViewParams extends bindings.Struct {
   }
 }
 
-const int _ViewProvider_createViewName = 0;
+const int _viewProviderMethodCreateViewName = 0;
 
 class _ViewProviderServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -174,7 +174,7 @@ class _ViewProviderProxyCalls implements ViewProvider {
       params.viewOwner = viewOwner;
       params.services = services;
       params.exposedServices = exposedServices;
-      _proxyImpl.sendMessage(params, _ViewProvider_createViewName);
+      _proxyImpl.sendMessage(params, _viewProviderMethodCreateViewName);
     }
 }
 
@@ -266,7 +266,7 @@ class ViewProviderStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ViewProvider_createViewName:
+      case _viewProviderMethodCreateViewName:
         var params = _ViewProviderCreateViewParams.deserialize(
             message.payload);
         _impl.createView(params.viewOwner, params.services, params.exposedServices);

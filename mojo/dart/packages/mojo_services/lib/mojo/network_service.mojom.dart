@@ -991,15 +991,15 @@ class _NetworkServiceCreateHostResolverParams extends bindings.Struct {
   }
 }
 
-const int _NetworkService_createUrlLoaderName = 0;
-const int _NetworkService_getCookieStoreName = 1;
-const int _NetworkService_createWebSocketName = 2;
-const int _NetworkService_createTcpBoundSocketName = 3;
-const int _NetworkService_createTcpConnectedSocketName = 4;
-const int _NetworkService_createUdpSocketName = 5;
-const int _NetworkService_createHttpServerName = 6;
-const int _NetworkService_registerUrlLoaderInterceptorName = 7;
-const int _NetworkService_createHostResolverName = 8;
+const int _networkServiceMethodCreateUrlLoaderName = 0;
+const int _networkServiceMethodGetCookieStoreName = 1;
+const int _networkServiceMethodCreateWebSocketName = 2;
+const int _networkServiceMethodCreateTcpBoundSocketName = 3;
+const int _networkServiceMethodCreateTcpConnectedSocketName = 4;
+const int _networkServiceMethodCreateUdpSocketName = 5;
+const int _networkServiceMethodCreateHttpServerName = 6;
+const int _networkServiceMethodRegisterUrlLoaderInterceptorName = 7;
+const int _networkServiceMethodCreateHostResolverName = 8;
 
 class _NetworkServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1046,7 +1046,7 @@ class _NetworkServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _NetworkService_createTcpBoundSocketName:
+      case _networkServiceMethodCreateTcpBoundSocketName:
         var r = NetworkServiceCreateTcpBoundSocketResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1066,7 +1066,7 @@ class _NetworkServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _NetworkService_createTcpConnectedSocketName:
+      case _networkServiceMethodCreateTcpConnectedSocketName:
         var r = NetworkServiceCreateTcpConnectedSocketResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1086,7 +1086,7 @@ class _NetworkServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _NetworkService_createHttpServerName:
+      case _networkServiceMethodCreateHttpServerName:
         var r = NetworkServiceCreateHttpServerResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1131,7 +1131,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceCreateUrlLoaderParams();
       params.loader = loader;
-      _proxyImpl.sendMessage(params, _NetworkService_createUrlLoaderName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodCreateUrlLoaderName);
     }
     void getCookieStore(Object cookieStore) {
       if (!_proxyImpl.isBound) {
@@ -1140,7 +1140,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceGetCookieStoreParams();
       params.cookieStore = cookieStore;
-      _proxyImpl.sendMessage(params, _NetworkService_getCookieStoreName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodGetCookieStoreName);
     }
     void createWebSocket(Object socket) {
       if (!_proxyImpl.isBound) {
@@ -1149,7 +1149,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceCreateWebSocketParams();
       params.socket = socket;
-      _proxyImpl.sendMessage(params, _NetworkService_createWebSocketName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodCreateWebSocketName);
     }
     dynamic createTcpBoundSocket(net_address_mojom.NetAddress localAddress,Object boundSocket,[Function responseFactory = null]) {
       var params = new _NetworkServiceCreateTcpBoundSocketParams();
@@ -1157,7 +1157,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       params.boundSocket = boundSocket;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _NetworkService_createTcpBoundSocketName,
+          _networkServiceMethodCreateTcpBoundSocketName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1169,7 +1169,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       params.clientSocket = clientSocket;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _NetworkService_createTcpConnectedSocketName,
+          _networkServiceMethodCreateTcpConnectedSocketName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1180,7 +1180,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceCreateUdpSocketParams();
       params.socket = socket;
-      _proxyImpl.sendMessage(params, _NetworkService_createUdpSocketName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodCreateUdpSocketName);
     }
     dynamic createHttpServer(net_address_mojom.NetAddress localAddress,Object delegate,[Function responseFactory = null]) {
       var params = new _NetworkServiceCreateHttpServerParams();
@@ -1188,7 +1188,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       params.delegate = delegate;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _NetworkService_createHttpServerName,
+          _networkServiceMethodCreateHttpServerName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1199,7 +1199,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceRegisterUrlLoaderInterceptorParams();
       params.factory = factory;
-      _proxyImpl.sendMessage(params, _NetworkService_registerUrlLoaderInterceptorName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodRegisterUrlLoaderInterceptorName);
     }
     void createHostResolver(Object hostResolver) {
       if (!_proxyImpl.isBound) {
@@ -1208,7 +1208,7 @@ class _NetworkServiceProxyCalls implements NetworkService {
       }
       var params = new _NetworkServiceCreateHostResolverParams();
       params.hostResolver = hostResolver;
-      _proxyImpl.sendMessage(params, _NetworkService_createHostResolverName);
+      _proxyImpl.sendMessage(params, _networkServiceMethodCreateHostResolverName);
     }
 }
 
@@ -1291,23 +1291,23 @@ class NetworkServiceStub extends bindings.Stub {
   }
 
 
-  NetworkServiceCreateTcpBoundSocketResponseParams _NetworkServiceCreateTcpBoundSocketResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress boundTo) {
-    var mojo_factory_result = new NetworkServiceCreateTcpBoundSocketResponseParams();
-    mojo_factory_result.result = result;
-    mojo_factory_result.boundTo = boundTo;
-    return mojo_factory_result;
+  NetworkServiceCreateTcpBoundSocketResponseParams _networkServiceCreateTcpBoundSocketResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress boundTo) {
+    var result = new NetworkServiceCreateTcpBoundSocketResponseParams();
+    result.result = result;
+    result.boundTo = boundTo;
+    return result;
   }
-  NetworkServiceCreateTcpConnectedSocketResponseParams _NetworkServiceCreateTcpConnectedSocketResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress localAddress) {
-    var mojo_factory_result = new NetworkServiceCreateTcpConnectedSocketResponseParams();
-    mojo_factory_result.result = result;
-    mojo_factory_result.localAddress = localAddress;
-    return mojo_factory_result;
+  NetworkServiceCreateTcpConnectedSocketResponseParams _networkServiceCreateTcpConnectedSocketResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress localAddress) {
+    var result = new NetworkServiceCreateTcpConnectedSocketResponseParams();
+    result.result = result;
+    result.localAddress = localAddress;
+    return result;
   }
-  NetworkServiceCreateHttpServerResponseParams _NetworkServiceCreateHttpServerResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress boundTo) {
-    var mojo_factory_result = new NetworkServiceCreateHttpServerResponseParams();
-    mojo_factory_result.result = result;
-    mojo_factory_result.boundTo = boundTo;
-    return mojo_factory_result;
+  NetworkServiceCreateHttpServerResponseParams _networkServiceCreateHttpServerResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress boundTo) {
+    var result = new NetworkServiceCreateHttpServerResponseParams();
+    result.result = result;
+    result.boundTo = boundTo;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1318,31 +1318,31 @@ class NetworkServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NetworkService_createUrlLoaderName:
+      case _networkServiceMethodCreateUrlLoaderName:
         var params = _NetworkServiceCreateUrlLoaderParams.deserialize(
             message.payload);
         _impl.createUrlLoader(params.loader);
         break;
-      case _NetworkService_getCookieStoreName:
+      case _networkServiceMethodGetCookieStoreName:
         var params = _NetworkServiceGetCookieStoreParams.deserialize(
             message.payload);
         _impl.getCookieStore(params.cookieStore);
         break;
-      case _NetworkService_createWebSocketName:
+      case _networkServiceMethodCreateWebSocketName:
         var params = _NetworkServiceCreateWebSocketParams.deserialize(
             message.payload);
         _impl.createWebSocket(params.socket);
         break;
-      case _NetworkService_createTcpBoundSocketName:
+      case _networkServiceMethodCreateTcpBoundSocketName:
         var params = _NetworkServiceCreateTcpBoundSocketParams.deserialize(
             message.payload);
-        var response = _impl.createTcpBoundSocket(params.localAddress,params.boundSocket,_NetworkServiceCreateTcpBoundSocketResponseParamsFactory);
+        var response = _impl.createTcpBoundSocket(params.localAddress,params.boundSocket,_networkServiceCreateTcpBoundSocketResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _NetworkService_createTcpBoundSocketName,
+                  _networkServiceMethodCreateTcpBoundSocketName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1350,21 +1350,21 @@ class NetworkServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _NetworkService_createTcpBoundSocketName,
+              _networkServiceMethodCreateTcpBoundSocketName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _NetworkService_createTcpConnectedSocketName:
+      case _networkServiceMethodCreateTcpConnectedSocketName:
         var params = _NetworkServiceCreateTcpConnectedSocketParams.deserialize(
             message.payload);
-        var response = _impl.createTcpConnectedSocket(params.remoteAddress,params.sendStream,params.receiveStream,params.clientSocket,_NetworkServiceCreateTcpConnectedSocketResponseParamsFactory);
+        var response = _impl.createTcpConnectedSocket(params.remoteAddress,params.sendStream,params.receiveStream,params.clientSocket,_networkServiceCreateTcpConnectedSocketResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _NetworkService_createTcpConnectedSocketName,
+                  _networkServiceMethodCreateTcpConnectedSocketName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1372,26 +1372,26 @@ class NetworkServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _NetworkService_createTcpConnectedSocketName,
+              _networkServiceMethodCreateTcpConnectedSocketName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _NetworkService_createUdpSocketName:
+      case _networkServiceMethodCreateUdpSocketName:
         var params = _NetworkServiceCreateUdpSocketParams.deserialize(
             message.payload);
         _impl.createUdpSocket(params.socket);
         break;
-      case _NetworkService_createHttpServerName:
+      case _networkServiceMethodCreateHttpServerName:
         var params = _NetworkServiceCreateHttpServerParams.deserialize(
             message.payload);
-        var response = _impl.createHttpServer(params.localAddress,params.delegate,_NetworkServiceCreateHttpServerResponseParamsFactory);
+        var response = _impl.createHttpServer(params.localAddress,params.delegate,_networkServiceCreateHttpServerResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _NetworkService_createHttpServerName,
+                  _networkServiceMethodCreateHttpServerName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1399,17 +1399,17 @@ class NetworkServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _NetworkService_createHttpServerName,
+              _networkServiceMethodCreateHttpServerName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _NetworkService_registerUrlLoaderInterceptorName:
+      case _networkServiceMethodRegisterUrlLoaderInterceptorName:
         var params = _NetworkServiceRegisterUrlLoaderInterceptorParams.deserialize(
             message.payload);
         _impl.registerUrlLoaderInterceptor(params.factory);
         break;
-      case _NetworkService_createHostResolverName:
+      case _networkServiceMethodCreateHostResolverName:
         var params = _NetworkServiceCreateHostResolverParams.deserialize(
             message.payload);
         _impl.createHostResolver(params.hostResolver);

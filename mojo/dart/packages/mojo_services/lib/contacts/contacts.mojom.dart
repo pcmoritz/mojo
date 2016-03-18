@@ -744,10 +744,10 @@ class ContactsServiceGetPhotoResponseParams extends bindings.Struct {
   }
 }
 
-const int _ContactsService_getCountName = 0;
-const int _ContactsService_getName = 1;
-const int _ContactsService_getEmailsName = 2;
-const int _ContactsService_getPhotoName = 3;
+const int _contactsServiceMethodGetCountName = 0;
+const int _contactsServiceMethodGetName = 1;
+const int _contactsServiceMethodGetEmailsName = 2;
+const int _contactsServiceMethodGetPhotoName = 3;
 
 class _ContactsServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -789,7 +789,7 @@ class _ContactsServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ContactsService_getCountName:
+      case _contactsServiceMethodGetCountName:
         var r = ContactsServiceGetCountResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -809,7 +809,7 @@ class _ContactsServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ContactsService_getName:
+      case _contactsServiceMethodGetName:
         var r = ContactsServiceGetResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -829,7 +829,7 @@ class _ContactsServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ContactsService_getEmailsName:
+      case _contactsServiceMethodGetEmailsName:
         var r = ContactsServiceGetEmailsResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -849,7 +849,7 @@ class _ContactsServiceProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ContactsService_getPhotoName:
+      case _contactsServiceMethodGetPhotoName:
         var r = ContactsServiceGetPhotoResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -892,7 +892,7 @@ class _ContactsServiceProxyCalls implements ContactsService {
       params.filter = filter;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ContactsService_getCountName,
+          _contactsServiceMethodGetCountName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -903,7 +903,7 @@ class _ContactsServiceProxyCalls implements ContactsService {
       params.limit = limit;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ContactsService_getName,
+          _contactsServiceMethodGetName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -912,7 +912,7 @@ class _ContactsServiceProxyCalls implements ContactsService {
       params.id = id;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ContactsService_getEmailsName,
+          _contactsServiceMethodGetEmailsName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -922,7 +922,7 @@ class _ContactsServiceProxyCalls implements ContactsService {
       params.highResolution = highResolution;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ContactsService_getPhotoName,
+          _contactsServiceMethodGetPhotoName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1007,25 +1007,25 @@ class ContactsServiceStub extends bindings.Stub {
   }
 
 
-  ContactsServiceGetCountResponseParams _ContactsServiceGetCountResponseParamsFactory(int count) {
-    var mojo_factory_result = new ContactsServiceGetCountResponseParams();
-    mojo_factory_result.count = count;
-    return mojo_factory_result;
+  ContactsServiceGetCountResponseParams _contactsServiceGetCountResponseParamsFactory(int count) {
+    var result = new ContactsServiceGetCountResponseParams();
+    result.count = count;
+    return result;
   }
-  ContactsServiceGetResponseParams _ContactsServiceGetResponseParamsFactory(List<Contact> contacts) {
-    var mojo_factory_result = new ContactsServiceGetResponseParams();
-    mojo_factory_result.contacts = contacts;
-    return mojo_factory_result;
+  ContactsServiceGetResponseParams _contactsServiceGetResponseParamsFactory(List<Contact> contacts) {
+    var result = new ContactsServiceGetResponseParams();
+    result.contacts = contacts;
+    return result;
   }
-  ContactsServiceGetEmailsResponseParams _ContactsServiceGetEmailsResponseParamsFactory(List<String> emails) {
-    var mojo_factory_result = new ContactsServiceGetEmailsResponseParams();
-    mojo_factory_result.emails = emails;
-    return mojo_factory_result;
+  ContactsServiceGetEmailsResponseParams _contactsServiceGetEmailsResponseParamsFactory(List<String> emails) {
+    var result = new ContactsServiceGetEmailsResponseParams();
+    result.emails = emails;
+    return result;
   }
-  ContactsServiceGetPhotoResponseParams _ContactsServiceGetPhotoResponseParamsFactory(String photoUrl) {
-    var mojo_factory_result = new ContactsServiceGetPhotoResponseParams();
-    mojo_factory_result.photoUrl = photoUrl;
-    return mojo_factory_result;
+  ContactsServiceGetPhotoResponseParams _contactsServiceGetPhotoResponseParamsFactory(String photoUrl) {
+    var result = new ContactsServiceGetPhotoResponseParams();
+    result.photoUrl = photoUrl;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1036,16 +1036,16 @@ class ContactsServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ContactsService_getCountName:
+      case _contactsServiceMethodGetCountName:
         var params = _ContactsServiceGetCountParams.deserialize(
             message.payload);
-        var response = _impl.getCount(params.filter,_ContactsServiceGetCountResponseParamsFactory);
+        var response = _impl.getCount(params.filter,_contactsServiceGetCountResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ContactsService_getCountName,
+                  _contactsServiceMethodGetCountName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1053,21 +1053,21 @@ class ContactsServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ContactsService_getCountName,
+              _contactsServiceMethodGetCountName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ContactsService_getName:
+      case _contactsServiceMethodGetName:
         var params = _ContactsServiceGetParams.deserialize(
             message.payload);
-        var response = _impl.get(params.filter,params.offset,params.limit,_ContactsServiceGetResponseParamsFactory);
+        var response = _impl.get(params.filter,params.offset,params.limit,_contactsServiceGetResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ContactsService_getName,
+                  _contactsServiceMethodGetName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1075,21 +1075,21 @@ class ContactsServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ContactsService_getName,
+              _contactsServiceMethodGetName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ContactsService_getEmailsName:
+      case _contactsServiceMethodGetEmailsName:
         var params = _ContactsServiceGetEmailsParams.deserialize(
             message.payload);
-        var response = _impl.getEmails(params.id,_ContactsServiceGetEmailsResponseParamsFactory);
+        var response = _impl.getEmails(params.id,_contactsServiceGetEmailsResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ContactsService_getEmailsName,
+                  _contactsServiceMethodGetEmailsName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1097,21 +1097,21 @@ class ContactsServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ContactsService_getEmailsName,
+              _contactsServiceMethodGetEmailsName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ContactsService_getPhotoName:
+      case _contactsServiceMethodGetPhotoName:
         var params = _ContactsServiceGetPhotoParams.deserialize(
             message.payload);
-        var response = _impl.getPhoto(params.id,params.highResolution,_ContactsServiceGetPhotoResponseParamsFactory);
+        var response = _impl.getPhoto(params.id,params.highResolution,_contactsServiceGetPhotoResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ContactsService_getPhotoName,
+                  _contactsServiceMethodGetPhotoName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1119,7 +1119,7 @@ class ContactsServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ContactsService_getPhotoName,
+              _contactsServiceMethodGetPhotoName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

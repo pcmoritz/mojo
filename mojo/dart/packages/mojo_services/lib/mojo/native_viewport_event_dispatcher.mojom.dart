@@ -141,7 +141,7 @@ class NativeViewportEventDispatcherOnEventResponseParams extends bindings.Struct
   }
 }
 
-const int _NativeViewportEventDispatcher_onEventName = 0;
+const int _nativeViewportEventDispatcherMethodOnEventName = 0;
 
 class _NativeViewportEventDispatcherServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -180,7 +180,7 @@ class _NativeViewportEventDispatcherProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _NativeViewportEventDispatcher_onEventName:
+      case _nativeViewportEventDispatcherMethodOnEventName:
         var r = NativeViewportEventDispatcherOnEventResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -223,7 +223,7 @@ class _NativeViewportEventDispatcherProxyCalls implements NativeViewportEventDis
       params.event = event;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _NativeViewportEventDispatcher_onEventName,
+          _nativeViewportEventDispatcherMethodOnEventName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -308,9 +308,9 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
   }
 
 
-  NativeViewportEventDispatcherOnEventResponseParams _NativeViewportEventDispatcherOnEventResponseParamsFactory() {
-    var mojo_factory_result = new NativeViewportEventDispatcherOnEventResponseParams();
-    return mojo_factory_result;
+  NativeViewportEventDispatcherOnEventResponseParams _nativeViewportEventDispatcherOnEventResponseParamsFactory() {
+    var result = new NativeViewportEventDispatcherOnEventResponseParams();
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -321,16 +321,16 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NativeViewportEventDispatcher_onEventName:
+      case _nativeViewportEventDispatcherMethodOnEventName:
         var params = _NativeViewportEventDispatcherOnEventParams.deserialize(
             message.payload);
-        var response = _impl.onEvent(params.event,_NativeViewportEventDispatcherOnEventResponseParamsFactory);
+        var response = _impl.onEvent(params.event,_nativeViewportEventDispatcherOnEventResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _NativeViewportEventDispatcher_onEventName,
+                  _nativeViewportEventDispatcherMethodOnEventName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -338,7 +338,7 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _NativeViewportEventDispatcher_onEventName,
+              _nativeViewportEventDispatcherMethodOnEventName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

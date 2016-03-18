@@ -698,10 +698,10 @@ class TerminalSetSizeResponseParams extends bindings.Struct {
   }
 }
 
-const int _Terminal_connectName = 0;
-const int _Terminal_connectToClientName = 1;
-const int _Terminal_getSizeName = 2;
-const int _Terminal_setSizeName = 3;
+const int _terminalMethodConnectName = 0;
+const int _terminalMethodConnectToClientName = 1;
+const int _terminalMethodGetSizeName = 2;
+const int _terminalMethodSetSizeName = 3;
 
 class _TerminalServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -743,7 +743,7 @@ class _TerminalProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Terminal_connectName:
+      case _terminalMethodConnectName:
         var r = TerminalConnectResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -763,7 +763,7 @@ class _TerminalProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Terminal_connectToClientName:
+      case _terminalMethodConnectToClientName:
         var r = TerminalConnectToClientResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -783,7 +783,7 @@ class _TerminalProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Terminal_getSizeName:
+      case _terminalMethodGetSizeName:
         var r = TerminalGetSizeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -803,7 +803,7 @@ class _TerminalProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Terminal_setSizeName:
+      case _terminalMethodSetSizeName:
         var r = TerminalSetSizeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -847,7 +847,7 @@ class _TerminalProxyCalls implements Terminal {
       params.force = force;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Terminal_connectName,
+          _terminalMethodConnectName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -857,7 +857,7 @@ class _TerminalProxyCalls implements Terminal {
       params.force = force;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Terminal_connectToClientName,
+          _terminalMethodConnectToClientName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -865,7 +865,7 @@ class _TerminalProxyCalls implements Terminal {
       var params = new _TerminalGetSizeParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Terminal_getSizeName,
+          _terminalMethodGetSizeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -876,7 +876,7 @@ class _TerminalProxyCalls implements Terminal {
       params.reset = reset;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Terminal_setSizeName,
+          _terminalMethodSetSizeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -961,29 +961,29 @@ class TerminalStub extends bindings.Stub {
   }
 
 
-  TerminalConnectResponseParams _TerminalConnectResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new TerminalConnectResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  TerminalConnectResponseParams _terminalConnectResponseParamsFactory(types_mojom.Error error) {
+    var result = new TerminalConnectResponseParams();
+    result.error = error;
+    return result;
   }
-  TerminalConnectToClientResponseParams _TerminalConnectToClientResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new TerminalConnectToClientResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  TerminalConnectToClientResponseParams _terminalConnectToClientResponseParamsFactory(types_mojom.Error error) {
+    var result = new TerminalConnectToClientResponseParams();
+    result.error = error;
+    return result;
   }
-  TerminalGetSizeResponseParams _TerminalGetSizeResponseParamsFactory(types_mojom.Error error, int rows, int columns) {
-    var mojo_factory_result = new TerminalGetSizeResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.rows = rows;
-    mojo_factory_result.columns = columns;
-    return mojo_factory_result;
+  TerminalGetSizeResponseParams _terminalGetSizeResponseParamsFactory(types_mojom.Error error, int rows, int columns) {
+    var result = new TerminalGetSizeResponseParams();
+    result.error = error;
+    result.rows = rows;
+    result.columns = columns;
+    return result;
   }
-  TerminalSetSizeResponseParams _TerminalSetSizeResponseParamsFactory(types_mojom.Error error, int rows, int columns) {
-    var mojo_factory_result = new TerminalSetSizeResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.rows = rows;
-    mojo_factory_result.columns = columns;
-    return mojo_factory_result;
+  TerminalSetSizeResponseParams _terminalSetSizeResponseParamsFactory(types_mojom.Error error, int rows, int columns) {
+    var result = new TerminalSetSizeResponseParams();
+    result.error = error;
+    result.rows = rows;
+    result.columns = columns;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -994,16 +994,16 @@ class TerminalStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Terminal_connectName:
+      case _terminalMethodConnectName:
         var params = _TerminalConnectParams.deserialize(
             message.payload);
-        var response = _impl.connect(params.terminalFile,params.force,_TerminalConnectResponseParamsFactory);
+        var response = _impl.connect(params.terminalFile,params.force,_terminalConnectResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Terminal_connectName,
+                  _terminalMethodConnectName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1011,21 +1011,21 @@ class TerminalStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Terminal_connectName,
+              _terminalMethodConnectName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Terminal_connectToClientName:
+      case _terminalMethodConnectToClientName:
         var params = _TerminalConnectToClientParams.deserialize(
             message.payload);
-        var response = _impl.connectToClient(params.terminalClient,params.force,_TerminalConnectToClientResponseParamsFactory);
+        var response = _impl.connectToClient(params.terminalClient,params.force,_terminalConnectToClientResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Terminal_connectToClientName,
+                  _terminalMethodConnectToClientName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1033,19 +1033,19 @@ class TerminalStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Terminal_connectToClientName,
+              _terminalMethodConnectToClientName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Terminal_getSizeName:
-        var response = _impl.getSize(_TerminalGetSizeResponseParamsFactory);
+      case _terminalMethodGetSizeName:
+        var response = _impl.getSize(_terminalGetSizeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Terminal_getSizeName,
+                  _terminalMethodGetSizeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1053,21 +1053,21 @@ class TerminalStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Terminal_getSizeName,
+              _terminalMethodGetSizeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Terminal_setSizeName:
+      case _terminalMethodSetSizeName:
         var params = _TerminalSetSizeParams.deserialize(
             message.payload);
-        var response = _impl.setSize(params.rows,params.columns,params.reset,_TerminalSetSizeResponseParamsFactory);
+        var response = _impl.setSize(params.rows,params.columns,params.reset,_terminalSetSizeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Terminal_setSizeName,
+                  _terminalMethodSetSizeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1075,7 +1075,7 @@ class TerminalStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Terminal_setSizeName,
+              _terminalMethodSetSizeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

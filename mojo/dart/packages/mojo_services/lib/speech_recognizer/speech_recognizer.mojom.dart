@@ -397,12 +397,12 @@ enum ResultOrErrorTag {
 }
 
 class ResultOrError extends bindings.Union {
-  static final _tag_to_int = const {
+  static final _tagToInt = const {
     ResultOrErrorTag.errorCode: 0,
     ResultOrErrorTag.results: 1,
   };
 
-  static final _int_to_tag = const {
+  static final _intToTag = const {
     0: ResultOrErrorTag.errorCode,
     1: ResultOrErrorTag.results,
   };
@@ -442,7 +442,7 @@ class ResultOrError extends bindings.Union {
     ResultOrError result = new ResultOrError();
 
     
-    ResultOrErrorTag tag = _int_to_tag[decoder0.decodeUint32(offset + 4)];
+    ResultOrErrorTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
       case ResultOrErrorTag.errorCode:
         
@@ -475,7 +475,7 @@ class ResultOrError extends bindings.Union {
   void encode(bindings.Encoder encoder0, int offset) {
     
     encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tag_to_int[_tag], offset + 4);
+    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
       case ResultOrErrorTag.errorCode:
         encoder0.encodeEnum(errorCode, offset + 8);
@@ -511,8 +511,8 @@ class ResultOrError extends bindings.Union {
     return result;
   }
 }
-const int _SpeechRecognizerService_listenName = 0;
-const int _SpeechRecognizerService_stopListeningName = 1;
+const int _speechRecognizerServiceMethodListenName = 0;
+const int _speechRecognizerServiceMethodStopListeningName = 1;
 
 class _SpeechRecognizerServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -552,7 +552,7 @@ class _SpeechRecognizerServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _SpeechRecognizerService_listenName:
+      case _speechRecognizerServiceMethodListenName:
         var r = SpeechRecognizerServiceListenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -594,7 +594,7 @@ class _SpeechRecognizerServiceProxyCalls implements SpeechRecognizerService {
       var params = new _SpeechRecognizerServiceListenParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _SpeechRecognizerService_listenName,
+          _speechRecognizerServiceMethodListenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -604,7 +604,7 @@ class _SpeechRecognizerServiceProxyCalls implements SpeechRecognizerService {
         return;
       }
       var params = new _SpeechRecognizerServiceStopListeningParams();
-      _proxyImpl.sendMessage(params, _SpeechRecognizerService_stopListeningName);
+      _proxyImpl.sendMessage(params, _speechRecognizerServiceMethodStopListeningName);
     }
 }
 
@@ -687,10 +687,10 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
   }
 
 
-  SpeechRecognizerServiceListenResponseParams _SpeechRecognizerServiceListenResponseParamsFactory(ResultOrError resultOrError) {
-    var mojo_factory_result = new SpeechRecognizerServiceListenResponseParams();
-    mojo_factory_result.resultOrError = resultOrError;
-    return mojo_factory_result;
+  SpeechRecognizerServiceListenResponseParams _speechRecognizerServiceListenResponseParamsFactory(ResultOrError resultOrError) {
+    var result = new SpeechRecognizerServiceListenResponseParams();
+    result.resultOrError = resultOrError;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -701,14 +701,14 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SpeechRecognizerService_listenName:
-        var response = _impl.listen(_SpeechRecognizerServiceListenResponseParamsFactory);
+      case _speechRecognizerServiceMethodListenName:
+        var response = _impl.listen(_speechRecognizerServiceListenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _SpeechRecognizerService_listenName,
+                  _speechRecognizerServiceMethodListenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -716,12 +716,12 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _SpeechRecognizerService_listenName,
+              _speechRecognizerServiceMethodListenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _SpeechRecognizerService_stopListeningName:
+      case _speechRecognizerServiceMethodStopListeningName:
         _impl.stopListening();
         break;
       default:

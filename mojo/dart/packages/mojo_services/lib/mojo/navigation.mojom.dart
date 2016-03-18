@@ -302,9 +302,9 @@ class _NavigatorHostDidNavigateLocallyParams extends bindings.Struct {
   }
 }
 
-const int _NavigatorHost_requestNavigateName = 0;
-const int _NavigatorHost_requestNavigateHistoryName = 1;
-const int _NavigatorHost_didNavigateLocallyName = 2;
+const int _navigatorHostMethodRequestNavigateName = 0;
+const int _navigatorHostMethodRequestNavigateHistoryName = 1;
+const int _navigatorHostMethodDidNavigateLocallyName = 2;
 
 class _NavigatorHostServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -371,7 +371,7 @@ class _NavigatorHostProxyCalls implements NavigatorHost {
       var params = new _NavigatorHostRequestNavigateParams();
       params.target = target;
       params.request = request;
-      _proxyImpl.sendMessage(params, _NavigatorHost_requestNavigateName);
+      _proxyImpl.sendMessage(params, _navigatorHostMethodRequestNavigateName);
     }
     void requestNavigateHistory(int delta) {
       if (!_proxyImpl.isBound) {
@@ -380,7 +380,7 @@ class _NavigatorHostProxyCalls implements NavigatorHost {
       }
       var params = new _NavigatorHostRequestNavigateHistoryParams();
       params.delta = delta;
-      _proxyImpl.sendMessage(params, _NavigatorHost_requestNavigateHistoryName);
+      _proxyImpl.sendMessage(params, _navigatorHostMethodRequestNavigateHistoryName);
     }
     void didNavigateLocally(String url) {
       if (!_proxyImpl.isBound) {
@@ -389,7 +389,7 @@ class _NavigatorHostProxyCalls implements NavigatorHost {
       }
       var params = new _NavigatorHostDidNavigateLocallyParams();
       params.url = url;
-      _proxyImpl.sendMessage(params, _NavigatorHost_didNavigateLocallyName);
+      _proxyImpl.sendMessage(params, _navigatorHostMethodDidNavigateLocallyName);
     }
 }
 
@@ -481,17 +481,17 @@ class NavigatorHostStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NavigatorHost_requestNavigateName:
+      case _navigatorHostMethodRequestNavigateName:
         var params = _NavigatorHostRequestNavigateParams.deserialize(
             message.payload);
         _impl.requestNavigate(params.target, params.request);
         break;
-      case _NavigatorHost_requestNavigateHistoryName:
+      case _navigatorHostMethodRequestNavigateHistoryName:
         var params = _NavigatorHostRequestNavigateHistoryParams.deserialize(
             message.payload);
         _impl.requestNavigateHistory(params.delta);
         break;
-      case _NavigatorHost_didNavigateLocallyName:
+      case _navigatorHostMethodDidNavigateLocallyName:
         var params = _NavigatorHostDidNavigateLocallyParams.deserialize(
             message.payload);
         _impl.didNavigateLocally(params.url);

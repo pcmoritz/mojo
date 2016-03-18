@@ -2317,20 +2317,20 @@ class FileIoctlResponseParams extends bindings.Struct {
   }
 }
 
-const int _File_closeName = 0;
-const int _File_readName = 1;
-const int _File_writeName = 2;
-const int _File_readToStreamName = 3;
-const int _File_writeFromStreamName = 4;
-const int _File_tellName = 5;
-const int _File_seekName = 6;
-const int _File_statName = 7;
-const int _File_truncateName = 8;
-const int _File_touchName = 9;
-const int _File_dupName = 10;
-const int _File_reopenName = 11;
-const int _File_asBufferName = 12;
-const int _File_ioctlName = 13;
+const int _fileMethodCloseName = 0;
+const int _fileMethodReadName = 1;
+const int _fileMethodWriteName = 2;
+const int _fileMethodReadToStreamName = 3;
+const int _fileMethodWriteFromStreamName = 4;
+const int _fileMethodTellName = 5;
+const int _fileMethodSeekName = 6;
+const int _fileMethodStatName = 7;
+const int _fileMethodTruncateName = 8;
+const int _fileMethodTouchName = 9;
+const int _fileMethodDupName = 10;
+const int _fileMethodReopenName = 11;
+const int _fileMethodAsBufferName = 12;
+const int _fileMethodIoctlName = 13;
 
 class _FileServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -2382,7 +2382,7 @@ class _FileProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _File_closeName:
+      case _fileMethodCloseName:
         var r = FileCloseResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2402,7 +2402,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_readName:
+      case _fileMethodReadName:
         var r = FileReadResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2422,7 +2422,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_writeName:
+      case _fileMethodWriteName:
         var r = FileWriteResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2442,7 +2442,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_readToStreamName:
+      case _fileMethodReadToStreamName:
         var r = FileReadToStreamResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2462,7 +2462,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_writeFromStreamName:
+      case _fileMethodWriteFromStreamName:
         var r = FileWriteFromStreamResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2482,7 +2482,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_tellName:
+      case _fileMethodTellName:
         var r = FileTellResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2502,7 +2502,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_seekName:
+      case _fileMethodSeekName:
         var r = FileSeekResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2522,7 +2522,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_statName:
+      case _fileMethodStatName:
         var r = FileStatResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2542,7 +2542,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_truncateName:
+      case _fileMethodTruncateName:
         var r = FileTruncateResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2562,7 +2562,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_touchName:
+      case _fileMethodTouchName:
         var r = FileTouchResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2582,7 +2582,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_dupName:
+      case _fileMethodDupName:
         var r = FileDupResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2602,7 +2602,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_reopenName:
+      case _fileMethodReopenName:
         var r = FileReopenResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2622,7 +2622,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_asBufferName:
+      case _fileMethodAsBufferName:
         var r = FileAsBufferResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2642,7 +2642,7 @@ class _FileProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _File_ioctlName:
+      case _fileMethodIoctlName:
         var r = FileIoctlResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -2684,7 +2684,7 @@ class _FileProxyCalls implements File {
       var params = new _FileCloseParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_closeName,
+          _fileMethodCloseName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2695,7 +2695,7 @@ class _FileProxyCalls implements File {
       params.whence = whence;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_readName,
+          _fileMethodReadName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2706,7 +2706,7 @@ class _FileProxyCalls implements File {
       params.whence = whence;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_writeName,
+          _fileMethodWriteName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2718,7 +2718,7 @@ class _FileProxyCalls implements File {
       params.numBytesToRead = numBytesToRead;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_readToStreamName,
+          _fileMethodReadToStreamName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2729,7 +2729,7 @@ class _FileProxyCalls implements File {
       params.whence = whence;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_writeFromStreamName,
+          _fileMethodWriteFromStreamName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2737,7 +2737,7 @@ class _FileProxyCalls implements File {
       var params = new _FileTellParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_tellName,
+          _fileMethodTellName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2747,7 +2747,7 @@ class _FileProxyCalls implements File {
       params.whence = whence;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_seekName,
+          _fileMethodSeekName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2755,7 +2755,7 @@ class _FileProxyCalls implements File {
       var params = new _FileStatParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_statName,
+          _fileMethodStatName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2764,7 +2764,7 @@ class _FileProxyCalls implements File {
       params.size = size;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_truncateName,
+          _fileMethodTruncateName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2774,7 +2774,7 @@ class _FileProxyCalls implements File {
       params.mtime = mtime;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_touchName,
+          _fileMethodTouchName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2783,7 +2783,7 @@ class _FileProxyCalls implements File {
       params.file = file;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_dupName,
+          _fileMethodDupName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2793,7 +2793,7 @@ class _FileProxyCalls implements File {
       params.openFlags = openFlags;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_reopenName,
+          _fileMethodReopenName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2801,7 +2801,7 @@ class _FileProxyCalls implements File {
       var params = new _FileAsBufferParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_asBufferName,
+          _fileMethodAsBufferName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2811,7 +2811,7 @@ class _FileProxyCalls implements File {
       params.inValues = inValues;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _File_ioctlName,
+          _fileMethodIoctlName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -2896,82 +2896,82 @@ class FileStub extends bindings.Stub {
   }
 
 
-  FileCloseResponseParams _FileCloseResponseParamsFactory(types_mojom.Error err) {
-    var mojo_factory_result = new FileCloseResponseParams();
-    mojo_factory_result.err = err;
-    return mojo_factory_result;
+  FileCloseResponseParams _fileCloseResponseParamsFactory(types_mojom.Error err) {
+    var result = new FileCloseResponseParams();
+    result.err = err;
+    return result;
   }
-  FileReadResponseParams _FileReadResponseParamsFactory(types_mojom.Error error, List<int> bytesRead) {
-    var mojo_factory_result = new FileReadResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.bytesRead = bytesRead;
-    return mojo_factory_result;
+  FileReadResponseParams _fileReadResponseParamsFactory(types_mojom.Error error, List<int> bytesRead) {
+    var result = new FileReadResponseParams();
+    result.error = error;
+    result.bytesRead = bytesRead;
+    return result;
   }
-  FileWriteResponseParams _FileWriteResponseParamsFactory(types_mojom.Error error, int numBytesWritten) {
-    var mojo_factory_result = new FileWriteResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.numBytesWritten = numBytesWritten;
-    return mojo_factory_result;
+  FileWriteResponseParams _fileWriteResponseParamsFactory(types_mojom.Error error, int numBytesWritten) {
+    var result = new FileWriteResponseParams();
+    result.error = error;
+    result.numBytesWritten = numBytesWritten;
+    return result;
   }
-  FileReadToStreamResponseParams _FileReadToStreamResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileReadToStreamResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileReadToStreamResponseParams _fileReadToStreamResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileReadToStreamResponseParams();
+    result.error = error;
+    return result;
   }
-  FileWriteFromStreamResponseParams _FileWriteFromStreamResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileWriteFromStreamResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileWriteFromStreamResponseParams _fileWriteFromStreamResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileWriteFromStreamResponseParams();
+    result.error = error;
+    return result;
   }
-  FileTellResponseParams _FileTellResponseParamsFactory(types_mojom.Error error, int position) {
-    var mojo_factory_result = new FileTellResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.position = position;
-    return mojo_factory_result;
+  FileTellResponseParams _fileTellResponseParamsFactory(types_mojom.Error error, int position) {
+    var result = new FileTellResponseParams();
+    result.error = error;
+    result.position = position;
+    return result;
   }
-  FileSeekResponseParams _FileSeekResponseParamsFactory(types_mojom.Error error, int position) {
-    var mojo_factory_result = new FileSeekResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.position = position;
-    return mojo_factory_result;
+  FileSeekResponseParams _fileSeekResponseParamsFactory(types_mojom.Error error, int position) {
+    var result = new FileSeekResponseParams();
+    result.error = error;
+    result.position = position;
+    return result;
   }
-  FileStatResponseParams _FileStatResponseParamsFactory(types_mojom.Error error, types_mojom.FileInformation fileInformation) {
-    var mojo_factory_result = new FileStatResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.fileInformation = fileInformation;
-    return mojo_factory_result;
+  FileStatResponseParams _fileStatResponseParamsFactory(types_mojom.Error error, types_mojom.FileInformation fileInformation) {
+    var result = new FileStatResponseParams();
+    result.error = error;
+    result.fileInformation = fileInformation;
+    return result;
   }
-  FileTruncateResponseParams _FileTruncateResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileTruncateResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileTruncateResponseParams _fileTruncateResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileTruncateResponseParams();
+    result.error = error;
+    return result;
   }
-  FileTouchResponseParams _FileTouchResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileTouchResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileTouchResponseParams _fileTouchResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileTouchResponseParams();
+    result.error = error;
+    return result;
   }
-  FileDupResponseParams _FileDupResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileDupResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileDupResponseParams _fileDupResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileDupResponseParams();
+    result.error = error;
+    return result;
   }
-  FileReopenResponseParams _FileReopenResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new FileReopenResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  FileReopenResponseParams _fileReopenResponseParamsFactory(types_mojom.Error error) {
+    var result = new FileReopenResponseParams();
+    result.error = error;
+    return result;
   }
-  FileAsBufferResponseParams _FileAsBufferResponseParamsFactory(types_mojom.Error error, core.MojoSharedBuffer buffer) {
-    var mojo_factory_result = new FileAsBufferResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.buffer = buffer;
-    return mojo_factory_result;
+  FileAsBufferResponseParams _fileAsBufferResponseParamsFactory(types_mojom.Error error, core.MojoSharedBuffer buffer) {
+    var result = new FileAsBufferResponseParams();
+    result.error = error;
+    result.buffer = buffer;
+    return result;
   }
-  FileIoctlResponseParams _FileIoctlResponseParamsFactory(types_mojom.Error error, List<int> outValues) {
-    var mojo_factory_result = new FileIoctlResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.outValues = outValues;
-    return mojo_factory_result;
+  FileIoctlResponseParams _fileIoctlResponseParamsFactory(types_mojom.Error error, List<int> outValues) {
+    var result = new FileIoctlResponseParams();
+    result.error = error;
+    result.outValues = outValues;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -2982,14 +2982,14 @@ class FileStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _File_closeName:
-        var response = _impl.close(_FileCloseResponseParamsFactory);
+      case _fileMethodCloseName:
+        var response = _impl.close(_fileCloseResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_closeName,
+                  _fileMethodCloseName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -2997,21 +2997,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_closeName,
+              _fileMethodCloseName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_readName:
+      case _fileMethodReadName:
         var params = _FileReadParams.deserialize(
             message.payload);
-        var response = _impl.read(params.numBytesToRead,params.offset,params.whence,_FileReadResponseParamsFactory);
+        var response = _impl.read(params.numBytesToRead,params.offset,params.whence,_fileReadResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_readName,
+                  _fileMethodReadName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3019,21 +3019,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_readName,
+              _fileMethodReadName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_writeName:
+      case _fileMethodWriteName:
         var params = _FileWriteParams.deserialize(
             message.payload);
-        var response = _impl.write(params.bytesToWrite,params.offset,params.whence,_FileWriteResponseParamsFactory);
+        var response = _impl.write(params.bytesToWrite,params.offset,params.whence,_fileWriteResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_writeName,
+                  _fileMethodWriteName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3041,21 +3041,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_writeName,
+              _fileMethodWriteName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_readToStreamName:
+      case _fileMethodReadToStreamName:
         var params = _FileReadToStreamParams.deserialize(
             message.payload);
-        var response = _impl.readToStream(params.source,params.offset,params.whence,params.numBytesToRead,_FileReadToStreamResponseParamsFactory);
+        var response = _impl.readToStream(params.source,params.offset,params.whence,params.numBytesToRead,_fileReadToStreamResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_readToStreamName,
+                  _fileMethodReadToStreamName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3063,21 +3063,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_readToStreamName,
+              _fileMethodReadToStreamName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_writeFromStreamName:
+      case _fileMethodWriteFromStreamName:
         var params = _FileWriteFromStreamParams.deserialize(
             message.payload);
-        var response = _impl.writeFromStream(params.sink,params.offset,params.whence,_FileWriteFromStreamResponseParamsFactory);
+        var response = _impl.writeFromStream(params.sink,params.offset,params.whence,_fileWriteFromStreamResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_writeFromStreamName,
+                  _fileMethodWriteFromStreamName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3085,19 +3085,19 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_writeFromStreamName,
+              _fileMethodWriteFromStreamName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_tellName:
-        var response = _impl.tell(_FileTellResponseParamsFactory);
+      case _fileMethodTellName:
+        var response = _impl.tell(_fileTellResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_tellName,
+                  _fileMethodTellName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3105,21 +3105,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_tellName,
+              _fileMethodTellName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_seekName:
+      case _fileMethodSeekName:
         var params = _FileSeekParams.deserialize(
             message.payload);
-        var response = _impl.seek(params.offset,params.whence,_FileSeekResponseParamsFactory);
+        var response = _impl.seek(params.offset,params.whence,_fileSeekResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_seekName,
+                  _fileMethodSeekName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3127,19 +3127,19 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_seekName,
+              _fileMethodSeekName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_statName:
-        var response = _impl.stat(_FileStatResponseParamsFactory);
+      case _fileMethodStatName:
+        var response = _impl.stat(_fileStatResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_statName,
+                  _fileMethodStatName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3147,21 +3147,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_statName,
+              _fileMethodStatName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_truncateName:
+      case _fileMethodTruncateName:
         var params = _FileTruncateParams.deserialize(
             message.payload);
-        var response = _impl.truncate(params.size,_FileTruncateResponseParamsFactory);
+        var response = _impl.truncate(params.size,_fileTruncateResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_truncateName,
+                  _fileMethodTruncateName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3169,21 +3169,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_truncateName,
+              _fileMethodTruncateName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_touchName:
+      case _fileMethodTouchName:
         var params = _FileTouchParams.deserialize(
             message.payload);
-        var response = _impl.touch(params.atime,params.mtime,_FileTouchResponseParamsFactory);
+        var response = _impl.touch(params.atime,params.mtime,_fileTouchResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_touchName,
+                  _fileMethodTouchName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3191,21 +3191,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_touchName,
+              _fileMethodTouchName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_dupName:
+      case _fileMethodDupName:
         var params = _FileDupParams.deserialize(
             message.payload);
-        var response = _impl.dup(params.file,_FileDupResponseParamsFactory);
+        var response = _impl.dup(params.file,_fileDupResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_dupName,
+                  _fileMethodDupName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3213,21 +3213,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_dupName,
+              _fileMethodDupName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_reopenName:
+      case _fileMethodReopenName:
         var params = _FileReopenParams.deserialize(
             message.payload);
-        var response = _impl.reopen(params.file,params.openFlags,_FileReopenResponseParamsFactory);
+        var response = _impl.reopen(params.file,params.openFlags,_fileReopenResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_reopenName,
+                  _fileMethodReopenName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3235,19 +3235,19 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_reopenName,
+              _fileMethodReopenName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_asBufferName:
-        var response = _impl.asBuffer(_FileAsBufferResponseParamsFactory);
+      case _fileMethodAsBufferName:
+        var response = _impl.asBuffer(_fileAsBufferResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_asBufferName,
+                  _fileMethodAsBufferName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3255,21 +3255,21 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_asBufferName,
+              _fileMethodAsBufferName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _File_ioctlName:
+      case _fileMethodIoctlName:
         var params = _FileIoctlParams.deserialize(
             message.payload);
-        var response = _impl.ioctl(params.request,params.inValues,_FileIoctlResponseParamsFactory);
+        var response = _impl.ioctl(params.request,params.inValues,_fileIoctlResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _File_ioctlName,
+                  _fileMethodIoctlName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -3277,7 +3277,7 @@ class FileStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _File_ioctlName,
+              _fileMethodIoctlName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

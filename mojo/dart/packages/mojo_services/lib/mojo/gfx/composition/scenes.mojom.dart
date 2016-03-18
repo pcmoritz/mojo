@@ -707,10 +707,10 @@ class SceneListenerOnResourceUnavailableResponseParams extends bindings.Struct {
   }
 }
 
-const int _Scene_setListenerName = 0;
-const int _Scene_updateName = 1;
-const int _Scene_publishName = 2;
-const int _Scene_getSchedulerName = 3;
+const int _sceneMethodSetListenerName = 0;
+const int _sceneMethodUpdateName = 1;
+const int _sceneMethodPublishName = 2;
+const int _sceneMethodGetSchedulerName = 3;
 
 class _SceneServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -777,7 +777,7 @@ class _SceneProxyCalls implements Scene {
       }
       var params = new _SceneSetListenerParams();
       params.listener = listener;
-      _proxyImpl.sendMessage(params, _Scene_setListenerName);
+      _proxyImpl.sendMessage(params, _sceneMethodSetListenerName);
     }
     void update(SceneUpdate update) {
       if (!_proxyImpl.isBound) {
@@ -786,7 +786,7 @@ class _SceneProxyCalls implements Scene {
       }
       var params = new _SceneUpdateParams();
       params.update = update;
-      _proxyImpl.sendMessage(params, _Scene_updateName);
+      _proxyImpl.sendMessage(params, _sceneMethodUpdateName);
     }
     void publish(SceneMetadata metadata) {
       if (!_proxyImpl.isBound) {
@@ -795,7 +795,7 @@ class _SceneProxyCalls implements Scene {
       }
       var params = new _ScenePublishParams();
       params.metadata = metadata;
-      _proxyImpl.sendMessage(params, _Scene_publishName);
+      _proxyImpl.sendMessage(params, _sceneMethodPublishName);
     }
     void getScheduler(Object scheduler) {
       if (!_proxyImpl.isBound) {
@@ -804,7 +804,7 @@ class _SceneProxyCalls implements Scene {
       }
       var params = new _SceneGetSchedulerParams();
       params.scheduler = scheduler;
-      _proxyImpl.sendMessage(params, _Scene_getSchedulerName);
+      _proxyImpl.sendMessage(params, _sceneMethodGetSchedulerName);
     }
 }
 
@@ -896,22 +896,22 @@ class SceneStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Scene_setListenerName:
+      case _sceneMethodSetListenerName:
         var params = _SceneSetListenerParams.deserialize(
             message.payload);
         _impl.setListener(params.listener);
         break;
-      case _Scene_updateName:
+      case _sceneMethodUpdateName:
         var params = _SceneUpdateParams.deserialize(
             message.payload);
         _impl.update(params.update);
         break;
-      case _Scene_publishName:
+      case _sceneMethodPublishName:
         var params = _ScenePublishParams.deserialize(
             message.payload);
         _impl.publish(params.metadata);
         break;
-      case _Scene_getSchedulerName:
+      case _sceneMethodGetSchedulerName:
         var params = _SceneGetSchedulerParams.deserialize(
             message.payload);
         _impl.getScheduler(params.scheduler);
@@ -945,7 +945,7 @@ class SceneStub extends bindings.Stub {
   }
 }
 
-const int _SceneListener_onResourceUnavailableName = 0;
+const int _sceneListenerMethodOnResourceUnavailableName = 0;
 
 class _SceneListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -984,7 +984,7 @@ class _SceneListenerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _SceneListener_onResourceUnavailableName:
+      case _sceneListenerMethodOnResourceUnavailableName:
         var r = SceneListenerOnResourceUnavailableResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1027,7 +1027,7 @@ class _SceneListenerProxyCalls implements SceneListener {
       params.resourceId = resourceId;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _SceneListener_onResourceUnavailableName,
+          _sceneListenerMethodOnResourceUnavailableName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1112,9 +1112,9 @@ class SceneListenerStub extends bindings.Stub {
   }
 
 
-  SceneListenerOnResourceUnavailableResponseParams _SceneListenerOnResourceUnavailableResponseParamsFactory() {
-    var mojo_factory_result = new SceneListenerOnResourceUnavailableResponseParams();
-    return mojo_factory_result;
+  SceneListenerOnResourceUnavailableResponseParams _sceneListenerOnResourceUnavailableResponseParamsFactory() {
+    var result = new SceneListenerOnResourceUnavailableResponseParams();
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1125,16 +1125,16 @@ class SceneListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _SceneListener_onResourceUnavailableName:
+      case _sceneListenerMethodOnResourceUnavailableName:
         var params = _SceneListenerOnResourceUnavailableParams.deserialize(
             message.payload);
-        var response = _impl.onResourceUnavailable(params.resourceId,_SceneListenerOnResourceUnavailableResponseParamsFactory);
+        var response = _impl.onResourceUnavailable(params.resourceId,_sceneListenerOnResourceUnavailableResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _SceneListener_onResourceUnavailableName,
+                  _sceneListenerMethodOnResourceUnavailableName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1142,7 +1142,7 @@ class SceneListenerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _SceneListener_onResourceUnavailableName,
+              _sceneListenerMethodOnResourceUnavailableName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

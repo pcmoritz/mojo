@@ -615,8 +615,8 @@ class HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams extends bin
   }
 }
 
-const int _HttpConnection_setSendBufferSizeName = 0;
-const int _HttpConnection_setReceiveBufferSizeName = 1;
+const int _httpConnectionMethodSetSendBufferSizeName = 0;
+const int _httpConnectionMethodSetReceiveBufferSizeName = 1;
 
 class _HttpConnectionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -656,7 +656,7 @@ class _HttpConnectionProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _HttpConnection_setSendBufferSizeName:
+      case _httpConnectionMethodSetSendBufferSizeName:
         var r = HttpConnectionSetSendBufferSizeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -676,7 +676,7 @@ class _HttpConnectionProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _HttpConnection_setReceiveBufferSizeName:
+      case _httpConnectionMethodSetReceiveBufferSizeName:
         var r = HttpConnectionSetReceiveBufferSizeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -719,7 +719,7 @@ class _HttpConnectionProxyCalls implements HttpConnection {
       params.size = size;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HttpConnection_setSendBufferSizeName,
+          _httpConnectionMethodSetSendBufferSizeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -728,7 +728,7 @@ class _HttpConnectionProxyCalls implements HttpConnection {
       params.size = size;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HttpConnection_setReceiveBufferSizeName,
+          _httpConnectionMethodSetReceiveBufferSizeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -813,15 +813,15 @@ class HttpConnectionStub extends bindings.Stub {
   }
 
 
-  HttpConnectionSetSendBufferSizeResponseParams _HttpConnectionSetSendBufferSizeResponseParamsFactory(network_error_mojom.NetworkError result) {
-    var mojo_factory_result = new HttpConnectionSetSendBufferSizeResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  HttpConnectionSetSendBufferSizeResponseParams _httpConnectionSetSendBufferSizeResponseParamsFactory(network_error_mojom.NetworkError result) {
+    var result = new HttpConnectionSetSendBufferSizeResponseParams();
+    result.result = result;
+    return result;
   }
-  HttpConnectionSetReceiveBufferSizeResponseParams _HttpConnectionSetReceiveBufferSizeResponseParamsFactory(network_error_mojom.NetworkError result) {
-    var mojo_factory_result = new HttpConnectionSetReceiveBufferSizeResponseParams();
-    mojo_factory_result.result = result;
-    return mojo_factory_result;
+  HttpConnectionSetReceiveBufferSizeResponseParams _httpConnectionSetReceiveBufferSizeResponseParamsFactory(network_error_mojom.NetworkError result) {
+    var result = new HttpConnectionSetReceiveBufferSizeResponseParams();
+    result.result = result;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -832,16 +832,16 @@ class HttpConnectionStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HttpConnection_setSendBufferSizeName:
+      case _httpConnectionMethodSetSendBufferSizeName:
         var params = _HttpConnectionSetSendBufferSizeParams.deserialize(
             message.payload);
-        var response = _impl.setSendBufferSize(params.size,_HttpConnectionSetSendBufferSizeResponseParamsFactory);
+        var response = _impl.setSendBufferSize(params.size,_httpConnectionSetSendBufferSizeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HttpConnection_setSendBufferSizeName,
+                  _httpConnectionMethodSetSendBufferSizeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -849,21 +849,21 @@ class HttpConnectionStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HttpConnection_setSendBufferSizeName,
+              _httpConnectionMethodSetSendBufferSizeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _HttpConnection_setReceiveBufferSizeName:
+      case _httpConnectionMethodSetReceiveBufferSizeName:
         var params = _HttpConnectionSetReceiveBufferSizeParams.deserialize(
             message.payload);
-        var response = _impl.setReceiveBufferSize(params.size,_HttpConnectionSetReceiveBufferSizeResponseParamsFactory);
+        var response = _impl.setReceiveBufferSize(params.size,_httpConnectionSetReceiveBufferSizeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HttpConnection_setReceiveBufferSizeName,
+                  _httpConnectionMethodSetReceiveBufferSizeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -871,7 +871,7 @@ class HttpConnectionStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HttpConnection_setReceiveBufferSizeName,
+              _httpConnectionMethodSetReceiveBufferSizeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -905,8 +905,8 @@ class HttpConnectionStub extends bindings.Stub {
   }
 }
 
-const int _HttpConnectionDelegate_onReceivedRequestName = 0;
-const int _HttpConnectionDelegate_onReceivedWebSocketRequestName = 1;
+const int _httpConnectionDelegateMethodOnReceivedRequestName = 0;
+const int _httpConnectionDelegateMethodOnReceivedWebSocketRequestName = 1;
 
 class _HttpConnectionDelegateServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -946,7 +946,7 @@ class _HttpConnectionDelegateProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _HttpConnectionDelegate_onReceivedRequestName:
+      case _httpConnectionDelegateMethodOnReceivedRequestName:
         var r = HttpConnectionDelegateOnReceivedRequestResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -966,7 +966,7 @@ class _HttpConnectionDelegateProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _HttpConnectionDelegate_onReceivedWebSocketRequestName:
+      case _httpConnectionDelegateMethodOnReceivedWebSocketRequestName:
         var r = HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1009,7 +1009,7 @@ class _HttpConnectionDelegateProxyCalls implements HttpConnectionDelegate {
       params.request = request;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HttpConnectionDelegate_onReceivedRequestName,
+          _httpConnectionDelegateMethodOnReceivedRequestName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1018,7 +1018,7 @@ class _HttpConnectionDelegateProxyCalls implements HttpConnectionDelegate {
       params.request = request;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _HttpConnectionDelegate_onReceivedWebSocketRequestName,
+          _httpConnectionDelegateMethodOnReceivedWebSocketRequestName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1103,17 +1103,17 @@ class HttpConnectionDelegateStub extends bindings.Stub {
   }
 
 
-  HttpConnectionDelegateOnReceivedRequestResponseParams _HttpConnectionDelegateOnReceivedRequestResponseParamsFactory(http_message_mojom.HttpResponse response) {
-    var mojo_factory_result = new HttpConnectionDelegateOnReceivedRequestResponseParams();
-    mojo_factory_result.response = response;
-    return mojo_factory_result;
+  HttpConnectionDelegateOnReceivedRequestResponseParams _httpConnectionDelegateOnReceivedRequestResponseParamsFactory(http_message_mojom.HttpResponse response) {
+    var result = new HttpConnectionDelegateOnReceivedRequestResponseParams();
+    result.response = response;
+    return result;
   }
-  HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams _HttpConnectionDelegateOnReceivedWebSocketRequestResponseParamsFactory(Object webSocket, core.MojoDataPipeConsumer sendStream, Object client) {
-    var mojo_factory_result = new HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams();
-    mojo_factory_result.webSocket = webSocket;
-    mojo_factory_result.sendStream = sendStream;
-    mojo_factory_result.client = client;
-    return mojo_factory_result;
+  HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams _httpConnectionDelegateOnReceivedWebSocketRequestResponseParamsFactory(Object webSocket, core.MojoDataPipeConsumer sendStream, Object client) {
+    var result = new HttpConnectionDelegateOnReceivedWebSocketRequestResponseParams();
+    result.webSocket = webSocket;
+    result.sendStream = sendStream;
+    result.client = client;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1124,16 +1124,16 @@ class HttpConnectionDelegateStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _HttpConnectionDelegate_onReceivedRequestName:
+      case _httpConnectionDelegateMethodOnReceivedRequestName:
         var params = _HttpConnectionDelegateOnReceivedRequestParams.deserialize(
             message.payload);
-        var response = _impl.onReceivedRequest(params.request,_HttpConnectionDelegateOnReceivedRequestResponseParamsFactory);
+        var response = _impl.onReceivedRequest(params.request,_httpConnectionDelegateOnReceivedRequestResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HttpConnectionDelegate_onReceivedRequestName,
+                  _httpConnectionDelegateMethodOnReceivedRequestName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1141,21 +1141,21 @@ class HttpConnectionDelegateStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HttpConnectionDelegate_onReceivedRequestName,
+              _httpConnectionDelegateMethodOnReceivedRequestName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _HttpConnectionDelegate_onReceivedWebSocketRequestName:
+      case _httpConnectionDelegateMethodOnReceivedWebSocketRequestName:
         var params = _HttpConnectionDelegateOnReceivedWebSocketRequestParams.deserialize(
             message.payload);
-        var response = _impl.onReceivedWebSocketRequest(params.request,_HttpConnectionDelegateOnReceivedWebSocketRequestResponseParamsFactory);
+        var response = _impl.onReceivedWebSocketRequest(params.request,_httpConnectionDelegateOnReceivedWebSocketRequestResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _HttpConnectionDelegate_onReceivedWebSocketRequestName,
+                  _httpConnectionDelegateMethodOnReceivedWebSocketRequestName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1163,7 +1163,7 @@ class HttpConnectionDelegateStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _HttpConnectionDelegate_onReceivedWebSocketRequestName,
+              _httpConnectionDelegateMethodOnReceivedWebSocketRequestName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

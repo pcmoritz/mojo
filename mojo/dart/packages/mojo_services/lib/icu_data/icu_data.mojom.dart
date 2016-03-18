@@ -152,7 +152,7 @@ class IcuDataMapResponseParams extends bindings.Struct {
   }
 }
 
-const int _IcuData_mapName = 0;
+const int _icuDataMethodMapName = 0;
 
 class _IcuDataServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -191,7 +191,7 @@ class _IcuDataProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _IcuData_mapName:
+      case _icuDataMethodMapName:
         var r = IcuDataMapResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -234,7 +234,7 @@ class _IcuDataProxyCalls implements IcuData {
       params.sha1hash = sha1hash;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _IcuData_mapName,
+          _icuDataMethodMapName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -319,10 +319,10 @@ class IcuDataStub extends bindings.Stub {
   }
 
 
-  IcuDataMapResponseParams _IcuDataMapResponseParamsFactory(core.MojoSharedBuffer icuData) {
-    var mojo_factory_result = new IcuDataMapResponseParams();
-    mojo_factory_result.icuData = icuData;
-    return mojo_factory_result;
+  IcuDataMapResponseParams _icuDataMapResponseParamsFactory(core.MojoSharedBuffer icuData) {
+    var result = new IcuDataMapResponseParams();
+    result.icuData = icuData;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -333,16 +333,16 @@ class IcuDataStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _IcuData_mapName:
+      case _icuDataMethodMapName:
         var params = _IcuDataMapParams.deserialize(
             message.payload);
-        var response = _impl.map(params.sha1hash,_IcuDataMapResponseParamsFactory);
+        var response = _impl.map(params.sha1hash,_icuDataMapResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _IcuData_mapName,
+                  _icuDataMethodMapName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -350,7 +350,7 @@ class IcuDataStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _IcuData_mapName,
+              _icuDataMethodMapName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

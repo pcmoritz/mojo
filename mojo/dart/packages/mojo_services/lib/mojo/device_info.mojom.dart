@@ -143,7 +143,7 @@ class DeviceInfoGetDeviceTypeResponseParams extends bindings.Struct {
   }
 }
 
-const int _DeviceInfo_getDeviceTypeName = 0;
+const int _deviceInfoMethodGetDeviceTypeName = 0;
   
 class DeviceInfoDeviceType extends bindings.MojoEnum {
   static const DeviceInfoDeviceType unknown = const DeviceInfoDeviceType._(0);
@@ -269,7 +269,7 @@ class _DeviceInfoProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _DeviceInfo_getDeviceTypeName:
+      case _deviceInfoMethodGetDeviceTypeName:
         var r = DeviceInfoGetDeviceTypeResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -311,7 +311,7 @@ class _DeviceInfoProxyCalls implements DeviceInfo {
       var params = new _DeviceInfoGetDeviceTypeParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _DeviceInfo_getDeviceTypeName,
+          _deviceInfoMethodGetDeviceTypeName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -396,10 +396,10 @@ class DeviceInfoStub extends bindings.Stub {
   }
 
 
-  DeviceInfoGetDeviceTypeResponseParams _DeviceInfoGetDeviceTypeResponseParamsFactory(DeviceInfoDeviceType deviceType) {
-    var mojo_factory_result = new DeviceInfoGetDeviceTypeResponseParams();
-    mojo_factory_result.deviceType = deviceType;
-    return mojo_factory_result;
+  DeviceInfoGetDeviceTypeResponseParams _deviceInfoGetDeviceTypeResponseParamsFactory(DeviceInfoDeviceType deviceType) {
+    var result = new DeviceInfoGetDeviceTypeResponseParams();
+    result.deviceType = deviceType;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -410,14 +410,14 @@ class DeviceInfoStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _DeviceInfo_getDeviceTypeName:
-        var response = _impl.getDeviceType(_DeviceInfoGetDeviceTypeResponseParamsFactory);
+      case _deviceInfoMethodGetDeviceTypeName:
+        var response = _impl.getDeviceType(_deviceInfoGetDeviceTypeResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _DeviceInfo_getDeviceTypeName,
+                  _deviceInfoMethodGetDeviceTypeName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -425,7 +425,7 @@ class DeviceInfoStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _DeviceInfo_getDeviceTypeName,
+              _deviceInfoMethodGetDeviceTypeName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

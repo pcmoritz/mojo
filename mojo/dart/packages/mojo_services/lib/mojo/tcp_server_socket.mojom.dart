@@ -197,7 +197,7 @@ class TcpServerSocketAcceptResponseParams extends bindings.Struct {
   }
 }
 
-const int _TcpServerSocket_acceptName = 0;
+const int _tcpServerSocketMethodAcceptName = 0;
 
 class _TcpServerSocketServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -236,7 +236,7 @@ class _TcpServerSocketProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _TcpServerSocket_acceptName:
+      case _tcpServerSocketMethodAcceptName:
         var r = TcpServerSocketAcceptResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -281,7 +281,7 @@ class _TcpServerSocketProxyCalls implements TcpServerSocket {
       params.clientSocket = clientSocket;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _TcpServerSocket_acceptName,
+          _tcpServerSocketMethodAcceptName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -366,11 +366,11 @@ class TcpServerSocketStub extends bindings.Stub {
   }
 
 
-  TcpServerSocketAcceptResponseParams _TcpServerSocketAcceptResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress remoteAddress) {
-    var mojo_factory_result = new TcpServerSocketAcceptResponseParams();
-    mojo_factory_result.result = result;
-    mojo_factory_result.remoteAddress = remoteAddress;
-    return mojo_factory_result;
+  TcpServerSocketAcceptResponseParams _tcpServerSocketAcceptResponseParamsFactory(network_error_mojom.NetworkError result, net_address_mojom.NetAddress remoteAddress) {
+    var result = new TcpServerSocketAcceptResponseParams();
+    result.result = result;
+    result.remoteAddress = remoteAddress;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -381,16 +381,16 @@ class TcpServerSocketStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _TcpServerSocket_acceptName:
+      case _tcpServerSocketMethodAcceptName:
         var params = _TcpServerSocketAcceptParams.deserialize(
             message.payload);
-        var response = _impl.accept(params.sendStream,params.receiveStream,params.clientSocket,_TcpServerSocketAcceptResponseParamsFactory);
+        var response = _impl.accept(params.sendStream,params.receiveStream,params.clientSocket,_tcpServerSocketAcceptResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _TcpServerSocket_acceptName,
+                  _tcpServerSocketMethodAcceptName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -398,7 +398,7 @@ class TcpServerSocketStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _TcpServerSocket_acceptName,
+              _tcpServerSocketMethodAcceptName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

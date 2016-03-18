@@ -485,7 +485,7 @@ class _NfcUnregisterParams extends bindings.Struct {
   }
 }
 
-const int _NfcTransmission_cancelName = 0;
+const int _nfcTransmissionMethodCancelName = 0;
 
 class _NfcTransmissionServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -548,7 +548,7 @@ class _NfcTransmissionProxyCalls implements NfcTransmission {
         return;
       }
       var params = new _NfcTransmissionCancelParams();
-      _proxyImpl.sendMessage(params, _NfcTransmission_cancelName);
+      _proxyImpl.sendMessage(params, _nfcTransmissionMethodCancelName);
     }
 }
 
@@ -640,7 +640,7 @@ class NfcTransmissionStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NfcTransmission_cancelName:
+      case _nfcTransmissionMethodCancelName:
         _impl.cancel();
         break;
       default:
@@ -672,7 +672,7 @@ class NfcTransmissionStub extends bindings.Stub {
   }
 }
 
-const int _NfcReceiver_onReceivedNfcDataName = 0;
+const int _nfcReceiverMethodOnReceivedNfcDataName = 0;
 
 class _NfcReceiverServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -736,7 +736,7 @@ class _NfcReceiverProxyCalls implements NfcReceiver {
       }
       var params = new _NfcReceiverOnReceivedNfcDataParams();
       params.nfcData = nfcData;
-      _proxyImpl.sendMessage(params, _NfcReceiver_onReceivedNfcDataName);
+      _proxyImpl.sendMessage(params, _nfcReceiverMethodOnReceivedNfcDataName);
     }
 }
 
@@ -828,7 +828,7 @@ class NfcReceiverStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _NfcReceiver_onReceivedNfcDataName:
+      case _nfcReceiverMethodOnReceivedNfcDataName:
         var params = _NfcReceiverOnReceivedNfcDataParams.deserialize(
             message.payload);
         _impl.onReceivedNfcData(params.nfcData);
@@ -862,9 +862,9 @@ class NfcReceiverStub extends bindings.Stub {
   }
 }
 
-const int _Nfc_transmitOnNextConnectionName = 0;
-const int _Nfc_registerName = 1;
-const int _Nfc_unregisterName = 2;
+const int _nfcMethodTransmitOnNextConnectionName = 0;
+const int _nfcMethodRegisterName = 1;
+const int _nfcMethodUnregisterName = 2;
 
 class _NfcServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -905,7 +905,7 @@ class _NfcProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Nfc_transmitOnNextConnectionName:
+      case _nfcMethodTransmitOnNextConnectionName:
         var r = NfcTransmitOnNextConnectionResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -949,7 +949,7 @@ class _NfcProxyCalls implements Nfc {
       params.transmission = transmission;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Nfc_transmitOnNextConnectionName,
+          _nfcMethodTransmitOnNextConnectionName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -959,7 +959,7 @@ class _NfcProxyCalls implements Nfc {
         return;
       }
       var params = new _NfcRegisterParams();
-      _proxyImpl.sendMessage(params, _Nfc_registerName);
+      _proxyImpl.sendMessage(params, _nfcMethodRegisterName);
     }
     void unregister() {
       if (!_proxyImpl.isBound) {
@@ -967,7 +967,7 @@ class _NfcProxyCalls implements Nfc {
         return;
       }
       var params = new _NfcUnregisterParams();
-      _proxyImpl.sendMessage(params, _Nfc_unregisterName);
+      _proxyImpl.sendMessage(params, _nfcMethodUnregisterName);
     }
 }
 
@@ -1050,10 +1050,10 @@ class NfcStub extends bindings.Stub {
   }
 
 
-  NfcTransmitOnNextConnectionResponseParams _NfcTransmitOnNextConnectionResponseParamsFactory(bool success) {
-    var mojo_factory_result = new NfcTransmitOnNextConnectionResponseParams();
-    mojo_factory_result.success = success;
-    return mojo_factory_result;
+  NfcTransmitOnNextConnectionResponseParams _nfcTransmitOnNextConnectionResponseParamsFactory(bool success) {
+    var result = new NfcTransmitOnNextConnectionResponseParams();
+    result.success = success;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1064,16 +1064,16 @@ class NfcStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Nfc_transmitOnNextConnectionName:
+      case _nfcMethodTransmitOnNextConnectionName:
         var params = _NfcTransmitOnNextConnectionParams.deserialize(
             message.payload);
-        var response = _impl.transmitOnNextConnection(params.nfcData,params.transmission,_NfcTransmitOnNextConnectionResponseParamsFactory);
+        var response = _impl.transmitOnNextConnection(params.nfcData,params.transmission,_nfcTransmitOnNextConnectionResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Nfc_transmitOnNextConnectionName,
+                  _nfcMethodTransmitOnNextConnectionName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1081,15 +1081,15 @@ class NfcStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Nfc_transmitOnNextConnectionName,
+              _nfcMethodTransmitOnNextConnectionName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Nfc_registerName:
+      case _nfcMethodRegisterName:
         _impl.register();
         break;
-      case _Nfc_unregisterName:
+      case _nfcMethodUnregisterName:
         _impl.unregister();
         break;
       default:

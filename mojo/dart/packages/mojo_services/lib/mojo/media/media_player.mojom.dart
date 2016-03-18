@@ -465,10 +465,10 @@ class MediaPlayerGetStatusResponseParams extends bindings.Struct {
   }
 }
 
-const int _MediaPlayer_playName = 0;
-const int _MediaPlayer_pauseName = 1;
-const int _MediaPlayer_seekName = 2;
-const int _MediaPlayer_getStatusName = 3;
+const int _mediaPlayerMethodPlayName = 0;
+const int _mediaPlayerMethodPauseName = 1;
+const int _mediaPlayerMethodSeekName = 2;
+const int _mediaPlayerMethodGetStatusName = 3;
 
 class _MediaPlayerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -510,7 +510,7 @@ class _MediaPlayerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _MediaPlayer_getStatusName:
+      case _mediaPlayerMethodGetStatusName:
         var r = MediaPlayerGetStatusResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -554,7 +554,7 @@ class _MediaPlayerProxyCalls implements MediaPlayer {
         return;
       }
       var params = new _MediaPlayerPlayParams();
-      _proxyImpl.sendMessage(params, _MediaPlayer_playName);
+      _proxyImpl.sendMessage(params, _mediaPlayerMethodPlayName);
     }
     void pause() {
       if (!_proxyImpl.isBound) {
@@ -562,7 +562,7 @@ class _MediaPlayerProxyCalls implements MediaPlayer {
         return;
       }
       var params = new _MediaPlayerPauseParams();
-      _proxyImpl.sendMessage(params, _MediaPlayer_pauseName);
+      _proxyImpl.sendMessage(params, _mediaPlayerMethodPauseName);
     }
     void seek(int position) {
       if (!_proxyImpl.isBound) {
@@ -571,14 +571,14 @@ class _MediaPlayerProxyCalls implements MediaPlayer {
       }
       var params = new _MediaPlayerSeekParams();
       params.position = position;
-      _proxyImpl.sendMessage(params, _MediaPlayer_seekName);
+      _proxyImpl.sendMessage(params, _mediaPlayerMethodSeekName);
     }
     dynamic getStatus(int versionLastSeen,[Function responseFactory = null]) {
       var params = new _MediaPlayerGetStatusParams();
       params.versionLastSeen = versionLastSeen;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _MediaPlayer_getStatusName,
+          _mediaPlayerMethodGetStatusName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -663,11 +663,11 @@ class MediaPlayerStub extends bindings.Stub {
   }
 
 
-  MediaPlayerGetStatusResponseParams _MediaPlayerGetStatusResponseParamsFactory(int version, MediaPlayerStatus status) {
-    var mojo_factory_result = new MediaPlayerGetStatusResponseParams();
-    mojo_factory_result.version = version;
-    mojo_factory_result.status = status;
-    return mojo_factory_result;
+  MediaPlayerGetStatusResponseParams _mediaPlayerGetStatusResponseParamsFactory(int version, MediaPlayerStatus status) {
+    var result = new MediaPlayerGetStatusResponseParams();
+    result.version = version;
+    result.status = status;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -678,27 +678,27 @@ class MediaPlayerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _MediaPlayer_playName:
+      case _mediaPlayerMethodPlayName:
         _impl.play();
         break;
-      case _MediaPlayer_pauseName:
+      case _mediaPlayerMethodPauseName:
         _impl.pause();
         break;
-      case _MediaPlayer_seekName:
+      case _mediaPlayerMethodSeekName:
         var params = _MediaPlayerSeekParams.deserialize(
             message.payload);
         _impl.seek(params.position);
         break;
-      case _MediaPlayer_getStatusName:
+      case _mediaPlayerMethodGetStatusName:
         var params = _MediaPlayerGetStatusParams.deserialize(
             message.payload);
-        var response = _impl.getStatus(params.versionLastSeen,_MediaPlayerGetStatusResponseParamsFactory);
+        var response = _impl.getStatus(params.versionLastSeen,_mediaPlayerGetStatusResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _MediaPlayer_getStatusName,
+                  _mediaPlayerMethodGetStatusName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -706,7 +706,7 @@ class MediaPlayerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _MediaPlayer_getStatusName,
+              _mediaPlayerMethodGetStatusName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }

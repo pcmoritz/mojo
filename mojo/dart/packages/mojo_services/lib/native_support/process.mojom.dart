@@ -799,8 +799,8 @@ class ProcessControllerKillResponseParams extends bindings.Struct {
   }
 }
 
-const int _Process_spawnName = 0;
-const int _Process_spawnWithTerminalName = 1;
+const int _processMethodSpawnName = 0;
+const int _processMethodSpawnWithTerminalName = 1;
 
 class _ProcessServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -840,7 +840,7 @@ class _ProcessProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _Process_spawnName:
+      case _processMethodSpawnName:
         var r = ProcessSpawnResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -860,7 +860,7 @@ class _ProcessProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _Process_spawnWithTerminalName:
+      case _processMethodSpawnWithTerminalName:
         var r = ProcessSpawnWithTerminalResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -909,7 +909,7 @@ class _ProcessProxyCalls implements Process {
       params.processController = processController;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Process_spawnName,
+          _processMethodSpawnName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -922,7 +922,7 @@ class _ProcessProxyCalls implements Process {
       params.processController = processController;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _Process_spawnWithTerminalName,
+          _processMethodSpawnWithTerminalName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1007,15 +1007,15 @@ class ProcessStub extends bindings.Stub {
   }
 
 
-  ProcessSpawnResponseParams _ProcessSpawnResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new ProcessSpawnResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  ProcessSpawnResponseParams _processSpawnResponseParamsFactory(types_mojom.Error error) {
+    var result = new ProcessSpawnResponseParams();
+    result.error = error;
+    return result;
   }
-  ProcessSpawnWithTerminalResponseParams _ProcessSpawnWithTerminalResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new ProcessSpawnWithTerminalResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  ProcessSpawnWithTerminalResponseParams _processSpawnWithTerminalResponseParamsFactory(types_mojom.Error error) {
+    var result = new ProcessSpawnWithTerminalResponseParams();
+    result.error = error;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1026,16 +1026,16 @@ class ProcessStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _Process_spawnName:
+      case _processMethodSpawnName:
         var params = _ProcessSpawnParams.deserialize(
             message.payload);
-        var response = _impl.spawn(params.path,params.argv,params.envp,params.stdinFile,params.stdoutFile,params.stderrFile,params.processController,_ProcessSpawnResponseParamsFactory);
+        var response = _impl.spawn(params.path,params.argv,params.envp,params.stdinFile,params.stdoutFile,params.stderrFile,params.processController,_processSpawnResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Process_spawnName,
+                  _processMethodSpawnName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1043,21 +1043,21 @@ class ProcessStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Process_spawnName,
+              _processMethodSpawnName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _Process_spawnWithTerminalName:
+      case _processMethodSpawnWithTerminalName:
         var params = _ProcessSpawnWithTerminalParams.deserialize(
             message.payload);
-        var response = _impl.spawnWithTerminal(params.path,params.argv,params.envp,params.terminalFile,params.processController,_ProcessSpawnWithTerminalResponseParamsFactory);
+        var response = _impl.spawnWithTerminal(params.path,params.argv,params.envp,params.terminalFile,params.processController,_processSpawnWithTerminalResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _Process_spawnWithTerminalName,
+                  _processMethodSpawnWithTerminalName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1065,7 +1065,7 @@ class ProcessStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _Process_spawnWithTerminalName,
+              _processMethodSpawnWithTerminalName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
@@ -1099,8 +1099,8 @@ class ProcessStub extends bindings.Stub {
   }
 }
 
-const int _ProcessController_waitName = 0;
-const int _ProcessController_killName = 1;
+const int _processControllerMethodWaitName = 0;
+const int _processControllerMethodKillName = 1;
 
 class _ProcessControllerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1140,7 +1140,7 @@ class _ProcessControllerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _ProcessController_waitName:
+      case _processControllerMethodWaitName:
         var r = ProcessControllerWaitResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1160,7 +1160,7 @@ class _ProcessControllerProxyImpl extends bindings.Proxy {
         }
         c.complete(r);
         break;
-      case _ProcessController_killName:
+      case _processControllerMethodKillName:
         var r = ProcessControllerKillResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
@@ -1202,7 +1202,7 @@ class _ProcessControllerProxyCalls implements ProcessController {
       var params = new _ProcessControllerWaitParams();
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ProcessController_waitName,
+          _processControllerMethodWaitName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1211,7 +1211,7 @@ class _ProcessControllerProxyCalls implements ProcessController {
       params.signal = signal;
       return _proxyImpl.sendMessageWithRequestId(
           params,
-          _ProcessController_killName,
+          _processControllerMethodKillName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1296,16 +1296,16 @@ class ProcessControllerStub extends bindings.Stub {
   }
 
 
-  ProcessControllerWaitResponseParams _ProcessControllerWaitResponseParamsFactory(types_mojom.Error error, int exitStatus) {
-    var mojo_factory_result = new ProcessControllerWaitResponseParams();
-    mojo_factory_result.error = error;
-    mojo_factory_result.exitStatus = exitStatus;
-    return mojo_factory_result;
+  ProcessControllerWaitResponseParams _processControllerWaitResponseParamsFactory(types_mojom.Error error, int exitStatus) {
+    var result = new ProcessControllerWaitResponseParams();
+    result.error = error;
+    result.exitStatus = exitStatus;
+    return result;
   }
-  ProcessControllerKillResponseParams _ProcessControllerKillResponseParamsFactory(types_mojom.Error error) {
-    var mojo_factory_result = new ProcessControllerKillResponseParams();
-    mojo_factory_result.error = error;
-    return mojo_factory_result;
+  ProcessControllerKillResponseParams _processControllerKillResponseParamsFactory(types_mojom.Error error) {
+    var result = new ProcessControllerKillResponseParams();
+    result.error = error;
+    return result;
   }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
@@ -1316,14 +1316,14 @@ class ProcessControllerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _ProcessController_waitName:
-        var response = _impl.wait(_ProcessControllerWaitResponseParamsFactory);
+      case _processControllerMethodWaitName:
+        var response = _impl.wait(_processControllerWaitResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ProcessController_waitName,
+                  _processControllerMethodWaitName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1331,21 +1331,21 @@ class ProcessControllerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ProcessController_waitName,
+              _processControllerMethodWaitName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
-      case _ProcessController_killName:
+      case _processControllerMethodKillName:
         var params = _ProcessControllerKillParams.deserialize(
             message.payload);
-        var response = _impl.kill(params.signal,_ProcessControllerKillResponseParamsFactory);
+        var response = _impl.kill(params.signal,_processControllerKillResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {
               return buildResponseWithId(
                   response,
-                  _ProcessController_killName,
+                  _processControllerMethodKillName,
                   message.header.requestId,
                   bindings.MessageHeader.kMessageIsResponse);
             }
@@ -1353,7 +1353,7 @@ class ProcessControllerStub extends bindings.Stub {
         } else if (response != null) {
           return buildResponseWithId(
               response,
-              _ProcessController_killName,
+              _processControllerMethodKillName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
