@@ -82,6 +82,10 @@ group("tests") {
     "//services/prediction:apptests",
   ]
 
+  if (!is_android) {
+    deps += [ "//services/authentication:apptests" ]
+  }
+
   if (is_linux && !is_fnl) {
     deps += [ "//services/python:python_apptests" ]
   }

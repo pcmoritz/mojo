@@ -55,6 +55,11 @@ base::ScopedFILE BlockingCopyToTempFile(ScopedDataPipeConsumerHandle source);
 // Returns true on success, false on failure.
 bool BlockingCopyToFile(ScopedDataPipeConsumerHandle source, FILE* fp);
 
+// Copies the string |contents| to a temporary data pipe and returns the
+// consumer handle.
+ScopedDataPipeConsumerHandle WriteStringToConsumerHandle(
+    const std::string& source);
+
 }  // namespace common
 }  // namespace mojo
 

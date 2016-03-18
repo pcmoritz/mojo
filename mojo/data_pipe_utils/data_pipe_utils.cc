@@ -112,5 +112,18 @@ bool BlockingCopyFromString(const std::string& source,
   }
 }
 
+ScopedDataPipeConsumerHandle WriteStringToConsumerHandle(
+    const std::string& source) {
+  TRACE_EVENT0("data_pipe_utils", "WriteStringToConsumerHandle");
+  static const size_t max_buffer_size = 2 * 1024 * 1024;  // 2MB
+  CHECK_LE(static_cast<uint32_t>(source.size()), max_buffer_size);
+  MojoCreateDataPipeOptions options = {sizeof(MojoCreateDataPipeOptions),
+                                       MOJO_CREATE_DATA_PIPE_OPTIONS_FLAG_NONE,
+                                       1, source.size()};
+  DataPipe pipe(options);
+  BlockingCopyFromString(source, pipe.producer_handle.Pass());
+  return pipe.consumer_handle.Pass();
+}
+
 }  // namespace common
 }  // namespace mojo
