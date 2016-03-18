@@ -80,6 +80,13 @@ type UserDefinedType interface {
 	// reachable from this UserDefinedType. This method must only be invoked
 	// after type resolution has succeeded.
 	FindReachableTypes() []string
+
+	// ComputeFinalData() is invoked on each user-defined type in a MojomDescriptor
+	// after the resolution and type validation phases have completed successfully.
+	// The method computes information that is useful for the code generators in the
+	// backend. Examples include struct field packing data and MinVersion values.
+	// See computed_data.go.
+	ComputeFinalData() error
 }
 
 // This struct is embedded in each of MojomStruct, MojomInterface
@@ -334,7 +341,12 @@ type MojomStruct struct {
 
 	fieldsByName         map[string]*StructField
 	FieldsInLexicalOrder []*StructField
+
+	// This is computed after the parsing phase.
 	fieldsInOrdinalOrder []*StructField
+
+	// This is computed in ComputeVersionInfo which is invoked by ComputeFinalData().
+	versionInfo []StructVersion
 
 	// Used to form an error message in case of a duplicate field name.
 	userFacingName string
@@ -424,6 +436,13 @@ func (s *MojomStruct) FieldsInOrdinalOrder() []*StructField {
 	return s.fieldsInOrdinalOrder
 }
 
+func (s *MojomStruct) VersionInfo() []StructVersion {
+	if s.versionInfo == nil {
+		panic("The method ComputeVersionInfo() must be invoked first.")
+	}
+	return s.versionInfo
+}
+
 func (*MojomStruct) Kind() UserDefinedTypeKind {
 	return UserDefinedTypeKindStruct
 }
@@ -499,6 +518,145 @@ func (s *MojomStruct) ComputeFieldOrdinals() error {
 	return nil
 }
 
+var ErrMinVersionIllformed = errors.New("MinVersion attribute value illformed")
+var ErrMinVersionOutOfOrder = errors.New("MinVersion attribute value out of order")
+var ErrMinVersionNotNullable = errors.New("Non-Zero MinVersion attribute value on non-nullable field")
+
+type StructFieldMinVersionError struct {
+	// The field whose MinVersion is being set.
+	field *StructField
+
+	// The MinValue of the previous field. Only used for ErrMinVersionOutOfOrder
+	previousValue uint32
+
+	// The LiteralValue of the attribute assignment.
+	// NOTE: We use the following convention: literalValue.token == nil indicates that
+	// there was no MinVersion attribute on the given field. This can only happen with
+	// ErrMinVersionOutOfOrder
+	literalValue LiteralValue
+
+	// The type of error (ErrMinVersionIllfromed, ErrMinVersionOutOfOrder, ErrMinVersionNotNullable)
+	err error
+}
+
+// StructFieldMinVersionError implements error.
+func (e *StructFieldMinVersionError) Error() string {
+	var message string
+	var token lexer.Token
+	switch e.err {
+	case ErrMinVersionIllformed:
+		message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+			"The value must be a non-negative 32-bit integer value.",
+			e.field.SimpleName(), e.literalValue)
+		token = *e.literalValue.token
+	case ErrMinVersionOutOfOrder:
+		if e.literalValue.token == nil {
+			message = fmt.Sprintf("Invalid missing MinVersion for field %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This field must have a MinVersion attribute with a value at least %d.",
+				e.field.SimpleName(), e.previousValue)
+			token = e.field.NameToken()
+		} else {
+			message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This field's MinVersion must be at least %d.",
+				e.field.SimpleName(), e.literalValue.token.Text, e.previousValue)
+			token = *e.literalValue.token
+		}
+	case ErrMinVersionNotNullable:
+		message = fmt.Sprintf("Invalid type for field %s: %s. "+
+			"Non-nullable fields are only allowed in version 0 of of a struct. "+
+			"This field's MinVersion is %s.",
+			e.field.SimpleName(), e.field.FieldType.TypeName(), e.literalValue.token.Text)
+		switch fieldType := e.field.FieldType.(type) {
+		case *UserTypeRef:
+			token = fieldType.token
+		default:
+			// It would be nice for the green carets in the snippit in the error message to point at
+			// the type name, but other than for user type refs we don't store that token so
+			// instead we use the field's name.
+			token = e.field.NameToken()
+		}
+	}
+	return UserErrorMessage(e.field.OwningFile(), token, message)
+}
+
+// ComputeVersionInfo is invoked by ComputeFinalData() after the
+// parsing, resolution and type validation phases. It examines the |MinVersion|
+// attributes of all of the fields of the struct, validates the values, and
+// sets up the versionInfo array.
+func (s *MojomStruct) ComputeVersionInfo() error {
+	s.versionInfo = make([]StructVersion, 0)
+	previousMinVersion := uint32(0)
+	payloadSizeSoFar := uint32(0)
+	for i, field := range s.fieldsInOrdinalOrder {
+		value, literalValue, found, ok := field.minVersionAttribute()
+		if found == false {
+			if previousMinVersion != 0 {
+				return &StructFieldMinVersionError{
+					field:         field,
+					previousValue: previousMinVersion,
+					literalValue:  MakeStringLiteralValue("", nil),
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		} else {
+			if !ok {
+				return &StructFieldMinVersionError{
+					field:        field,
+					literalValue: literalValue,
+					err:          ErrMinVersionIllformed,
+				}
+			}
+			if value < previousMinVersion {
+				return &StructFieldMinVersionError{
+					field:         field,
+					previousValue: previousMinVersion,
+					literalValue:  literalValue,
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		}
+		if value != 0 && !field.FieldType.Nullable() {
+			return &StructFieldMinVersionError{
+				field:        field,
+				literalValue: literalValue,
+				err:          ErrMinVersionNotNullable,
+			}
+		}
+		field.minVersion = int64(value)
+		if value > previousMinVersion {
+			s.versionInfo = append(s.versionInfo, StructVersion{
+				VersionNumber: previousMinVersion,
+				NumFields:     uint32(i),
+				NumBytes:      payloadSizeSoFar,
+			})
+			previousMinVersion = value
+		}
+		// TODO(rudominer) Set payloadSizeSoFar to the payload size if the
+		// current |field| were the last field.
+	}
+	s.versionInfo = append(s.versionInfo, StructVersion{
+		VersionNumber: previousMinVersion,
+		NumFields:     uint32(len(s.fieldsInOrdinalOrder)),
+		NumBytes:      payloadSizeSoFar,
+	})
+
+	return nil
+}
+
+// ComputeFieldOffsets is invoked by ComputeFinalData after the
+// parsing, resolution and type validation phases. It computes the |offset|
+// and |bit| fields of each struct field.
+func (s *MojomStruct) ComputeFieldOffsets() error {
+	// TODO(rudominer) Implement MojomStruct.ComputeFieldOffsets
+	for _, field := range s.FieldsInLexicalOrder {
+		field.offset = 0
+		field.bit = 0
+	}
+	return nil
+}
+
 func (m MojomStruct) String() string {
 	s := fmt.Sprintf("\n---------struct--------------\n")
 	s += fmt.Sprintf("%s\n", m.UserDefinedTypeBase)
@@ -547,14 +705,27 @@ type StructField struct {
 
 	FieldType    TypeRef
 	DefaultValue ValueRef
-	// TODO(rudominer) Implement struct field offset computation.
-	Offset int32
+
+	// Computed Data. The values are computed and set in
+	// See mojom_types.mojom for the meanings.
+
+	// A valid offset is a uint32. We use -1 to indicate unset.
+	offset int64
+
+	// A valid |bit| value is a uint8. We use -1 to indicate unset.
+	bit int16
+
+	// A valid min version is a unt32. We use -1 to indicate unset.
+	minVersion int64
 }
 
 func NewStructField(declData DeclarationData, fieldType TypeRef, defaultValue ValueRef) *StructField {
 	field := StructField{FieldType: fieldType, DefaultValue: defaultValue}
 	declData.declaredObject = &field
 	field.DeclarationData = declData
+	field.offset = -1
+	field.bit = -1
+	field.minVersion = -1
 	return &field
 }
 
@@ -600,6 +771,52 @@ func (f *StructField) KindString() string {
 	return "field"
 }
 
+const minVersionAttributeName = "MinVersion"
+
+// minVersionAttribute() Attempts to return a uint32 corresponding to the "MinVersion" attribute of this field.
+// If found = false then no such attribute could be found and the rest of the return values should be ignored.
+// If found = true then |literalValue| is the LiteralValue of the found attribute. In this case:
+//    If ok = false then |literalValue| does not contain a uint32 and |value| should be ignored.
+//    If ok = true then |literalValue| contains the uint32 value in |value|.
+func (f *StructField) minVersionAttribute() (value uint32, literalValue LiteralValue, found, ok bool) {
+	if f.attributes == nil {
+		return 0, LiteralValue{}, false, false
+	}
+	for _, attribute := range f.attributes.List {
+		if attribute.Key == minVersionAttributeName {
+			value, ok := uint32Value(attribute.Value)
+			return value, attribute.Value, true, ok
+		}
+	}
+	return 0, LiteralValue{}, false, false
+}
+
+// MinVersion() returns the computed value of MinVersion for this field. This method should only be invoked
+// after the method ComputeVersionInfo() has been invoked on the containing MojomStruct and returned a nil error.
+// This method is different than the minVersionAttribute() method in that it does not just return a value
+// for fields that have the "MinVersion" attribute explicitly specified. Rather it returns a computed value for
+// every field after the "MinVersion" attributes for every field have been checked and validated.
+func (f *StructField) MinVersion() uint32 {
+	if f.minVersion < 0 {
+		panic("The method ComputeVersionInfo() must first be invoked for the containing struct.")
+	}
+	return uint32(f.minVersion)
+}
+
+func (f *StructField) Offset() uint32 {
+	if f.offset < 0 {
+		panic("The method ComputeFieldOffsets() must first be invoked for the containing struct.")
+	}
+	return uint32(f.offset)
+}
+
+func (f *StructField) Bit() uint8 {
+	if f.bit < 0 {
+		panic("The method ComputeFieldOffsets() must first be invoked for the containing struct.")
+	}
+	return uint8(f.bit)
+}
+
 func (f StructField) String() string {
 	attributeString := ""
 	if f.attributes != nil {
@@ -614,6 +831,13 @@ func (f StructField) String() string {
 		ordinalString = fmt.Sprintf("@%d", f.declaredOrdinal)
 	}
 	return fmt.Sprintf("%s%s %s%s%s", attributeString, f.FieldType, f.simpleName, ordinalString, defaultValueString)
+}
+
+// See StructVersion in mojom_types.mojom for a description of the fields.
+type StructVersion struct {
+	VersionNumber uint32
+	NumFields     uint32
+	NumBytes      uint32
 }
 
 /////////////////////////////////////////////////////////////

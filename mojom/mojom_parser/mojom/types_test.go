@@ -352,3 +352,26 @@ func TestValidateAfterResolution(t *testing.T) {
 		}
 	}
 }
+
+func TestUint32Value(t *testing.T) {
+	cases := []struct {
+		literalValue    LiteralValue
+		expectedValue   uint32
+		expectedSuccess bool
+	}{
+		{MakeUint32LiteralValue(12345, nil), 12345, true},
+		{MakeInt64LiteralValue(12345, nil), 12345, true},
+		{MakeInt64LiteralValue(1234567890123456, nil), 1015724736, false},
+		{MakeInt32LiteralValue(-12345, nil), 4294954951, false},
+		{MakeFloatLiteralValue(1234.5, nil), 0, false},
+		{MakeStringLiteralValue("12345", nil), 0, false},
+		{MakeBoolLiteralValue(false, nil), 0, false},
+	}
+	for _, c := range cases {
+		got, ok := uint32Value(c.literalValue)
+		if ok != c.expectedSuccess || got != c.expectedValue {
+			t.Errorf("uint32Value(%v) == %v, %v, want %v, %v", c.literalValue,
+				got, ok, c.expectedValue, c.expectedSuccess)
+		}
+	}
+}

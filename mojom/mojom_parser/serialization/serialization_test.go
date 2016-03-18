@@ -1102,12 +1102,8 @@ func TestSingleFileSerialization(t *testing.T) {
 			t.Errorf("Resolve error for %s: %s", c.fileName, err.Error())
 			continue
 		}
-		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
-			t.Errorf("ComputeEnumValueIntegers error for %s: %s", c.fileName, err.Error())
-			continue
-		}
-		if err := descriptor.ComputeDataForGenerators(); err != nil {
-			t.Errorf("ComputeDataForGenerators error for %s: %s", c.fileName, err.Error())
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
@@ -1121,14 +1117,370 @@ func TestSingleFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
 		// Serialize again and check for consistency.
-		bytes2, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
+		bytes2, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
+		if err != nil {
+			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		if !reflect.DeepEqual(bytes, bytes2) {
+			t.Errorf("Inconsistent serialization for %s:\nbytes=%v\nbytes2=%v\n",
+				c.fileName, bytes, bytes2)
+			continue
+		}
+
+		// Deserialize
+		decoder := bindings.NewDecoder(bytes, nil)
+		fileGraph := mojom_files.MojomFileGraph{}
+		fileGraph.Decode(decoder)
+
+		// Compare
+		if err := compareTwoGoObjects(c.expectedGraph, &fileGraph); err != nil {
+			t.Errorf("%s:\n%s", c.fileName, err.Error())
+			continue
+		}
+	}
+}
+
+// TestWithComputedData is similar to the previous test except that it sets
+// emitComputedPackingData = true.
+func TestWithComputedData(t *testing.T) {
+	test := singleFileTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test struct field min versions: 1,2
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct Foo{
+	  int32 x;
+	  int32 y;
+
+	  [MinVersion = 1]
+	  array<int32>? z;
+
+      [MinVersion = 2]
+	  array<int32>? w;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field z
+				{
+					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 1,
+				},
+				// field w
+				{
+					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 2,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     2,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 1,
+					NumFields:     3,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 2,
+					NumFields:     4,
+					NumBytes:      0,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test struct field min versions: 1, 3
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct Foo{
+	  int32 x;
+	  int32 y;
+
+	  [MinVersion = 1]
+	  array<int32>? z;
+
+      [MinVersion = 3]
+	  array<int32>? w;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field z
+				{
+					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 1,
+				},
+				// field w
+				{
+					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{3}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 3,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     2,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 1,
+					NumFields:     3,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 3,
+					NumFields:     4,
+					NumBytes:      0,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test struct field min versions: 1, 1
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct Foo{
+	  int32 x;
+	  int32 y;
+
+	  [MinVersion = 1]
+	  array<int32>? z;
+
+      [MinVersion = 1]
+	  array<int32>? w;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field z
+				{
+					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 1,
+				},
+				// field w
+				{
+					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 1,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     2,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 1,
+					NumFields:     4,
+					NumBytes:      0,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test struct field min versions: 1,2 with specified ordinals
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct Foo{
+	  int32 y@1;
+
+	  [MinVersion = 1]
+	  array<int32>? z@2;
+
+      [MinVersion = 2]
+	  array<int32>? w@3;
+
+	  int32 x@0;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		// ResolvedTypes
+
+		// struct Foo
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(3, 0, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(0, 1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+				},
+				// field z
+				{
+					DeclData:   test.newShortDeclDataAO(1, 2, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 1,
+				},
+				// field w
+				{
+					DeclData:   test.newShortDeclDataAO(2, 3, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
+					MinVersion: 2,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     2,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 1,
+					NumFields:     3,
+					NumBytes:      0,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 2,
+					NumFields:     4,
+					NumBytes:      0,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for _, c := range test.cases {
+		// Parse and resolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		parser := parser.MakeParser(c.fileName, c.fileName, c.mojomContents, descriptor, nil)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
+			continue
+		}
+		if err := descriptor.Resolve(); err != nil {
+			t.Errorf("Resolve error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		// Simulate setting the canonical file name for the imported files. In real operation
+		// this step is done in parser_driver.go when each of the imported files are parsed.
+		mojomFile := parser.GetMojomFile()
+		if mojomFile.Imports != nil {
+			for _, imp := range mojomFile.Imports {
+				imp.CanonicalFileName = fmt.Sprintf("%s.canonical", imp.SpecifiedName)
+			}
+		}
+
+		// Serialize. Notice that the fourth argument is |true|.
+		bytes, _, err := serialize(descriptor, false, false, true, false, false)
+		if err != nil {
+			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+
+		// Serialize again and check for consistency.
+		bytes2, _, err := serialize(descriptor, false, false, true, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -1215,17 +1567,13 @@ func TestMetaDataOnlyMode(t *testing.T) {
 			t.Errorf("Resolve error for %s: %s", c.fileName, err.Error())
 			continue
 		}
-		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
-			t.Errorf("ComputeEnumValueIntegers error for %s: %s", c.fileName, err.Error())
-			continue
-		}
-		if err := descriptor.ComputeDataForGenerators(); err != nil {
-			t.Errorf("ComputeDataForGenerators error for %s: %s", c.fileName, err.Error())
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -1494,17 +1842,13 @@ func TestTwoFileSerialization(t *testing.T) {
 			t.Errorf("Resolve error for case %d: %s", i, err.Error())
 			continue
 		}
-		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
-			t.Errorf("ComputeEnumValueIntegers error for case %d: %s", i, err.Error())
-			continue
-		}
-		if err := descriptor.ComputeDataForGenerators(); err != nil {
-			t.Errorf("ComputeDataForGenerators error for case %d: %s", i, err.Error())
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for case %d: %s", i, err.Error())
 			continue
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -2118,17 +2462,13 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			t.Errorf("Resolve error for case %d: %s", i, err.Error())
 			continue
 		}
-		if err := descriptor.ComputeEnumValueIntegers(); err != nil {
-			t.Errorf("ComputeEnumValueIntegers error for case %d: %s", i, err.Error())
-			continue
-		}
-		if err := descriptor.ComputeDataForGenerators(); err != nil {
-			t.Errorf("ComputeDataForGenerators error for case %d: %s", i, err.Error())
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for case %d: %s", i, err.Error())
 			continue
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, true, true)
+		bytes, _, err := serialize(descriptor, false, false, false, true, true)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -2157,7 +2497,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 
 		// Test the parameter populateCompleteTypeSet. We set the final
 		// parameter to false.
-		bytes, _, err = serialize(descriptor, false, false, true, false)
+		bytes, _, err = serialize(descriptor, false, false, false, true, false)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue

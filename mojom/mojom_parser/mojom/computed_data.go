@@ -8,13 +8,47 @@ import (
 	"fmt"
 )
 
-// ComputeEnumValueIntegers() should be invoked after Resolve() has completed
-// successfully. It computes the |ComputedIntValue| field of all EnumValues.
-func (d *MojomDescriptor) ComputeEnumValueIntegers() error {
+// ComputeFinalData() should be invoked after Resolve() has completed
+// successfully. It computes the field packing and version data that will
+// be used by the code generators.
+func (d *MojomDescriptor) ComputeFinalData() error {
 	for _, userDefinedType := range d.TypesByKey {
-		switch userDefinedType := userDefinedType.(type) {
-		case *MojomEnum:
-			if err := d.computeEnumValueIntegersForEnum(userDefinedType); err != nil {
+		if err := userDefinedType.ComputeFinalData(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *MojomEnum) ComputeFinalData() error {
+	return e.ComputeEnumValueIntegers()
+}
+
+func (e *MojomStruct) ComputeFinalData() error {
+	if err := e.ComputeVersionInfo(); err != nil {
+		return err
+	}
+	if err := e.ComputeFieldOffsets(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *MojomInterface) ComputeFinalData() error {
+	for _, method := range i.MethodsByOrdinal {
+		if method.Parameters != nil {
+			if err := (*method.Parameters).ComputeVersionInfo(); err != nil {
+				return err
+			}
+			if err := (*method.Parameters).ComputeFieldOffsets(); err != nil {
+				return err
+			}
+		}
+		if method.ResponseParameters != nil {
+			if err := (*method.ResponseParameters).ComputeVersionInfo(); err != nil {
+				return err
+			}
+			if err := (*method.ResponseParameters).ComputeFieldOffsets(); err != nil {
 				return err
 			}
 		}
@@ -22,15 +56,19 @@ func (d *MojomDescriptor) ComputeEnumValueIntegers() error {
 	return nil
 }
 
-// computeEnumValueIntegersForEnum() computes the |ComputedIntValue| field of all
+func (u *MojomUnion) ComputeFinalData() error {
+	return nil
+}
+
+// ComputeEnumValueIntegers() computes the |ComputedIntValue| field of all
 // the values in |enum|.
-func (d *MojomDescriptor) computeEnumValueIntegersForEnum(enum *MojomEnum) error {
+func (enum *MojomEnum) ComputeEnumValueIntegers() error {
 	previousValue := int32(-1)
 	for _, enumValue := range enum.Values {
 		if enumValue.ValueRef() == nil {
 			previousValue++
 		} else {
-			value, err := d.int32EnumValueFromValue(enum, enumValue.ValueRef())
+			value, err := int32EnumValueFromValue(enum, enumValue.ValueRef())
 			if err != nil {
 				return err
 			}
@@ -63,7 +101,7 @@ func (d *MojomDescriptor) computeEnumValueIntegersForEnum(enum *MojomEnum) error
 // prior to the current attempt. In practice this means it is safe for an EnumValue
 // to be initialized in terms of an earlier EnumValue from the same Enum. Future enhancements
 // may allow more general patterns.
-func (d *MojomDescriptor) int32EnumValueFromValue(enum *MojomEnum, valueRef ValueRef) (int32, error) {
+func int32EnumValueFromValue(enum *MojomEnum, valueRef ValueRef) (int32, error) {
 	var int32EnumValue int32
 	switch specifiedValue := valueRef.(type) {
 	case LiteralValue:
@@ -109,12 +147,4 @@ func (d *MojomDescriptor) int32EnumValueFromValue(enum *MojomEnum, valueRef Valu
 		panic(fmt.Sprintf("Unexpected ValueRef type %T", specifiedValue))
 	}
 	return int32EnumValue, nil
-}
-
-// ComputeDataForGenerators() should be invoked after Resolve() has completed
-// successfully. It computes the field packing and version data that will
-// be used by the code generators.
-func (d *MojomDescriptor) ComputeDataForGenerators() error {
-	// TODO(rudominer) Implement ComputeDataForGenerators().
-	return nil
 }

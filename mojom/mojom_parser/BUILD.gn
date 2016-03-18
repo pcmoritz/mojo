@@ -22,9 +22,11 @@ action("mojom_tool") {
     "mojom/types.go",
     "mojom/user_defined_types.go",
     "mojom/utils.go",
+    "parser/computed_data_test.go",
     "parser/parse_driver.go",
     "parser/parser.go",
     "parser/parsing.go",
+    "parser/resolution_test.go",
     "serialization/serialization.go",
     "utils/sort_utils.go",
   ]

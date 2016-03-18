@@ -134,6 +134,45 @@ func TestStructFieldValidateDefaultValue(t *testing.T) {
 	}
 }
 
+func TestStructFieldMinVersionAttribute(t *testing.T) {
+	dummyLiteralValue := MakeBoolLiteralValue(false, &lexer.Token{})
+	cases := []struct {
+		includeAttributes          bool
+		includeMinVersionAttribute bool
+		attributeValue             LiteralValue
+		expectedValue              uint32
+		expectedFound              bool
+		expectedOk                 bool
+	}{
+		{false, false, dummyLiteralValue, 0, false, false},
+		{true, false, dummyLiteralValue, 0, false, false},
+		{true, true, MakeUint32LiteralValue(123, &lexer.Token{}), 123, true, true},
+		{true, true, MakeFloatLiteralValue(1.1, &lexer.Token{}), 0, true, false},
+		{true, true, MakeInt64LiteralValue(1234567890123, &lexer.Token{}), 1912276171, true, false},
+	}
+	for i, c := range cases {
+		var attributes *Attributes
+		if c.includeAttributes {
+			attributes = NewAttributes(lexer.Token{})
+			attributes.List = append(attributes.List,
+				NewMojomAttribute("dummy", nil, dummyLiteralValue))
+			if c.includeMinVersionAttribute {
+				attributes.List = append(attributes.List,
+					NewMojomAttribute("MinVersion", nil, c.attributeValue))
+			}
+			attributes.List = append(attributes.List,
+				NewMojomAttribute("dummy2", nil, dummyLiteralValue))
+		}
+		structField := NewStructField(
+			DeclTestDataA(fmt.Sprintf("field%d", i), attributes),
+			SimpleTypeInt8, nil)
+		value, _, found, ok := structField.minVersionAttribute()
+		if found != c.expectedFound || ok != c.expectedOk || value != c.expectedValue {
+			t.Errorf("case %d: found=%v, ok=%v, value=%v", i, found, ok, value)
+		}
+	}
+}
+
 func TestInterfaceComputeMethodOridnals(t *testing.T) {
 	myInterface := NewTestInterface("MyInterface")
 	myInterface.InitAsScope(NewTestFileScope("test.scope"))

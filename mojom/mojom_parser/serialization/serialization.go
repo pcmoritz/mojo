@@ -21,11 +21,15 @@ import (
 //////////////////////////////////////////////////
 
 // This variable may be set to false in order to omit emitting line and
-// column numbers.
+// column numbers. This is useful in tests.
 var emitLineAndColumnNumbers bool = true
 
+// This variable may be set to false in order to omit emitting computed
+// packing. This is useful in tests.
+var emitComputedPackingData bool = true
+
 // This variable may be set to false in order to omit emitting serialized
-// runtime type info.
+// runtime type info. This is useful in tests.
 var emitSerializedRuntimeTypeInfo bool = true
 
 // By default we do not populate the complete type set of each top-level interface
@@ -39,21 +43,24 @@ var populateCompleteTypeSet bool = false
 // of the serialized mojom_types.FileGraph.
 // This function is not thread safe.
 func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString string, err error) {
-	return serialize(d, debug, true, true, false)
+	return serialize(d, debug, true, true, true, false)
 }
 
 // serialize() is a package-private version of the public method Serialize().
 // It is intended for use in tests because it allows setting of the variables
-// emitLineAndColumnNumbers, emitSerializedRuntimeTypeInfo and populateCompleteTypeSet.
+// emitLineAndColumnNumbers, emitComputedPackingData, emitSerializedRuntimeTypeInfo
+// and populateCompleteTypeSet.
 // This function is not thread safe because it sets and accesses these global
 // variables.
 func serialize(d *mojom.MojomDescriptor, debug,
-	emitLineAndColumnNumbersParam, emitSerializedRuntimeTypeInfoParam,
+	emitLineAndColumnNumbersParam, emitComputedPackingDataParam, emitSerializedRuntimeTypeInfoParam,
 	populateCompleteTypeSetParam bool) (bytes []byte, debugString string, err error) {
 
 	// Save the global state and then set it based on the parameters.
 	saveEmitLineAndColumnNumbers := emitLineAndColumnNumbers
 	emitLineAndColumnNumbers = emitLineAndColumnNumbersParam
+	saveEmitComputedPackingData := emitComputedPackingData
+	emitComputedPackingData = emitComputedPackingDataParam
 	saveEmitSerializedRuntimeTypeInfo := emitSerializedRuntimeTypeInfo
 	emitSerializedRuntimeTypeInfo = emitSerializedRuntimeTypeInfoParam
 	savePopulateCompleteTypeSet := populateCompleteTypeSet
@@ -70,6 +77,7 @@ func serialize(d *mojom.MojomDescriptor, debug,
 
 	// Restore the original values of the global state.
 	emitLineAndColumnNumbers = saveEmitLineAndColumnNumbers
+	emitComputedPackingData = saveEmitComputedPackingData
 	emitSerializedRuntimeTypeInfo = saveEmitSerializedRuntimeTypeInfo
 	populateCompleteTypeSet = savePopulateCompleteTypeSet
 	return
@@ -290,10 +298,24 @@ func translateMojomStruct(s *mojom.MojomStruct) mojom_types.MojomStruct {
 		mojomStruct.Fields = append(mojomStruct.Fields, translateStructField(field))
 	}
 
-	// TODO(rudominer) Implement VersionInfo.
-	//mojomStruct.Value.VersionInfo = new([]mojom_types.StructVersion)
+	if emitComputedPackingData {
+		versionInfo := s.VersionInfo()
+		mojomStruct.VersionInfo = new([]mojom_types.StructVersion)
+		for _, version := range versionInfo {
+			(*mojomStruct.VersionInfo) = append(*mojomStruct.VersionInfo,
+				translateStructVersion(version))
+		}
+	}
 
 	return mojomStruct
+}
+
+func translateStructVersion(v mojom.StructVersion) mojom_types.StructVersion {
+	return mojom_types.StructVersion{
+		VersionNumber: v.VersionNumber,
+		NumFields:     v.NumFields,
+		NumBytes:      v.NumBytes,
+	}
 }
 
 func translateStructField(f *mojom.StructField) (field mojom_types.StructField) {
@@ -302,8 +324,13 @@ func translateStructField(f *mojom.StructField) (field mojom_types.StructField) 
 	if f.DefaultValue != nil {
 		field.DefaultValue = translateDefaultFieldValue(f.DefaultValue)
 	}
-	// TODO(rudominer) Implement field offsets.
-	field.Offset = f.Offset
+	if emitComputedPackingData {
+		// TODO(rudominer) Check the allowed size of offsets. The type used in
+		// mojom_types.mojom might need to be changed.
+		field.Offset = int32(f.Offset())
+		field.Bit = int8(f.Bit())
+		field.MinVersion = f.MinVersion()
+	}
 	return
 }
 

@@ -55,6 +55,7 @@ const (
 // A LiteralType is a |ConcreteType|.
 type LiteralType interface {
 	ConcreteType
+	LiteralTypeKind() TypeKind
 }
 
 // ConcreteType represents the type of a concrete value. These are the types
@@ -106,8 +107,9 @@ type TypeRef interface {
 	// or MapTypeRefs because those types are never validated after resolution.
 	IsAssignmentCompatible(assignedValue ConcreteValue) bool
 
-	// TypeName() returns a string appropriate for using-facing messages
-	// that names a type. For UserDefinedTypes it will return the fully-qualified
+	// TypeName() returns a string appropriate for user-facing messages
+	// that names a type, including markers for interface requests and nullability.
+	// For UserDefinedTypes it will return the fully-qualified
 	// name of the resolved type, if the identifier has already been resolved.
 	// Otherwise it will return the identifier.
 	TypeName() string
@@ -121,6 +123,9 @@ type TypeRef interface {
 	// type and for MapTypes this method returns the union of the set of UserDefined
 	// types of the key type and the value type.
 	ReferencedUserDefinedTypes() UserDefinedTypeSet
+
+	// Returns true just in case the type referene is nullable.
+	Nullable() bool
 }
 
 /////////////////////////////////////////////////////////////
@@ -185,10 +190,12 @@ func (SimpleType) MarkUsedAsMapKey() bool {
 	return true
 }
 
-// From interface TypeRef:
-
 func (SimpleType) MarkUsedAsConstantType() bool {
 	return true
+}
+
+func (SimpleType) Nullable() bool {
+	return false
 }
 
 // A SimpleType does not reference any UserDefinedTypes.
@@ -1214,6 +1221,19 @@ func int32Value(literalValue LiteralValue) (int32Value int32, ok bool) {
 	int64Value, ok := int64Value(literalValue)
 	ok = ok && int64Value <= math.MaxInt32 && int64Value >= math.MinInt32
 	int32Value = int32(int64Value)
+	return
+}
+
+// uint32Value returns the value of |literalValue| as an uint32.
+// If the type of |literalValue| is not an integer type then |ok|
+// will be false and |int32Value| will be zero. If the type of
+// |literalValue| is any of the integer types then |uint32Value| will
+// be the integer value cast to an uint32 and |ok| will indicate whether
+// or not the pre-cast value is between 0 and math.MaxUInt32.
+func uint32Value(literalValue LiteralValue) (int32Value uint32, ok bool) {
+	int64Value, ok := int64Value(literalValue)
+	ok = ok && int64Value <= math.MaxUint32 && int64Value >= 0
+	int32Value = uint32(int64Value)
 	return
 }
 
