@@ -6,7 +6,6 @@ library layouts_mojom;
 import 'package:mojo/bindings.dart' as bindings;
 
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
-import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
 
 
 
@@ -213,9 +212,8 @@ class ViewLayoutParams extends bindings.Struct {
 
 class ViewLayoutInfo extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
-  scene_token_mojom.SceneToken sceneToken = null;
   geometry_mojom.Size size = null;
 
   ViewLayoutInfo() : super(kVersions.last.size);
@@ -256,11 +254,6 @@ class ViewLayoutInfo extends bindings.Struct {
     if (mainDataHeader.version >= 0) {
       
       var decoder1 = decoder0.decodePointer(8, false);
-      result.sceneToken = scene_token_mojom.SceneToken.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(16, false);
       result.size = geometry_mojom.Size.decode(decoder1);
     }
     return result;
@@ -269,14 +262,7 @@ class ViewLayoutInfo extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeStruct(sceneToken, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "sceneToken of struct ViewLayoutInfo: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeStruct(size, 16, false);
+      encoder0.encodeStruct(size, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "size of struct ViewLayoutInfo: $e";
@@ -286,13 +272,11 @@ class ViewLayoutInfo extends bindings.Struct {
 
   String toString() {
     return "ViewLayoutInfo("
-           "sceneToken: $sceneToken" ", "
            "size: $size" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["sceneToken"] = sceneToken;
     map["size"] = size;
     return map;
   }

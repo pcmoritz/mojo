@@ -57,6 +57,9 @@ class BaseView : public mojo::ui::ViewListener {
   mojo::gfx::composition::ScenePtr TakeScene() { return scene_.Pass(); }
 
   // |ViewListener|:
+  void OnChildAttached(uint32_t child_key,
+                       mojo::ui::ViewInfoPtr child_view_info,
+                       const OnChildUnavailableCallback& callback) override;
   void OnChildUnavailable(uint32_t child_key,
                           const OnChildUnavailableCallback& callback) override;
 

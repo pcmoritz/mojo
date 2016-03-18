@@ -50,6 +50,20 @@ void TileView::ConnectViews() {
   }
 }
 
+void TileView::OnChildAttached(uint32_t child_key,
+                               mojo::ui::ViewInfoPtr child_view_info,
+                               const OnChildAttachedCallback& callback) {
+  auto it = views_.find(child_key);
+  DCHECK(it != views_.end());
+
+  ViewData* view_data = it->second.get();
+  view_data->view_info = child_view_info.Pass();
+
+  callback.Run();
+
+  UpdateScene();
+}
+
 void TileView::OnChildUnavailable(uint32_t child_key,
                                   const OnChildUnavailableCallback& callback) {
   auto it = views_.find(child_key);
@@ -61,13 +75,6 @@ void TileView::OnChildUnavailable(uint32_t child_key,
   views_.erase(it);
 
   view()->RemoveChild(child_key, nullptr);
-
-  if (view_data->layout_pending) {
-    DCHECK(pending_child_layout_count_);
-    pending_child_layout_count_--;
-    FinishLayout();
-  }
-
   callback.Run();
 }
 
@@ -77,13 +84,6 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
   size_.width = layout_params->constraints->max_width;
   size_.height = layout_params->constraints->max_height;
 
-  // Wipe out cached layout information for children needing layout.
-  for (uint32_t child_key : children_needing_layout) {
-    auto view_it = views_.find(child_key);
-    if (view_it != views_.end())
-      view_it->second->layout_info.reset();
-  }
-
   // Layout all children in a row.
   if (!views_.empty()) {
     uint32_t index = 0;
@@ -92,7 +92,6 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
     uint32_t x = 0;
     for (auto it = views_.begin(); it != views_.end(); ++it, ++index) {
       ViewData* view_data = it->second.get();
-      DCHECK(!view_data->layout_pending);
 
       // Distribute any excess width among the leading children.
       uint32_t child_width = base_width;
@@ -117,52 +116,36 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
       params->constraints->max_height = child_height;
       params->device_pixel_ratio = layout_params->device_pixel_ratio;
 
-      if (view_data->layout_info && view_data->layout_params.Equals(params))
+      if (view_data->layout_params.Equals(params))
         continue;  // no layout work to do
 
-      pending_child_layout_count_++;
-      view_data->layout_pending = true;
       view_data->layout_params = params.Clone();
-      view_data->layout_info.reset();
-
       view()->LayoutChild(it->first, params.Pass(),
                           base::Bind(&TileView::OnChildLayoutFinished,
                                      base::Unretained(this), it->first));
     }
   }
 
-  // Store the callback until layout of all children is finished.
-  pending_layout_callback_ = callback;
-  FinishLayout();
+  // Submit the new layout information.
+  auto info = mojo::ui::ViewLayoutResult::New();
+  info->size = size_.Clone();
+  callback.Run(info.Pass());
+
+  UpdateScene();
 }
 
 void TileView::OnChildLayoutFinished(
     uint32_t child_key,
     mojo::ui::ViewLayoutInfoPtr child_layout_info) {
-  auto it = views_.find(child_key);
-  if (it != views_.end()) {
-    ViewData* view_data = it->second.get();
-    DCHECK(view_data->layout_pending);
-    DCHECK(pending_child_layout_count_);
-    pending_child_layout_count_--;
-    view_data->layout_pending = false;
-    view_data->layout_info = child_layout_info.Pass();
-    FinishLayout();
-  }
+  // TODO(jeffbrown): Delete this method once layout protocol is replaced.
 }
 
-void TileView::FinishLayout() {
-  if (pending_layout_callback_.is_null())
-    return;
-
-  // Wait until all children have laid out.
-  // TODO(jeffbrown): There should be a timeout on this.
-  if (pending_child_layout_count_)
-    return;
-
+void TileView::UpdateScene() {
   // Update the scene.
   // TODO: only send the resources once, be more incremental
   auto update = mojo::gfx::composition::SceneUpdate::New();
+  update->clear_resources = true;
+  update->clear_nodes = true;
 
   // Create the root node.
   auto root_node = mojo::gfx::composition::Node::New();
@@ -195,11 +178,11 @@ void TileView::FinishLayout() {
         mojo::gfx::composition::Node::Combinator::FALLBACK;
 
     // If we have the view, add it to the scene.
-    if (view_data.layout_info) {
+    if (view_data.view_info) {
       auto scene_resource = mojo::gfx::composition::Resource::New();
       scene_resource->set_scene(mojo::gfx::composition::SceneResource::New());
       scene_resource->get_scene()->scene_token =
-          view_data.layout_info->scene_token.Clone();
+          view_data.view_info->scene_token.Clone();
       update->resources.insert(scene_resource_id, scene_resource.Pass());
 
       auto scene_node = mojo::gfx::composition::Node::New();
@@ -235,16 +218,10 @@ void TileView::FinishLayout() {
   // Publish the scene.
   scene()->Update(update.Pass());
   scene()->Publish(nullptr);
-
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  pending_layout_callback_.Run(info.Pass());
-  pending_layout_callback_.reset();
 }
 
 TileView::ViewData::ViewData(const std::string& url, uint32_t key)
-    : url(url), key(key), layout_pending(false) {}
+    : url(url), key(key) {}
 
 TileView::ViewData::~ViewData() {}
 

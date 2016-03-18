@@ -9,12 +9,16 @@
 
 #include "base/bind.h"
 #include "base/bind_helpers.h"
+#include "base/strings/stringprintf.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "services/ui/view_manager/view_impl.h"
 #include "services/ui/view_manager/view_tree_impl.h"
 
 namespace view_manager {
 namespace {
+constexpr uint32_t kSceneResourceId = 1u;
+constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
+
 bool AreViewLayoutParamsValid(const mojo::ui::ViewLayoutParams* params) {
   return params && params->constraints && params->constraints->min_width >= 0 &&
          params->constraints->max_width >= params->constraints->min_width &&
@@ -163,17 +167,58 @@ void ViewRegistry::OnSceneCreated(
     mojo::gfx::composition::SceneTokenPtr scene_token) {
   DCHECK(scene_token);
   ViewState* view_state = view_state_weak.get();
-  if (view_state) {
-    DVLOG(1) << "OnSceneCreated: scene_token=" << scene_token;
+  if (!view_state)
+    return;
 
-    if (view_state->scene_token())
-      views_by_scene_token_.erase(view_state->scene_token()->value);
-    views_by_scene_token_.emplace(scene_token->value, view_state);
+  DCHECK(IsViewStateRegisteredDebug(view_state));
+  DVLOG(1) << "OnSceneCreated: view=" << view_state
+           << ", scene_token=" << scene_token;
 
-    view_state->set_scene_token(scene_token.Pass());
-    view_state->set_scene_changed_since_last_report(true);
-    InvalidateLayout(view_state);
+  if (view_state->scene_token())
+    views_by_scene_token_.erase(view_state->scene_token()->value);
+  views_by_scene_token_.emplace(scene_token->value, view_state);
+
+  view_state->set_scene_token(scene_token.Pass());
+
+  PublishStubScene(view_state);
+}
+
+void ViewRegistry::PublishStubScene(ViewState* view_state) {
+  DCHECK(IsViewStateRegisteredDebug(view_state));
+  DVLOG(1) << "PublishStubScene: view=" << view_state
+           << ", view_stub=" << view_state->view_stub();
+
+  if (!view_state->view_stub())
+    return;
+
+  DCHECK(view_state->view_stub()->stub_scene());  // we know view is attached
+
+  auto update = mojo::gfx::composition::SceneUpdate::New();
+  update->clear_resources = true;
+  update->clear_nodes = true;
+
+  if (view_state->layout_result()) {
+    auto scene_resource = mojo::gfx::composition::Resource::New();
+    scene_resource->set_scene(mojo::gfx::composition::SceneResource::New());
+    scene_resource->get_scene()->scene_token =
+        view_state->scene_token()->Clone();
+    update->resources.insert(kSceneResourceId, scene_resource.Pass());
+
+    auto root_node = mojo::gfx::composition::Node::New();
+    root_node->content_clip = mojo::RectF::New();
+    root_node->content_clip->width = view_state->layout_result()->size->width;
+    root_node->content_clip->height = view_state->layout_result()->size->height;
+    root_node->op = mojo::gfx::composition::NodeOp::New();
+    root_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
+    root_node->op->get_scene()->scene_resource_id = kSceneResourceId;
+    update->nodes.insert(kRootNodeId, root_node.Pass());
   }
+  view_state->view_stub()->stub_scene()->Update(update.Pass());
+
+  // TODO(jeffbrown): Set version based on container's last layout request
+  // once new layout protocol is in place.
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  view_state->view_stub()->stub_scene()->Publish(metadata.Pass());
 }
 
 void ViewRegistry::RequestLayout(ViewState* view_state) {
@@ -475,9 +520,21 @@ void ViewRegistry::OnViewResolved(ViewStub* view_stub,
 void ViewRegistry::AttachViewStubAndNotify(ViewStub* view_stub,
                                            ViewState* view_state) {
   DCHECK(view_stub);
+  DCHECK(IsViewStateRegisteredDebug(view_state));
+
+  // TODO(jeffbrown): It would be really nice to have a way to pipeline
+  // getting the scene token.
+  mojo::gfx::composition::ScenePtr stub_scene;
+  compositor_->CreateScene(
+      mojo::GetProxy(&stub_scene),
+      base::StringPrintf("*%s", view_state->label().c_str()),
+      base::Bind(&ViewRegistry::OnViewAttached, base::Unretained(this),
+                 view_stub->GetWeakPtr()));
 
   view_state->ReleaseOwner();  // don't need the ViewOwner pipe anymore
-  view_stub->AttachView(view_state);
+  view_stub->AttachView(view_state, stub_scene.Pass());
+
+  PublishStubScene(view_state);
 
   if (view_stub->pending_layout_request()) {
     view_state->pending_layout_requests().push_back(
@@ -501,6 +558,28 @@ void ViewRegistry::ReleaseViewStubAndNotify(ViewStub* view_stub) {
   // response to the notification at which point layout will occur.
   // We don't need to schedule layout for the child either since it will
   // retain its old layout parameters.
+}
+
+void ViewRegistry::OnViewAttached(
+    base::WeakPtr<ViewStub> view_stub_weak,
+    mojo::gfx::composition::SceneTokenPtr scene_token) {
+  DCHECK(scene_token);
+
+  ViewStub* view_stub = view_stub_weak.get();
+  if (!view_stub || view_stub->is_unavailable())
+    return;
+
+  DCHECK(view_stub->is_linked());
+  view_stub->SetStubSceneToken(scene_token.Clone());
+
+  auto view_info = mojo::ui::ViewInfo::New();
+  view_info->scene_token = scene_token.Pass();
+  if (view_stub->parent()) {
+    SendChildAttached(view_stub->parent(), view_stub->key(), view_info.Pass());
+  } else if (view_stub->tree()) {
+    SendRootAttached(view_stub->tree(), view_stub->key(), view_info.Pass());
+    UpdateViewTreeRootScene(view_stub->tree());
+  }
 }
 
 void ViewRegistry::TransferOrUnregisterViewStub(
@@ -569,7 +648,6 @@ void ViewRegistry::SetLayout(ViewStub* view_stub,
     mojo::ui::ViewLayoutInfoPtr info = view_state->CreateLayoutInfo();
     if (info) {
       DVLOG(2) << "Layout cache hit";
-      view_state->set_scene_changed_since_last_report(false);
       callback.Run(info.Pass());
       return;
     }
@@ -714,18 +792,14 @@ void ViewRegistry::OnViewLayoutResult(base::WeakPtr<ViewState> view_state_weak,
   const bool size_changed =
       !view_state->layout_result() ||
       !view_state->layout_result()->size->Equals(*result->size);
-  const bool recurse =
-      !request->has_callbacks() &&
-      (size_changed || view_state->scene_changed_since_last_report());
+  const bool recurse = !request->has_callbacks() && size_changed;
 
   view_state->set_layout_params(request->TakeLayoutParams().Pass());
   view_state->set_layout_result(result.Pass());
 
   mojo::ui::ViewLayoutInfoPtr info = view_state->CreateLayoutInfo();
-  if (info) {
-    view_state->set_scene_changed_since_last_report(false);
+  if (info)
     request->DispatchLayoutInfo(info.Pass());
-  }
 
   if (recurse && view_state->view_stub()) {
     if (view_state->view_stub()->parent()) {
@@ -735,6 +809,8 @@ void ViewRegistry::OnViewLayoutResult(base::WeakPtr<ViewState> view_state_weak,
       InvalidateLayoutForRoot(view_state->view_stub()->tree());
     }
   }
+
+  PublishStubScene(view_state);
 
   if (view_state->view_stub()->is_root_of_tree() && size_changed)
     UpdateViewTreeRootScene(view_state->view_stub()->tree());
@@ -762,7 +838,7 @@ void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
   if (!tree_state->renderer())
     return;
 
-  if (tree_state->root()) {
+  if (tree_state->root() && tree_state->root()->stub_scene_token()) {
     ViewState* root_state = tree_state->root()->state();
     if (root_state && root_state->scene_token() &&
         root_state->layout_result()) {
@@ -772,7 +848,7 @@ void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
       viewport->width = root_state->layout_result()->size->width;
       viewport->height = root_state->layout_result()->size->height;
       tree_state->renderer()->SetRootScene(
-          tree_state->root()->state()->scene_token()->Clone(),
+          tree_state->root()->stub_scene_token()->Clone(),
           mojo::gfx::composition::kSceneVersionNone, viewport.Pass());
       return;
     }
@@ -783,10 +859,24 @@ void ViewRegistry::UpdateViewTreeRootScene(ViewTreeState* tree_state) {
 
 void ViewRegistry::OnRendererDied(ViewTreeState* tree_state) {
   DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
-  DVLOG(1) << "UpdateViewTreeRootScene: tree_state=" << tree_state;
+  DVLOG(1) << "OnRendererDied: tree_state=" << tree_state;
 
   tree_state->SetRenderer(nullptr);
   SendRendererDied(tree_state);
+}
+
+void ViewRegistry::SendChildAttached(ViewState* parent_state,
+                                     uint32_t child_key,
+                                     mojo::ui::ViewInfoPtr child_view_info) {
+  DCHECK(IsViewStateRegisteredDebug(parent_state));
+  DCHECK(child_view_info);
+
+  // TODO: Detect ANRs
+  DVLOG(1) << "SendChildAttached: parent_state=" << parent_state
+           << ", child_key=" << child_key
+           << ", child_view_info=" << child_view_info;
+  parent_state->view_listener()->OnChildAttached(
+      child_key, child_view_info.Pass(), base::Bind(&base::DoNothing));
 }
 
 void ViewRegistry::SendChildUnavailable(ViewState* parent_state,
@@ -798,6 +888,20 @@ void ViewRegistry::SendChildUnavailable(ViewState* parent_state,
            << ", child_key=" << child_key;
   parent_state->view_listener()->OnChildUnavailable(
       child_key, base::Bind(&base::DoNothing));
+}
+
+void ViewRegistry::SendRootAttached(ViewTreeState* tree_state,
+                                    uint32_t root_key,
+                                    mojo::ui::ViewInfoPtr root_view_info) {
+  DCHECK(IsViewTreeStateRegisteredDebug(tree_state));
+  DCHECK(root_view_info);
+
+  // TODO: Detect ANRs
+  DVLOG(1) << "SendRootAttached: tree_state=" << tree_state
+           << ", root_key=" << root_key
+           << ", root_view_info=" << root_view_info;
+  tree_state->view_tree_listener()->OnRootAttached(
+      root_key, root_view_info.Pass(), base::Bind(&base::DoNothing));
 }
 
 void ViewRegistry::SendRootUnavailable(ViewTreeState* tree_state,

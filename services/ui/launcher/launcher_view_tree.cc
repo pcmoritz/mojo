@@ -57,7 +57,6 @@ void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
     view_tree_->ClearRoot(nullptr);
     root_was_set_ = false;
   }
-  root_layout_info_.reset();
 }
 
 void LauncherViewTree::SetViewportMetrics(
@@ -85,6 +84,18 @@ void LauncherViewTree::OnInputDispatcherConnectionError() {
 
 void LauncherViewTree::OnLayout(const OnLayoutCallback& callback) {
   LayoutRoot();
+  callback.Run();
+}
+
+void LauncherViewTree::OnRootAttached(uint32_t root_key,
+                                      mojo::ui::ViewInfoPtr root_view_info,
+                                      const OnRootAttachedCallback& callback) {
+  DCHECK(root_view_info);
+
+  if (root_key_ == root_key) {
+    DVLOG(1) << "OnRootAttached: root_view_info=" << root_view_info;
+    root_view_info_ = root_view_info.Pass();
+  }
   callback.Run();
 }
 
@@ -127,10 +138,7 @@ void LauncherViewTree::OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info) {
   }
 
   DVLOG(1) << "Root layout: size.width=" << info->size->width
-           << ", size.height=" << info->size->height
-           << ", scene_token.value=" << info->scene_token->value;
-
-  root_layout_info_ = info.Pass();
+           << ", size.height=" << info->size->height;
 }
 
 void LauncherViewTree::Shutdown() {

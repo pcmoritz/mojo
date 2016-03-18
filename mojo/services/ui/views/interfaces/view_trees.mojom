@@ -153,6 +153,14 @@ interface ViewTreeListener {
   // been handled and the view tree is ready to be shown in its new aspect.
   OnLayout() => ();
 
+  // Called when the root view is attached along with embedding information.
+  //
+  // This method will be called at most once after the root is set.
+  //
+  // The implementation should invoke the callback once the event has
+  // been handled.
+  OnRootAttached(uint32 root_key, mojo.ui.ViewInfo root_view_info) => ();
+
   // Called when the root view has become unavailable.
   //
   // The root may become unavailable for many reasons such being unregistered

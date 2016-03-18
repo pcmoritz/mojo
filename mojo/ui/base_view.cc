@@ -27,6 +27,12 @@ BaseView::BaseView(
 
 BaseView::~BaseView() {}
 
+void BaseView::OnChildAttached(uint32_t child_key,
+                               mojo::ui::ViewInfoPtr child_view_info,
+                               const OnChildUnavailableCallback& callback) {
+  callback.Run();
+}
+
 void BaseView::OnChildUnavailable(uint32_t child_key,
                                   const OnChildUnavailableCallback& callback) {
   callback.Run();

@@ -83,12 +83,11 @@ void ViewState::ReleaseOwner() {
 }
 
 mojo::ui::ViewLayoutInfoPtr ViewState::CreateLayoutInfo() {
-  if (!layout_result_ || !scene_token_)
+  if (!layout_result_)
     return nullptr;
 
   auto info = mojo::ui::ViewLayoutInfo::New();
   info->size = layout_result_->size.Clone();
-  info->scene_token = scene_token_.Clone();
   return info;
 }
 

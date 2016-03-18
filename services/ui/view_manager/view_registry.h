@@ -167,6 +167,9 @@ class ViewRegistry : public mojo::ui::ViewInspector {
                                         transferred_view_owner_request);
   void UnregisterViewStub(std::unique_ptr<ViewStub> view_stub);
 
+  void OnViewAttached(base::WeakPtr<ViewStub> view_stub_weak,
+                      mojo::gfx::composition::SceneTokenPtr scene_token);
+
   // LAYOUT
 
   void SetLayout(ViewStub* view_stub,
@@ -188,6 +191,7 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   void OnSceneCreated(base::WeakPtr<ViewState> view_state_weak,
                       mojo::gfx::composition::SceneTokenPtr scene_token);
+  void PublishStubScene(ViewState* view_state);
 
   // RENDERING
 
@@ -196,7 +200,13 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   // SIGNALING
 
+  void SendChildAttached(ViewState* parent_state,
+                         uint32_t child_key,
+                         mojo::ui::ViewInfoPtr child_view_info);
   void SendChildUnavailable(ViewState* parent_state, uint32_t child_key);
+  void SendRootAttached(ViewTreeState* tree_state,
+                        uint32_t root_key,
+                        mojo::ui::ViewInfoPtr root_view_info);
   void SendRootUnavailable(ViewTreeState* tree_state, uint32_t root_key);
   void SendRendererDied(ViewTreeState* tree_state);
 

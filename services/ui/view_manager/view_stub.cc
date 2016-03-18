@@ -17,7 +17,8 @@ namespace view_manager {
 ViewStub::ViewStub(ViewRegistry* registry,
                    mojo::InterfaceHandle<mojo::ui::ViewOwner> owner)
     : registry_(registry),
-      owner_(mojo::ui::ViewOwnerPtr::Create(std::move(owner))) {
+      owner_(mojo::ui::ViewOwnerPtr::Create(std::move(owner))),
+      weak_factory_(this) {
   DCHECK(registry_);
   DCHECK(owner_);
 
@@ -35,13 +36,25 @@ ViewStub::~ViewStub() {
   DCHECK(is_unavailable());
 }
 
-void ViewStub::AttachView(ViewState* state) {
+void ViewStub::AttachView(ViewState* state,
+                          mojo::gfx::composition::ScenePtr stub_scene) {
   DCHECK(state);
   DCHECK(!state->view_stub());
+  DCHECK(stub_scene);
   DCHECK(is_pending());
 
   state_ = state;
   state_->set_view_stub(this);
+  stub_scene_ = stub_scene.Pass();
+}
+
+void ViewStub::SetStubSceneToken(
+    mojo::gfx::composition::SceneTokenPtr stub_scene_token) {
+  DCHECK(stub_scene_token);
+  DCHECK(stub_scene_);
+  DCHECK(!stub_scene_token_);
+
+  stub_scene_token_ = stub_scene_token.Pass();
 }
 
 ViewState* ViewStub::ReleaseView() {
@@ -53,6 +66,8 @@ ViewState* ViewStub::ReleaseView() {
     DCHECK(state->view_stub() == this);
     state->set_view_stub(nullptr);
     state_ = nullptr;
+    stub_scene_.reset();
+    stub_scene_token_.reset();
   }
   unavailable_ = true;
   return state;

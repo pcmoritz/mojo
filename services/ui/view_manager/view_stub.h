@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "base/macros.h"
+#include "base/memory/weak_ptr.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
 #include "services/ui/view_manager/view_layout_request.h"
 
@@ -38,6 +39,8 @@ class ViewStub {
            mojo::InterfaceHandle<mojo::ui::ViewOwner> owner);
   ~ViewStub();
 
+  base::WeakPtr<ViewStub> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
+
   // Gets the view state referenced by the stub, or null if the view
   // has not yet been resolved or is unavailable.
   ViewState* state() const { return state_; }
@@ -64,6 +67,14 @@ class ViewStub {
   // Gets the key that this child has in its container, or 0 if none.
   uint32_t key() const { return key_; }
 
+  // Gets the wrapped scene exposed to the container.
+  mojo::gfx::composition::Scene* stub_scene() const {
+    return stub_scene_.get();
+  }
+  const mojo::gfx::composition::SceneToken* stub_scene_token() const {
+    return stub_scene_token_.get();
+  }
+
   // A pending layout request, held until such time as the view is attached.
   std::unique_ptr<ViewLayoutRequest>& pending_layout_request() {
     return pending_layout_request_;
@@ -72,7 +83,13 @@ class ViewStub {
   // Binds the stub to the specified actual view, which must not be null.
   // Must be called at most once to apply the effects of resolving the
   // view owner.
-  void AttachView(ViewState* state);
+  void AttachView(ViewState* state,
+                  mojo::gfx::composition::ScenePtr stub_scene);
+
+  // Sets the stub scene token, which must not be null.
+  // Called after |AttachView| once the scene token is known.
+  void SetStubSceneToken(
+      mojo::gfx::composition::SceneTokenPtr stub_scene_token);
 
   // Marks the stub as unavailable.
   // Returns the previous view state, or null if none.
@@ -100,11 +117,15 @@ class ViewStub {
   mojo::ui::ViewOwnerPtr owner_;
   ViewState* state_ = nullptr;
   bool unavailable_ = false;
+  mojo::gfx::composition::ScenePtr stub_scene_;
+  mojo::gfx::composition::SceneTokenPtr stub_scene_token_;
   std::unique_ptr<ViewLayoutRequest> pending_layout_request_;
 
   ViewTreeState* tree_ = nullptr;
   ViewState* parent_ = nullptr;
   uint32_t key_ = 0u;
+
+  base::WeakPtrFactory<ViewStub> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(ViewStub);
 };

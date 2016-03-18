@@ -32,6 +32,9 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener {
  private:
   // |ViewTree|:
   void OnLayout(const OnLayoutCallback& callback) override;
+  void OnRootAttached(uint32_t root_key,
+                      mojo::ui::ViewInfoPtr root_view_info,
+                      const OnRootAttachedCallback& callback) override;
   void OnRootUnavailable(uint32_t root_key,
                          const OnRootUnavailableCallback& callback) override;
   void OnRendererDied(const OnRendererDiedCallback& callback) override;
@@ -53,13 +56,12 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener {
 
   mojo::Binding<mojo::ui::ViewTreeListener> view_tree_listener_binding_;
 
-  ;
   mojo::ui::ViewTreePtr view_tree_;
   mojo::ui::InputDispatcherPtr input_dispatcher_;
 
   uint32_t root_key_ = 0u;
   bool root_was_set_ = false;
-  mojo::ui::ViewLayoutInfoPtr root_layout_info_;
+  mojo::ui::ViewInfoPtr root_view_info_;
 
   DISALLOW_COPY_AND_ASSIGN(LauncherViewTree);
 };

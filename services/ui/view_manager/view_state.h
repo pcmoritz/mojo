@@ -99,15 +99,6 @@ class ViewState {
     scene_token_ = scene_token.Pass();
   }
 
-  // True if the scene changed since the last time the layout was reported
-  // to the parent or tree.
-  bool scene_changed_since_last_report() {
-    return scene_changed_since_last_report_;
-  }
-  void set_scene_changed_since_last_report(bool value) {
-    scene_changed_since_last_report_ = value;
-  }
-
   // Creates layout information to return to the parent or tree.
   // Returns null if unavailable.
   mojo::ui::ViewLayoutInfoPtr CreateLayoutInfo();
@@ -142,7 +133,6 @@ class ViewState {
   mojo::ui::ViewLayoutParamsPtr layout_params_;
   mojo::ui::ViewLayoutResultPtr layout_result_;
   mojo::gfx::composition::SceneTokenPtr scene_token_;
-  bool scene_changed_since_last_report_ = false;
 
   base::WeakPtrFactory<ViewState> weak_factory_;  // must be last
 

@@ -29,23 +29,25 @@ class TileView : public mojo::ui::BaseView {
     const std::string url;
     const uint32_t key;
 
-    bool layout_pending;
     mojo::ui::ViewLayoutParamsPtr layout_params;
-    mojo::ui::ViewLayoutInfoPtr layout_info;
     mojo::RectF layout_bounds;
+    mojo::ui::ViewInfoPtr view_info;
   };
 
   // |BaseView|:
   void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
                 mojo::Array<uint32_t> children_needing_layout,
                 const OnLayoutCallback& callback) override;
+  void OnChildAttached(uint32_t child_key,
+                       mojo::ui::ViewInfoPtr child_view_info,
+                       const OnChildAttachedCallback& callback) override;
   void OnChildUnavailable(uint32_t child_key,
                           const OnChildUnavailableCallback& callback) override;
 
   void ConnectViews();
   void OnChildLayoutFinished(uint32_t child_key,
                              mojo::ui::ViewLayoutInfoPtr child_layout_info);
-  void FinishLayout();
+  void UpdateScene();
 
   void OnFrameSubmitted();
 
@@ -53,8 +55,6 @@ class TileView : public mojo::ui::BaseView {
   std::map<uint32_t, std::unique_ptr<ViewData>> views_;
 
   mojo::Size size_;
-  OnLayoutCallback pending_layout_callback_;
-  uint32_t pending_child_layout_count_ = 0u;
 
   DISALLOW_COPY_AND_ASSIGN(TileView);
 };

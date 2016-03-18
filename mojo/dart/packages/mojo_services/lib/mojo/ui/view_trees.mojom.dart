@@ -834,6 +834,151 @@ class ViewTreeListenerOnLayoutResponseParams extends bindings.Struct {
 }
 
 
+class _ViewTreeListenerOnRootAttachedParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  int rootKey = 0;
+  views_mojom.ViewInfo rootViewInfo = null;
+
+  _ViewTreeListenerOnRootAttachedParams() : super(kVersions.last.size);
+
+  static _ViewTreeListenerOnRootAttachedParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _ViewTreeListenerOnRootAttachedParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _ViewTreeListenerOnRootAttachedParams result = new _ViewTreeListenerOnRootAttachedParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.rootKey = decoder0.decodeUint32(8);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(16, false);
+      result.rootViewInfo = views_mojom.ViewInfo.decode(decoder1);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeUint32(rootKey, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "rootKey of struct _ViewTreeListenerOnRootAttachedParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeStruct(rootViewInfo, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "rootViewInfo of struct _ViewTreeListenerOnRootAttachedParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_ViewTreeListenerOnRootAttachedParams("
+           "rootKey: $rootKey" ", "
+           "rootViewInfo: $rootViewInfo" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["rootKey"] = rootKey;
+    map["rootViewInfo"] = rootViewInfo;
+    return map;
+  }
+}
+
+
+class ViewTreeListenerOnRootAttachedResponseParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  ViewTreeListenerOnRootAttachedResponseParams() : super(kVersions.last.size);
+
+  static ViewTreeListenerOnRootAttachedResponseParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static ViewTreeListenerOnRootAttachedResponseParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    ViewTreeListenerOnRootAttachedResponseParams result = new ViewTreeListenerOnRootAttachedResponseParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "ViewTreeListenerOnRootAttachedResponseParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
 class _ViewTreeListenerOnRootUnavailableParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -1445,8 +1590,9 @@ class ViewTreeStub extends bindings.Stub {
 }
 
 const int _ViewTreeListener_onLayoutName = 0;
-const int _ViewTreeListener_onRootUnavailableName = 1;
-const int _ViewTreeListener_onRendererDiedName = 2;
+const int _ViewTreeListener_onRootAttachedName = 1;
+const int _ViewTreeListener_onRootUnavailableName = 2;
+const int _ViewTreeListener_onRendererDiedName = 3;
 
 class _ViewTreeListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1462,6 +1608,7 @@ class _ViewTreeListenerServiceDescription implements service_describer.ServiceDe
 abstract class ViewTreeListener {
   static const String serviceName = null;
   dynamic onLayout([Function responseFactory = null]);
+  dynamic onRootAttached(int rootKey,views_mojom.ViewInfo rootViewInfo,[Function responseFactory = null]);
   dynamic onRootUnavailable(int rootKey,[Function responseFactory = null]);
   dynamic onRendererDied([Function responseFactory = null]);
 }
@@ -1489,6 +1636,26 @@ class _ViewTreeListenerProxyImpl extends bindings.Proxy {
     switch (message.header.type) {
       case _ViewTreeListener_onLayoutName:
         var r = ViewTreeListenerOnLayoutResponseParams.deserialize(
+            message.payload);
+        if (!message.header.hasRequestId) {
+          proxyError("Expected a message with a valid request Id.");
+          return;
+        }
+        Completer c = completerMap[message.header.requestId];
+        if (c == null) {
+          proxyError(
+              "Message had unknown request Id: ${message.header.requestId}");
+          return;
+        }
+        completerMap.remove(message.header.requestId);
+        if (c.isCompleted) {
+          proxyError("Response completer already completed");
+          return;
+        }
+        c.complete(r);
+        break;
+      case _ViewTreeListener_onRootAttachedName:
+        var r = ViewTreeListenerOnRootAttachedResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1570,6 +1737,16 @@ class _ViewTreeListenerProxyCalls implements ViewTreeListener {
       return _proxyImpl.sendMessageWithRequestId(
           params,
           _ViewTreeListener_onLayoutName,
+          -1,
+          bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    dynamic onRootAttached(int rootKey,views_mojom.ViewInfo rootViewInfo,[Function responseFactory = null]) {
+      var params = new _ViewTreeListenerOnRootAttachedParams();
+      params.rootKey = rootKey;
+      params.rootViewInfo = rootViewInfo;
+      return _proxyImpl.sendMessageWithRequestId(
+          params,
+          _ViewTreeListener_onRootAttachedName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
     }
@@ -1675,6 +1852,10 @@ class ViewTreeListenerStub extends bindings.Stub {
     var mojo_factory_result = new ViewTreeListenerOnLayoutResponseParams();
     return mojo_factory_result;
   }
+  ViewTreeListenerOnRootAttachedResponseParams _ViewTreeListenerOnRootAttachedResponseParamsFactory() {
+    var mojo_factory_result = new ViewTreeListenerOnRootAttachedResponseParams();
+    return mojo_factory_result;
+  }
   ViewTreeListenerOnRootUnavailableResponseParams _ViewTreeListenerOnRootUnavailableResponseParamsFactory() {
     var mojo_factory_result = new ViewTreeListenerOnRootUnavailableResponseParams();
     return mojo_factory_result;
@@ -1708,6 +1889,28 @@ class ViewTreeListenerStub extends bindings.Stub {
           return buildResponseWithId(
               response,
               _ViewTreeListener_onLayoutName,
+              message.header.requestId,
+              bindings.MessageHeader.kMessageIsResponse);
+        }
+        break;
+      case _ViewTreeListener_onRootAttachedName:
+        var params = _ViewTreeListenerOnRootAttachedParams.deserialize(
+            message.payload);
+        var response = _impl.onRootAttached(params.rootKey,params.rootViewInfo,_ViewTreeListenerOnRootAttachedResponseParamsFactory);
+        if (response is Future) {
+          return response.then((response) {
+            if (response != null) {
+              return buildResponseWithId(
+                  response,
+                  _ViewTreeListener_onRootAttachedName,
+                  message.header.requestId,
+                  bindings.MessageHeader.kMessageIsResponse);
+            }
+          });
+        } else if (response != null) {
+          return buildResponseWithId(
+              response,
+              _ViewTreeListener_onRootAttachedName,
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
