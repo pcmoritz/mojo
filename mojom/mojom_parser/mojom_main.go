@@ -25,6 +25,7 @@ import (
 //	For further information about each command, see the file named
 //	<command>_cmd.go for example "parse_cmd.go" and "fmt_cmd.go".
 func main() {
+	checkVersion(os.Args)
 	commands := NewCommandSet()
 	commands.AddCommand("parse", parseCmd, "Parses mojom files.")
 	commands.AddCommand("fmt", fmtCmd, "Formats a mojom file.")
