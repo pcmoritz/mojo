@@ -586,16 +586,23 @@ MojoResult Core::WaitManyInternal(const MojoHandle* handles,
 
   DispatcherVector dispatchers;
   dispatchers.reserve(num_handles);
-  // TODO(vtl): Probably shouldn't grab the handle table lock N times. (This
-  // also makes the "busy" result kind of oddly racy.)
-  for (uint32_t i = 0; i < num_handles; i++) {
-    RefPtr<Dispatcher> dispatcher;
-    MojoResult result = GetDispatcher(handles[i], &dispatcher);
-    if (result != MOJO_RESULT_OK) {
-      *result_index = i;
-      return result;
+
+  {
+    MutexLocker locker(&handle_table_mutex_);
+    for (uint32_t i = 0; i < num_handles; i++) {
+      if (handles[i] == MOJO_HANDLE_INVALID) {
+        *result_index = i;
+        return MOJO_RESULT_INVALID_ARGUMENT;
+      }
+
+      RefPtr<Dispatcher> dispatcher;
+      MojoResult result = handle_table_.GetDispatcher(handles[i], &dispatcher);
+      if (result != MOJO_RESULT_OK) {
+        *result_index = i;
+        return result;
+      }
+      dispatchers.push_back(std::move(dispatcher));
     }
-    dispatchers.push_back(std::move(dispatcher));
   }
 
   // TODO(vtl): Should make the waiter live (permanently) in TLS.
