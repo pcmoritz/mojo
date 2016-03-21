@@ -5,11 +5,16 @@
 package mojom
 
 import (
+	"container/list"
 	"fmt"
+	"mojom/mojom_parser/utils"
 )
 
 // ComputeFinalData() should be invoked after Resolve() has completed
-// successfully. It computes the field packing and version data that will
+// successfully. It performs the final computations needed in order to
+// populate all of the fields in the intermediate representation that is
+// the output of the frontend of the compiler and is consumed by the backend.
+// An example is the field packing and version data for struct fields that will
 // be used by the code generators.
 func (d *MojomDescriptor) ComputeFinalData() error {
 	for _, userDefinedType := range d.TypesByKey {
@@ -20,35 +25,200 @@ func (d *MojomDescriptor) ComputeFinalData() error {
 	return nil
 }
 
-func (e *MojomEnum) ComputeFinalData() error {
-	return e.ComputeEnumValueIntegers()
-}
+////////////////////////  Structs  ////////////////////////
 
 func (e *MojomStruct) ComputeFinalData() error {
-	if err := e.ComputeVersionInfo(); err != nil {
+	// Note(rudominer) computeFieldOffsets must be invoked before computeVersionInfo.
+	if err := e.computeFieldOffsets(); err != nil {
 		return err
 	}
-	if err := e.ComputeFieldOffsets(); err != nil {
+	if err := e.computeVersionInfo(); err != nil {
 		return err
 	}
 	return nil
 }
+
+// computePadding returns the least non-negative integer |pad| such that
+// |offset| + |pad| is a multiple of |alignment|.
+func computePadding(offset, alignment uint32) uint32 {
+	return (alignment - (offset % alignment)) % alignment
+}
+
+// computeFieldOffsets is invoked by ComputeFinalData after the
+// parsing, resolution and type validation phases. It computes the |offset|
+// and |bit| fields of each struct field. This function must be invoked
+// before computeVersionInfo() because computeVersionInfo() consumes the
+// |offset| and |size| fields that are computed by this method.
+//
+// The goal is to pack each field into the earliest possible position in the serialized
+// struct, subject to the alignment and size constraints of its type.
+// Additionally booleans are represented as a single bit. See go/mojo-archive-format.
+//
+// The algorithm is as follows: We iterate over |fieldsInOrdinalOrder|, building up
+// |fieldsInPackingOrder|, and setting |field.offset| and |field.bit| as we go.
+// |fieldsInPackingOrder| represents the fields whose serialization position has
+// already been determined. For each |field| in |fieldsInOrdinalOrder| we search
+// through |fieldsInPackingOrder| looking for a position in which |field| will fit,
+// and we insert it into the first position we find where it will fit.
+func (s *MojomStruct) computeFieldOffsets() error {
+	fieldsInPackingOrder := list.New()
+LoopOverFields:
+	for i, field := range s.fieldsInOrdinalOrder {
+		if i == 0 {
+			// Field zero always goes first in packing order.
+			field.offset = 0
+			field.bit = 0
+			fieldsInPackingOrder.PushBack(field)
+			continue
+		}
+
+		// Search through |fieldsInPackingOrder| for two consecutive fields,
+		// |before| and |after|, with enough space between them that we may
+		// insert |field| between |before| and |after|.
+		before := fieldsInPackingOrder.Front()
+		if before.Next() != nil {
+			for after := before.Next(); after != nil; after = after.Next() {
+				// Tentatively assume that |field| will fit after |before|
+				computeTentativeFieldOffset(field, before.Value.(*StructField))
+				// Check if it actually fits before |after|.
+				if field.Offset()+field.FieldType.SerializationSize() <= after.Value.(*StructField).Offset() {
+					// It fits: insert it.
+					fieldsInPackingOrder.InsertAfter(field, before)
+					// We are finished processing this |field|.
+					continue LoopOverFields
+				}
+				// It didn't fit: continue to search for a spot to fit it.
+				before = after
+			}
+		}
+		// If we are here then we did not find a hole and so |field| should be inserted
+		// at the end.
+		computeTentativeFieldOffset(field, before.Value.(*StructField))
+		fieldsInPackingOrder.PushBack(field)
+	}
+	return nil
+}
+
+// computeTentativeFieldOffset computes and sets the |offset| and |bit| fields
+// of |field|, assuming it will fit right after |previousField| in packing
+// order. The setting is only tentative because it may turn out it does not fit
+// before the field that is currently following |previousField| in packing order,
+// in which case |field| needs to be moved forward to a different location.
+// The |offset| and |bit| fields of |previousField| must already be set.
+func computeTentativeFieldOffset(field, previousField *StructField) {
+	if isBoolField(field) && isBoolField(previousField) && previousField.bit < 7 {
+		field.offset = int64(previousField.Offset())
+		field.bit = previousField.bit + 1
+		return
+	}
+	offset := previousField.Offset() + previousField.FieldType.SerializationSize()
+	alignment := field.FieldType.SerializationAlignment()
+	field.offset = int64(offset + computePadding(offset, alignment))
+	field.bit = 0
+}
+
+func isBoolField(field *StructField) bool {
+	simpleType, ok := field.FieldType.(SimpleType)
+	if ok {
+		return simpleType == SimpleTypeBool
+	}
+	return false
+}
+
+// computeVersionInfo is invoked by ComputeFinalData() after the
+// computeFieldOffsets(). It examines the |MinVersion|
+// attributes of all of the fields of the struct, validates the values, and
+// sets up the versionInfo array.
+//
+// Note that computeFieldOffsets() must be invoked prior to this function becuase
+// this function consumes the |offset| fields of each field. The accessor
+// StructField.Offset() will panic if computeFieldOffsets() has not yet been invoked.
+func (s *MojomStruct) computeVersionInfo() error {
+	s.versionInfo = make([]StructVersion, 0)
+	previousMinVersion := uint32(0)
+	payloadSizeSoFar := uint32(0)
+	for i, field := range s.fieldsInOrdinalOrder {
+		value, literalValue, found, ok := field.minVersionAttribute()
+		if found == false {
+			if previousMinVersion != 0 {
+				return &StructFieldMinVersionError{
+					field:         field,
+					previousValue: previousMinVersion,
+					literalValue:  MakeStringLiteralValue("", nil),
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		} else {
+			if !ok {
+				return &StructFieldMinVersionError{
+					field:        field,
+					literalValue: literalValue,
+					err:          ErrMinVersionIllformed,
+				}
+			}
+			if value < previousMinVersion {
+				return &StructFieldMinVersionError{
+					field:         field,
+					previousValue: previousMinVersion,
+					literalValue:  literalValue,
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		}
+		if value != 0 && !field.FieldType.Nullable() {
+			return &StructFieldMinVersionError{
+				field:        field,
+				literalValue: literalValue,
+				err:          ErrMinVersionNotNullable,
+			}
+		}
+		field.minVersion = int64(value)
+		if value > previousMinVersion {
+			s.versionInfo = append(s.versionInfo, StructVersion{
+				VersionNumber: previousMinVersion,
+				NumFields:     uint32(i),
+				NumBytes:      payloadSizeSoFar,
+			})
+			previousMinVersion = value
+		}
+		// Taking a max here is necessary since the ordinal order is not the same as packing order.
+		payloadSizeSoFar = utils.MaximumUint32(payloadSizeSoFar, computePayloadSizeSoFar(field))
+	}
+	s.versionInfo = append(s.versionInfo, StructVersion{
+		VersionNumber: previousMinVersion,
+		NumFields:     uint32(len(s.fieldsInOrdinalOrder)),
+		NumBytes:      payloadSizeSoFar,
+	})
+
+	return nil
+}
+
+const structHeaderSize = uint32(8)
+
+func computePayloadSizeSoFar(field *StructField) uint32 {
+	fieldEndOffset := field.Offset() + field.FieldType.SerializationSize()
+	return structHeaderSize + fieldEndOffset + computePadding(fieldEndOffset, uint32(8))
+}
+
+////////////////////////  Interfaces  ////////////////////////
 
 func (i *MojomInterface) ComputeFinalData() error {
 	for _, method := range i.MethodsByOrdinal {
 		if method.Parameters != nil {
-			if err := (*method.Parameters).ComputeVersionInfo(); err != nil {
+			// Note(rudominer) computeFieldOffsets must be invoked before computeVersionInfo.
+			if err := (*method.Parameters).computeFieldOffsets(); err != nil {
 				return err
 			}
-			if err := (*method.Parameters).ComputeFieldOffsets(); err != nil {
+			if err := (*method.Parameters).computeVersionInfo(); err != nil {
 				return err
 			}
 		}
 		if method.ResponseParameters != nil {
-			if err := (*method.ResponseParameters).ComputeVersionInfo(); err != nil {
+			// Note(rudominer) computeFieldOffsets must be invoked before computeVersionInfo.
+			if err := (*method.ResponseParameters).computeFieldOffsets(); err != nil {
 				return err
 			}
-			if err := (*method.ResponseParameters).ComputeFieldOffsets(); err != nil {
+			if err := (*method.ResponseParameters).computeVersionInfo(); err != nil {
 				return err
 			}
 		}
@@ -56,8 +226,15 @@ func (i *MojomInterface) ComputeFinalData() error {
 	return nil
 }
 
+////////////////////////  Unions  ////////////////////////
+
 func (u *MojomUnion) ComputeFinalData() error {
 	return nil
+}
+
+////////////////////////  Enums  ////////////////////////
+func (e *MojomEnum) ComputeFinalData() error {
+	return e.ComputeEnumValueIntegers()
 }
 
 // ComputeEnumValueIntegers() computes the |ComputedIntValue| field of all

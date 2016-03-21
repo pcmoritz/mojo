@@ -87,6 +87,14 @@ type UserDefinedType interface {
 	// backend. Examples include struct field packing data and MinVersion values.
 	// See computed_data.go.
 	ComputeFinalData() error
+
+	// SerializationSize() returns the number of bytes necessary to serialize an
+	// instance of this type in Mojo serialization.
+	SerializationSize() uint32
+
+	// SerializationAlignment() returns the number of bytes on which an instance
+	// of this type should be aligned in Mojo serialization.
+	SerializationAlignment() uint32
 }
 
 // This struct is embedded in each of MojomStruct, MojomInterface
@@ -342,10 +350,10 @@ type MojomStruct struct {
 	fieldsByName         map[string]*StructField
 	FieldsInLexicalOrder []*StructField
 
-	// This is computed after the parsing phase.
+	// This is computed by ComputeFieldOrdinals().
 	fieldsInOrdinalOrder []*StructField
 
-	// This is computed in ComputeVersionInfo which is invoked by ComputeFinalData().
+	// This is computed in computeVersionInfo which is invoked by ComputeFinalData().
 	versionInfo []StructVersion
 
 	// Used to form an error message in case of a duplicate field name.
@@ -445,6 +453,14 @@ func (s *MojomStruct) VersionInfo() []StructVersion {
 
 func (*MojomStruct) Kind() UserDefinedTypeKind {
 	return UserDefinedTypeKindStruct
+}
+
+func (*MojomStruct) SerializationSize() uint32 {
+	return 8
+}
+
+func (*MojomStruct) SerializationAlignment() uint32 {
+	return 8
 }
 
 func (s *MojomStruct) StructType() StructType {
@@ -579,82 +595,6 @@ func (e *StructFieldMinVersionError) Error() string {
 		}
 	}
 	return UserErrorMessage(e.field.OwningFile(), token, message)
-}
-
-// ComputeVersionInfo is invoked by ComputeFinalData() after the
-// parsing, resolution and type validation phases. It examines the |MinVersion|
-// attributes of all of the fields of the struct, validates the values, and
-// sets up the versionInfo array.
-func (s *MojomStruct) ComputeVersionInfo() error {
-	s.versionInfo = make([]StructVersion, 0)
-	previousMinVersion := uint32(0)
-	payloadSizeSoFar := uint32(0)
-	for i, field := range s.fieldsInOrdinalOrder {
-		value, literalValue, found, ok := field.minVersionAttribute()
-		if found == false {
-			if previousMinVersion != 0 {
-				return &StructFieldMinVersionError{
-					field:         field,
-					previousValue: previousMinVersion,
-					literalValue:  MakeStringLiteralValue("", nil),
-					err:           ErrMinVersionOutOfOrder,
-				}
-			}
-		} else {
-			if !ok {
-				return &StructFieldMinVersionError{
-					field:        field,
-					literalValue: literalValue,
-					err:          ErrMinVersionIllformed,
-				}
-			}
-			if value < previousMinVersion {
-				return &StructFieldMinVersionError{
-					field:         field,
-					previousValue: previousMinVersion,
-					literalValue:  literalValue,
-					err:           ErrMinVersionOutOfOrder,
-				}
-			}
-		}
-		if value != 0 && !field.FieldType.Nullable() {
-			return &StructFieldMinVersionError{
-				field:        field,
-				literalValue: literalValue,
-				err:          ErrMinVersionNotNullable,
-			}
-		}
-		field.minVersion = int64(value)
-		if value > previousMinVersion {
-			s.versionInfo = append(s.versionInfo, StructVersion{
-				VersionNumber: previousMinVersion,
-				NumFields:     uint32(i),
-				NumBytes:      payloadSizeSoFar,
-			})
-			previousMinVersion = value
-		}
-		// TODO(rudominer) Set payloadSizeSoFar to the payload size if the
-		// current |field| were the last field.
-	}
-	s.versionInfo = append(s.versionInfo, StructVersion{
-		VersionNumber: previousMinVersion,
-		NumFields:     uint32(len(s.fieldsInOrdinalOrder)),
-		NumBytes:      payloadSizeSoFar,
-	})
-
-	return nil
-}
-
-// ComputeFieldOffsets is invoked by ComputeFinalData after the
-// parsing, resolution and type validation phases. It computes the |offset|
-// and |bit| fields of each struct field.
-func (s *MojomStruct) ComputeFieldOffsets() error {
-	// TODO(rudominer) Implement MojomStruct.ComputeFieldOffsets
-	for _, field := range s.FieldsInLexicalOrder {
-		field.offset = 0
-		field.bit = 0
-	}
-	return nil
 }
 
 func (m MojomStruct) String() string {
@@ -900,6 +840,14 @@ func (MojomInterface) Kind() UserDefinedTypeKind {
 	return UserDefinedTypeKindInterface
 }
 
+func (*MojomInterface) SerializationSize() uint32 {
+	return 8
+}
+
+func (*MojomInterface) SerializationAlignment() uint32 {
+	return 4
+}
+
 func (MojomInterface) IsAssignmentCompatibleWith(value LiteralValue) bool {
 	return false
 }
@@ -1140,6 +1088,14 @@ func (MojomUnion) Kind() UserDefinedTypeKind {
 	return UserDefinedTypeKindUnion
 }
 
+func (MojomUnion) SerializationSize() uint32 {
+	return 16
+}
+
+func (MojomUnion) SerializationAlignment() uint32 {
+	return 8
+}
+
 func (MojomUnion) IsAssignmentCompatibleWith(value LiteralValue) bool {
 	return false
 }
@@ -1193,6 +1149,14 @@ func (e MojomEnum) IsAssignmentCompatibleWith(value LiteralValue) bool {
 
 func (MojomEnum) Kind() UserDefinedTypeKind {
 	return UserDefinedTypeKindEnum
+}
+
+func (MojomEnum) SerializationSize() uint32 {
+	return 4
+}
+
+func (MojomEnum) SerializationAlignment() uint32 {
+	return 4
 }
 
 func (e *MojomEnum) InitAsScope(parentScope *Scope) *Scope {

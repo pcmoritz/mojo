@@ -1174,9 +1174,6 @@ func TestWithComputedData(t *testing.T) {
 
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
 
-		// ResolvedTypes
-
-		// struct Foo
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
 			DeclData: test.newDeclData("Foo", "Foo"),
 			Fields: []mojom_types.StructField{
@@ -1186,40 +1183,44 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(0, -1, "x"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   0,
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(1, -1, "y"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
 				},
 				// field z
 				{
 					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 1,
+					Offset:     8,
 				},
 				// field w
 				{
 					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 2,
+					Offset:     16,
 				},
 			},
 			VersionInfo: &[]mojom_types.StructVersion{
 				mojom_types.StructVersion{
 					VersionNumber: 0,
 					NumFields:     2,
-					NumBytes:      0,
+					NumBytes:      16,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 1,
 					NumFields:     3,
-					NumBytes:      0,
+					NumBytes:      24,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 2,
 					NumFields:     4,
-					NumBytes:      0,
+					NumBytes:      32,
 				},
 			},
 		}}
@@ -1247,9 +1248,6 @@ func TestWithComputedData(t *testing.T) {
 
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
 
-		// ResolvedTypes
-
-		// struct Foo
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
 			DeclData: test.newDeclData("Foo", "Foo"),
 			Fields: []mojom_types.StructField{
@@ -1259,40 +1257,44 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(0, -1, "x"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   0,
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(1, -1, "y"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
 				},
 				// field z
 				{
 					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 1,
+					Offset:     8,
 				},
 				// field w
 				{
 					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{3}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 3,
+					Offset:     16,
 				},
 			},
 			VersionInfo: &[]mojom_types.StructVersion{
 				mojom_types.StructVersion{
 					VersionNumber: 0,
 					NumFields:     2,
-					NumBytes:      0,
+					NumBytes:      16,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 1,
 					NumFields:     3,
-					NumBytes:      0,
+					NumBytes:      24,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 3,
 					NumFields:     4,
-					NumBytes:      0,
+					NumBytes:      32,
 				},
 			},
 		}}
@@ -1320,9 +1322,6 @@ func TestWithComputedData(t *testing.T) {
 
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
 
-		// ResolvedTypes
-
-		// struct Foo
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
 			DeclData: test.newDeclData("Foo", "Foo"),
 			Fields: []mojom_types.StructField{
@@ -1332,35 +1331,39 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(0, -1, "x"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   0,
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(1, -1, "y"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
 				},
 				// field z
 				{
 					DeclData:   test.newShortDeclDataAO(2, -1, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 1,
+					Offset:     8,
 				},
 				// field w
 				{
 					DeclData:   test.newShortDeclDataAO(3, -1, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 1,
+					Offset:     16,
 				},
 			},
 			VersionInfo: &[]mojom_types.StructVersion{
 				mojom_types.StructVersion{
 					VersionNumber: 0,
 					NumFields:     2,
-					NumBytes:      0,
+					NumBytes:      16,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 1,
 					NumFields:     4,
-					NumBytes:      0,
+					NumBytes:      32,
 				},
 			},
 		}}
@@ -1389,9 +1392,6 @@ func TestWithComputedData(t *testing.T) {
 
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
 
-		// ResolvedTypes
-
-		// struct Foo
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
 			DeclData: test.newDeclData("Foo", "Foo"),
 			Fields: []mojom_types.StructField{
@@ -1401,42 +1401,658 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(3, 0, "x"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   0,
 				},
 				// field y
 				{
 					DeclData: test.newShortDeclDataO(0, 1, "y"),
 					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
 				},
 				// field z
 				{
 					DeclData:   test.newShortDeclDataAO(1, 2, "z", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 1,
+					Offset:     8,
 				},
 				// field w
 				{
 					DeclData:   test.newShortDeclDataAO(2, 3, "w", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
 					Type:       &mojom_types.TypeArrayType{mojom_types.ArrayType{true, -1, &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32}}},
 					MinVersion: 2,
+					Offset:     16,
 				},
 			},
 			VersionInfo: &[]mojom_types.StructVersion{
 				mojom_types.StructVersion{
 					VersionNumber: 0,
 					NumFields:     2,
-					NumBytes:      0,
+					NumBytes:      16,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 1,
 					NumFields:     3,
-					NumBytes:      0,
+					NumBytes:      24,
 				},
 				mojom_types.StructVersion{
 					VersionNumber: 2,
 					NumFields:     4,
-					NumBytes:      0,
+					NumBytes:      32,
 				},
 			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: 3 boolean fields
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct MyStruct1 {
+	  bool b1;
+	  bool b2;
+	  bool b3;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field b1
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "b1"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      0,
+				},
+				// field b2
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "b2"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      1,
+				},
+				// field b3
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "b3"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      2,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     3,
+					NumBytes:      16,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: int8 field + 2 boolean fields + int32field + 2 boolean fields
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct MyStruct1 {
+	  int8 x;
+
+	  bool b1;
+	  bool b2;
+
+	  int32 y;
+
+	  bool b3;
+	  bool b4;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   0,
+				},
+				// field b1
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "b1"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      0,
+				},
+				// field b2
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "b2"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      1,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
+				},
+				// field b3
+				{
+					DeclData: test.newShortDeclDataO(4, -1, "b3"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      2,
+				},
+				// field b4
+				{
+					DeclData: test.newShortDeclDataO(5, -1, "b4"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      3,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     6,
+					NumBytes:      16,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: int8 + int64 + bool + int32 + int8 + bool + int16
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct MyStruct1 {
+	  int8 x;
+	  int64 y;
+	  bool b1;
+	  int32 z;
+	  int8 w;
+	  bool b2;
+	  int16 r;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   0,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
+					Offset:   8,
+				},
+				// field b1
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "b1"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      0,
+				},
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(4, -1, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   2,
+				},
+				// field b2
+				{
+					DeclData: test.newShortDeclDataO(5, -1, "b2"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      1,
+				},
+				// field r
+				{
+					DeclData: test.newShortDeclDataO(6, -1, "r"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int16},
+					Offset:   16,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     7,
+					NumBytes:      32,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Specified ordinals with int8 + int64 + bool + int32 + int8 + bool + int16
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct MyStruct1 {
+	  int64 y@1;
+	  bool b1@2;
+	  int32 z@3;
+	  bool b2@5;
+	  int16 r@6;
+	  int8 x@0;
+	  int8 w@4;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(5, 0, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   0,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(0, 1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
+					Offset:   8,
+				},
+				// field b1
+				{
+					DeclData: test.newShortDeclDataO(1, 2, "b1"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      0,
+				},
+				// field z
+				{
+					DeclData: test.newShortDeclDataO(2, 3, "z"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   4,
+				},
+				// field w
+				{
+					DeclData: test.newShortDeclDataO(6, 4, "w"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   2,
+				},
+				// field b2
+				{
+					DeclData: test.newShortDeclDataO(3, 5, "b2"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      1,
+				},
+				// field r
+				{
+					DeclData: test.newShortDeclDataO(4, 6, "r"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int16},
+					Offset:   16,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     7,
+					NumBytes:      32,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Ten bools
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct MyStruct1 {
+	  bool b0;
+	  bool b1;
+	  bool b2;
+	  bool b3;
+	  bool b4;
+	  bool b5;
+	  bool b6;
+	  bool b7;
+	  bool b8;
+	  bool b9;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "b0"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      0,
+				},
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "b1"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      1,
+				},
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "b2"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      2,
+				},
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "b3"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      3,
+				},
+				{
+					DeclData: test.newShortDeclDataO(4, -1, "b4"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      4,
+				},
+				{
+					DeclData: test.newShortDeclDataO(5, -1, "b5"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      5,
+				},
+				{
+					DeclData: test.newShortDeclDataO(6, -1, "b6"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      6,
+				},
+				{
+					DeclData: test.newShortDeclDataO(7, -1, "b7"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   0,
+					Bit:      7,
+				},
+				{
+					DeclData: test.newShortDeclDataO(8, -1, "b8"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      0,
+				},
+				{
+					DeclData: test.newShortDeclDataO(9, -1, "b9"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Bool},
+					Offset:   1,
+					Bit:      1,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     10,
+					NumBytes:      16,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: int8 + union + struct + interface-request + int32 + interface
+	//
+	// x           intfcreqst  my_union---------------------------------------->  my_struct------------>  y-------->  my_interface--------->
+	// 0  1  2  3  4  5  6  7  8  9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
+	//
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	union MyUnion1{};
+
+	interface MyInterface1{};
+
+	struct MyStruct1 {
+	  int8          x;
+	  MyUnion1      my_union;
+	  MyStruct1     my_struct;
+	  MyInterface1& my_interface_request;
+	  int32         y;
+	  MyInterface1  my_interface;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Unions = &[]string{"TYPE_KEY:MyUnion1"}
+		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:MyInterface1"}
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		// MyStruct1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   0,
+				},
+				// field my_union
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "my_union"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("MyUnion1"), stringPointer("TYPE_KEY:MyUnion1")}},
+					Offset: 8,
+				},
+				// field my_struct
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "my_struct"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
+					Offset: 24,
+				},
+				// field my_interface_request
+				{
+					DeclData: test.newShortDeclDataO(3, -1, "my_interface_request"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, true, stringPointer("MyInterface1"), stringPointer("TYPE_KEY:MyInterface1")}},
+					Offset: 4,
+				},
+				// field y
+				{
+					DeclData: test.newShortDeclDataO(4, -1, "y"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
+					Offset:   32,
+				},
+				// field my_interface
+				{
+					DeclData: test.newShortDeclDataO(5, -1, "my_interface"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("MyInterface1"), stringPointer("TYPE_KEY:MyInterface1")}},
+					Offset: 36,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     6,
+					NumBytes:      56,
+				},
+			},
+		}}
+
+		// MyUnion1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyUnion1"] = &mojom_types.UserDefinedTypeUnionType{mojom_types.MojomUnion{
+			DeclData: test.newDeclData("MyUnion1", "MyUnion1"),
+			Fields:   []mojom_types.UnionField{},
+		}}
+
+		// MyInterface1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyInterface1"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: test.newDeclData("MyInterface1", "MyInterface1"),
+			Methods:  map[uint32]mojom_types.MojomMethod{},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Multiple versions with int8 + union + struct + interface-request + handle + interface
+	//
+	// x           intfcreqst  my_union---------------------------------------->  my_struct------------>  y-------->  my_interface--------->
+	// 0  1  2  3  4  5  6  7  8  9  10  11  12  13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
+	//
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	union MyUnion1{};
+
+	interface MyInterface1{};
+
+	struct MyStruct1 {
+	  int8          x;
+	  MyUnion1      my_union;
+	  MyStruct1     my_struct;
+
+	  [MinVersion=1]
+	  MyInterface1&? my_interface_request;
+
+	  [MinVersion=2]
+	  handle?       y;
+
+	  [MinVersion=2]
+	  MyInterface1?  my_interface;
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Unions = &[]string{"TYPE_KEY:MyUnion1"}
+		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:MyInterface1"}
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct1"}
+
+		// MyStruct1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyStruct1"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("MyStruct1", "MyStruct1"),
+			Fields: []mojom_types.StructField{
+				// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+				// declarationOrder and declaredOrdinal.
+				// field x
+				{
+					DeclData: test.newShortDeclDataO(0, -1, "x"),
+					Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+					Offset:   0,
+				},
+				// field my_union
+				{
+					DeclData: test.newShortDeclDataO(1, -1, "my_union"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("MyUnion1"), stringPointer("TYPE_KEY:MyUnion1")}},
+					Offset: 8,
+				},
+				// field my_struct
+				{
+					DeclData: test.newShortDeclDataO(2, -1, "my_struct"),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						false, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
+					Offset: 24,
+				},
+				// field my_interface_request
+				{
+					DeclData: test.newShortDeclDataAO(3, -1, "my_interface_request", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						true, true, stringPointer("MyInterface1"), stringPointer("TYPE_KEY:MyInterface1")}},
+					Offset:     4,
+					MinVersion: 1,
+				},
+				// field y
+				{
+					DeclData:   test.newShortDeclDataAO(4, -1, "y", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					Type:       &mojom_types.TypeHandleType{mojom_types.HandleType{Nullable: true}},
+					Offset:     32,
+					MinVersion: 2,
+				},
+				// field my_interface
+				{
+					DeclData: test.newShortDeclDataAO(5, -1, "my_interface", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
+						true, false, stringPointer("MyInterface1"), stringPointer("TYPE_KEY:MyInterface1")}},
+					Offset:     36,
+					MinVersion: 2,
+				},
+			},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     3,
+					NumBytes:      40,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 1,
+					NumFields:     4,
+					NumBytes:      40,
+				},
+				mojom_types.StructVersion{
+					VersionNumber: 2,
+					NumFields:     6,
+					NumBytes:      56,
+				},
+			},
+		}}
+
+		// MyUnion1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyUnion1"] = &mojom_types.UserDefinedTypeUnionType{mojom_types.MojomUnion{
+			DeclData: test.newDeclData("MyUnion1", "MyUnion1"),
+			Fields:   []mojom_types.UnionField{},
+		}}
+
+		// MyInterface1
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyInterface1"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: test.newDeclData("MyInterface1", "MyInterface1"),
+			Methods:  map[uint32]mojom_types.MojomMethod{},
 		}}
 
 		test.endTestCase()

@@ -126,6 +126,16 @@ type TypeRef interface {
 
 	// Returns true just in case the type referene is nullable.
 	Nullable() bool
+
+	// SerializationSize() is invoked after the resolution and validation phases.
+	// It returns the number of bytes necessary to serialize an instance of the type
+	// to which this type reference resolves in Mojo serialization.
+	SerializationSize() uint32
+
+	// SerializationAlignment() is invoked after the resolution and validation phases.
+	// It returns the number of bytes on which an instance of the type to which this
+	// type reference resolves must be aligned during Mojo serialization.
+	SerializationAlignment() uint32
 }
 
 /////////////////////////////////////////////////////////////
@@ -328,6 +338,39 @@ func (t SimpleType) MarkTypeCompatible(assignment LiteralAssignment) bool {
 	return t.isAssignmentCompatibleWithLiteral(assignment.assignedValue)
 }
 
+func (t SimpleType) SerializationSize() uint32 {
+	switch t {
+	case SimpleTypeBool:
+		return 1
+	case SimpleTypeDouble:
+		return 8
+	case SimpleTypeFloat:
+		return 4
+	case SimpleTypeInt8:
+		return 1
+	case SimpleTypeInt16:
+		return 2
+	case SimpleTypeInt32:
+		return 4
+	case SimpleTypeInt64:
+		return 8
+	case SimpleTypeUInt8:
+		return 1
+	case SimpleTypeUInt16:
+		return 2
+	case SimpleTypeUInt32:
+		return 4
+	case SimpleTypeUInt64:
+		return 8
+	default:
+		panic(fmt.Sprintf("unexpected type: &d", t))
+	}
+}
+
+func (t SimpleType) SerializationAlignment() uint32 {
+	return t.SerializationSize()
+}
+
 func (t SimpleType) String() string {
 	switch t {
 	case SimpleTypeBool:
@@ -374,6 +417,14 @@ type StringType struct {
 
 func (s StringType) Nullable() bool {
 	return s.nullable
+}
+
+func (StringType) SerializationSize() uint32 {
+	return 8
+}
+
+func (StringType) SerializationAlignment() uint32 {
+	return 8
 }
 
 // StringLiteralType is a global singleton representing the unique LiteralType string.
@@ -464,6 +515,14 @@ type HandleTypeRef struct {
 
 func (h HandleTypeRef) Nullable() bool {
 	return h.nullable
+}
+
+func (HandleTypeRef) SerializationSize() uint32 {
+	return 4
+}
+
+func (HandleTypeRef) SerializationAlignment() uint32 {
+	return 4
 }
 
 func (h HandleTypeRef) HandleKind() HandleKind {
@@ -596,6 +655,14 @@ func (a ArrayTypeRef) Nullable() bool {
 	return a.nullable
 }
 
+func (ArrayTypeRef) SerializationSize() uint32 {
+	return 8
+}
+
+func (ArrayTypeRef) SerializationAlignment() uint32 {
+	return 8
+}
+
 func (a ArrayTypeRef) FixedLength() int32 {
 	return a.fixedLength
 }
@@ -682,6 +749,14 @@ func NewMapTypeRef(keyType TypeRef, valueType TypeRef, nullable bool) *MapTypeRe
 
 func (m MapTypeRef) Nullable() bool {
 	return m.nullable
+}
+
+func (MapTypeRef) SerializationSize() uint32 {
+	return 8
+}
+
+func (MapTypeRef) SerializationAlignment() uint32 {
+	return 8
 }
 
 func (m MapTypeRef) KeyType() TypeRef {
@@ -802,6 +877,23 @@ func NewResolvedUserTypeRef(identifier string, resolvedType UserDefinedType) *Us
 
 func (t *UserTypeRef) Nullable() bool {
 	return t.nullable
+}
+
+func (t *UserTypeRef) SerializationSize() uint32 {
+	if t.resolvedType == nil {
+		panic("This method should only be invoked after successful resolution.")
+	}
+	if t.IsInterfaceRequest() {
+		return HandleTypeRef{}.SerializationSize()
+	}
+	return t.resolvedType.SerializationSize()
+}
+
+func (t *UserTypeRef) SerializationAlignment() uint32 {
+	if t.resolvedType == nil {
+		panic("This method should only be invoked after successful resolution.")
+	}
+	return t.resolvedType.SerializationAlignment()
 }
 
 func (t *UserTypeRef) IsInterfaceRequest() bool {
