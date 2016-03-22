@@ -67,10 +67,10 @@ class MediaPipeBase : public MediaConsumer {
     void*    base() const { return base_; }
 
    private:
-    MappedSharedBuffer(ScopedSharedBufferHandle handle, size_t size);
+    MappedSharedBuffer(ScopedSharedBufferHandle handle, uint64_t size);
 
     ScopedSharedBufferHandle handle_;
-    size_t size_;
+    uint64_t size_;
     void*  base_ = nullptr;
   };
 
@@ -85,7 +85,6 @@ class MediaPipeBase : public MediaConsumer {
 
   // MediaConsumer.mojom implementation.
   void SetBuffer(ScopedSharedBufferHandle handle,
-                uint64_t size,
                 const SetBufferCallback& cbk) final;
   void SendPacket(MediaPacketPtr packet,
                   const SendPacketCallback& cbk) final;

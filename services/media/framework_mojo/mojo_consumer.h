@@ -52,7 +52,6 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
   // MediaConsumer implementation.
   void SetBuffer(
       ScopedSharedBufferHandle buffer,
-      uint64_t size,
       const SetBufferCallback& callback) override;
 
   void SendPacket(MediaPacketPtr packet, const SendPacketCallback& callback)

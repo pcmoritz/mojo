@@ -40,26 +40,37 @@ void MediaPipeBase::Reset() {
 }
 
 void MediaPipeBase::SetBuffer(ScopedSharedBufferHandle handle,
-                              uint64_t size,
                               const SetBufferCallback& cbk) {
+  DCHECK(handle.is_valid());
+
   // Double init?  Close the connection.
   if (buffer_) {
-    LOG(ERROR) << "Attempting to set a new buffer (size = "
-               << size
-               << ") on a MediaConsumer which already has a buffer (size = "
+    LOG(ERROR) << "Attempting to set a new buffer on a MediaConsumer which "
+                  "already has a buffer assigned. (size = "
                << buffer_->size()
                << ")";
     Reset();
     return;
   }
 
+  // Query the buffer for its size.  If we fail to query the info, close the
+  // connection.
+  MojoResult res;
+  MojoBufferInformation info;
+  res = MojoGetBufferInformation(handle.get().value(), &info, sizeof(info));
+  if (res != MOJO_RESULT_OK) {
+    LOG(ERROR) << "Failed to query shared buffer info (res = " << res << ")";
+    Reset();
+    return;
+  }
+
   // Invalid size?  Close the connection.
+  uint64_t size = info.num_bytes;
   if (!size || (size > MediaConsumer::kMaxBufferLen)) {
     LOG(ERROR) << "Invalid shared buffer size (size = " << size << ")";
     Reset();
     return;
   }
-
 
   // Failed to map the buffer?  Close the connection.
   buffer_ = MappedSharedBuffer::Create(handle.Pass(), size);
@@ -183,7 +194,7 @@ MediaPipeBase::MappedSharedBuffer::~MappedSharedBuffer() {
 
 MediaPipeBase::MappedSharedBuffer::MappedSharedBuffer(
     ScopedSharedBufferHandle handle,
-    size_t size)
+    uint64_t size)
   : handle_(handle.Pass()),
     size_(size) {
   MojoResult res = MapBuffer(handle_.get(),

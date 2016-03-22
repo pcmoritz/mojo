@@ -31,7 +31,7 @@ class MappedSharedBuffer {
   void InitNew(uint64_t size);
 
   // Initializes from a handle to an existing shared buffer.
-  void InitFromHandle(ScopedSharedBufferHandle handle, uint64_t size);
+  void InitFromHandle(ScopedSharedBufferHandle handle);
 
   // Indicates whether the buffer is initialized.
   bool initialized() const;
@@ -49,7 +49,7 @@ class MappedSharedBuffer {
   uint64_t OffsetFromPtr(void *payload_ptr) const;
 
  protected:
-  void InitInternal(ScopedSharedBufferHandle& handle, uint64_t size);
+  void InitInternal(const ScopedSharedBufferHandle& handle);
 
   // Does nothing. Called when initialization is complete. Subclasses may
   // override.
@@ -78,4 +78,4 @@ class MappedSharedBuffer {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_SERVICES_MEDIA_COMMON_CPP_MAPPED_SHARED_BUFFER_H_
+#endif  // MOJO_SERVICES_MEDIA_COMMON_CPP_MAPPED_SHARED_BUFFER_H_

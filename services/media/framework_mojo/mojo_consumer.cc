@@ -37,9 +37,8 @@ void MojoConsumer::SetFlushRequestedCallback(
 
 void MojoConsumer::SetBuffer(
     ScopedSharedBufferHandle buffer,
-    uint64_t size,
     const SetBufferCallback& callback) {
-  buffer_.InitFromHandle(buffer.Pass(), size);
+  buffer_.InitFromHandle(buffer.Pass());
   callback.Run();
 }
 
@@ -116,5 +115,5 @@ void MojoConsumer::PacketImpl::Release() {
   delete this;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

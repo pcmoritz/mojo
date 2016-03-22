@@ -769,10 +769,9 @@ class _MediaPullModeProducerReleasePacketParams extends bindings.Struct {
 
 class _MediaConsumerSetBufferParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
   core.MojoSharedBuffer buffer = null;
-  int size = 0;
 
   _MediaConsumerSetBufferParams() : super(kVersions.last.size);
 
@@ -813,10 +812,6 @@ class _MediaConsumerSetBufferParams extends bindings.Struct {
       
       result.buffer = decoder0.decodeSharedBufferHandle(8, false);
     }
-    if (mainDataHeader.version >= 0) {
-      
-      result.size = decoder0.decodeUint64(16);
-    }
     return result;
   }
 
@@ -829,19 +824,11 @@ class _MediaConsumerSetBufferParams extends bindings.Struct {
           "buffer of struct _MediaConsumerSetBufferParams: $e";
       rethrow;
     }
-    try {
-      encoder0.encodeUint64(size, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "size of struct _MediaConsumerSetBufferParams: $e";
-      rethrow;
-    }
   }
 
   String toString() {
     return "_MediaConsumerSetBufferParams("
-           "buffer: $buffer" ", "
-           "size: $size" ")";
+           "buffer: $buffer" ")";
   }
 
   Map toJson() {
@@ -1906,7 +1893,7 @@ class _MediaConsumerServiceDescription implements service_describer.ServiceDescr
 
 abstract class MediaConsumer {
   static const String serviceName = null;
-  dynamic setBuffer(core.MojoSharedBuffer buffer,int size,[Function responseFactory = null]);
+  dynamic setBuffer(core.MojoSharedBuffer buffer,[Function responseFactory = null]);
   dynamic sendPacket(MediaPacket packet,[Function responseFactory = null]);
   dynamic prime([Function responseFactory = null]);
   dynamic flush([Function responseFactory = null]);
@@ -2032,10 +2019,9 @@ class _MediaConsumerProxyCalls implements MediaConsumer {
   _MediaConsumerProxyImpl _proxyImpl;
 
   _MediaConsumerProxyCalls(this._proxyImpl);
-    dynamic setBuffer(core.MojoSharedBuffer buffer,int size,[Function responseFactory = null]) {
+    dynamic setBuffer(core.MojoSharedBuffer buffer,[Function responseFactory = null]) {
       var params = new _MediaConsumerSetBufferParams();
       params.buffer = buffer;
-      params.size = size;
       return _proxyImpl.sendMessageWithRequestId(
           params,
           _mediaConsumerMethodSetBufferName,
@@ -2177,7 +2163,7 @@ class MediaConsumerStub extends bindings.Stub {
       case _mediaConsumerMethodSetBufferName:
         var params = _MediaConsumerSetBufferParams.deserialize(
             message.payload);
-        var response = _impl.setBuffer(params.buffer,params.size,_mediaConsumerSetBufferResponseParamsFactory);
+        var response = _impl.setBuffer(params.buffer,_mediaConsumerSetBufferResponseParamsFactory);
         if (response is Future) {
           return response.then((response) {
             if (response != null) {

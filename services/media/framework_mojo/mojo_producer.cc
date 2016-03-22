@@ -29,7 +29,7 @@ void MojoProducer::PrimeConnection(const FlushConnectionCallback& callback) {
 
   {
     base::AutoLock lock(lock_);
-    max_pushes_outstanding_ = 10; // TODO(dalesat): Made up!
+    max_pushes_outstanding_ = 10;  // TODO(dalesat): Made up!
     demand = current_pushes_outstanding_ < max_pushes_outstanding_ ?
         Demand::kPositive :
         Demand::kNegative;
@@ -57,7 +57,7 @@ void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
   DCHECK(consumer_.is_bound());
   consumer_->Flush(callback);
   first_pts_since_flush_ = Packet::kUnknownPts;
-  end_of_stream_= false;
+  end_of_stream_ = false;
 }
 
 void MojoProducer::SetStatusCallback(
@@ -129,12 +129,11 @@ void MojoProducer::Connect(
   consumer_ = MediaConsumerPtr::Create(std::move(consumer));
 
   if (!mojo_allocator_.initialized()) {
-    mojo_allocator_.InitNew(256 * 1024); // TODO(dalesat): Made up!
+    mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
   }
 
   consumer_->SetBuffer(
       mojo_allocator_.GetDuplicateHandle(),
-      mojo_allocator_.size(),
       [callback]() {
     callback.Run();
   });
@@ -198,5 +197,5 @@ MediaPacketPtr MojoProducer::CreateMediaPacket(
   return media_packet.Pass();
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

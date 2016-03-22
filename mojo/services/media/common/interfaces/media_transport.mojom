@@ -119,7 +119,7 @@ interface MediaConsumer {
   };
 
   // Sets the shared buffer in which packet payload will be located.
-  SetBuffer(handle<shared_buffer> buffer, uint64 size) => ();
+  SetBuffer(handle<shared_buffer> buffer) => ();
 
   // Sends a packet to the consumer. The callback signals that the consumer
   // is done with the packet buffer region.
