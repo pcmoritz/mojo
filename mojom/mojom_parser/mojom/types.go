@@ -124,8 +124,13 @@ type TypeRef interface {
 	// types of the key type and the value type.
 	ReferencedUserDefinedTypes() UserDefinedTypeSet
 
-	// Returns true just in case the type referene is nullable.
-	Nullable() bool
+	// Returns true just in case this type reference is allowed as the type of
+	// a struct field in a non-zero version of a struct.  We disallow
+	// pointer and handle types that are not nullable. This means we allow all primitive
+	// types and enums, and nullable strings, arrays, maps, handles, interfaces
+	// structs and unions. This method should only be invoked after successful
+	// parsing and resolution have occurred.
+	AllowedInNonZeroStructVersion() bool
 
 	// SerializationSize() is invoked after the resolution and validation phases.
 	// It returns the number of bytes necessary to serialize an instance of the type
@@ -204,8 +209,8 @@ func (SimpleType) MarkUsedAsConstantType() bool {
 	return true
 }
 
-func (SimpleType) Nullable() bool {
-	return false
+func (SimpleType) AllowedInNonZeroStructVersion() bool {
+	return true
 }
 
 // A SimpleType does not reference any UserDefinedTypes.
@@ -419,6 +424,10 @@ func (s StringType) Nullable() bool {
 	return s.nullable
 }
 
+func (s StringType) AllowedInNonZeroStructVersion() bool {
+	return s.nullable
+}
+
 func (StringType) SerializationSize() uint32 {
 	return 8
 }
@@ -514,6 +523,10 @@ type HandleTypeRef struct {
 }
 
 func (h HandleTypeRef) Nullable() bool {
+	return h.nullable
+}
+
+func (h HandleTypeRef) AllowedInNonZeroStructVersion() bool {
 	return h.nullable
 }
 
@@ -655,6 +668,10 @@ func (a ArrayTypeRef) Nullable() bool {
 	return a.nullable
 }
 
+func (a ArrayTypeRef) AllowedInNonZeroStructVersion() bool {
+	return a.nullable
+}
+
 func (ArrayTypeRef) SerializationSize() uint32 {
 	return 8
 }
@@ -748,6 +765,10 @@ func NewMapTypeRef(keyType TypeRef, valueType TypeRef, nullable bool) *MapTypeRe
 }
 
 func (m MapTypeRef) Nullable() bool {
+	return m.nullable
+}
+
+func (m MapTypeRef) AllowedInNonZeroStructVersion() bool {
 	return m.nullable
 }
 
@@ -876,6 +897,16 @@ func NewResolvedUserTypeRef(identifier string, resolvedType UserDefinedType) *Us
 }
 
 func (t *UserTypeRef) Nullable() bool {
+	return t.nullable
+}
+
+func (t *UserTypeRef) AllowedInNonZeroStructVersion() bool {
+	if t.resolvedType == nil {
+		panic("This method should only be invoked after successful resolution.")
+	}
+	if t.resolvedType.Kind() == UserDefinedTypeKindEnum {
+		return true
+	}
 	return t.nullable
 }
 

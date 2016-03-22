@@ -1962,7 +1962,7 @@ func TestWithComputedData(t *testing.T) {
 	  MyInterface1&? my_interface_request;
 
 	  [MinVersion=2]
-	  handle?       y;
+	  int32       y;
 
 	  [MinVersion=2]
 	  MyInterface1?  my_interface;
@@ -2011,7 +2011,7 @@ func TestWithComputedData(t *testing.T) {
 				// field y
 				{
 					DeclData:   test.newShortDeclDataAO(4, -1, "y", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
-					Type:       &mojom_types.TypeHandleType{mojom_types.HandleType{Nullable: true}},
+					Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 					Offset:     32,
 					MinVersion: 2,
 				},

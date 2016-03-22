@@ -6,7 +6,9 @@ package mojom
 
 import (
 	"container/list"
+	"errors"
 	"fmt"
+	"mojom/mojom_parser/lexer"
 	"mojom/mojom_parser/utils"
 )
 
@@ -125,6 +127,69 @@ func isBoolField(field *StructField) bool {
 	return false
 }
 
+var ErrMinVersionIllformed = errors.New("MinVersion attribute value illformed")
+var ErrMinVersionOutOfOrder = errors.New("MinVersion attribute value out of order")
+var ErrMinVersionNotNullable = errors.New("Non-Zero MinVersion attribute value on non-nullable field")
+
+type StructFieldMinVersionError struct {
+	// The field whose MinVersion is being set.
+	field *StructField
+
+	// The MinValue of the previous field. Only used for ErrMinVersionOutOfOrder
+	previousValue uint32
+
+	// The LiteralValue of the attribute assignment.
+	// NOTE: We use the following convention: literalValue.token == nil indicates that
+	// there was no MinVersion attribute on the given field. This can only happen with
+	// ErrMinVersionOutOfOrder
+	literalValue LiteralValue
+
+	// The type of error (ErrMinVersionIllfromed, ErrMinVersionOutOfOrder, ErrMinVersionNotNullable)
+	err error
+}
+
+// StructFieldMinVersionError implements error.
+func (e *StructFieldMinVersionError) Error() string {
+	var message string
+	var token lexer.Token
+	switch e.err {
+	case ErrMinVersionIllformed:
+		message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+			"The value must be a non-negative 32-bit integer value.",
+			e.field.SimpleName(), e.literalValue)
+		token = *e.literalValue.token
+	case ErrMinVersionOutOfOrder:
+		if e.literalValue.token == nil {
+			message = fmt.Sprintf("Invalid missing MinVersion for field %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This field must have a MinVersion attribute with a value at least %d.",
+				e.field.SimpleName(), e.previousValue)
+			token = e.field.NameToken()
+		} else {
+			message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This field's MinVersion must be at least %d.",
+				e.field.SimpleName(), e.literalValue.token.Text, e.previousValue)
+			token = *e.literalValue.token
+		}
+	case ErrMinVersionNotNullable:
+		message = fmt.Sprintf("Invalid type for field %s: %s. "+
+			"Non-nullable reference fields are only allowed in version 0 of of a struct. "+
+			"This field's MinVersion is %s.",
+			e.field.SimpleName(), e.field.FieldType.TypeName(), e.literalValue.token.Text)
+		switch fieldType := e.field.FieldType.(type) {
+		case *UserTypeRef:
+			token = fieldType.token
+		default:
+			// It would be nice for the green carets in the snippit in the error message to point at
+			// the type name, but other than for user type refs we don't store that token so
+			// instead we use the field's name.
+			token = e.field.NameToken()
+		}
+	}
+	return UserErrorMessage(e.field.OwningFile(), token, message)
+}
+
 // computeVersionInfo is invoked by ComputeFinalData() after the
 // computeFieldOffsets(). It examines the |MinVersion|
 // attributes of all of the fields of the struct, validates the values, and
@@ -165,7 +230,7 @@ func (s *MojomStruct) computeVersionInfo() error {
 				}
 			}
 		}
-		if value != 0 && !field.FieldType.Nullable() {
+		if value != 0 && !field.FieldType.AllowedInNonZeroStructVersion() {
 			return &StructFieldMinVersionError{
 				field:        field,
 				literalValue: literalValue,

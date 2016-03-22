@@ -156,7 +156,7 @@ func TestMinVersionErrors(t *testing.T) {
 	};`
 		test.addTestCase(contents, []string{
 			"Invalid type for field z: array<int32>.",
-			"Non-nullable fields are only allowed in version 0 of of a struct.",
+			"Non-nullable reference fields are only allowed in version 0 of of a struct.",
 			"This field's MinVersion is 1."})
 	}
 
