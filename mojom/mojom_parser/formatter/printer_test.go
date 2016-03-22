@@ -140,6 +140,22 @@ import "foo2.mojom";
 	checkEq(t, expected, p.result())
 }
 
+func TestWriteSingleLineComment(t *testing.T) {
+	commentText := "// Hello world."
+	token := lexer.Token{Kind: lexer.SingleLineComment, Text: commentText}
+	p := getNewPrinter()
+	p.writeSingleLineComment(token)
+	checkEq(t, commentText, p.result())
+}
+
+func TestWriteSingleLineCommentAddSpace(t *testing.T) {
+	commentText := "//Hello world."
+	token := lexer.Token{Kind: lexer.SingleLineComment, Text: commentText}
+	p := getNewPrinter()
+	p.writeSingleLineComment(token)
+	checkEq(t, "// Hello world.", p.result())
+}
+
 func TestWriteMultilineComments(t *testing.T) {
 	commentText := `/*
  * Some comment.

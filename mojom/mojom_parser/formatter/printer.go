@@ -96,7 +96,7 @@ func (p *printer) writeMojomFile(mojomFile *mojom.MojomFile) {
 	}
 
 	if mojomFile.FinalComments != nil {
-		finalComments := trimEmptyLines(mojomFile.FinalComments)
+		finalComments := trimEmptyLinesEnd(mojomFile.FinalComments)
 		if len(finalComments) > 0 {
 			p.nl()
 			p.writeCommentBlocks(finalComments, true)
@@ -375,6 +375,9 @@ func (p *printer) writeDeclaredObjectsContainer(container mojom.DeclaredObjectsC
 	p.nl()
 	declaredObjects := container.GetDeclaredObjects()
 	for i, declaredObject := range declaredObjects {
+		if i == 0 {
+			trimEmptyLinesDeclaredObject(declaredObject)
+		}
 		p.writeDeclaredObject(declaredObject)
 		if i < len(declaredObjects)-1 {
 			p.nl()
@@ -632,7 +635,7 @@ func (p *printer) writeCommentBlocks(comments []lexer.Token, finalEol bool) {
 			} else if comment.Text == "// end-no-format" {
 				p.endNoFormat(comment)
 			}
-			p.write(comment.Text)
+			p.writeSingleLineComment(comment)
 			if finalEol || i < len(comments)-1 {
 				p.nl()
 			}
@@ -651,6 +654,21 @@ func (p *printer) writeCommentBlocks(comments []lexer.Token, finalEol bool) {
 			panic(fmt.Sprintf("%s is not a comment.", comment))
 		}
 	}
+}
+
+func (p *printer) writeSingleLineComment(comment lexer.Token) {
+	if comment.Kind != lexer.SingleLineComment {
+		panic(fmt.Sprintf("This is not a SingleLineComment: %s", comment))
+	}
+	commentText := comment.Text
+
+	// We expect that the first 2 characters are // followed by a space or tab.
+	// If the third character is not a space or tab, we insert a space.
+	space := commentText[2]
+	if space != ' ' && space != '\t' {
+		commentText = "// " + commentText[2:]
+	}
+	p.write(commentText)
 }
 
 func (p *printer) writeMultiLineComment(comment lexer.Token) {
@@ -734,7 +752,8 @@ func (p *printer) nl() {
 	// Before going to the next line, print the last comment on the line.
 	if p.eolComment != nil {
 		if !p.noFormat {
-			p.writef("  %s", p.eolComment.Text)
+			p.write("  ")
+			p.writeSingleLineComment(*p.eolComment)
 		}
 		p.eolComment = nil
 	}
@@ -868,8 +887,8 @@ func containsFinalComments(el mojom.MojomElement) bool {
 	return false
 }
 
-// trimEmptyLines trims out empty line comments at the end of a slice of comments.
-func trimEmptyLines(comments []lexer.Token) []lexer.Token {
+// trimEmptyLinesEnd trims out empty line comments at the end of a slice of comments.
+func trimEmptyLinesEnd(comments []lexer.Token) []lexer.Token {
 	lastNonEmpty := -1
 	for i, comment := range comments {
 		if comment.Kind != lexer.EmptyLine {
@@ -877,6 +896,35 @@ func trimEmptyLines(comments []lexer.Token) []lexer.Token {
 		}
 	}
 	return comments[:lastNonEmpty+1]
+}
+
+// trimEmptyLinesBegin trims out empty line comments at the beginning of a slice of comments.
+func trimEmptyLinesBegin(comments []lexer.Token) []lexer.Token {
+	for i, comment := range comments {
+		if comment.Kind != lexer.EmptyLine {
+			return comments[i:]
+		}
+	}
+	return comments[len(comments):]
+}
+
+// trimEmptyLinesDeclaredObject trims out empty lines from the beginning of the
+// comments on a DeclaredObject or its Attributes.
+func trimEmptyLinesDeclaredObject(declaredObject mojom.DeclaredObject) {
+	if declaredObject.Attributes() != nil {
+		comments := declaredObject.Attributes().AttachedComments()
+		if comments == nil {
+			return
+		}
+		comments.Above = trimEmptyLinesBegin(comments.Above)
+		return
+	}
+	comments := declaredObject.AttachedComments()
+
+	if comments == nil || len(comments.Above) == 0 {
+		return
+	}
+	comments.Above = trimEmptyLinesBegin(comments.Above)
 }
 
 // Following is a utility to sort slices of |ImportedFile|s.
