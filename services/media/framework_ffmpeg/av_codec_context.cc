@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
-#include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
+#include "services/media/framework_ffmpeg/av_codec_context.h"
+#include "services/media/framework_ffmpeg/ffmpeg_init.h"
 extern "C" {
 #include "third_party/ffmpeg/libavformat/avformat.h"
 }
@@ -334,7 +335,8 @@ AvCodecContextPtr AVCodecContextFromVideoStreamType(
 
 }  // namespace
 
-std::unique_ptr<StreamType> StreamTypeFromAVCodecContext(
+// static
+std::unique_ptr<StreamType> AvCodecContext::GetStreamType(
     const AVCodecContext& from) {
   switch (from.codec_type) {
     case AVMEDIA_TYPE_AUDIO:
@@ -367,7 +369,10 @@ std::unique_ptr<StreamType> StreamTypeFromAVCodecContext(
   }
 }
 
-AvCodecContextPtr AVCodecContextFromStreamType(const StreamType& stream_type) {
+// static
+AvCodecContextPtr AvCodecContext::Create(const StreamType& stream_type) {
+  InitFfmpeg();
+
   switch (stream_type.scheme()) {
     case StreamType::Scheme::kLpcm:
       return CodecContextFromLpcmDetails(*stream_type.lpcm());

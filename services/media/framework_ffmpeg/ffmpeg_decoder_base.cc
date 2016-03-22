@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
+#include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/ffmpeg_decoder_base.h"
-#include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
 
 namespace mojo {
 namespace media {
@@ -18,7 +18,7 @@ FfmpegDecoderBase::FfmpegDecoderBase(AvCodecContextPtr av_codec_context) :
 FfmpegDecoderBase::~FfmpegDecoderBase() {}
 
 std::unique_ptr<StreamType> FfmpegDecoderBase::output_stream_type() {
-  return StreamTypeFromAVCodecContext(*av_codec_context_);
+  return AvCodecContext::GetStreamType(*av_codec_context_);
 }
 
 void FfmpegDecoderBase::Flush() {

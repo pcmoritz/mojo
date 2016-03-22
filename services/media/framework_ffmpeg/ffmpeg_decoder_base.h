@@ -6,9 +6,9 @@
 #define SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_BASE_H_
 
 #include "services/media/framework/parts/decoder.h"
+#include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/av_frame.h"
 #include "services/media/framework_ffmpeg/av_packet.h"
-#include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
 extern "C" {
 #include "third_party/ffmpeg/libavcodec/avcodec.h"
 }

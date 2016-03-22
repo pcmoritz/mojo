@@ -34,14 +34,18 @@ Result FileReader::Init(const GURL& gurl) {
       return Result::kUnsupportedOperation;
     }
   } else {
-    size_ = -1;
+    size_ = kFailed;
   }
 
   return Result::kOk;
 }
 
 size_t FileReader::Read(uint8_t* buffer, size_t bytes_to_read) {
-  return fread(buffer, 1, bytes_to_read, file_);
+  size_t bytes_read = fread(buffer, 1, bytes_to_read, file_);
+  if (bytes_read != bytes_to_read && ferror(file_) != 0) {
+    bytes_read = kFailed;
+  }
+  return bytes_read;
 }
 
 int64_t FileReader::GetPosition() const {

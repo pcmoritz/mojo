@@ -6,10 +6,11 @@
 
 #include "base/logging.h"
 #include "services/media/framework/safe_clone.h"
+#include "services/media/framework_ffmpeg/av_codec_context.h"
+#include "services/media/framework_ffmpeg/av_format_context.h"
+#include "services/media/framework_ffmpeg/av_io_context.h"
 #include "services/media/framework_ffmpeg/av_packet.h"
 #include "services/media/framework_ffmpeg/ffmpeg_demux.h"
-#include "services/media/framework_ffmpeg/ffmpeg_io.h"
-#include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
 
 namespace mojo {
 namespace media {
@@ -97,8 +98,8 @@ class FfmpegDemuxImpl : public FfmpegDemux {
       std::map<std::string, std::string>& map);
 
   std::shared_ptr<Reader> reader_;
-  std::unique_ptr<AVFormatContext, AVFormatContextDeleter> format_context_;
-  AvioContextPtr io_context_;
+  AvFormatContextPtr format_context_;
+  AvIoContextPtr io_context_;
   std::vector<DemuxStream*> streams_;
   std::unique_ptr<Metadata> metadata_;
   int64_t next_pts_;
@@ -119,26 +120,20 @@ Result FfmpegDemuxImpl::Init(std::shared_ptr<Reader> reader) {
 
   reader_ = reader;
 
-  io_context_ = CreateAvioContext(reader.get());
+  io_context_ = AvIoContext::Create(reader);
   if (!io_context_) {
-    LOG(ERROR) << "CreateAvioContext failed (allocation failure)";
+    LOG(ERROR) << "AvIoContext::Create failed";
     return Result::kInternalError;
   }
 
-  // TODO(dalesat): Consider ffmpeg util to centralize memory management.
-  AVFormatContext* format_context = avformat_alloc_context();
-  format_context->flags |= AVFMT_FLAG_CUSTOM_IO | AVFMT_FLAG_FAST_SEEK;
-  format_context->pb = io_context_.get();
-
-  // TODO(dalesat): This synchronous operation may take a long time.
-  int r = avformat_open_input(&format_context, nullptr, nullptr, nullptr);
-  format_context_.reset(format_context);
-  if (r < 0) {
+  format_context_ = AvFormatContext::OpenInput(io_context_);
+  if (!format_context_) {
+    LOG(ERROR) << "AvFormatContext::OpenInput failed";
     return Result::kInternalError;
   }
 
   // TODO(dalesat): This synchronous operation may take a long time.
-  r = avformat_find_stream_info(format_context_.get(), nullptr);
+  int r = avformat_find_stream_info(format_context_.get(), nullptr);
   if (r < 0) {
     LOG(ERROR) << "avformat_find_stream_info failed, result " << r;
     return Result::kInternalError;
@@ -247,7 +242,7 @@ FfmpegDemuxImpl::FfmpegDemuxStream::FfmpegDemuxStream(
     const AVFormatContext& format_context,
     size_t index) :
     stream_(format_context.streams[index]), index_(index) {
-  stream_type_ = StreamTypeFromAVCodecContext(*stream_->codec);
+  stream_type_ = AvCodecContext::GetStreamType(*stream_->codec);
 }
 
 FfmpegDemuxImpl::FfmpegDemuxStream::~FfmpegDemuxStream() {}

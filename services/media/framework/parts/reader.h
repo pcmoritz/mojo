@@ -5,6 +5,7 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_PARTS_READER_H_
 #define SERVICES_MEDIA_FRAMEWORK_PARTS_READER_H_
 
+#include <limits>
 #include <memory>
 
 #include "services/media/framework/result.h"
@@ -15,8 +16,11 @@ namespace media {
 
 // Abstract base class for objects that read raw data on behalf of demuxes.
 // This model is synchronous, because that's how ffmpeg works.
+// TODO(dalesat): Make this model async and deal with it in FfmpegDemux.
 class Reader {
  public:
+  static constexpr size_t kFailed = std::numeric_limits<size_t>::max();
+
   // Creates a Reader object for a given url.
   static Result Create(const GURL& gurl, std::shared_ptr<Reader>* reader_out);
 
@@ -26,7 +30,7 @@ class Reader {
   virtual Result Init(const GURL& gurl) = 0;
 
   // Reads the given number of bytes into the buffer and returns the number of
-  // bytes read. Returns -1 if the operation fails.
+  // bytes read. Returns kFailed if the operation fails.
   virtual size_t Read(uint8_t* buffer, size_t bytes_to_read) = 0;
 
   // Gets the current position or -1 if the operation fails.
@@ -36,8 +40,8 @@ class Reader {
   // fails.
   virtual int64_t SetPosition(int64_t position) = 0;
 
-  // Returns the file size. Returns -1 if the operation fails or the size isn't
-  // known.
+  // Returns the file size. Returns kFailed if the operation fails or the size
+  // isn't known.
   virtual size_t GetSize() const = 0;
 
   // Returns true if this object supports seeking, false otherwise.

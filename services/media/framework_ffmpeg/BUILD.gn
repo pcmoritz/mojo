@@ -21,7 +21,12 @@ config("default_include_dirs") {
 
 source_set("framework_ffmpeg") {
   sources = [
+    "av_codec_context.cc",
+    "av_codec_context.h",
+    "av_format_context.h",
     "av_frame.h",
+    "av_io_context.cc",
+    "av_io_context.h",
     "av_packet.h",
     "ffmpeg_audio_decoder.cc",
     "ffmpeg_audio_decoder.h",
@@ -35,10 +40,6 @@ source_set("framework_ffmpeg") {
     "ffmpeg_formatting.h",
     "ffmpeg_init.cc",
     "ffmpeg_init.h",
-    "ffmpeg_io.cc",
-    "ffmpeg_io.h",
-    "ffmpeg_type_converters.cc",
-    "ffmpeg_type_converters.h",
     "ffmpeg_video_decoder.cc",
     "ffmpeg_video_decoder.h",
   ]

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/ffmpeg_audio_decoder.h"
 #include "services/media/framework_ffmpeg/ffmpeg_decoder.h"
-#include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
 #include "services/media/framework_ffmpeg/ffmpeg_video_decoder.h"
 
 namespace mojo {
@@ -15,7 +15,7 @@ Result FfmpegDecoder::Create(
     std::shared_ptr<Decoder>* decoder_out) {
   DCHECK(decoder_out);
 
-  AvCodecContextPtr av_codec_context(AVCodecContextFromStreamType(stream_type));
+  AvCodecContextPtr av_codec_context(AvCodecContext::Create(stream_type));
   if (!av_codec_context) {
     return Result::kUnsupportedOperation;
   }
