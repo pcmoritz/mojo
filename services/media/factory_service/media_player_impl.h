@@ -103,14 +103,14 @@ class MediaPlayerImpl
   // Handles a status update from the source. When called with the default
   // argument values, initiates source status updates.
   void HandleSourceStatusUpdates(
-      uint64_t version = 0,
+      uint64_t version = MediaSource::kInitialStatus,
       MediaSourceStatusPtr status = nullptr);
 
   // Handles a status update from a sink. When called with the default
   // argument values, initiates sink status updates.
   void HandleSinkStatusUpdates(
       const std::unique_ptr<Stream>& stream,
-      uint64_t version = 0,
+      uint64_t version = MediaSink::kInitialStatus,
       MediaSinkStatusPtr status = nullptr);
 
   Event event_;

@@ -756,6 +756,7 @@ abstract class MediaSink {
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
   void play();
   void pause();
+  static const int kInitialStatus = 0;
 }
 
 

@@ -487,6 +487,7 @@ abstract class MediaPlayer {
   void pause();
   void seek(int position);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
+  static const int kInitialStatus = 0;
 }
 
 

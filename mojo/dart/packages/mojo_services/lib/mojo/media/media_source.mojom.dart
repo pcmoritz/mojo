@@ -1471,6 +1471,7 @@ abstract class MediaSource {
   dynamic prime([Function responseFactory = null]);
   dynamic flush([Function responseFactory = null]);
   dynamic seek(int position,[Function responseFactory = null]);
+  static const int kInitialStatus = 0;
 }
 
 

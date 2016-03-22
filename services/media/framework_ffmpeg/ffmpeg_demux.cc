@@ -76,7 +76,7 @@ class FfmpegDemuxImpl : public FfmpegDemux {
             static_cast<size_t>(av_packet->size),
             av_packet->data),
         av_packet_(std::move(av_packet)) {
-      DCHECK(av_packet->size >= 0);
+      DCHECK(av_packet_->size >= 0);
     }
 
     ffmpeg::AvPacketPtr av_packet_;
