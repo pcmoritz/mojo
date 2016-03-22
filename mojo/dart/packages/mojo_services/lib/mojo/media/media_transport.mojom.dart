@@ -100,11 +100,10 @@ class MediaPacketRegion extends bindings.Struct {
 
 class MediaPacket extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(48, 0)
+    const bindings.StructDataHeader(40, 0)
   ];
   static const int kNoTimestamp = 9223372036854775807;
   int pts = 9223372036854775807;
-  int duration = 0;
   bool endOfStream = false;
   MediaPacketRegion payload = null;
   List<MediaPacketRegion> extraPayload = null;
@@ -150,20 +149,16 @@ class MediaPacket extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.duration = decoder0.decodeUint64(16);
+      result.endOfStream = decoder0.decodeBool(16, 0);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.endOfStream = decoder0.decodeBool(24, 0);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(32, false);
+      var decoder1 = decoder0.decodePointer(24, false);
       result.payload = MediaPacketRegion.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(40, true);
+      var decoder1 = decoder0.decodePointer(32, true);
       if (decoder1 == null) {
         result.extraPayload = null;
       } else {
@@ -189,21 +184,14 @@ class MediaPacket extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeUint64(duration, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "duration of struct MediaPacket: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeBool(endOfStream, 24, 0);
+      encoder0.encodeBool(endOfStream, 16, 0);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "endOfStream of struct MediaPacket: $e";
       rethrow;
     }
     try {
-      encoder0.encodeStruct(payload, 32, false);
+      encoder0.encodeStruct(payload, 24, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "payload of struct MediaPacket: $e";
@@ -211,9 +199,9 @@ class MediaPacket extends bindings.Struct {
     }
     try {
       if (extraPayload == null) {
-        encoder0.encodeNullPointer(40, true);
+        encoder0.encodeNullPointer(32, true);
       } else {
-        var encoder1 = encoder0.encodePointerArray(extraPayload.length, 40, bindings.kUnspecifiedArrayLength);
+        var encoder1 = encoder0.encodePointerArray(extraPayload.length, 32, bindings.kUnspecifiedArrayLength);
         for (int i0 = 0; i0 < extraPayload.length; ++i0) {
           encoder1.encodeStruct(extraPayload[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
         }
@@ -228,7 +216,6 @@ class MediaPacket extends bindings.Struct {
   String toString() {
     return "MediaPacket("
            "pts: $pts" ", "
-           "duration: $duration" ", "
            "endOfStream: $endOfStream" ", "
            "payload: $payload" ", "
            "extraPayload: $extraPayload" ")";
@@ -237,7 +224,6 @@ class MediaPacket extends bindings.Struct {
   Map toJson() {
     Map map = new Map();
     map["pts"] = pts;
-    map["duration"] = duration;
     map["endOfStream"] = endOfStream;
     map["payload"] = payload;
     map["extraPayload"] = extraPayload;

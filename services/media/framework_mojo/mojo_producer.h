@@ -45,7 +45,7 @@ class MojoProducer : public MediaProducer, public ActiveSink {
 
   // Gets the first presentation time seen on any packet after the most recent
   // flush or, if there has never been a flush, the first packet supplied.
-  int64_t GetFirstPresentationTimeSinceFlush();
+  int64_t GetFirstPtsSinceFlush();
 
   // ActiveSink implementation.
   PayloadAllocator* allocator() override;
@@ -89,8 +89,7 @@ class MojoProducer : public MediaProducer, public ActiveSink {
   bool end_of_stream_= false;
   DemandCallback demand_callback_;
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
-  int64_t first_presentation_time_since_flush_ =
-      Packet::kUnknownPresentationTime;
+  int64_t first_pts_since_flush_ = Packet::kUnknownPts;
   // TODO(dalesat): Base this logic on presentation time or duration.
   uint32_t max_pushes_outstanding_ = 0;
   uint32_t current_pushes_outstanding_ = 0;

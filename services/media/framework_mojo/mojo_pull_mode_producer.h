@@ -78,7 +78,7 @@ class MojoPullModeProducer :
   // THE FIELDS BELOW SHOULD ONLY BE ACCESSED WITH lock_ TAKEN.
   MediaState state_;
   Demand demand_;
-  int64_t presentation_time_;
+  int64_t pts_;
 
   // pending_pulls_ contains the callbacks for the pull requests that have yet
   // to be satisfied. unreleased_packets_ contains the packets that have been

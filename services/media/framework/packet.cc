@@ -9,66 +9,57 @@
 namespace mojo {
 namespace media {
 
+Packet::Packet(
+    int64_t pts,
+    bool end_of_stream,
+    size_t size,
+    void* payload) :
+    pts_(pts),
+    end_of_stream_(end_of_stream),
+    size_(size),
+    payload_(payload) {
+  DCHECK((size == 0) == (payload == nullptr));
+}
+
 class PacketImpl : public Packet {
  public:
   PacketImpl(
-      int64_t presentation_time,
-      uint64_t duration,
+      int64_t pts,
       bool end_of_stream,
       size_t size,
       void* payload,
       PayloadAllocator* allocator) :
-      presentation_time_(presentation_time),
-      duration_(duration),
-      end_of_stream_(end_of_stream),
-      size_(size),
-      payload_(payload),
-      allocator_(allocator) {
-    DCHECK((size == 0) == (payload == nullptr));
-  }
-
-  ~PacketImpl() override {};
-
-  int64_t presentation_time() const override { return presentation_time_; }
-
-  uint64_t duration() const override { return duration_; }
-
-  bool end_of_stream() const override { return end_of_stream_; }
-
-  size_t size() const override { return size_; }
-
-  void* payload() const override { return payload_; }
+      Packet(pts, end_of_stream, size, payload),
+      allocator_(allocator) {}
 
  protected:
+  ~PacketImpl() override {};
+
   void Release() override {
-    if (payload_ != nullptr && allocator_ != nullptr) {
-      DCHECK(allocator_);
-      allocator_->ReleasePayloadBuffer(size_, payload_);
+    // In the default implementation, payload() will be nullptr if and only if
+    // allocator_ is nullptr. Subclasses have the option of having a non-null
+    // payload() and handling deallocation themselves, so allocator_ can be
+    // nullptr even when payload() is not.
+    if (payload() != nullptr && allocator_ != nullptr) {
+      allocator_->ReleasePayloadBuffer(size(), payload());
     }
     delete this;
   }
 
  private:
-  int64_t presentation_time_;
-  uint64_t duration_;
-  bool end_of_stream_;
-  size_t size_;
-  void* payload_;
   PayloadAllocator* allocator_;
 };
 
 // static
 PacketPtr Packet::Create(
-    int64_t presentation_time,
-    uint64_t duration,
+    int64_t pts,
     bool end_of_stream,
     size_t size,
     void* payload,
     PayloadAllocator* allocator) {
   DCHECK(payload == nullptr || allocator != nullptr);
   return PacketPtr(new PacketImpl(
-      presentation_time,
-      duration,
+      pts,
       end_of_stream,
       size,
       payload,
@@ -77,14 +68,12 @@ PacketPtr Packet::Create(
 
 // static
 PacketPtr Packet::CreateNoAllocator(
-    int64_t presentation_time,
-    uint64_t duration,
+    int64_t pts,
     bool end_of_stream,
     size_t size,
     void* payload) {
   return PacketPtr(new PacketImpl(
-      presentation_time,
-      duration,
+      pts,
       end_of_stream,
       size,
       payload,
@@ -92,10 +81,9 @@ PacketPtr Packet::CreateNoAllocator(
 }
 
 // static
-PacketPtr Packet::CreateEndOfStream(int64_t presentation_time) {
+PacketPtr Packet::CreateEndOfStream(int64_t pts) {
   return PacketPtr(new PacketImpl(
-      presentation_time,
-      0, // duration
+      pts,
       true, // end_of_stream
       0, // size
       nullptr, // payload

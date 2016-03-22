@@ -6,6 +6,8 @@
 #define SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_BASE_H_
 
 #include "services/media/framework/parts/decoder.h"
+#include "services/media/framework_ffmpeg/av_frame.h"
+#include "services/media/framework_ffmpeg/av_packet.h"
 #include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
 extern "C" {
 #include "third_party/ffmpeg/libavcodec/avcodec.h"
@@ -34,20 +36,12 @@ class FfmpegDecoderBase : public Decoder {
       PacketPtr* output) override;
 
  protected:
-  struct AVFrameDeleter {
-    inline void operator()(AVFrame* ptr) const {
-      av_frame_free(&ptr);
-    }
-  };
-
-  using AvFramePtr = std::unique_ptr<AVFrame, AVFrameDeleter>;
-
   // Decodes from av_packet into av_frame_ptr. The result indicates how many
   // bytes were consumed from av_packet_. *frame_decoded_out indicates whether
   // av_frame_ptr contains a complete frame.
   virtual int Decode(
       const AVPacket& av_packet,
-      const AvFramePtr& av_frame_ptr,
+      const ffmpeg::AvFramePtr& av_frame_ptr,
       PayloadAllocator* allocator,
       bool* frame_decoded_out) = 0;
 
@@ -75,7 +69,7 @@ class FfmpegDecoderBase : public Decoder {
 
   AvCodecContextPtr av_codec_context_;
   AVPacket av_packet_;
-  AvFramePtr av_frame_ptr_;
+  ffmpeg::AvFramePtr av_frame_ptr_;
 };
 
 }  // namespace media

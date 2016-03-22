@@ -46,6 +46,7 @@ void MojoConsumer::SetBuffer(
 void MojoConsumer::SendPacket(
     MediaPacketPtr media_packet,
     const SendPacketCallback& callback) {
+  DCHECK(media_packet);
   DCHECK(supply_callback_);
   supply_callback_(PacketImpl::Create(
       media_packet.Pass(),
@@ -77,7 +78,7 @@ bool MojoConsumer::can_accept_allocator() const {
 }
 
 void MojoConsumer::set_allocator(PayloadAllocator* allocator) {
-  NOTREACHED();
+  LOG(ERROR) << "set_allocator called on MojoConsumer";
 }
 
 void MojoConsumer::SetSupplyCallback(const SupplyCallback& supply_callback) {
@@ -91,10 +92,16 @@ MojoConsumer::PacketImpl::PacketImpl(
     const SendPacketCallback& callback,
     scoped_refptr<base::SingleThreadTaskRunner> task_runner,
     const MappedSharedBuffer& buffer) :
+    Packet(
+        media_packet->pts,
+        media_packet->end_of_stream,
+        media_packet->payload->length,
+        media_packet->payload->length == 0 ?
+            nullptr :
+            buffer.PtrFromOffset(media_packet->payload->offset)),
     media_packet_(media_packet.Pass()),
     callback_(callback),
-    task_runner_(task_runner),
-    payload_(buffer.PtrFromOffset(media_packet_->payload->offset)) {}
+    task_runner_(task_runner) {}
 
 MojoConsumer::PacketImpl::~PacketImpl() {}
 

@@ -271,7 +271,13 @@ class LpcmStreamType : public StreamType {
   }
 
   uint64_t min_buffer_size(uint64_t frame_count) const {
-    return frame_count * sample_size_ * channels_;
+    return frame_count * bytes_per_frame();
+  }
+
+  uint64_t frame_count(uint64_t size) const {
+    DCHECK(bytes_per_frame() != 0);
+    DCHECK(size % bytes_per_frame() == 0);
+    return size / bytes_per_frame();
   }
 
   static uint32_t SampleSizeFromFormat(SampleFormat sample_format);

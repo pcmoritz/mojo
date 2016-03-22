@@ -56,7 +56,7 @@ void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
 
   DCHECK(consumer_.is_bound());
   consumer_->Flush(callback);
-  first_presentation_time_since_flush_ = Packet::kUnknownPresentationTime;
+  first_pts_since_flush_ = Packet::kUnknownPts;
   end_of_stream_= false;
 }
 
@@ -65,8 +65,8 @@ void MojoProducer::SetStatusCallback(
   status_callback_ = callback;
 }
 
-int64_t MojoProducer::GetFirstPresentationTimeSinceFlush() {
-  return first_presentation_time_since_flush_;
+int64_t MojoProducer::GetFirstPtsSinceFlush() {
+  return first_pts_since_flush_;
 }
 
 PayloadAllocator* MojoProducer::allocator() {
@@ -80,9 +80,8 @@ void MojoProducer::SetDemandCallback(const DemandCallback& demand_callback) {
 Demand MojoProducer::SupplyPacket(PacketPtr packet) {
   DCHECK(packet);
 
-  if (first_presentation_time_since_flush_ ==
-      Packet::kUnknownPresentationTime) {
-    first_presentation_time_since_flush_ = packet->presentation_time();
+  if (first_pts_since_flush_ == Packet::kUnknownPts) {
+    first_pts_since_flush_ = packet->pts();
   }
 
   // If we're no longer connected, throw the packet away.
@@ -192,8 +191,7 @@ MediaPacketPtr MojoProducer::CreateMediaPacket(
   region->length = packet->size();
 
   MediaPacketPtr media_packet = MediaPacket::New();
-  media_packet->pts = packet->presentation_time();
-  media_packet->duration = packet->duration();
+  media_packet->pts = packet->pts();
   media_packet->end_of_stream = packet->end_of_stream();
   media_packet->payload = region.Pass();
 

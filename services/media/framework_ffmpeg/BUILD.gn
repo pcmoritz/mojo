@@ -21,6 +21,8 @@ config("default_include_dirs") {
 
 source_set("framework_ffmpeg") {
   sources = [
+    "av_frame.h",
+    "av_packet.h",
     "ffmpeg_audio_decoder.cc",
     "ffmpeg_audio_decoder.h",
     "ffmpeg_decoder.cc",

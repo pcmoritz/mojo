@@ -28,12 +28,12 @@ FfmpegAudioDecoder::~FfmpegAudioDecoder() {}
 
 void FfmpegAudioDecoder::Flush() {
   FfmpegDecoderBase::Flush();
-  next_presentation_time_= Packet::kUnknownPresentationTime;
+  next_pts_= Packet::kUnknownPts;
 }
 
 int FfmpegAudioDecoder::Decode(
     const AVPacket& av_packet,
-    const AvFramePtr& av_frame_ptr,
+    const ffmpeg::AvFramePtr& av_frame_ptr,
     PayloadAllocator* allocator,
     bool* frame_decoded_out) {
   DCHECK(allocator);
@@ -41,11 +41,11 @@ int FfmpegAudioDecoder::Decode(
   DCHECK(context());
   DCHECK(av_frame_ptr);
 
-  if (next_presentation_time_ == Packet::kUnknownPresentationTime) {
+  if (next_pts_ == Packet::kUnknownPts) {
     if (av_packet.pts == AV_NOPTS_VALUE) {
-      next_presentation_time_ = 0;
+      next_pts_ = 0;
     } else {
-      next_presentation_time_ = av_packet.pts;
+      next_pts_ = av_packet.pts;
     }
   }
 
@@ -74,10 +74,10 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
     PayloadAllocator* allocator) {
   DCHECK(allocator);
 
-  int64_t presentation_time = av_frame.pts;
-  if (presentation_time == AV_NOPTS_VALUE) {
-    presentation_time = next_presentation_time_;
-    next_presentation_time_ += av_frame.nb_samples;
+  int64_t pts = av_frame.pts;
+  if (pts == AV_NOPTS_VALUE) {
+    pts = next_pts_;
+    next_pts_ += av_frame.nb_samples;
   }
 
   uint64_t payload_size;
@@ -110,8 +110,7 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
   }
 
   return Packet::Create(
-      presentation_time,
-      av_frame.nb_samples,
+      pts,
       false, // The base class is responsible for end-of-stream.
       payload_size,
       payload_buffer,
@@ -119,7 +118,7 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
 }
 
 PacketPtr FfmpegAudioDecoder::CreateOutputEndOfStreamPacket() {
-  return Packet::CreateEndOfStream(next_presentation_time_);
+  return Packet::CreateEndOfStream(next_pts_);
 }
 
 int FfmpegAudioDecoder::AllocateBufferForAvFrame(

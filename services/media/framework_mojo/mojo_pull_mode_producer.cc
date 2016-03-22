@@ -11,7 +11,7 @@ namespace media {
 MojoPullModeProducer::MojoPullModeProducer() :
     state_(MediaState::UNPREPARED),
     demand_(Demand::kNegative),
-    presentation_time_(0),
+    pts_(0),
     cached_packet_(nullptr) {}
 
 MojoPullModeProducer::~MojoPullModeProducer() {
@@ -157,7 +157,7 @@ bool MojoPullModeProducer::MaybeHandlePullUnsafe(
     // At end-of-stream. Respond with empty end-of-stream packet.
     HandlePullWithPacketUnsafe(
         callback,
-        Packet::CreateEndOfStream(presentation_time_));
+        Packet::CreateEndOfStream(pts_));
     return true;
   }
 
@@ -190,11 +190,10 @@ MediaPacketPtr MojoPullModeProducer::CreateMediaPacket(
   region->length = packet->size();
 
   MediaPacketPtr media_packet = MediaPacket::New();
-  media_packet->pts = packet->presentation_time();
-  media_packet->duration = packet->duration();
+  media_packet->pts = packet->pts();
   media_packet->end_of_stream = packet->end_of_stream();
   media_packet->payload = region.Pass();
-  presentation_time_ = packet->presentation_time() + packet->duration();
+  pts_ = packet->pts();
 
   return media_packet.Pass();
 }

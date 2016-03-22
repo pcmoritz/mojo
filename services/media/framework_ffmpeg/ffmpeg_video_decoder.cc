@@ -17,7 +17,7 @@ FfmpegVideoDecoder::~FfmpegVideoDecoder() {}
 
 int FfmpegVideoDecoder::Decode(
     const AVPacket& av_packet,
-    const AvFramePtr& av_frame_ptr,
+    const ffmpeg::AvFramePtr& av_frame_ptr,
     PayloadAllocator* allocator,
     bool* frame_decoded_out) {
   DCHECK(av_frame_ptr);
@@ -45,7 +45,6 @@ PacketPtr FfmpegVideoDecoder::CreateOutputPacket(
   // TODO(dalesat): This is just a copy of the audio version.
   return Packet::Create(
       av_frame.pts,
-      av_frame.pkt_duration,
       false,
       packet_size_,
       av_frame.data[0],

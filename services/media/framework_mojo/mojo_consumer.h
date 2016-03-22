@@ -89,25 +89,6 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
           buffer));
     }
 
-    // Packet implementation.
-    int64_t presentation_time() const override {
-      return media_packet_->pts;
-    }
-
-    uint64_t duration() const override {
-      return media_packet_->duration;
-    }
-
-    bool end_of_stream() const override {
-      return media_packet_->end_of_stream;
-    }
-
-    size_t size() const override {
-      return media_packet_->payload->length;
-    }
-
-    void* payload() const override { return payload_; }
-
    protected:
     void Release() override;
 
@@ -125,7 +106,6 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
     MediaPacketPtr media_packet_;
     const SendPacketCallback callback_;
     scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
-    void* payload_;
   };
 
   BindingSet<MediaConsumer> bindings_;

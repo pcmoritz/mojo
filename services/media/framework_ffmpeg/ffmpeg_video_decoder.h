@@ -22,7 +22,7 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
   // FfmpegDecoderBase overrides.
   int Decode(
       const AVPacket& av_packet,
-      const AvFramePtr& av_frame_ptr,
+      const ffmpeg::AvFramePtr& av_frame_ptr,
       PayloadAllocator* allocator,
       bool* frame_decoded_out) override;
 

@@ -32,14 +32,12 @@ typedef std::unique_ptr<Packet, PacketDeleter> PacketPtr;
 // 2) The relationship to the allocator could be clearer.
 class Packet {
  public:
-  static const int64_t kUnknownPresentationTime =
-      std::numeric_limits<int64_t>::min();
+  static const int64_t kUnknownPts = std::numeric_limits<int64_t>::min();
 
   // Creates a packet. If size is 0, payload must be nullptr and vice-versa.
   // If payload is not nullptr, an allocator must be provided.
   static PacketPtr Create(
-      int64_t presentation_time,
-      uint64_t duration,
+      int64_t pts,
       bool end_of_stream,
       size_t size,
       void* payload,
@@ -49,29 +47,38 @@ class Packet {
   // No allocator is provided, and the payload will not be released when the
   // packet is released.
   static PacketPtr CreateNoAllocator(
-      int64_t presentation_time,
-      uint64_t duration,
+      int64_t pts,
       bool end_of_stream,
       size_t size,
       void* payload);
 
   // Creates an end-of-stream packet with no payload.
-  static PacketPtr CreateEndOfStream(int64_t presentation_time);
+  static PacketPtr CreateEndOfStream(int64_t pts);
 
-  virtual int64_t presentation_time() const = 0;
+  int64_t pts() const { return pts_; }
 
-  virtual uint64_t duration() const = 0;
+  bool end_of_stream() const { return end_of_stream_; }
 
-  virtual bool end_of_stream() const = 0;
+  size_t size() const { return size_; }
 
-  virtual size_t size() const = 0;
-
-  virtual void* payload() const = 0;
+  void* payload() const { return payload_; }
 
  protected:
+  Packet(
+      int64_t pts,
+      bool end_of_stream,
+      size_t size,
+      void* payload);
+
   virtual ~Packet() {}
 
   virtual void Release() = 0;
+
+ private:
+  int64_t pts_;
+  bool end_of_stream_;
+  size_t size_;
+  void* payload_;
 
   friend PacketDeleter;
 };

@@ -6,6 +6,7 @@
 
 #include "base/logging.h"
 #include "services/media/framework/safe_clone.h"
+#include "services/media/framework_ffmpeg/av_packet.h"
 #include "services/media/framework_ffmpeg/ffmpeg_demux.h"
 #include "services/media/framework_ffmpeg/ffmpeg_io.h"
 #include "services/media/framework_ffmpeg/ffmpeg_type_converters.h"
@@ -54,36 +55,31 @@ class FfmpegDemuxImpl : public FfmpegDemux {
   // Specialized packet implementation.
   class DemuxPacket : public Packet {
    public:
-    DemuxPacket() {
-      av_init_packet(&av_packet_);
-    }
-
-    // Packet implementation.
-    int64_t presentation_time() const override { return av_packet_.pts; };
-
-    uint64_t duration() const override { return av_packet_.duration; };
-
-    bool end_of_stream() const override { return false; }
-
-    size_t size() const override { return size_t(av_packet_.size); }
-
-    void* payload() const override {
-      return reinterpret_cast<void*>(av_packet_.data);
+    static PacketPtr Create(ffmpeg::AvPacketPtr av_packet) {
+      return PacketPtr(new DemuxPacket(std::move(av_packet)));
     }
 
     AVPacket& av_packet() {
-      return av_packet_;
+      return *av_packet_;
     }
 
    protected:
-    ~DemuxPacket() override {
-      av_free_packet(&av_packet_);
-    }
+    ~DemuxPacket() override {}
 
     void Release() override { delete this; }
 
-  private:
-    AVPacket av_packet_;
+   private:
+    DemuxPacket(ffmpeg::AvPacketPtr av_packet) :
+        Packet(
+            (av_packet->pts == AV_NOPTS_VALUE) ? kUnknownPts : av_packet->pts,
+            false,
+            static_cast<size_t>(av_packet->size),
+            av_packet->data),
+        av_packet_(std::move(av_packet)) {
+      DCHECK(av_packet->size >= 0);
+    }
+
+    ffmpeg::AvPacketPtr av_packet_;
   };
 
   struct AVFormatContextDeleter {
@@ -105,7 +101,7 @@ class FfmpegDemuxImpl : public FfmpegDemux {
   AvioContextPtr io_context_;
   std::vector<DemuxStream*> streams_;
   std::unique_ptr<Metadata> metadata_;
-  int64_t next_presentation_time_;
+  int64_t next_pts_;
   int next_stream_to_end_ = -1; // -1: don't end, streams_.size(): stop.
 };
 
@@ -199,26 +195,23 @@ PacketPtr FfmpegDemuxImpl::PullPacket(size_t* stream_index_out) {
     return PullEndOfStreamPacket(stream_index_out);
   }
 
-  FfmpegDemuxImpl::DemuxPacket* demux_packet =
-      new FfmpegDemuxImpl::DemuxPacket();
+  ffmpeg::AvPacketPtr av_packet = ffmpeg::AvPacket::Create();
 
-  demux_packet->av_packet().data = nullptr;
-  demux_packet->av_packet().size = 0;
+  av_packet->data = nullptr;
+  av_packet->size = 0;
 
-  if (av_read_frame(format_context_.get(), &demux_packet->av_packet()) < 0) {
+  if (av_read_frame(format_context_.get(), av_packet.get()) < 0) {
     // End of stream. Start producing end-of-stream packets for all the streams.
-    PacketPtr(demux_packet); // Deletes demux_packet.
     next_stream_to_end_ = 0;
     return PullEndOfStreamPacket(stream_index_out);
   }
 
   *stream_index_out =
-      static_cast<size_t>(demux_packet->av_packet().stream_index);
+      static_cast<size_t>(av_packet->stream_index);
   // TODO(dalesat): What if the packet has no PTS or duration?
-  next_presentation_time_ =
-      demux_packet->presentation_time() + demux_packet->duration();
+  next_pts_ = av_packet->pts + av_packet->duration;
 
-  return PacketPtr(demux_packet);
+  return DemuxPacket::Create(std::move(av_packet));
 }
 
 PacketPtr FfmpegDemuxImpl::PullEndOfStreamPacket(size_t* stream_index_out) {
@@ -230,7 +223,7 @@ PacketPtr FfmpegDemuxImpl::PullEndOfStreamPacket(size_t* stream_index_out) {
   }
 
   *stream_index_out = next_stream_to_end_++;
-  return Packet::CreateEndOfStream(next_presentation_time_);
+  return Packet::CreateEndOfStream(next_pts_);
 }
 
 void FfmpegDemuxImpl::CopyMetadata(

@@ -65,8 +65,7 @@ void Output::SupplyPacket(PacketPtr packet, Engine* engine) const {
     }
 
     packet = Packet::Create(
-        packet->presentation_time(),
-        packet->duration(),
+        packet->pts(),
         packet->end_of_stream(),
         size,
         buffer,

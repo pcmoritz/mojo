@@ -76,7 +76,7 @@ void FfmpegDecoderBase::PrepareInputPacket(const PacketPtr& input) {
   av_init_packet(&av_packet_);
   av_packet_.data = reinterpret_cast<uint8_t*>(input->payload());
   av_packet_.size = input->size();
-  av_packet_.pts = input->presentation_time();
+  av_packet_.pts = input->pts();
 }
 
 bool FfmpegDecoderBase::UnprepareInputPacket(

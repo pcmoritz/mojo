@@ -24,7 +24,7 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
 
   int Decode(
       const AVPacket& av_packet,
-      const AvFramePtr& av_frame_ptr,
+      const ffmpeg::AvFramePtr& av_frame_ptr,
       PayloadAllocator* allocator,
       bool* frame_decoded_out) override;
 
@@ -112,7 +112,7 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   std::unique_ptr<StreamType> stream_type_;
 
   // Used to supply missing PTS.
-  int64_t next_presentation_time_= Packet::kUnknownPresentationTime;
+  int64_t next_pts_= Packet::kUnknownPts;
 };
 
 }  // namespace media

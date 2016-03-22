@@ -249,8 +249,7 @@ bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
   if (in_size == 0) {
     // Zero-sized input packet. Make a copy.
     *output = Packet::Create(
-        input->presentation_time(),
-        input->duration(),
+        input->pts(),
         input->end_of_stream(),
         0,
         nullptr,
@@ -258,7 +257,7 @@ bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
     return true;
   }
 
-  size_t frame_count = input->duration();
+  size_t frame_count = in_type_.frame_count(in_size);
   uint64_t out_size = out_type_.min_buffer_size(frame_count);
 
   void* buffer = allocator->AllocatePayloadBuffer(out_size);
@@ -285,8 +284,7 @@ bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
   }
 
   *output = Packet::Create(
-      input->presentation_time(),
-      frame_count,
+      input->pts(),
       input->end_of_stream(),
       out_size,
       buffer,

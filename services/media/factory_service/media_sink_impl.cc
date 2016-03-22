@@ -240,12 +240,11 @@ void MediaSinkImpl::MaybeSetRate() {
   // The media time corresponding to start_local_time.
   int64_t start_media_time;
   if (flushed_ &&
-      producer_->GetFirstPresentationTimeSinceFlush() !=
-          Packet::kUnknownPresentationTime) {
+      producer_->GetFirstPtsSinceFlush() != Packet::kUnknownPts) {
     // We're getting started initially or after a flush/prime, so the media
     // time corresponding to start_local_time should be the PTS of
     // the first packet.
-    start_media_time = producer_->GetFirstPresentationTimeSinceFlush();
+    start_media_time = producer_->GetFirstPtsSinceFlush();
   } else {
     // We're resuming, so the media time corresponding to start_local_time can
     // be calculated using the existing transform.
