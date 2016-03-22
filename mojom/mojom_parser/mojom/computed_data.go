@@ -201,7 +201,7 @@ func (e *StructFieldMinVersionError) Error() string {
 func (s *MojomStruct) computeVersionInfo() error {
 	s.versionInfo = make([]StructVersion, 0)
 	previousMinVersion := uint32(0)
-	payloadSizeSoFar := uint32(0)
+	payloadSizeSoFar := structHeaderSize
 	for i, field := range s.fieldsInOrdinalOrder {
 		value, literalValue, found, ok := field.minVersionAttribute()
 		if found == false {

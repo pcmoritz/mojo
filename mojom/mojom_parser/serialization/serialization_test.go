@@ -1155,6 +1155,33 @@ func TestWithComputedData(t *testing.T) {
 	test := singleFileTest{}
 
 	////////////////////////////////////////////////////////////
+	// Test Case: Empty struct
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	struct Foo{
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:Foo"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
+			DeclData: test.newDeclData("Foo", "Foo"),
+			Fields:   []mojom_types.StructField{},
+			VersionInfo: &[]mojom_types.StructVersion{
+				mojom_types.StructVersion{
+					VersionNumber: 0,
+					NumFields:     0,
+					NumBytes:      8,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
 	// Test Case: Test struct field min versions: 1,2
 	////////////////////////////////////////////////////////////
 	{
