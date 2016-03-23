@@ -16,6 +16,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"mojom/mojom_parser/formatter"
 	"os"
 	"path/filepath"
@@ -52,7 +53,7 @@ func fmtCmd(args []string) {
 
 	originalBytes, err := ioutil.ReadFile(inputFileName)
 	if err != nil {
-		ErrorExit(err.Error())
+		log.Fatalln(err.Error())
 	}
 
 	original := string(originalBytes[:])
@@ -60,13 +61,13 @@ func fmtCmd(args []string) {
 	var formatted string
 	formatted, err = formatter.FormatMojom(inputFileName, original)
 	if err != nil {
-		ErrorExit(err.Error())
+		log.Fatalln(err.Error())
 	}
 
 	if overwrite {
 		if formatted != original {
 			if err := ioutil.WriteFile(inputFileName, []byte(formatted), 0); err != nil {
-				ErrorExit(err.Error())
+				log.Fatalln(err.Error())
 			}
 		}
 	} else {

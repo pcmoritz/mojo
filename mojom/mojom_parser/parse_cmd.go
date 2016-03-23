@@ -33,6 +33,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"mojom/mojom_parser/mojom"
 	"mojom/mojom_parser/parser"
 	"mojom/mojom_parser/serialization"
@@ -103,7 +104,7 @@ func parseCmd(args []string) {
 	// Do the parsing
 	descriptor, err := parseDriver.ParseFiles(fileNames)
 	if err != nil {
-		ErrorExit(fmt.Sprintf("%s", err.Error()))
+		log.Fatalln(err.Error())
 	} else if *debug {
 		fmt.Println("Parsing complete.")
 	}
@@ -111,7 +112,7 @@ func parseCmd(args []string) {
 	// Serialize the result.
 	bytes, debug_string, err := serialization.Serialize(descriptor, *debug)
 	if err != nil {
-		ErrorExit(fmt.Sprintf("Serialization error: %s", err))
+		log.Fatalf("Serialization error: %s\n", err)
 	}
 
 	// In debug mode print out the debug information.
@@ -123,12 +124,12 @@ func parseCmd(args []string) {
 	if len(*outFile) == 0 {
 		w := bufio.NewWriter(os.Stdout)
 		if _, err := w.Write(bytes); err != nil {
-			ErrorExit(fmt.Sprintf("Error writing output to standard out: %s.", *outFile, err.Error()))
+			log.Fatalf("Error writing output to standard out: %s.\n", err.Error())
 		}
 		w.Flush()
 	} else {
 		if err := ioutil.WriteFile(*outFile, bytes, os.ModePerm); err != nil {
-			ErrorExit(fmt.Sprintf("Error writing output to %s: %s.", *outFile, err.Error()))
+			log.Fatalf("Error writing output to %s: %s.", *outFile, err.Error())
 		} else {
 			if *debug {
 				fmt.Printf("The output was written to %s.\n", *outFile)

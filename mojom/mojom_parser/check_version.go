@@ -24,8 +24,6 @@ import (
 // the comparison fails, an error message is logged and the program terminates
 // with return code 1.
 func checkVersion(args []string) {
-	// TODO(azani): Move log.SetFlags to mojom_main.go when replacing ErrorExit with log.Fatalln.
-	log.SetFlags(0)
 	mojomToolPath := args[0]
 	mojomDir := filepath.Dir(mojomToolPath)
 	sha1FilePath := filepath.Join(mojomDir, "mojom.sha1")
