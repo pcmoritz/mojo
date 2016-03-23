@@ -664,8 +664,7 @@ func (p *printer) writeSingleLineComment(comment lexer.Token) {
 
 	// We expect that the first 2 characters are // followed by a space or tab.
 	// If the third character is not a space or tab, we insert a space.
-	space := commentText[2]
-	if space != ' ' && space != '\t' {
+	if len(commentText) > 2 && commentText[2] != ' ' && commentText[2] != '\t' {
 		commentText = "// " + commentText[2:]
 	}
 	p.write(commentText)
