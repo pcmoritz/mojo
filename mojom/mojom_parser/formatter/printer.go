@@ -668,7 +668,8 @@ func (p *printer) writeSingleLineComment(comment lexer.Token) {
 
 	// We expect that the first 2 characters are // followed by a space or tab.
 	// If the third character is not a space or tab, we insert a space.
-	if len(commentText) > 2 && commentText[2] != ' ' && commentText[2] != '\t' {
+	// There is an exception for three forward slashes which are allowed.
+	if len(commentText) > 2 && !strings.ContainsAny(" \t/", commentText[2:3]) {
 		commentText = "// " + commentText[2:]
 	}
 	p.write(commentText)
