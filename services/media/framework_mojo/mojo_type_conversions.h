@@ -38,8 +38,8 @@ VideoStreamType::ColorSpace Convert(ColorSpace color_space);
 std::unique_ptr<StreamType> Convert(const MediaTypePtr& media_type);
 
 // Creates std::vector<std::unique_ptr<StreamType>> from an array of MediaTypes.
-std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>
-    Convert(const Array<MediaTypePtr>& media_types);
+std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> Convert(
+    const Array<MediaTypePtr>& media_types);
 
 // Creates a StreamTypeSet from a MediaTypeSet.
 std::unique_ptr<StreamTypeSet> Convert(const MediaTypeSetPtr& media_type_set);
@@ -82,7 +82,7 @@ MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type);
 // Creates an array of MediaTypes from std::vector<std::unique_ptr<StreamType>>.
 Array<MediaTypePtr> Convert(
     const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>&
-      stream_types);
+        stream_types);
 
 // Creates a MediaTypeSet from a StreamTypeSet.
 MediaTypeSetPtr Convert(const std::unique_ptr<StreamTypeSet>& stream_type_set);
@@ -102,4 +102,4 @@ MediaMetadataPtr Convert(const std::unique_ptr<Metadata>& metadata);
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_TYPE_CONVERSIONS_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_TYPE_CONVERSIONS_H_

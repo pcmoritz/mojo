@@ -25,4 +25,4 @@ enum class Demand {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_DEMAND_H_
+#endif  // MOJO_MEDIA_MODELS_DEMAND_H_

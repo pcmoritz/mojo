@@ -19,7 +19,7 @@ Event RuleSet::AddRule(const Condition& condition) {
   if (condition()) {
     event.Occur();
   } else {
-    CheckRules(); // To purge occurred/cancelled events.
+    CheckRules();  // To purge occurred/cancelled events.
     rules_.push_back(Rule(condition, event));
   }
 

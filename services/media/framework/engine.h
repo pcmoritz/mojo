@@ -107,28 +107,25 @@ class Engine {
   void PushToDemandBacklog(Stage* stage);
 
  private:
-  using UpstreamVisitor = std::function<void(
-      const InputRef& input,
-      const OutputRef& output,
-      const Stage::UpstreamCallback& callback)>;
-  using DownstreamVisitor = std::function<void(
-      const OutputRef& output,
-      const InputRef& input,
-      const Stage::DownstreamCallback& callback)>;
+  using UpstreamVisitor =
+      std::function<void(const InputRef& input,
+                         const OutputRef& output,
+                         const Stage::UpstreamCallback& callback)>;
+  using DownstreamVisitor =
+      std::function<void(const OutputRef& output,
+                         const InputRef& input,
+                         const Stage::DownstreamCallback& callback)>;
 
-  void VisitUpstream(
-      const InputRef& input,
-      const UpstreamVisitor& vistor);
+  void VisitUpstream(const InputRef& input, const UpstreamVisitor& vistor);
 
-  void VisitDownstream(
-      const OutputRef& output,
-      const DownstreamVisitor& vistor);
+  void VisitDownstream(const OutputRef& output,
+                       const DownstreamVisitor& vistor);
 
   // Processes the entire backlog.
   void Update();
 
   // Performs processing for a single stage, updating the backlog accordingly.
-  void Update(Stage *stage);
+  void Update(Stage* stage);
 
   // Pops a stage from the supply backlog and returns it or returns nullptr if
   // the supply backlog is empty.

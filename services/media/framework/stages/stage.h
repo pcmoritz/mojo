@@ -53,10 +53,9 @@ class Stage {
   // by the output or nullptr if there is no such requirement. The callback is
   // used to indicate what inputs are ready to be prepared as a consequence of
   // preparing the output.
-  virtual void PrepareOutput(
-      size_t index,
-      PayloadAllocator* allocator,
-      const UpstreamCallback& callback) = 0;
+  virtual void PrepareOutput(size_t index,
+                             PayloadAllocator* allocator,
+                             const UpstreamCallback& callback) = 0;
 
   // Unprepares the input. The default implementation does nothing.
   virtual void UnprepareInput(size_t index);
@@ -64,18 +63,14 @@ class Stage {
   // Unprepares the output. The default implementation does nothing. The
   // the callback is used to indicate what inputs are ready to be unprepared as
   // a consequence of unpreparing the output.
-  virtual void UnprepareOutput(
-    size_t index,
-    const UpstreamCallback& callback);
+  virtual void UnprepareOutput(size_t index, const UpstreamCallback& callback);
 
   // Performs processing.
   virtual void Update(Engine* engine) = 0;
 
   // Flushes an input. The callback is used to indicate what outputs are ready
   // to be flushed as a consequence of flushing the input.
-  virtual void FlushInput(
-      size_t index,
-      const DownstreamCallback& callback) = 0;
+  virtual void FlushInput(size_t index, const DownstreamCallback& callback) = 0;
 
   // Flushes an output.
   virtual void FlushOutput(size_t index) = 0;

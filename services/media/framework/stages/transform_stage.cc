@@ -7,11 +7,8 @@
 namespace mojo {
 namespace media {
 
-TransformStage::TransformStage(
-    std::shared_ptr<Transform> transform) :
-    transform_(transform),
-    allocator_(nullptr),
-    input_packet_is_new_(true) {
+TransformStage::TransformStage(std::shared_ptr<Transform> transform)
+    : transform_(transform), allocator_(nullptr), input_packet_is_new_(true) {
   DCHECK(transform_);
 }
 
@@ -40,10 +37,9 @@ PayloadAllocator* TransformStage::PrepareInput(size_t index) {
   return nullptr;
 }
 
-void TransformStage::PrepareOutput(
-    size_t index,
-    PayloadAllocator* allocator,
-    const UpstreamCallback& callback) {
+void TransformStage::PrepareOutput(size_t index,
+                                   PayloadAllocator* allocator,
+                                   const UpstreamCallback& callback) {
   DCHECK_EQ(index, 0u);
 
   allocator_ =
@@ -52,9 +48,8 @@ void TransformStage::PrepareOutput(
   callback(0);
 }
 
-void TransformStage::UnprepareOutput(
-    size_t index,
-    const UpstreamCallback& callback) {
+void TransformStage::UnprepareOutput(size_t index,
+                                     const UpstreamCallback& callback) {
   allocator_ = nullptr;
   callback(0);
 }
@@ -65,11 +60,9 @@ void TransformStage::Update(Engine* engine) {
 
   if (input_.packet_from_upstream() && output_.demand() != Demand::kNegative) {
     PacketPtr output_packet;
-    if (transform_->TransformPacket(
-        input_.packet_from_upstream(),
-        input_packet_is_new_,
-        allocator_,
-        &output_packet)) {
+    if (transform_->TransformPacket(input_.packet_from_upstream(),
+                                    input_packet_is_new_, allocator_,
+                                    &output_packet)) {
       input_.packet_from_upstream().reset();
       input_packet_is_new_ = true;
     } else {
@@ -84,9 +77,8 @@ void TransformStage::Update(Engine* engine) {
   input_.SetDemand(output_.demand(), engine);
 }
 
-void TransformStage::FlushInput(
-    size_t index,
-    const DownstreamCallback& callback) {
+void TransformStage::FlushInput(size_t index,
+                                const DownstreamCallback& callback) {
   DCHECK_EQ(index, 0u);
   input_.Flush();
   callback(0);

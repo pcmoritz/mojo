@@ -30,9 +30,9 @@ void MojoProducer::PrimeConnection(const FlushConnectionCallback& callback) {
   {
     base::AutoLock lock(lock_);
     max_pushes_outstanding_ = 10;  // TODO(dalesat): Made up!
-    demand = current_pushes_outstanding_ < max_pushes_outstanding_ ?
-        Demand::kPositive :
-        Demand::kNegative;
+    demand = current_pushes_outstanding_ < max_pushes_outstanding_
+                 ? Demand::kPositive
+                 : Demand::kNegative;
   }
 
   DCHECK(demand_callback_);
@@ -40,9 +40,7 @@ void MojoProducer::PrimeConnection(const FlushConnectionCallback& callback) {
   SetState(MediaState::PAUSED);
 
   DCHECK(consumer_.is_bound());
-  consumer_->Prime([this, callback]() {
-    callback.Run();
-  });
+  consumer_->Prime([this, callback]() { callback.Run(); });
 }
 
 void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
@@ -60,8 +58,7 @@ void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
   end_of_stream_ = false;
 }
 
-void MojoProducer::SetStatusCallback(
-    const StatusCallback& callback) {
+void MojoProducer::SetStatusCallback(const StatusCallback& callback) {
   status_callback_ = callback;
 }
 
@@ -105,25 +102,23 @@ Demand MojoProducer::SupplyPacket(PacketPtr packet) {
       demand = Demand::kNegative;
       max_pushes_outstanding_ = 0;
     } else {
-      demand = current_pushes_outstanding_ < max_pushes_outstanding_ ?
-          Demand::kPositive :
-          Demand::kNegative;
+      demand = current_pushes_outstanding_ < max_pushes_outstanding_
+                   ? Demand::kPositive
+                   : Demand::kNegative;
     }
   }
 
   MediaPacketPtr media_packet = CreateMediaPacket(packet);
-  task_runner_->PostTask(FROM_HERE, base::Bind(
-      &MojoProducer::SendPacket,
-      base::Unretained(this),
-      packet.release(),
-      base::Passed(media_packet.Pass())));
+  task_runner_->PostTask(
+      FROM_HERE,
+      base::Bind(&MojoProducer::SendPacket, base::Unretained(this),
+                 packet.release(), base::Passed(media_packet.Pass())));
 
   return demand;
 }
 
-void MojoProducer::Connect(
-    InterfaceHandle<MediaConsumer> consumer,
-    const ConnectCallback& callback) {
+void MojoProducer::Connect(InterfaceHandle<MediaConsumer> consumer,
+                           const ConnectCallback& callback) {
   DCHECK(consumer);
 
   consumer_ = MediaConsumerPtr::Create(std::move(consumer));
@@ -132,11 +127,8 @@ void MojoProducer::Connect(
     mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
   }
 
-  consumer_->SetBuffer(
-      mojo_allocator_.GetDuplicateHandle(),
-      [callback]() {
-    callback.Run();
-  });
+  consumer_->SetBuffer(mojo_allocator_.GetDuplicateHandle(),
+                       [callback]() { callback.Run(); });
 }
 
 void MojoProducer::Disconnect() {
@@ -146,29 +138,28 @@ void MojoProducer::Disconnect() {
   consumer_.reset();
 }
 
-void MojoProducer::SendPacket(
-    Packet* packet_raw_ptr,
-    MediaPacketPtr media_packet) {
+void MojoProducer::SendPacket(Packet* packet_raw_ptr,
+                              MediaPacketPtr media_packet) {
   consumer_->SendPacket(
-    media_packet.Pass(),
-    [this, packet_raw_ptr](MediaConsumer::SendResult send_result) {
-      PacketPtr packet = PacketPtr(packet_raw_ptr);
-      Demand demand;
+      media_packet.Pass(),
+      [this, packet_raw_ptr](MediaConsumer::SendResult send_result) {
+        PacketPtr packet = PacketPtr(packet_raw_ptr);
+        Demand demand;
 
-      {
-        base::AutoLock lock(lock_);
-        demand = --current_pushes_outstanding_ < max_pushes_outstanding_ ?
-            Demand::kPositive :
-            Demand::kNegative;
-      }
+        {
+          base::AutoLock lock(lock_);
+          demand = --current_pushes_outstanding_ < max_pushes_outstanding_
+                       ? Demand::kPositive
+                       : Demand::kNegative;
+        }
 
-      DCHECK(demand_callback_);
-      demand_callback_(demand);
+        DCHECK(demand_callback_);
+        demand_callback_(demand);
 
-      if (end_of_stream_ && packet->end_of_stream()) {
-        SetState(MediaState::ENDED);
-      }
-    });
+        if (end_of_stream_ && packet->end_of_stream()) {
+          SetState(MediaState::ENDED);
+        }
+      });
 }
 
 void MojoProducer::SetState(MediaState state) {
@@ -180,13 +171,13 @@ void MojoProducer::SetState(MediaState state) {
   }
 }
 
-MediaPacketPtr MojoProducer::CreateMediaPacket(
-    const PacketPtr& packet) {
+MediaPacketPtr MojoProducer::CreateMediaPacket(const PacketPtr& packet) {
   DCHECK(packet);
 
   MediaPacketRegionPtr region = MediaPacketRegion::New();
-  region->offset = packet->size() == 0 ? 0 :
-      mojo_allocator_.OffsetFromPtr(packet->payload());
+  region->offset = packet->size() == 0
+                       ? 0
+                       : mojo_allocator_.OffsetFromPtr(packet->payload());
   region->length = packet->size();
 
   MediaPacketPtr media_packet = MediaPacket::New();

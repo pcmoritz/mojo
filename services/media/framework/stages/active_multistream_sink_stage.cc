@@ -8,7 +8,8 @@ namespace mojo {
 namespace media {
 
 ActiveMultistreamSinkStage::ActiveMultistreamSinkStage(
-      std::shared_ptr<ActiveMultistreamSink> sink) : sink_(sink) {
+    std::shared_ptr<ActiveMultistreamSink> sink)
+    : sink_(sink) {
   DCHECK(sink_);
   sink_->SetHost(this);
   // Add one unallocated input so this stage isn't misidentified as a source.
@@ -56,13 +57,12 @@ void ActiveMultistreamSinkStage::Update(Engine* engine) {
 
   base::AutoLock lock(lock_);
 
-  for (auto iter = pending_inputs_.begin(); iter != pending_inputs_.end(); ) {
+  for (auto iter = pending_inputs_.begin(); iter != pending_inputs_.end();) {
     DCHECK(*iter < inputs_.size());
     StageInput* input = inputs_[*iter].get();
     if (input->input_.packet_from_upstream()) {
       input->demand_ = sink_->SupplyPacket(
-          input->index_,
-          std::move(input->input_.packet_from_upstream()));
+          input->index_, std::move(input->input_.packet_from_upstream()));
 
       if (input->demand_ == Demand::kNegative) {
         auto remove_iter = iter;
@@ -141,9 +141,8 @@ size_t ActiveMultistreamSinkStage::ReleaseInput(size_t index) {
   return inputs_.size();
 }
 
-void ActiveMultistreamSinkStage::UpdateDemand(
-    size_t input_index,
-    Demand demand) {
+void ActiveMultistreamSinkStage::UpdateDemand(size_t input_index,
+                                              Demand demand) {
   lock_.Acquire();
   DCHECK(input_index < inputs_.size());
   DCHECK(demand != Demand::kNegative);

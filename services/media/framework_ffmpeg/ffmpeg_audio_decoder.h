@@ -22,15 +22,13 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   // FfmpegDecoderBase overrides.
   void Flush() override;
 
-  int Decode(
-      const AVPacket& av_packet,
-      const ffmpeg::AvFramePtr& av_frame_ptr,
-      PayloadAllocator* allocator,
-      bool* frame_decoded_out) override;
+  int Decode(const AVPacket& av_packet,
+             const ffmpeg::AvFramePtr& av_frame_ptr,
+             PayloadAllocator* allocator,
+             bool* frame_decoded_out) override;
 
-  PacketPtr CreateOutputPacket(
-      const AVFrame& av_frame,
-      PayloadAllocator* allocator) override;
+  PacketPtr CreateOutputPacket(const AVFrame& av_frame,
+                               PayloadAllocator* allocator) override;
 
   PacketPtr CreateOutputEndOfStreamPacket() override;
 
@@ -38,15 +36,14 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   // Used to control deallocation of buffers.
   class AvBufferContext {
    public:
-    AvBufferContext(size_t size, PayloadAllocator* allocator) :
-        size_(size),
-        allocator_(allocator) {
+    AvBufferContext(size_t size, PayloadAllocator* allocator)
+        : size_(size), allocator_(allocator) {
       DCHECK(allocator_);
       if (size_ == 0) {
         buffer_ = nullptr;
       } else {
-        buffer_ = static_cast<uint8_t*>(
-            allocator_->AllocatePayloadBuffer(size_));
+        buffer_ =
+            static_cast<uint8_t*>(allocator_->AllocatePayloadBuffer(size_));
       }
     }
 
@@ -92,10 +89,9 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   static const int kChannelAlign = 32;
 
   // Callback used by the ffmpeg decoder to acquire a buffer.
-  static int AllocateBufferForAvFrame(
-      AVCodecContext* av_codec_context,
-      AVFrame* av_frame,
-      int flags);
+  static int AllocateBufferForAvFrame(AVCodecContext* av_codec_context,
+                                      AVFrame* av_frame,
+                                      int flags);
 
   // Callback used by the ffmpeg decoder to release a buffer.
   static void ReleaseBufferForAvFrame(void* opaque, uint8_t* buffer);
@@ -112,10 +108,10 @@ class FfmpegAudioDecoder : public FfmpegDecoderBase {
   std::unique_ptr<StreamType> stream_type_;
 
   // Used to supply missing PTS.
-  int64_t next_pts_= Packet::kUnknownPts;
+  int64_t next_pts_ = Packet::kUnknownPts;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_AUDIO_DECODER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_AUDIO_DECODER_H_

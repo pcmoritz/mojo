@@ -7,7 +7,7 @@
 namespace mojo {
 namespace media {
 
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, const InterfacePtr<T>& value) {
   if (!value.is_bound()) {
     return os << "<not bound>" << std::endl;
@@ -16,9 +16,8 @@ std::ostream& operator<<(std::ostream& os, const InterfacePtr<T>& value) {
   }
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const MediaSourceStreamDescriptorPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const MediaSourceStreamDescriptorPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -28,8 +27,8 @@ std::ostream& operator<<(
   os << indent;
   os << begl << "uint32_t index: " << int(value->index) << std::endl;
   os << begl << "MediaTypePtr media_type: " << value->media_type;
-  os << begl << "MediaTypePtr original_media_type: " <<
-      value->original_media_type;
+  os << begl
+     << "MediaTypePtr original_media_type: " << value->original_media_type;
   return os << outdent;
 }
 
@@ -41,8 +40,9 @@ std::ostream& operator<<(std::ostream& os, const MediaTypePtr& value) {
   }
 
   os << indent;
-  os << begl << "MediaTypeScheme scheme: " <<
-      StringFromMediaTypeScheme(value->scheme) << std::endl;
+  os << begl
+     << "MediaTypeScheme scheme: " << StringFromMediaTypeScheme(value->scheme)
+     << std::endl;
   os << begl << "MediaTypeDetailsPtr details: " << value->details;
   return os << outdent;
 }
@@ -55,8 +55,9 @@ std::ostream& operator<<(std::ostream& os, const MediaTypeSetPtr& value) {
   }
 
   os << indent;
-  os << begl << "MediaTypeScheme scheme: " <<
-      StringFromMediaTypeScheme(value->scheme) << std::endl;
+  os << begl
+     << "MediaTypeScheme scheme: " << StringFromMediaTypeScheme(value->scheme)
+     << std::endl;
   os << begl << "MediaTypeSetDetailsPtr details: " << value->details;
   return os << outdent;
 }
@@ -64,7 +65,7 @@ std::ostream& operator<<(std::ostream& os, const MediaTypeSetPtr& value) {
 std::ostream& operator<<(std::ostream& os, const MediaTypeDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
-  } else   if (value->has_unknown_tag()) {
+  } else if (value->has_unknown_tag()) {
     return os << "<empty>" << std::endl;
   } else {
     os << std::endl;
@@ -72,31 +73,31 @@ std::ostream& operator<<(std::ostream& os, const MediaTypeDetailsPtr& value) {
 
   os << indent;
   if (value->is_multiplexed()) {
-    return os << begl << "MultiplexedMediaTypeDetailsPtr* multiplexed: " <<
-        value->get_multiplexed() << outdent;
+    return os << begl << "MultiplexedMediaTypeDetailsPtr* multiplexed: "
+              << value->get_multiplexed() << outdent;
   }
   if (value->is_lpcm()) {
-    return os << begl << "LpcmMediaTypeDetailsPtr* lpcm: " <<
-        value->get_lpcm() << outdent;
+    return os << begl << "LpcmMediaTypeDetailsPtr* lpcm: " << value->get_lpcm()
+              << outdent;
   }
   if (value->is_compressed_audio()) {
-    return os << begl <<
-        "CompressedAudiomMediaTypeDetailsPtr* compressed_audio: " <<
-        value->get_compressed_audio() << outdent;
+    return os << begl
+              << "CompressedAudiomMediaTypeDetailsPtr* compressed_audio: "
+              << value->get_compressed_audio() << outdent;
   }
   if (value->is_video()) {
-    return os << begl << "VideoMediaTypeDetailsPtr* video: " <<
-        value->get_video() << outdent;
+    return os << begl
+              << "VideoMediaTypeDetailsPtr* video: " << value->get_video()
+              << outdent;
   }
   return os << begl << "UNKNOWN TAG" << std::endl << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const MediaTypeSetDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const MediaTypeSetDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
-  } else   if (value->has_unknown_tag()) {
+  } else if (value->has_unknown_tag()) {
     return os << "<empty>" << std::endl;
   } else {
     os << std::endl;
@@ -104,28 +105,29 @@ std::ostream& operator<<(
 
   os << indent;
   if (value->is_multiplexed()) {
-    return os << begl << "MultiplexedMediaTypeSetDetailsPtr* multiplexed: " <<
-        value->get_multiplexed() << outdent;
+    return os << begl << "MultiplexedMediaTypeSetDetailsPtr* multiplexed: "
+              << value->get_multiplexed() << outdent;
   }
   if (value->is_lpcm()) {
-    return os << begl << "LpcmMediaTypeSetDetailsPtr* lpcm: " <<
-        value->get_lpcm() << outdent;
+    return os << begl
+              << "LpcmMediaTypeSetDetailsPtr* lpcm: " << value->get_lpcm()
+              << outdent;
   }
   if (value->is_compressed_audio()) {
-    return os << begl <<
-        "CompressedAudioMediaTypeSetDetailsPtr* compressed_audio: " <<
-        value->get_compressed_audio() << outdent;
+    return os << begl
+              << "CompressedAudioMediaTypeSetDetailsPtr* compressed_audio: "
+              << value->get_compressed_audio() << outdent;
   }
   if (value->is_video()) {
-    return os << begl << "VideoMediaTypeSetDetailsPtr* video: " <<
-        value->get_video() << outdent;
+    return os << begl
+              << "VideoMediaTypeSetDetailsPtr* video: " << value->get_video()
+              << outdent;
   }
   return os << begl << "UNKNOWN TAG" << std::endl << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const MultiplexedMediaTypeDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const MultiplexedMediaTypeDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -134,14 +136,13 @@ std::ostream& operator<<(
 
   os << indent;
   os << begl << "MediaTypePtr multiplex_type: " << value->multiplex_type;
-  os << begl << "Array<MediaTypePtr> substream_types: " <<
-      value->substream_types;
+  os << begl
+     << "Array<MediaTypePtr> substream_types: " << value->substream_types;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const MultiplexedMediaTypeSetDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const MultiplexedMediaTypeSetDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -149,16 +150,15 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "MediaTypeSetPtr multiplex_type_set: " <<
-      value->multiplex_type_set;
-  os << begl << "Array<MediaTypeSetPtr> substream_type_sets: " <<
-      value->substream_type_sets;
+  os << begl
+     << "MediaTypeSetPtr multiplex_type_set: " << value->multiplex_type_set;
+  os << begl << "Array<MediaTypeSetPtr> substream_type_sets: "
+     << value->substream_type_sets;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const LpcmMediaTypeDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const LpcmMediaTypeDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -166,17 +166,16 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "LpcmSampleFormat sample_format: " <<
-      StringFromLpcmSampleFormat(value->sample_format) << std::endl;
+  os << begl << "LpcmSampleFormat sample_format: "
+     << StringFromLpcmSampleFormat(value->sample_format) << std::endl;
   os << begl << "uint32_t channels: " << int(value->channels) << std::endl;
-  os << begl << "uint32_t frames_per_second: " << value->frames_per_second <<
-      std::endl;
+  os << begl << "uint32_t frames_per_second: " << value->frames_per_second
+     << std::endl;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const LpcmMediaTypeSetDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const LpcmMediaTypeSetDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -184,22 +183,23 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "LpcmSampleFormat sample_format: " <<
-      StringFromLpcmSampleFormat(value->sample_format) << std::endl;
-  os << begl << "uint32_t min_channels: " << int(value->min_channels) <<
-      std::endl;
-  os << begl << "uint32_t max_channels: " << int(value->max_channels) <<
-      std::endl;
-  os << begl << "uint32_t min_frames_per_second: " <<
-      value->min_frames_per_second << std::endl;
-  os << begl << "uint32_t max_cframes_per_second: " <<
-      value->max_frames_per_second << std::endl;
+  os << begl << "LpcmSampleFormat sample_format: "
+     << StringFromLpcmSampleFormat(value->sample_format) << std::endl;
+  os << begl << "uint32_t min_channels: " << int(value->min_channels)
+     << std::endl;
+  os << begl << "uint32_t max_channels: " << int(value->max_channels)
+     << std::endl;
+  os << begl
+     << "uint32_t min_frames_per_second: " << value->min_frames_per_second
+     << std::endl;
+  os << begl
+     << "uint32_t max_cframes_per_second: " << value->max_frames_per_second
+     << std::endl;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const CompressedAudioMediaTypeDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const CompressedAudioMediaTypeDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -207,19 +207,19 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "AudioEncoding encoding: " <<
-      StringFromAudioEncoding(value->encoding) << std::endl;
-  os << begl << "LpcmSampleFormat sample_format: " <<
-      StringFromLpcmSampleFormat(value->sample_format) << std::endl;
+  os << begl
+     << "AudioEncoding encoding: " << StringFromAudioEncoding(value->encoding)
+     << std::endl;
+  os << begl << "LpcmSampleFormat sample_format: "
+     << StringFromLpcmSampleFormat(value->sample_format) << std::endl;
   os << begl << "uint32_t channels: " << int(value->channels) << std::endl;
-  os << begl << "uint32_t frames_per_second: " << value->frames_per_second <<
-      std::endl;
+  os << begl << "uint32_t frames_per_second: " << value->frames_per_second
+     << std::endl;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const CompressedAudioMediaTypeSetDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const CompressedAudioMediaTypeSetDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -227,24 +227,26 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "AudioEncoding encoding: " <<
-      StringFromAudioEncoding(value->encoding) << std::endl;
-  os << begl << "LpcmSampleFormat sample_format: " <<
-      StringFromLpcmSampleFormat(value->sample_format) << std::endl;
-  os << begl << "uint32_t min_channels: " << int(value->min_channels) <<
-      std::endl;
-  os << begl << "uint32_t max_channels: " << int(value->max_channels) <<
-      std::endl;
-  os << begl << "uint32_t min_frames_per_second: " <<
-      value->min_frames_per_second << std::endl;
-  os << begl << "uint32_t max_cframes_per_second: " <<
-      value->max_frames_per_second << std::endl;
+  os << begl
+     << "AudioEncoding encoding: " << StringFromAudioEncoding(value->encoding)
+     << std::endl;
+  os << begl << "LpcmSampleFormat sample_format: "
+     << StringFromLpcmSampleFormat(value->sample_format) << std::endl;
+  os << begl << "uint32_t min_channels: " << int(value->min_channels)
+     << std::endl;
+  os << begl << "uint32_t max_channels: " << int(value->max_channels)
+     << std::endl;
+  os << begl
+     << "uint32_t min_frames_per_second: " << value->min_frames_per_second
+     << std::endl;
+  os << begl
+     << "uint32_t max_cframes_per_second: " << value->max_frames_per_second
+     << std::endl;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const VideoMediaTypeDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const VideoMediaTypeDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -252,11 +254,12 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "VideoEncoding encoding: " <<
-      StringFromVideoEncoding(value->encoding) << std::endl;
+  os << begl
+     << "VideoEncoding encoding: " << StringFromVideoEncoding(value->encoding)
+     << std::endl;
   os << begl << "VideoProfile profile: " << value->profile << std::endl;
-  os << begl << "PixelFormat pixel_format: " <<
-      value->pixel_format << std::endl;
+  os << begl << "PixelFormat pixel_format: " << value->pixel_format
+     << std::endl;
   os << begl << "ColorSpace color_space: " << value->color_space << std::endl;
   os << begl << "uint32_t width: " << value->width << std::endl;
   os << begl << "uint32_t height: " << value->height << std::endl;
@@ -265,9 +268,8 @@ std::ostream& operator<<(
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const VideoMediaTypeSetDetailsPtr& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const VideoMediaTypeSetDetailsPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -275,8 +277,9 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "VideoEncoding encoding: " <<
-      StringFromVideoEncoding(value->encoding) << std::endl;
+  os << begl
+     << "VideoEncoding encoding: " << StringFromVideoEncoding(value->encoding)
+     << std::endl;
   os << begl << "uint32_t min_width: " << value->min_width << std::endl;
   os << begl << "uint32_t max_width: " << value->max_width << std::endl;
   os << begl << "uint32_t min_height: " << value->min_height << std::endl;
@@ -284,9 +287,7 @@ std::ostream& operator<<(
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const TimelineQuadPtr& value) {
+std::ostream& operator<<(std::ostream& os, const TimelineQuadPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -294,20 +295,16 @@ std::ostream& operator<<(
   }
 
   os << indent;
-  os << begl << "int64 reference_offset: "
-      << value->reference_offset << std::endl;
-  os << begl << "int64 target_offset: "
-      << value->target_offset << std::endl;
-  os << begl << "int32 reference_delta: "
-      << value->reference_delta << std::endl;
-  os << begl << "uint32 target_delta: "
-      << value->target_delta << std::endl;
+  os << begl << "int64 reference_offset: " << value->reference_offset
+     << std::endl;
+  os << begl << "int64 target_offset: " << value->target_offset << std::endl;
+  os << begl << "int32 reference_delta: " << value->reference_delta
+     << std::endl;
+  os << begl << "uint32 target_delta: " << value->target_delta << std::endl;
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const TimelineTransformPtr& value) {
+std::ostream& operator<<(std::ostream& os, const TimelineTransformPtr& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -316,10 +313,10 @@ std::ostream& operator<<(
 
   os << indent;
   os << begl << "TimelineQuad quad: " << value->quad;
-  os << begl << "uint32 reference_timeline_id: "
-      << value->reference_timeline_id << std::endl;
-  os << begl << "uint32 target_timeline_id: "
-      << value->target_timeline_id << std::endl;
+  os << begl << "uint32 reference_timeline_id: " << value->reference_timeline_id
+     << std::endl;
+  os << begl << "uint32 target_timeline_id: " << value->target_timeline_id
+     << std::endl;
   return os << outdent;
 }
 
@@ -415,5 +412,5 @@ const char* StringFromMediaState(MediaState value) {
   return "UNKNOWN MEDIA STATE";
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

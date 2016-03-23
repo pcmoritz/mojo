@@ -26,15 +26,15 @@ const char* StringFromMediaState(MediaState value);
 
 // The following overloads add newlines.
 
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, const InterfacePtr<T>& value);
 
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, const Array<T>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else if (value.size() == 0) {
-      return os << "<empty>" << std::endl;
+    return os << "<empty>" << std::endl;
   } else {
     os << std::endl;
   }
@@ -51,41 +51,28 @@ std::ostream& operator<<(std::ostream& os, const MediaTypePtr& value);
 std::ostream& operator<<(std::ostream& os, const MediaTypeSetPtr& value);
 std::ostream& operator<<(std::ostream& os, const MediaTypeDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os, const MediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const MultiplexedMediaTypeDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const MultiplexedMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const LpcmMediaTypeDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const LpcmMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const CompressedAudioMediaTypeDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const CompressedAudioMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const VideoMediaTypeDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const VideoMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const MediaSourceStreamDescriptorPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const TimelineQuadPtr& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const TimelineTransformPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const MultiplexedMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const MultiplexedMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const LpcmMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const LpcmMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const CompressedAudioMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const CompressedAudioMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const VideoMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const VideoMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const MediaSourceStreamDescriptorPtr& value);
+std::ostream& operator<<(std::ostream& os, const TimelineQuadPtr& value);
+std::ostream& operator<<(std::ostream& os, const TimelineTransformPtr& value);
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_FORMATTING_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_FORMATTING_H_

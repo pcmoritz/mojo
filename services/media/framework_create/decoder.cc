@@ -8,9 +8,8 @@
 namespace mojo {
 namespace media {
 
-Result Decoder::Create(
-    const StreamType& stream_type,
-    std::shared_ptr<Decoder>* decoder_out) {
+Result Decoder::Create(const StreamType& stream_type,
+                       std::shared_ptr<Decoder>* decoder_out) {
   std::shared_ptr<Decoder> decoder;
   Result result = FfmpegDecoder::Create(stream_type, &decoder);
   if (result == Result::kOk) {
@@ -20,5 +19,5 @@ Result Decoder::Create(
   return result;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -20,62 +20,57 @@ std::shared_ptr<MediaPlayerImpl> MediaPlayerImpl::Create(
       new MediaPlayerImpl(origin_url, request.Pass(), owner));
 }
 
-MediaPlayerImpl::MediaPlayerImpl(
-    const String& origin_url,
-    InterfaceRequest<MediaPlayer> request,
-    MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()) {
+MediaPlayerImpl::MediaPlayerImpl(const String& origin_url,
+                                 InterfaceRequest<MediaPlayer> request,
+                                 MediaFactoryService* owner)
+    : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
   DCHECK(origin_url);
 
   target_state_.SetWithConsequences(MediaState::PAUSED);
   target_position_.SetWithConsequences(kNotSeeking);
 
   // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() {
-    ReleaseFromOwner();
-  });
+  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   app()->ConnectToService("mojo:media_factory", &factory_);
 
-  factory_->CreateSource(
-      origin_url,
-      nullptr, // allowed_media_types
-      GetProxy(&source_));
+  factory_->CreateSource(origin_url,
+                         nullptr,  // allowed_media_types
+                         GetProxy(&source_));
 
   HandleSourceStatusUpdates();
 
   source_->GetStreams(
       [this](mojo::Array<MediaSourceStreamDescriptorPtr> descriptors) {
-    // Populate streams_ and enable the streams we want.
-    std::vector<Event> stream_prepared_events;
+        // Populate streams_ and enable the streams we want.
+        std::vector<Event> stream_prepared_events;
 
-    for (MediaSourceStreamDescriptorPtr& descriptor : descriptors) {
-      streams_.push_back(std::unique_ptr<Stream>(new Stream()));
-      Stream& stream = *streams_.back();
-      stream.descriptor_ = descriptor.Pass();
-      switch (stream.descriptor_->media_type->scheme) {
-        case MediaTypeScheme::COMPRESSED_AUDIO:
-        case MediaTypeScheme::LPCM:
-          stream.enabled_ = true;
-          stream_prepared_events.push_back(
-              PrepareStream(streams_.back(), "mojo:audio_server"));
-          break;
-        // TODO(dalesat): Enable other stream types.
-        default:
-          break;
-      }
-    }
+        for (MediaSourceStreamDescriptorPtr& descriptor : descriptors) {
+          streams_.push_back(std::unique_ptr<Stream>(new Stream()));
+          Stream& stream = *streams_.back();
+          stream.descriptor_ = descriptor.Pass();
+          switch (stream.descriptor_->media_type->scheme) {
+            case MediaTypeScheme::COMPRESSED_AUDIO:
+            case MediaTypeScheme::LPCM:
+              stream.enabled_ = true;
+              stream_prepared_events.push_back(
+                  PrepareStream(streams_.back(), "mojo:audio_server"));
+              break;
+            // TODO(dalesat): Enable other stream types.
+            default:
+              break;
+          }
+        }
 
-    event_ = Event::All(stream_prepared_events).When([this]() {
-      // The enabled streams are prepared. Prepare the source.
-      factory_.reset();
-      source_->Prepare([this]() {
-        SetReportedMediaState(MediaState::PAUSED);
-        WhenPaused();
+        event_ = Event::All(stream_prepared_events).When([this]() {
+          // The enabled streams are prepared. Prepare the source.
+          factory_.reset();
+          source_->Prepare([this]() {
+            SetReportedMediaState(MediaState::PAUSED);
+            WhenPaused();
+          });
+        });
       });
-    });
-  });
 }
 
 MediaPlayerImpl::~MediaPlayerImpl() {
@@ -86,11 +81,9 @@ void MediaPlayerImpl::WhenPaused() {
   Event seek_requested = target_position_.BecomesOtherThan(kNotSeeking);
   Event play_requested = target_state_.Becomes(MediaState::PLAYING);
 
-  event_ = Event::First({ seek_requested, play_requested });
+  event_ = Event::First({seek_requested, play_requested});
 
-  seek_requested.When([this]() {
-    WhenPausedAndSeeking();
-  });
+  seek_requested.When([this]() { WhenPausedAndSeeking(); });
 
   play_requested.When([this]() {
     flushed_ = false;
@@ -110,7 +103,7 @@ void MediaPlayerImpl::WhenPlaying() {
   Event pause_requested = target_state_.Becomes(MediaState::PAUSED);
   Event sinks_ended = AllSinkStatesBecome(MediaState::ENDED);
 
-  event_ = Event::First({ seek_requested, pause_requested, sinks_ended });
+  event_ = Event::First({seek_requested, pause_requested, sinks_ended});
 
   seek_requested.When([this]() {
     event_ = ChangeSinkStates(MediaState::PAUSED).When([this]() {
@@ -183,9 +176,8 @@ void MediaPlayerImpl::SetReportedMediaState(MediaState media_state) {
   }
 }
 
-void MediaPlayerImpl::GetStatus(
-    uint64_t version_last_seen,
-    const GetStatusCallback& callback) {
+void MediaPlayerImpl::GetStatus(uint64_t version_last_seen,
+                                const GetStatusCallback& callback) {
   if (version_last_seen < status_version_) {
     RunStatusCallback(callback);
   } else {
@@ -206,95 +198,77 @@ void MediaPlayerImpl::Seek(int64_t position) {
   target_position_.SetWithConsequences(position);
 }
 
-Event MediaPlayerImpl::PrepareStream(
-    const std::unique_ptr<Stream>& stream,
-    const String& url) {
+Event MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
+                                     const String& url) {
   DCHECK(factory_);
 
   Event event = Event::Create();
 
-  source_->GetProducer(
-      stream->descriptor_->index,
-      GetProxy(&stream->encoded_producer_));
+  source_->GetProducer(stream->descriptor_->index,
+                       GetProxy(&stream->encoded_producer_));
 
   if (stream->descriptor_->media_type->scheme ==
       MediaTypeScheme::COMPRESSED_AUDIO) {
     // Compressed audio. Insert a decoder in front of the sink. The sink would
     // add its own internal decoder, but we want to test the decoder.
-    factory_->CreateDecoder(
-        stream->descriptor_->media_type.Clone(),
-        GetProxy(&stream->decoder_));
+    factory_->CreateDecoder(stream->descriptor_->media_type.Clone(),
+                            GetProxy(&stream->decoder_));
 
     MediaConsumerPtr decoder_consumer;
     stream->decoder_->GetConsumer(GetProxy(&decoder_consumer));
 
     Event connect_complete = Event::Create();
-    stream->encoded_producer_->Connect(
-        decoder_consumer.Pass(),
-        [&stream, connect_complete]() {
-          stream->encoded_producer_.reset();
-          connect_complete.Occur();
-        });
+    stream->encoded_producer_->Connect(decoder_consumer.Pass(),
+                                       [&stream, connect_complete]() {
+                                         stream->encoded_producer_.reset();
+                                         connect_complete.Occur();
+                                       });
 
     stream->decoder_->GetOutputType(
         [this, &stream, url, event](MediaTypePtr output_type) {
           stream->decoder_->GetProducer(GetProxy(&stream->decoded_producer_));
 
-          CreateSink(
-              stream,
-              output_type,
-              url,
-              event);
+          CreateSink(stream, output_type, url, event);
         });
 
-    return Event::All({ connect_complete, event });
+    return Event::All({connect_complete, event});
   } else {
     // Uncompressed audio. Connect the source stream directly to the sink. This
     // would work for compressed audio as well (the sink would decode), but we
     // want to test the decoder.
     DCHECK(stream->descriptor_->media_type->scheme == MediaTypeScheme::LPCM);
     stream->decoded_producer_ = stream->encoded_producer_.Pass();
-    CreateSink(
-        stream,
-        stream->descriptor_->media_type,
-        url,
-        event);
+    CreateSink(stream, stream->descriptor_->media_type, url, event);
     return event;
   }
 }
 
-void MediaPlayerImpl::CreateSink(
-    const std::unique_ptr<Stream>& stream,
-    const MediaTypePtr& input_media_type,
-    const String& url,
-    Event event) {
+void MediaPlayerImpl::CreateSink(const std::unique_ptr<Stream>& stream,
+                                 const MediaTypePtr& input_media_type,
+                                 const String& url,
+                                 Event event) {
   DCHECK(input_media_type);
   DCHECK(stream->decoded_producer_);
   DCHECK(factory_);
 
-  factory_->CreateSink(
-      url,
-      input_media_type.Clone(),
-      GetProxy(&stream->sink_));
+  factory_->CreateSink(url, input_media_type.Clone(), GetProxy(&stream->sink_));
 
   MediaConsumerPtr consumer;
   stream->sink_->GetConsumer(GetProxy(&consumer));
 
-  stream->decoded_producer_->Connect(
-      consumer.Pass(),
-      [this, event, &stream]() {
-        stream->decoded_producer_.reset();
+  stream->decoded_producer_->Connect(consumer.Pass(), [this, event, &stream]() {
+    stream->decoded_producer_.reset();
 
-        DCHECK(stream->state_ == MediaState::UNPREPARED);
-        DCHECK(reported_media_state_ == MediaState::UNPREPARED ||
-            reported_media_state_ == MediaState::FAULT);
+    DCHECK(stream->state_ == MediaState::UNPREPARED);
+    DCHECK(reported_media_state_ == MediaState::UNPREPARED ||
+           reported_media_state_ == MediaState::FAULT);
 
-        stream->state_.SetWithConsequences(MediaState::PAUSED);
+    stream->state_.SetWithConsequences(MediaState::PAUSED);
 
-        HandleSinkStatusUpdates(stream);
+    HandleSinkStatusUpdates(stream);
 
-        event.Occur();
-      });
+    event.Occur();
+  });
 }
 
 void MediaPlayerImpl::StatusUpdated() {
@@ -305,8 +279,8 @@ void MediaPlayerImpl::StatusUpdated() {
   }
 }
 
-void MediaPlayerImpl::RunStatusCallback(const GetStatusCallback& callback)
-    const {
+void MediaPlayerImpl::RunStatusCallback(
+    const GetStatusCallback& callback) const {
   MediaPlayerStatusPtr status = MediaPlayerStatus::New();
   status->state = reported_media_state_;
   status->timeline_transform = transform_.Clone();
@@ -314,19 +288,17 @@ void MediaPlayerImpl::RunStatusCallback(const GetStatusCallback& callback)
   callback.Run(status_version_, status.Pass());
 }
 
-void MediaPlayerImpl::HandleSourceStatusUpdates(
-    uint64_t version,
-    MediaSourceStatusPtr status) {
+void MediaPlayerImpl::HandleSourceStatusUpdates(uint64_t version,
+                                                MediaSourceStatusPtr status) {
   if (status) {
     metadata_ = status->metadata.Pass();
     StatusUpdated();
   }
 
-  source_->GetStatus(
-      version,
-      [this](uint64_t version, MediaSourceStatusPtr status) {
-        HandleSourceStatusUpdates(version, status.Pass());
-      });
+  source_->GetStatus(version,
+                     [this](uint64_t version, MediaSourceStatusPtr status) {
+                       HandleSourceStatusUpdates(version, status.Pass());
+                     });
 }
 
 void MediaPlayerImpl::HandleSinkStatusUpdates(
@@ -342,8 +314,7 @@ void MediaPlayerImpl::HandleSinkStatusUpdates(
   }
 
   stream->sink_->GetStatus(
-      version,
-      [this, &stream](uint64_t version, MediaSinkStatusPtr status) {
+      version, [this, &stream](uint64_t version, MediaSinkStatusPtr status) {
         HandleSinkStatusUpdates(stream, version, status.Pass());
       });
 }
@@ -354,5 +325,5 @@ MediaPlayerImpl::Stream::Stream() {
 
 MediaPlayerImpl::Stream::~Stream() {}
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -42,4 +42,4 @@ class FileReader : public Reader {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_PARTS_FILE_READER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_PARTS_FILE_READER_H_

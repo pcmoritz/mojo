@@ -8,8 +8,7 @@
 namespace mojo {
 namespace media {
 
-StreamType::Scheme Convert(
-    MediaTypeScheme media_type_scheme) {
+StreamType::Scheme Convert(MediaTypeScheme media_type_scheme) {
   switch (media_type_scheme) {
     case MediaTypeScheme::UNKNOWN:
       return StreamType::Scheme::kUnknown;
@@ -59,8 +58,7 @@ LpcmStreamType::SampleFormat Convert(LpcmSampleFormat lpcm_sample_format) {
   return LpcmStreamType::SampleFormat::kUnknown;
 }
 
-CompressedAudioStreamType::AudioEncoding Convert(
-    AudioEncoding audio_encoding) {
+CompressedAudioStreamType::AudioEncoding Convert(AudioEncoding audio_encoding) {
   switch (audio_encoding) {
     case AudioEncoding::UNKNOWN:
       return CompressedAudioStreamType::AudioEncoding::kUnknown;
@@ -193,8 +191,8 @@ std::unique_ptr<StreamType> Convert(const MediaTypePtr& media_type) {
           Convert(media_type->details->get_compressed_audio()->sample_format),
           media_type->details->get_compressed_audio()->channels,
           media_type->details->get_compressed_audio()->frames_per_second,
-          Convert(media_type->details->get_compressed_audio()->
-              extra_data_base64));
+          Convert(
+              media_type->details->get_compressed_audio()->extra_data_base64));
     case MediaTypeScheme::VIDEO:
       return VideoStreamType::Create(
           Convert(media_type->details->get_video()->encoding),
@@ -235,39 +233,35 @@ std::unique_ptr<StreamTypeSet> Convert(const MediaTypeSetPtr& media_type_set) {
   switch (media_type_set->scheme) {
     case MediaTypeScheme::MULTIPLEXED:
       return MultiplexedStreamTypeSet::Create(
-          Convert(media_type_set->details->get_multiplexed()->
-              multiplex_type_set),
-          Convert(media_type_set->details->get_multiplexed()->
-              substream_type_sets));
+          Convert(
+              media_type_set->details->get_multiplexed()->multiplex_type_set),
+          Convert(
+              media_type_set->details->get_multiplexed()->substream_type_sets));
     case MediaTypeScheme::LPCM:
       return LpcmStreamTypeSet::Create(
           Convert(media_type_set->details->get_lpcm()->sample_format),
-          Range<uint32_t>(
-              media_type_set->details->get_lpcm()->min_channels,
-              media_type_set->details->get_lpcm()->max_channels),
+          Range<uint32_t>(media_type_set->details->get_lpcm()->min_channels,
+                          media_type_set->details->get_lpcm()->max_channels),
           Range<uint32_t>(
               media_type_set->details->get_lpcm()->min_frames_per_second,
               media_type_set->details->get_lpcm()->max_frames_per_second));
     case MediaTypeScheme::COMPRESSED_AUDIO:
       return CompressedAudioStreamTypeSet::Create(
           Convert(media_type_set->details->get_compressed_audio()->encoding),
-          Convert(media_type_set->details->get_compressed_audio()->
-              sample_format),
-          Range<uint32_t>(
-              media_type_set->details->get_lpcm()->min_channels,
-              media_type_set->details->get_lpcm()->max_channels),
+          Convert(
+              media_type_set->details->get_compressed_audio()->sample_format),
+          Range<uint32_t>(media_type_set->details->get_lpcm()->min_channels,
+                          media_type_set->details->get_lpcm()->max_channels),
           Range<uint32_t>(
               media_type_set->details->get_lpcm()->min_frames_per_second,
               media_type_set->details->get_lpcm()->max_frames_per_second));
     case MediaTypeScheme::VIDEO:
       return VideoStreamTypeSet::Create(
           Convert(media_type_set->details->get_video()->encoding),
-          Range<uint32_t>(
-              media_type_set->details->get_video()->min_width,
-              media_type_set->details->get_video()->max_width),
-          Range<uint32_t>(
-              media_type_set->details->get_video()->min_height,
-              media_type_set->details->get_video()->max_height));
+          Range<uint32_t>(media_type_set->details->get_video()->min_width,
+                          media_type_set->details->get_video()->max_width),
+          Range<uint32_t>(media_type_set->details->get_video()->min_height,
+                          media_type_set->details->get_video()->max_height));
     default:
       return StreamTypeSet::Create(Convert(media_type_set->scheme));
   }
@@ -298,10 +292,8 @@ std::unique_ptr<Bytes> Convert(const String& base64) {
   size_t byte_count = modp_b64_decode_len(base64_size);
   std::unique_ptr<Bytes> bytes = Bytes::Create(byte_count);
 
-  byte_count = modp_b64_decode(
-      reinterpret_cast<char*>(bytes->data()),
-      base64.data(),
-      base64_size);
+  byte_count = modp_b64_decode(reinterpret_cast<char*>(bytes->data()),
+                               base64.data(), base64_size);
 
   if (byte_count == MODP_B64_ERROR) {
     return nullptr;
@@ -315,14 +307,10 @@ std::unique_ptr<Metadata> Convert(const MediaMetadataPtr& media_metadata) {
     return nullptr;
   }
 
-  return Metadata::Create(
-      media_metadata->duration,
-      media_metadata->title,
-      media_metadata->artist,
-      media_metadata->album,
-      media_metadata->publisher,
-      media_metadata->genre,
-      media_metadata->composer);
+  return Metadata::Create(media_metadata->duration, media_metadata->title,
+                          media_metadata->artist, media_metadata->album,
+                          media_metadata->publisher, media_metadata->genre,
+                          media_metadata->composer);
 }
 
 // Creates a MediaTypeScheme from a StreamType::Scheme.
@@ -523,8 +511,7 @@ MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type) {
       return media_type;
     }
     case StreamType::Scheme::kLpcm: {
-      LpcmMediaTypeDetailsPtr lpcm_details =
-          LpcmMediaTypeDetails::New();
+      LpcmMediaTypeDetailsPtr lpcm_details = LpcmMediaTypeDetails::New();
       lpcm_details->sample_format =
           Convert(stream_type->lpcm()->sample_format());
       lpcm_details->channels = stream_type->lpcm()->channels();
@@ -558,8 +545,7 @@ MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type) {
       return media_type;
     }
     case StreamType::Scheme::kVideo: {
-      VideoMediaTypeDetailsPtr video_details =
-          VideoMediaTypeDetails::New();
+      VideoMediaTypeDetailsPtr video_details = VideoMediaTypeDetails::New();
       video_details->encoding = Convert(stream_type->video()->encoding());
       video_details->profile = Convert(stream_type->video()->profile());
       video_details->pixel_format =
@@ -623,8 +609,7 @@ MediaTypeSetPtr Convert(const std::unique_ptr<StreamTypeSet>& stream_type_set) {
       return media_type_set;
     }
     case StreamType::Scheme::kLpcm: {
-      LpcmMediaTypeSetDetailsPtr lpcm_details =
-          LpcmMediaTypeSetDetails::New();
+      LpcmMediaTypeSetDetailsPtr lpcm_details = LpcmMediaTypeSetDetails::New();
       lpcm_details->sample_format =
           Convert(stream_type_set->lpcm()->sample_format());
       lpcm_details->min_channels = stream_type_set->lpcm()->channels().min;
@@ -697,7 +682,7 @@ Array<MediaTypeSetPtr> Convert(
   Array<MediaTypeSetPtr> result =
       Array<MediaTypeSetPtr>::New(stream_type_sets->size());
   for (const std::unique_ptr<StreamTypeSet>& stream_type_set :
-      *stream_type_sets) {
+       *stream_type_sets) {
     result.push_back(Convert(stream_type_set));
   }
   return result;
@@ -714,9 +699,7 @@ String Convert(const std::unique_ptr<Bytes>& bytes) {
 
   // modp_b64_encode_len() returns at least 1, so temp[0] is safe to use.
   size_t output_size = modp_b64_encode(
-      &(temp[0]),
-      reinterpret_cast<char*>(bytes->data()),
-      bytes->size());
+      &(temp[0]), reinterpret_cast<char*>(bytes->data()), bytes->size());
 
   temp.resize(output_size);  // Strips off null byte.
 

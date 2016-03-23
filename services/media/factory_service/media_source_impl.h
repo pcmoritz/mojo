@@ -22,9 +22,8 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that produces streams from an origin specified by URL.
-class MediaSourceImpl
-  : public MediaFactoryService::Product,
-    public MediaSource {
+class MediaSourceImpl : public MediaFactoryService::Product,
+                        public MediaSource {
  public:
   static std::shared_ptr<MediaSourceImpl> Create(
       const String& origin_url,
@@ -37,23 +36,22 @@ class MediaSourceImpl
   // MediaSource implementation.
   void GetStreams(const GetStreamsCallback& callback) override;
 
-  void GetClockDisposition(const GetClockDispositionCallback& callback)
-      override;
+  void GetClockDisposition(
+      const GetClockDispositionCallback& callback) override;
 
   void GetMasterClock(InterfaceRequest<Clock> master_clock) override;
 
   void SetMasterClock(InterfaceHandle<Clock> master_clock) override;
 
-  void GetProducer(
-      uint32_t stream_index,
-      InterfaceRequest<MediaProducer> producer) override;
+  void GetProducer(uint32_t stream_index,
+                   InterfaceRequest<MediaProducer> producer) override;
 
   void GetPullModeProducer(
       uint32_t stream_index,
       InterfaceRequest<MediaPullModeProducer> producer) override;
 
-  void GetStatus(uint64_t version_last_seen, const GetStatusCallback& callback)
-      override;
+  void GetStatus(uint64_t version_last_seen,
+                 const GetStatusCallback& callback) override;
 
   void Prepare(const PrepareCallback& callback) override;
 
@@ -64,20 +62,18 @@ class MediaSourceImpl
   void Seek(int64_t position, const SeekCallback& callback) override;
 
  private:
-  MediaSourceImpl(
-      const String& origin_url,
-      const Array<MediaTypeSetPtr>& allowed_media_types,
-      InterfaceRequest<MediaSource> request,
-      MediaFactoryService* owner);
+  MediaSourceImpl(const String& origin_url,
+                  const Array<MediaTypeSetPtr>& allowed_media_types,
+                  InterfaceRequest<MediaSource> request,
+                  MediaFactoryService* owner);
 
   class Stream {
    public:
-    Stream(
-        OutputRef output,
-        std::unique_ptr<StreamType> stream_type,
-        const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-            allowed_stream_types,
-        Graph* graph);
+    Stream(OutputRef output,
+           std::unique_ptr<StreamType> stream_type,
+           const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
+               allowed_stream_types,
+           Graph* graph);
 
     ~Stream();
 
@@ -91,8 +87,7 @@ class MediaSourceImpl
     void GetProducer(InterfaceRequest<MediaProducer> producer);
 
     // Gets the pull mode producer.
-    void GetPullModeProducer(
-        InterfaceRequest<MediaPullModeProducer> producer);
+    void GetPullModeProducer(InterfaceRequest<MediaPullModeProducer> producer);
 
     // Makes sure the stream has a sink.
     void EnsureSink();

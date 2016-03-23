@@ -46,4 +46,4 @@ class ActiveMultistreamSink : public Part {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_ACTIVE_MULTISTREAM_SINK_H_
+#endif  // MOJO_MEDIA_MODELS_ACTIVE_MULTISTREAM_SINK_H_

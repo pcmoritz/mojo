@@ -23,4 +23,4 @@ class LpcmReformatter : public Transform {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_PARTS_LPCM_REFORMATTER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_PARTS_LPCM_REFORMATTER_H_

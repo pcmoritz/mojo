@@ -34,14 +34,15 @@ class MediaTestApp : public mojo::ApplicationDelegate {
 
     if (input_file_names_.empty()) {
       std::cout << "Please provide the names of the files you want to play;"
-          << " for example:" << std::endl;
+                << " for example:" << std::endl;
       std::cout << "mojo/devtools/common/mojo_run \\" << std::endl;
       std::cout << "    \"https://core.mojoapps.io/media_test.mojo \\"
-          << std::endl;
+                << std::endl;
       std::cout << "    file:///usr/local/google/home/you/superstition.ogg \\"
-          << std::endl;
+                << std::endl;
       std::cout << "    file:///usr/local/google/home/you/higherground.ogg\""
-          << std::endl << std::endl;
+                << std::endl
+                << std::endl;
       base::MessageLoop::current()->Quit();
       return;
     }
@@ -75,9 +76,9 @@ class MediaTestApp : public mojo::ApplicationDelegate {
   }
 
  private:
-  static const char *kHome;
-  static const char *kClearLine;
-  static const char *kUp;
+  static const char* kHome;
+  static const char* kClearLine;
+  static const char* kUp;
   static constexpr double ns_per_second = 1000000000.0;
 
   // Processes arguments.
@@ -103,9 +104,8 @@ class MediaTestApp : public mojo::ApplicationDelegate {
     media_test_ = MediaTest::Create(app_, *input_file_names_iter_);
 
     metadata_shown_ = false;
-    media_test_->RegisterUpdateCallback([this]() {
-      HandleMediaTestUpdateCallback();
-    });
+    media_test_->RegisterUpdateCallback(
+        [this]() { HandleMediaTestUpdateCallback(); });
 
     media_test_->Play();
   }
@@ -128,35 +128,36 @@ class MediaTestApp : public mojo::ApplicationDelegate {
     if (paint_) {
       // Move the cursor up the terminal so we paint over the old metadata
       // (7 lines) a blank line and the state line (total of 9 lines).
-      std::cout << kHome
-          << kUp << kUp << kUp << kUp << kUp << kUp << kUp << kUp << kUp;
+      std::cout << kHome << kUp << kUp << kUp << kUp << kUp << kUp << kUp << kUp
+                << kUp;
     }
 
     if (!paint_ && metadata_shown_) {
       // Do nothing.
     } else if (metadata) {
       metadata_shown_ = true;
-      std::cout << "    duration   " << std::setprecision(1) <<
-          double(metadata->duration) / ns_per_second << " seconds"
-          << clear_line() << std::endl;
-      std::cout << "    title      " <<
-          (metadata->title ? metadata->title : "<none>")
-          << clear_line() << std::endl;
-      std::cout << "    artist     " <<
-          (metadata->artist ? metadata->artist :  "<none>")
-          << clear_line() << std::endl;
-      std::cout << "    album      " <<
-          (metadata->album ? metadata->album : "<none>")
-          << clear_line() << std::endl;
-      std::cout << "    publisher  " <<
-          (metadata->publisher ? metadata->publisher : "<none>")
-          << clear_line() << std::endl;
-      std::cout << "    genre      " <<
-          (metadata->genre ? metadata->genre : "<none>")
-          << clear_line() << std::endl;
-      std::cout << "    composer   " <<
-          (metadata->composer ? metadata->composer : "<none>")
-          << clear_line() << std::endl << std::endl;
+      std::cout << "    duration   " << std::setprecision(1)
+                << double(metadata->duration) / ns_per_second << " seconds"
+                << clear_line() << std::endl;
+      std::cout << "    title      "
+                << (metadata->title ? metadata->title : "<none>")
+                << clear_line() << std::endl;
+      std::cout << "    artist     "
+                << (metadata->artist ? metadata->artist : "<none>")
+                << clear_line() << std::endl;
+      std::cout << "    album      "
+                << (metadata->album ? metadata->album : "<none>")
+                << clear_line() << std::endl;
+      std::cout << "    publisher  "
+                << (metadata->publisher ? metadata->publisher : "<none>")
+                << clear_line() << std::endl;
+      std::cout << "    genre      "
+                << (metadata->genre ? metadata->genre : "<none>")
+                << clear_line() << std::endl;
+      std::cout << "    composer   "
+                << (metadata->composer ? metadata->composer : "<none>")
+                << clear_line() << std::endl
+                << std::endl;
     } else {
       std::cout << "    duration   <none>" << kClearLine << std::endl;
       std::cout << "    title      <none>" << kClearLine << std::endl;
@@ -198,7 +199,7 @@ class MediaTestApp : public mojo::ApplicationDelegate {
         quit_ = true;
         if (paint_) {
           std::cout << kHome << kUp << "    quitting" << kClearLine << std::endl
-              << kClearLine << std::endl;
+                    << kClearLine << std::endl;
         } else {
           std::cout << "    quitting" << std::endl;
         }
@@ -230,8 +231,8 @@ class MediaTestApp : public mojo::ApplicationDelegate {
         media_test_->Seek(position_ns);
         if (!paint_) {
           std::cout << "    seeking to " << std::fixed << std::setprecision(1)
-              << double(position_ns) / ns_per_second
-              << " seconds  " << std::endl;
+                    << double(position_ns) / ns_per_second << " seconds  "
+                    << std::endl;
         }
         break;
       }
@@ -283,13 +284,12 @@ class MediaTestApp : public mojo::ApplicationDelegate {
 
     if (paint_) {
       std::cout << kHome << "    " << std::fixed << std::setprecision(1)
-          << double(media_test_->position_ns()) / ns_per_second
-          << " seconds  " << kClearLine << std::flush;
+                << double(media_test_->position_ns()) / ns_per_second
+                << " seconds  " << kClearLine << std::flush;
     }
 
     base::MessageLoop::current()->PostDelayedTask(
-        FROM_HERE,
-        base::Bind(&MediaTestApp::Poll, base::Unretained(this)),
+        FROM_HERE, base::Bind(&MediaTestApp::Poll, base::Unretained(this)),
         base::TimeDelta::FromMilliseconds(100));
   }
 
@@ -301,9 +301,7 @@ class MediaTestApp : public mojo::ApplicationDelegate {
     }
   }
 
-  const char* clear_line() const {
-    return paint_ ? kClearLine : "";
-  }
+  const char* clear_line() const { return paint_ ? kClearLine : ""; }
 
   mojo::ApplicationImpl* app_;
   std::unique_ptr<MediaTest> media_test_;
@@ -326,7 +324,7 @@ const char* MediaTestApp::kUp = "\033[A";
 }  // namespace mojo
 
 MojoResult MojoMain(MojoHandle application_request) {
-  mojo::ApplicationRunnerChromium
-      runner(new mojo::media::examples::MediaTestApp);
+  mojo::ApplicationRunnerChromium runner(
+      new mojo::media::examples::MediaTestApp);
   return runner.Run(application_request);
 }

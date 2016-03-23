@@ -7,8 +7,8 @@
 namespace mojo {
 namespace media {
 
-ActiveSinkStage::ActiveSinkStage(std::shared_ptr<ActiveSink> sink) :
-    sink_(sink) {
+ActiveSinkStage::ActiveSinkStage(std::shared_ptr<ActiveSink> sink)
+    : sink_(sink) {
   DCHECK(sink_);
 
   demand_function_ = [this](Demand demand) {
@@ -46,10 +46,9 @@ PayloadAllocator* ActiveSinkStage::PrepareInput(size_t index) {
   return sink_->allocator();
 }
 
-void ActiveSinkStage::PrepareOutput(
-    size_t index,
-    PayloadAllocator* allocator,
-    const UpstreamCallback& callback) {
+void ActiveSinkStage::PrepareOutput(size_t index,
+                                    PayloadAllocator* allocator,
+                                    const UpstreamCallback& callback) {
   CHECK(false) << "PrepareOutput called on sink";
 }
 
@@ -65,9 +64,8 @@ void ActiveSinkStage::Update(Engine* engine) {
   input_.SetDemand(sink_demand_, engine);
 }
 
-void ActiveSinkStage::FlushInput(
-    size_t index,
-    const DownstreamCallback& callback) {
+void ActiveSinkStage::FlushInput(size_t index,
+                                 const DownstreamCallback& callback) {
   DCHECK(sink_);
   input_.Flush();
   sink_->Flush();

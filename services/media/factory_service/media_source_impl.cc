@@ -21,10 +21,7 @@ std::shared_ptr<MediaSourceImpl> MediaSourceImpl::Create(
     InterfaceRequest<MediaSource> request,
     MediaFactoryService* owner) {
   return std::shared_ptr<MediaSourceImpl>(new MediaSourceImpl(
-      origin_url,
-      allowed_media_types,
-      request.Pass(),
-      owner));
+      origin_url, allowed_media_types, request.Pass(), owner));
 }
 
 MediaSourceImpl::MediaSourceImpl(
@@ -32,14 +29,11 @@ MediaSourceImpl::MediaSourceImpl(
     const Array<MediaTypeSetPtr>& allowed_media_types,
     InterfaceRequest<MediaSource> request,
     MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()) {
+    : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
   DCHECK(origin_url);
 
   // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() {
-    ReleaseFromOwner();
-  });
+  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   GURL gurl = GURL(origin_url);
 
@@ -64,10 +58,8 @@ MediaSourceImpl::MediaSourceImpl(
   auto demux_streams = demux_->streams();
   for (auto demux_stream : demux_streams) {
     streams_.push_back(std::unique_ptr<Stream>(new Stream(
-        demux_part_.output(demux_stream->index()),
-        demux_stream->stream_type(),
-        Convert(allowed_media_types),
-        &graph_)));
+        demux_part_.output(demux_stream->index()), demux_stream->stream_type(),
+        Convert(allowed_media_types), &graph_)));
   }
 }
 
@@ -100,9 +92,8 @@ void MediaSourceImpl::SetMasterClock(InterfaceHandle<Clock> master_clock) {
   // TODO(dalesat): Is this needed?
 }
 
-void MediaSourceImpl::GetProducer(
-    uint32_t stream_index,
-    InterfaceRequest<MediaProducer> producer) {
+void MediaSourceImpl::GetProducer(uint32_t stream_index,
+                                  InterfaceRequest<MediaProducer> producer) {
   if (stream_index >= streams_.size()) {
     return;
   }
@@ -120,9 +111,8 @@ void MediaSourceImpl::GetPullModeProducer(
   streams_[stream_index]->GetPullModeProducer(producer.Pass());
 }
 
-void MediaSourceImpl::GetStatus(
-    uint64_t version_last_seen,
-    const GetStatusCallback& callback) {
+void MediaSourceImpl::GetStatus(uint64_t version_last_seen,
+                                const GetStatusCallback& callback) {
   if (version_last_seen < status_version_) {
     RunStatusCallback(callback);
   } else {
@@ -152,9 +142,7 @@ void MediaSourceImpl::Prime(const PrimeCallback& callback) {
   Event all_streams_primed = Event::All(stream_primed_events);
 
   // Capture all_streams_primed so it doesn't get deleted before it occurs.
-  all_streams_primed.When([callback, all_streams_primed]() {
-    callback.Run();
-  });
+  all_streams_primed.When([callback, all_streams_primed]() { callback.Run(); });
 }
 
 void MediaSourceImpl::Flush(const FlushCallback& callback) {
@@ -171,9 +159,8 @@ void MediaSourceImpl::Flush(const FlushCallback& callback) {
   Event all_streams_flushed = Event::All(stream_flushed_events);
 
   // Capture all_streams_flushed so it doesn't get deleted before it occurs.
-  all_streams_flushed.When([callback, all_streams_flushed]() {
-    callback.Run();
-  });
+  all_streams_flushed.When(
+      [callback, all_streams_flushed]() { callback.Run(); });
 }
 
 void MediaSourceImpl::Seek(int64_t position, const FlushCallback& callback) {
@@ -189,8 +176,8 @@ void MediaSourceImpl::StatusUpdated() {
   }
 }
 
-void MediaSourceImpl::RunStatusCallback(const GetStatusCallback& callback)
-    const {
+void MediaSourceImpl::RunStatusCallback(
+    const GetStatusCallback& callback) const {
   MediaSourceStatusPtr status = MediaSourceStatus::New();
   status->state = state_;
   status->metadata = demux_ ? Convert(demux_->metadata()) : nullptr;
@@ -202,9 +189,8 @@ MediaSourceImpl::Stream::Stream(
     std::unique_ptr<StreamType> stream_type,
     const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
         allowed_stream_types,
-    Graph* graph) :
-    original_stream_type_(std::move(stream_type)),
-    graph_(graph) {
+    Graph* graph)
+    : original_stream_type_(std::move(stream_type)), graph_(graph) {
   DCHECK(original_stream_type_);
   DCHECK(graph);
 
@@ -213,12 +199,9 @@ MediaSourceImpl::Stream::Stream(
   if (allowed_stream_types == nullptr) {
     // No conversion requested.
     stream_type_ = SafeClone(original_stream_type_);
-  } else if (!BuildConversionPipeline(
-      *original_stream_type_,
-      *allowed_stream_types,
-      graph,
-      &output_,
-      &stream_type_)) {
+  } else if (!BuildConversionPipeline(*original_stream_type_,
+                                      *allowed_stream_types, graph, &output_,
+                                      &stream_type_)) {
     // Can't convert to any allowed type.
     stream_type_ = StreamType::Create(StreamType::Scheme::kNone);
   }
@@ -265,7 +248,7 @@ void MediaSourceImpl::Stream::GetPullModeProducer(
 }
 
 void MediaSourceImpl::Stream::EnsureSink() {
-  if (producer_ == nullptr  && pull_mode_producer_ == nullptr) {
+  if (producer_ == nullptr && pull_mode_producer_ == nullptr) {
     null_sink_ = NullSink::Create();
     graph_->ConnectOutputToPart(output_, graph_->Add(null_sink_));
   }
@@ -285,5 +268,5 @@ void MediaSourceImpl::Stream::FlushConnection(
   }
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -29,34 +29,29 @@ class FfmpegDecoderBase : public Decoder {
   // Transform implementation.
   void Flush() override;
 
-  bool TransformPacket(
-      const PacketPtr& input,
-      bool new_input,
-      PayloadAllocator* allocator,
-      PacketPtr* output) override;
+  bool TransformPacket(const PacketPtr& input,
+                       bool new_input,
+                       PayloadAllocator* allocator,
+                       PacketPtr* output) override;
 
  protected:
   // Decodes from av_packet into av_frame_ptr. The result indicates how many
   // bytes were consumed from av_packet_. *frame_decoded_out indicates whether
   // av_frame_ptr contains a complete frame.
-  virtual int Decode(
-      const AVPacket& av_packet,
-      const ffmpeg::AvFramePtr& av_frame_ptr,
-      PayloadAllocator* allocator,
-      bool* frame_decoded_out) = 0;
+  virtual int Decode(const AVPacket& av_packet,
+                     const ffmpeg::AvFramePtr& av_frame_ptr,
+                     PayloadAllocator* allocator,
+                     bool* frame_decoded_out) = 0;
 
   // Creates a Packet from av_frame.
-  virtual PacketPtr CreateOutputPacket(
-      const AVFrame& av_frame,
-      PayloadAllocator* allocator) = 0;
+  virtual PacketPtr CreateOutputPacket(const AVFrame& av_frame,
+                                       PayloadAllocator* allocator) = 0;
 
   // Creates an end-of-stream packet with no payload.
   virtual PacketPtr CreateOutputEndOfStreamPacket() = 0;
 
   // The ffmpeg codec context.
-  const AvCodecContextPtr& context() {
-    return av_codec_context_;
-  }
+  const AvCodecContextPtr& context() { return av_codec_context_; }
 
  private:
   // Prepares to process a new input packet.
@@ -75,4 +70,4 @@ class FfmpegDecoderBase : public Decoder {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_BASE_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_BASE_H_

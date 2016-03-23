@@ -46,7 +46,7 @@ class MappedSharedBuffer {
   void* PtrFromOffset(uint64_t offset) const;
 
   // Translates a pointer into an offset.
-  uint64_t OffsetFromPtr(void *payload_ptr) const;
+  uint64_t OffsetFromPtr(void* payload_ptr) const;
 
  protected:
   void InitInternal(const ScopedSharedBufferHandle& handle);
@@ -57,9 +57,7 @@ class MappedSharedBuffer {
 
  private:
   struct MappedBufferDeleter {
-    inline void operator()(uint8_t* ptr) const {
-      UnmapBuffer(ptr);
-    }
+    inline void operator()(uint8_t* ptr) const { UnmapBuffer(ptr); }
   };
 
   // Size of the shared buffer.

@@ -18,12 +18,11 @@ namespace media {
 class FfmpegDecoder : public Decoder {
  public:
   // Creates an ffmpeg-based Decoder object for a given media type.
-  static Result Create(
-      const StreamType& stream_type,
-      std::shared_ptr<Decoder>* decoder_out);
+  static Result Create(const StreamType& stream_type,
+                       std::shared_ptr<Decoder>* decoder_out);
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_DECODER_H_

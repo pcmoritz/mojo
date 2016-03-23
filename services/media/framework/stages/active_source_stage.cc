@@ -7,9 +7,8 @@
 namespace mojo {
 namespace media {
 
-ActiveSourceStage::ActiveSourceStage(std::shared_ptr<ActiveSource> source) :
-    source_(source),
-    prepared_(false) {
+ActiveSourceStage::ActiveSourceStage(std::shared_ptr<ActiveSource> source)
+    : source_(source), prepared_(false) {
   DCHECK(source_);
 
   supply_function_ = [this](PacketPtr packet) {
@@ -48,19 +47,18 @@ PayloadAllocator* ActiveSourceStage::PrepareInput(size_t index) {
   return nullptr;
 }
 
-void ActiveSourceStage::PrepareOutput(
-    size_t index,
-    PayloadAllocator* allocator,
-    const UpstreamCallback& callback) {
+void ActiveSourceStage::PrepareOutput(size_t index,
+                                      PayloadAllocator* allocator,
+                                      const UpstreamCallback& callback) {
   DCHECK_EQ(index, 0u);
   DCHECK(source_);
 
   if (source_->can_accept_allocator()) {
     // Give the source the provided allocator or the default if non was
     // provided.
-    source_->set_allocator(
-        allocator == nullptr ? PayloadAllocator::GetDefault() : allocator);
-  } else if (allocator){
+    source_->set_allocator(allocator == nullptr ? PayloadAllocator::GetDefault()
+                                                : allocator);
+  } else if (allocator) {
     // The source can't use the provided allocator, so the output must copy
     // packets.
     output_.SetCopyAllocator(allocator);
@@ -69,9 +67,8 @@ void ActiveSourceStage::PrepareOutput(
   prepared_ = true;
 }
 
-void ActiveSourceStage::UnprepareOutput(
-    size_t index,
-    const UpstreamCallback& callback) {
+void ActiveSourceStage::UnprepareOutput(size_t index,
+                                        const UpstreamCallback& callback) {
   DCHECK_EQ(index, 0u);
   DCHECK(source_);
 
@@ -92,9 +89,8 @@ void ActiveSourceStage::Update(Engine* engine) {
   }
 }
 
-void ActiveSourceStage::FlushInput(
-    size_t index,
-    const DownstreamCallback& callback) {
+void ActiveSourceStage::FlushInput(size_t index,
+                                   const DownstreamCallback& callback) {
   CHECK(false) << "FlushInput called on source";
 }
 

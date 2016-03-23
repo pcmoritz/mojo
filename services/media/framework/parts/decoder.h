@@ -18,9 +18,8 @@ namespace media {
 class Decoder : public Transform {
  public:
   // Creates a Decoder object for a given stream type.
-  static Result Create(
-      const StreamType& stream_type,
-      std::shared_ptr<Decoder>* decoder_out);
+  static Result Create(const StreamType& stream_type,
+                       std::shared_ptr<Decoder>* decoder_out);
 
   ~Decoder() override {}
 
@@ -31,4 +30,4 @@ class Decoder : public Transform {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_PARTS_DECODER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_PARTS_DECODER_H_

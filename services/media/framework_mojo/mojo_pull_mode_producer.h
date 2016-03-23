@@ -18,9 +18,7 @@ namespace mojo {
 namespace media {
 
 // Implements MediaPullModeProducer to forward a stream across mojo.
-class MojoPullModeProducer :
-    public MediaPullModeProducer,
-    public ActiveSink {
+class MojoPullModeProducer : public MediaPullModeProducer, public ActiveSink {
  public:
   static std::shared_ptr<MojoPullModeProducer> Create() {
     return std::shared_ptr<MojoPullModeProducer>(new MojoPullModeProducer());
@@ -34,9 +32,8 @@ class MojoPullModeProducer :
   // MediaPullModeProducer implementation.
   void GetBuffer(const GetBufferCallback& callback) override;
 
-  void PullPacket(
-      MediaPacketPtr to_release,
-      const PullPacketCallback& callback) override;
+  void PullPacket(MediaPacketPtr to_release,
+                  const PullPacketCallback& callback) override;
 
   void ReleasePacket(MediaPacketPtr to_release) override;
 
@@ -60,9 +57,8 @@ class MojoPullModeProducer :
 
   // Runs the callback with a new MediaPacket created from the given Packet.
   // MUST BE CALLED WITH lock_ TAKEN.
-  void HandlePullWithPacketUnsafe(
-      const PullPacketCallback& callback,
-      PacketPtr packet);
+  void HandlePullWithPacketUnsafe(const PullPacketCallback& callback,
+                                  PacketPtr packet);
 
   // Creates a MediaPacket from a Packet.
   MediaPacketPtr CreateMediaPacket(const PacketPtr& packet);

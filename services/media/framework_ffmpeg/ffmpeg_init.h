@@ -13,4 +13,4 @@ void InitFfmpeg();
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_INIT_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_INIT_H_

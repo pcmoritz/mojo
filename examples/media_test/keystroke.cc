@@ -19,10 +19,10 @@ namespace {
 bool eat_newline = false;
 bool upped_already = false;
 
-} // namespace
+}  // namespace
 
 char Keystroke(void) {
-  const char *kUp = "\033[A";
+  const char* kUp = "\033[A";
 
   fcntl(STDIN_FILENO, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
   char buf[1];

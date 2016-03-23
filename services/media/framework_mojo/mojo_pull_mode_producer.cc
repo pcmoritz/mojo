@@ -8,11 +8,11 @@
 namespace mojo {
 namespace media {
 
-MojoPullModeProducer::MojoPullModeProducer() :
-    state_(MediaState::UNPREPARED),
-    demand_(Demand::kNegative),
-    pts_(0),
-    cached_packet_(nullptr) {}
+MojoPullModeProducer::MojoPullModeProducer()
+    : state_(MediaState::UNPREPARED),
+      demand_(Demand::kNegative),
+      pts_(0),
+      cached_packet_(nullptr) {}
 
 MojoPullModeProducer::~MojoPullModeProducer() {
   base::AutoLock lock(lock_);
@@ -25,7 +25,7 @@ void MojoPullModeProducer::AddBinding(
 
 void MojoPullModeProducer::GetBuffer(const GetBufferCallback& callback) {
   if (!mojo_allocator_.initialized()) {
-    mojo_allocator_.InitNew(256 * 1024); // TODO(dalesat): Made up!
+    mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
   }
 
   {
@@ -42,9 +42,8 @@ void MojoPullModeProducer::GetBuffer(const GetBufferCallback& callback) {
   demand_callback_(Demand::kPositive);
 }
 
-void MojoPullModeProducer::PullPacket(
-    MediaPacketPtr to_release,
-    const PullPacketCallback& callback) {
+void MojoPullModeProducer::PullPacket(MediaPacketPtr to_release,
+                                      const PullPacketCallback& callback) {
   if (to_release) {
     // The client has piggy-backed a release on this pull request.
     ReleasePacket(to_release.Pass());
@@ -78,8 +77,8 @@ void MojoPullModeProducer::ReleasePacket(MediaPacketPtr to_release) {
   {
     base::AutoLock lock(lock_);
     uint64_t size = to_release->payload ? to_release->payload->length : 0;
-    void* payload = size == 0 ? nullptr :
-        mojo_allocator_.PtrFromOffset(to_release->payload->offset);
+    void* payload = size == 0 ? nullptr : mojo_allocator_.PtrFromOffset(
+                                              to_release->payload->offset);
 
     for (auto iterator = unreleased_packets_.begin(); true; ++iterator) {
       if (iterator == unreleased_packets_.end()) {
@@ -155,9 +154,7 @@ bool MojoPullModeProducer::MaybeHandlePullUnsafe(
 
   if (state_ == MediaState::ENDED) {
     // At end-of-stream. Respond with empty end-of-stream packet.
-    HandlePullWithPacketUnsafe(
-        callback,
-        Packet::CreateEndOfStream(pts_));
+    HandlePullWithPacketUnsafe(callback, Packet::CreateEndOfStream(pts_));
     return true;
   }
 
@@ -198,5 +195,5 @@ MediaPacketPtr MojoPullModeProducer::CreateMediaPacket(
   return media_packet.Pass();
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

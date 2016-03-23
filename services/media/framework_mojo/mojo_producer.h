@@ -55,9 +55,8 @@ class MojoProducer : public MediaProducer, public ActiveSink {
   Demand SupplyPacket(PacketPtr packet) override;
 
   // MediaProducer implementation.
-  void Connect(
-      InterfaceHandle<MediaConsumer> consumer,
-      const ConnectCallback& callback) override;
+  void Connect(InterfaceHandle<MediaConsumer> consumer,
+               const ConnectCallback& callback) override;
 
   void Disconnect() override;
 
@@ -66,9 +65,7 @@ class MojoProducer : public MediaProducer, public ActiveSink {
 
   // Sends a packet to the consumer.
   // TODO(dalesat): Don't use a raw pointer, if possible.
-  void SendPacket(
-      Packet* packet_raw_ptr,
-      MediaPacketPtr media_packet);
+  void SendPacket(Packet* packet_raw_ptr, MediaPacketPtr media_packet);
 
   // Sets the current state and calls the registered callback, if there is one.
   void SetState(MediaState state);
@@ -85,8 +82,8 @@ class MojoProducer : public MediaProducer, public ActiveSink {
 
   mutable base::Lock lock_;
   // THE FIELDS BELOW SHOULD ONLY BE ACCESSED WITH lock_ TAKEN.
-  MediaState state_= MediaState::UNPREPARED;
-  bool end_of_stream_= false;
+  MediaState state_ = MediaState::UNPREPARED;
+  bool end_of_stream_ = false;
   DemandCallback demand_callback_;
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
   int64_t first_pts_since_flush_ = Packet::kUnknownPts;

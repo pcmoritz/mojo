@@ -25,9 +25,7 @@ namespace media {
 
 // Mojo agent that consumes a stream and delivers it to a destination specified
 // by URL.
-class MediaSinkImpl
-    : public MediaFactoryService::Product,
-      public MediaSink {
+class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
  public:
   static std::shared_ptr<MediaSinkImpl> Create(
       const String& destination_url,
@@ -38,8 +36,8 @@ class MediaSinkImpl
   ~MediaSinkImpl() override;
 
   // MediaSink implementation.
-  void GetClockDisposition(const GetClockDispositionCallback& callback)
-      override;
+  void GetClockDisposition(
+      const GetClockDispositionCallback& callback) override;
 
   void GetMasterClock(InterfaceRequest<Clock> master_clock) override;
 
@@ -47,19 +45,18 @@ class MediaSinkImpl
 
   void GetConsumer(InterfaceRequest<MediaConsumer> consumer) override;
 
-  void GetStatus(uint64_t version_last_seen, const GetStatusCallback& callback)
-      override;
+  void GetStatus(uint64_t version_last_seen,
+                 const GetStatusCallback& callback) override;
 
   void Play() override;
 
   void Pause() override;
 
  private:
-  MediaSinkImpl(
-      const String& destination_url,
-      MediaTypePtr media_type,
-      InterfaceRequest<MediaSink> request,
-      MediaFactoryService* owner);
+  MediaSinkImpl(const String& destination_url,
+                MediaTypePtr media_type,
+                InterfaceRequest<MediaSink> request,
+                MediaFactoryService* owner);
 
   // Increments the status version and runs pending status request callbacks.
   void StatusUpdated();

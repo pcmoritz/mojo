@@ -29,9 +29,8 @@ class AudioTrackController {
   void GetSupportedMediaTypes(const GetSupportedMediaTypesCallback& callback);
 
   // Configures the controller.
-  void Configure(
-      const std::unique_ptr<StreamType>& stream_type,
-      const ConfigureCallback& callback);
+  void Configure(const std::unique_ptr<StreamType>& stream_type,
+                 const ConfigureCallback& callback);
 
  private:
   AudioTrackPtr audio_track_;

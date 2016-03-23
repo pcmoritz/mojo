@@ -23,5 +23,5 @@ Demand NullSink::SupplyPacket(PacketPtr packet) {
   return Demand::kNeutral;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -51,4 +51,4 @@ class Reader {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_SERVICES_MEDIA_READER_H_
+#endif  // MOJO_SERVICES_MEDIA_READER_H_

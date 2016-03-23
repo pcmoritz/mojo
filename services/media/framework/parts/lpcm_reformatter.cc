@@ -10,21 +10,19 @@ namespace media {
 
 // LpcmReformatter implementation that accepts samples of type TIn and
 // produces samples of type TOut.
-template<typename TIn, typename TOut>
+template <typename TIn, typename TOut>
 class LpcmReformatterImpl : public LpcmReformatter {
  public:
-  LpcmReformatterImpl(
-      const LpcmStreamType& in_type,
-      const LpcmStreamTypeSet& out_type);
+  LpcmReformatterImpl(const LpcmStreamType& in_type,
+                      const LpcmStreamTypeSet& out_type);
 
   ~LpcmReformatterImpl() override;
 
   // Transform implementation.
-  bool TransformPacket(
-      const PacketPtr& input,
-      bool new_input,
-      PayloadAllocator* allocator,
-      PacketPtr* output) override;
+  bool TransformPacket(const PacketPtr& input,
+                       bool new_input,
+                       PayloadAllocator* allocator,
+                       PacketPtr* output) override;
 
  private:
   LpcmStreamType in_type_;
@@ -41,20 +39,16 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
       switch (out_type.sample_format()) {
         case LpcmStreamType::SampleFormat::kUnsigned8:
         case LpcmStreamType::SampleFormat::kAny:
-          result = new LpcmReformatterImpl<uint8_t, uint8_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<uint8_t, uint8_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned16:
-          result = new LpcmReformatterImpl<uint8_t, int16_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<uint8_t, int16_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned24In32:
-          result = new LpcmReformatterImpl<uint8_t, int32_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<uint8_t, int32_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kFloat:
-          result = new LpcmReformatterImpl<uint8_t, float>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<uint8_t, float>(in_type, out_type);
           break;
         default:
           NOTREACHED() << "unsupported sample format";
@@ -65,21 +59,17 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
     case LpcmStreamType::SampleFormat::kSigned16:
       switch (out_type.sample_format()) {
         case LpcmStreamType::SampleFormat::kUnsigned8:
-          result = new LpcmReformatterImpl<int16_t, uint8_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int16_t, uint8_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned16:
         case LpcmStreamType::SampleFormat::kAny:
-          result = new LpcmReformatterImpl<int16_t, int16_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int16_t, int16_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned24In32:
-          result = new LpcmReformatterImpl<int16_t, int32_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int16_t, int32_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kFloat:
-          result = new LpcmReformatterImpl<int16_t, float>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int16_t, float>(in_type, out_type);
           break;
         default:
           NOTREACHED() << "unsupported sample format";
@@ -90,21 +80,17 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
     case LpcmStreamType::SampleFormat::kSigned24In32:
       switch (out_type.sample_format()) {
         case LpcmStreamType::SampleFormat::kUnsigned8:
-          result = new LpcmReformatterImpl<int32_t, uint8_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int32_t, uint8_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned16:
-          result = new LpcmReformatterImpl<int32_t, int16_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int32_t, int16_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned24In32:
         case LpcmStreamType::SampleFormat::kAny:
-          result = new LpcmReformatterImpl<int32_t, int32_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int32_t, int32_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kFloat:
-          result = new LpcmReformatterImpl<int32_t, float>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<int32_t, float>(in_type, out_type);
           break;
         default:
           NOTREACHED() << "unsupported sample format";
@@ -115,16 +101,13 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
     case LpcmStreamType::SampleFormat::kFloat:
       switch (out_type.sample_format()) {
         case LpcmStreamType::SampleFormat::kUnsigned8:
-          result = new LpcmReformatterImpl<float, uint8_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<float, uint8_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned16:
-          result = new LpcmReformatterImpl<float, int16_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<float, int16_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kSigned24In32:
-          result = new LpcmReformatterImpl<float, int32_t>(
-              in_type, out_type);
+          result = new LpcmReformatterImpl<float, int32_t>(in_type, out_type);
           break;
         case LpcmStreamType::SampleFormat::kFloat:
         case LpcmStreamType::SampleFormat::kAny:
@@ -145,19 +128,18 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
   return std::shared_ptr<LpcmReformatter>(result);
 }
 
-template<typename TIn, typename TOut>
+template <typename TIn, typename TOut>
 LpcmReformatterImpl<TIn, TOut>::LpcmReformatterImpl(
     const LpcmStreamType& in_type,
-    const LpcmStreamTypeSet& out_type) :
-    in_type_(in_type),
-    out_type_(
-        out_type.sample_format() == LpcmStreamType::SampleFormat::kAny ?
-            in_type.sample_format() :
-            out_type.sample_format(),
-        in_type.channels(),
-        in_type.frames_per_second()) {}
+    const LpcmStreamTypeSet& out_type)
+    : in_type_(in_type),
+      out_type_(out_type.sample_format() == LpcmStreamType::SampleFormat::kAny
+                    ? in_type.sample_format()
+                    : out_type.sample_format(),
+                in_type.channels(),
+                in_type.frames_per_second()) {}
 
-template<typename TIn, typename TOut>
+template <typename TIn, typename TOut>
 LpcmReformatterImpl<TIn, TOut>::~LpcmReformatterImpl() {}
 
 namespace {
@@ -180,7 +162,7 @@ inline constexpr int32_t Clamp(int32_t val) {
   return Clamp(val, 1 << 23, -(1 << 23));
 }
 
-template<typename TIn, typename TOut>
+template <typename TIn, typename TOut>
 inline void CopySample(TOut* dest, const TIn* source) {
   *dest = static_cast<TOut>(*source);
 }
@@ -233,9 +215,9 @@ inline void CopySample(float* dest, const int32_t* source) {
   *dest = static_cast<float>(Clamp(*source)) / 0x800000;
 }
 
-} // namespace
+}  // namespace
 
-template<typename TIn, typename TOut>
+template <typename TIn, typename TOut>
 bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
     const PacketPtr& input,
     bool new_input,
@@ -248,12 +230,8 @@ bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
   uint64_t in_size = input->size();
   if (in_size == 0) {
     // Zero-sized input packet. Make a copy.
-    *output = Packet::Create(
-        input->pts(),
-        input->end_of_stream(),
-        0,
-        nullptr,
-        nullptr);
+    *output = Packet::Create(input->pts(), input->end_of_stream(), 0, nullptr,
+                             nullptr);
     return true;
   }
 
@@ -283,12 +261,8 @@ bool LpcmReformatterImpl<TIn, TOut>::TransformPacket(
     ++out_channel;
   }
 
-  *output = Packet::Create(
-      input->pts(),
-      input->end_of_stream(),
-      out_size,
-      buffer,
-      allocator);
+  *output = Packet::Create(input->pts(), input->end_of_stream(), out_size,
+                           buffer, allocator);
 
   return true;
 }

@@ -33,14 +33,13 @@ class LpcmUtil {
   // channel buffer per channel. The samples for each channel are contiguous
   // in the respective channel buffer with possible empty space at the end
   // (hence the in_type_count and the frame_count).
-  virtual void Interleave(
-      const void* in,
-      size_t in_byte_count,
-      void* out,
-      size_t frame_count) const = 0;
+  virtual void Interleave(const void* in,
+                          size_t in_byte_count,
+                          void* out,
+                          size_t frame_count) const = 0;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_LPCM_UTIL_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_LPCM_UTIL_H_

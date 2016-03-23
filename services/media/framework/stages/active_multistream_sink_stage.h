@@ -17,9 +17,8 @@ namespace mojo {
 namespace media {
 
 // A stage that hosts an ActiveSink.
-class ActiveMultistreamSinkStage :
-    public Stage,
-    public ActiveMultistreamSinkHost {
+class ActiveMultistreamSinkStage : public Stage,
+                                   public ActiveMultistreamSinkHost {
  public:
   ActiveMultistreamSinkStage(std::shared_ptr<ActiveMultistreamSink> sink);
 
@@ -36,16 +35,13 @@ class ActiveMultistreamSinkStage :
 
   PayloadAllocator* PrepareInput(size_t index) override;
 
-  void PrepareOutput(
-      size_t index,
-      PayloadAllocator* allocator,
-      const UpstreamCallback& callback) override;
+  void PrepareOutput(size_t index,
+                     PayloadAllocator* allocator,
+                     const UpstreamCallback& callback) override;
 
   void Update(Engine* engine) override;
 
-  void FlushInput(
-      size_t index,
-      const DownstreamCallback& callback) override;
+  void FlushInput(size_t index, const DownstreamCallback& callback) override;
 
   void FlushOutput(size_t index) override;
 
@@ -58,10 +54,8 @@ class ActiveMultistreamSinkStage :
 
  private:
   struct StageInput {
-    StageInput(size_t index) :
-        index_(index),
-        allocated_(false),
-        demand_(Demand::kNegative) {}
+    StageInput(size_t index)
+        : index_(index), allocated_(false), demand_(Demand::kNegative) {}
     Input input_;
     size_t index_;
     bool allocated_;

@@ -9,9 +9,9 @@
 namespace mojo {
 namespace media {
 
-FfmpegDecoderBase::FfmpegDecoderBase(AvCodecContextPtr av_codec_context) :
-    av_codec_context_(std::move(av_codec_context)),
-    av_frame_ptr_(av_frame_alloc()) {
+FfmpegDecoderBase::FfmpegDecoderBase(AvCodecContextPtr av_codec_context)
+    : av_codec_context_(std::move(av_codec_context)),
+      av_frame_ptr_(av_frame_alloc()) {
   DCHECK(av_codec_context_);
 }
 
@@ -26,11 +26,10 @@ void FfmpegDecoderBase::Flush() {
   avcodec_flush_buffers(av_codec_context_.get());
 }
 
-bool FfmpegDecoderBase::TransformPacket(
-    const PacketPtr& input,
-    bool new_input,
-    PayloadAllocator* allocator,
-    PacketPtr* output) {
+bool FfmpegDecoderBase::TransformPacket(const PacketPtr& input,
+                                        bool new_input,
+                                        PayloadAllocator* allocator,
+                                        PacketPtr* output) {
   DCHECK(input);
   DCHECK(allocator);
   DCHECK(output);
@@ -79,9 +78,8 @@ void FfmpegDecoderBase::PrepareInputPacket(const PacketPtr& input) {
   av_packet_.pts = input->pts();
 }
 
-bool FfmpegDecoderBase::UnprepareInputPacket(
-    const PacketPtr& input,
-    PacketPtr* output) {
+bool FfmpegDecoderBase::UnprepareInputPacket(const PacketPtr& input,
+                                             PacketPtr* output) {
   if (input->end_of_stream()) {
     // Indicate end of stream. This happens when we're draining for the last
     // time, so there should be no output packet yet.
@@ -95,5 +93,5 @@ bool FfmpegDecoderBase::UnprepareInputPacket(
   return true;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -35,12 +35,12 @@ void DefaultAllocator::ReleasePayloadBuffer(size_t size, void* buffer) {
 
 static constexpr DefaultAllocator default_allocator;
 
-} // namespace
+}  // namespace
 
 // static
 PayloadAllocator* PayloadAllocator::GetDefault() {
   return const_cast<DefaultAllocator*>(&default_allocator);
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

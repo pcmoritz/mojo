@@ -75,10 +75,10 @@ std::unique_ptr<StreamTypeSet> StreamTypeSet::Clone() const {
 
 MultiplexedStreamType::MultiplexedStreamType(
     std::unique_ptr<StreamType> multiplex_type,
-    std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> substream_types) :
-    StreamType(Scheme::kMultiplexed),
-    multiplex_type_(std::move(multiplex_type)),
-    substream_types_(std::move(substream_types)) {}
+    std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> substream_types)
+    : StreamType(Scheme::kMultiplexed),
+      multiplex_type_(std::move(multiplex_type)),
+      substream_types_(std::move(substream_types)) {}
 
 MultiplexedStreamType::~MultiplexedStreamType() {}
 
@@ -93,10 +93,10 @@ std::unique_ptr<StreamType> MultiplexedStreamType::Clone() const {
 MultiplexedStreamTypeSet::MultiplexedStreamTypeSet(
     std::unique_ptr<StreamTypeSet> multiplex_type_set,
     std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
-        substream_type_sets) :
-    StreamTypeSet(StreamType::Scheme::kMultiplexed),
-    multiplex_type_set_(std::move(multiplex_type_set)),
-    substream_type_sets_(std::move(substream_type_sets)) {}
+        substream_type_sets)
+    : StreamTypeSet(StreamType::Scheme::kMultiplexed),
+      multiplex_type_set_(std::move(multiplex_type_set)),
+      substream_type_sets_(std::move(substream_type_sets)) {}
 
 MultiplexedStreamTypeSet::~MultiplexedStreamTypeSet() {}
 
@@ -105,31 +105,27 @@ const MultiplexedStreamTypeSet* MultiplexedStreamTypeSet::multiplexed() const {
 }
 
 std::unique_ptr<StreamTypeSet> MultiplexedStreamTypeSet::Clone() const {
-  return Create(
-      SafeClone(multiplex_type_set()),
-      SafeClone(substream_type_sets()));
+  return Create(SafeClone(multiplex_type_set()),
+                SafeClone(substream_type_sets()));
 }
 
-LpcmStreamType::LpcmStreamType(
-    SampleFormat sample_format,
-    uint32_t channels,
-    uint32_t frames_per_second) :
-    LpcmStreamType(
-        Scheme::kLpcm,
-        sample_format,
-        channels,
-        frames_per_second) {}
+LpcmStreamType::LpcmStreamType(SampleFormat sample_format,
+                               uint32_t channels,
+                               uint32_t frames_per_second)
+    : LpcmStreamType(Scheme::kLpcm,
+                     sample_format,
+                     channels,
+                     frames_per_second) {}
 
-LpcmStreamType::LpcmStreamType(
-    Scheme scheme,
-    SampleFormat sample_format,
-    uint32_t channels,
-    uint32_t frames_per_second) :
-    StreamType(scheme),
-    sample_format_(sample_format),
-    channels_(channels),
-    frames_per_second_(frames_per_second),
-    sample_size_(SampleSizeFromFormat(sample_format)) {}
+LpcmStreamType::LpcmStreamType(Scheme scheme,
+                               SampleFormat sample_format,
+                               uint32_t channels,
+                               uint32_t frames_per_second)
+    : StreamType(scheme),
+      sample_format_(sample_format),
+      channels_(channels),
+      frames_per_second_(frames_per_second),
+      sample_size_(SampleSizeFromFormat(sample_format)) {}
 
 LpcmStreamType::~LpcmStreamType() {}
 
@@ -138,9 +134,8 @@ const LpcmStreamType* LpcmStreamType::lpcm() const {
 }
 
 // static
-uint32_t LpcmStreamType::SampleSizeFromFormat(
-    SampleFormat sample_format) {
-  switch(sample_format) {
+uint32_t LpcmStreamType::SampleSizeFromFormat(SampleFormat sample_format) {
+  switch (sample_format) {
     case SampleFormat::kUnsigned8:
       return sizeof(uint8_t);
     case SampleFormat::kSigned16:
@@ -161,25 +156,22 @@ std::unique_ptr<StreamType> LpcmStreamType::Clone() const {
   return Create(sample_format(), channels(), frames_per_second());
 }
 
-LpcmStreamTypeSet::LpcmStreamTypeSet(
-    LpcmStreamType::SampleFormat sample_format,
-    Range<uint32_t> channels,
-    Range<uint32_t> frames_per_second) :
-    LpcmStreamTypeSet(
-        StreamType::Scheme::kLpcm,
-        sample_format,
-        channels,
-        frames_per_second) {}
+LpcmStreamTypeSet::LpcmStreamTypeSet(LpcmStreamType::SampleFormat sample_format,
+                                     Range<uint32_t> channels,
+                                     Range<uint32_t> frames_per_second)
+    : LpcmStreamTypeSet(StreamType::Scheme::kLpcm,
+                        sample_format,
+                        channels,
+                        frames_per_second) {}
 
-LpcmStreamTypeSet::LpcmStreamTypeSet(
-    StreamType::Scheme scheme,
-    LpcmStreamType::SampleFormat sample_format,
-    Range<uint32_t> channels,
-    Range<uint32_t> frames_per_second) :
-    StreamTypeSet(scheme),
-    sample_format_(sample_format),
-    channels_(channels),
-    frames_per_second_(frames_per_second) {}
+LpcmStreamTypeSet::LpcmStreamTypeSet(StreamType::Scheme scheme,
+                                     LpcmStreamType::SampleFormat sample_format,
+                                     Range<uint32_t> channels,
+                                     Range<uint32_t> frames_per_second)
+    : StreamTypeSet(scheme),
+      sample_format_(sample_format),
+      channels_(channels),
+      frames_per_second_(frames_per_second) {}
 
 LpcmStreamTypeSet::~LpcmStreamTypeSet() {}
 
@@ -188,11 +180,10 @@ const LpcmStreamTypeSet* LpcmStreamTypeSet::lpcm() const {
 }
 
 bool LpcmStreamTypeSet::contains(const LpcmStreamType& type) const {
-  return
-      (sample_format() == type.sample_format() ||
+  return (sample_format() == type.sample_format() ||
           sample_format() == LpcmStreamType::SampleFormat::kAny) &&
-      channels().contains(type.frames_per_second()) &&
-      frames_per_second().contains(type.frames_per_second());
+         channels().contains(type.frames_per_second()) &&
+         frames_per_second().contains(type.frames_per_second());
 }
 
 std::unique_ptr<StreamTypeSet> LpcmStreamTypeSet::Clone() const {
@@ -200,18 +191,17 @@ std::unique_ptr<StreamTypeSet> LpcmStreamTypeSet::Clone() const {
 }
 
 CompressedAudioStreamType::CompressedAudioStreamType(
-  AudioEncoding encoding,
-  SampleFormat sample_format,
-  uint32_t channels,
-  uint32_t frames_per_second,
-  std::unique_ptr<Bytes> encoding_details) :
-  LpcmStreamType(
-      Scheme::kCompressedAudio,
-      sample_format,
-      channels,
-      frames_per_second),
-  encoding_(encoding),
-  encoding_details_(std::move(encoding_details)) {}
+    AudioEncoding encoding,
+    SampleFormat sample_format,
+    uint32_t channels,
+    uint32_t frames_per_second,
+    std::unique_ptr<Bytes> encoding_details)
+    : LpcmStreamType(Scheme::kCompressedAudio,
+                     sample_format,
+                     channels,
+                     frames_per_second),
+      encoding_(encoding),
+      encoding_details_(std::move(encoding_details)) {}
 
 CompressedAudioStreamType::~CompressedAudioStreamType() {}
 
@@ -221,72 +211,61 @@ const CompressedAudioStreamType* CompressedAudioStreamType::compressed_audio()
 }
 
 std::unique_ptr<StreamType> CompressedAudioStreamType::Clone() const {
-  return Create(
-      encoding(),
-      sample_format(),
-      channels(),
-      frames_per_second(),
-      SafeClone(encoding_details()));
+  return Create(encoding(), sample_format(), channels(), frames_per_second(),
+                SafeClone(encoding_details()));
 }
 
 CompressedAudioStreamTypeSet::CompressedAudioStreamTypeSet(
-  CompressedAudioStreamType::AudioEncoding encoding,
-  CompressedAudioStreamType::SampleFormat sample_format,
-  Range<uint32_t> channels,
-  Range<uint32_t> frames_per_second) :
-  LpcmStreamTypeSet(
-      StreamType::Scheme::kCompressedAudio,
-      sample_format,
-      channels,
-      frames_per_second),
-  encoding_(encoding) {}
+    CompressedAudioStreamType::AudioEncoding encoding,
+    CompressedAudioStreamType::SampleFormat sample_format,
+    Range<uint32_t> channels,
+    Range<uint32_t> frames_per_second)
+    : LpcmStreamTypeSet(StreamType::Scheme::kCompressedAudio,
+                        sample_format,
+                        channels,
+                        frames_per_second),
+      encoding_(encoding) {}
 
 CompressedAudioStreamTypeSet::~CompressedAudioStreamTypeSet() {}
 
 const CompressedAudioStreamTypeSet*
-    CompressedAudioStreamTypeSet::compressed_audio() const {
+CompressedAudioStreamTypeSet::compressed_audio() const {
   return this;
 }
 
 bool CompressedAudioStreamTypeSet::contains(
     const CompressedAudioStreamType& type) const {
-  return
-      (encoding() == type.encoding() ||
+  return (encoding() == type.encoding() ||
           encoding() == CompressedAudioStreamType::AudioEncoding::kAny) &&
-      (sample_format() == type.sample_format() ||
+         (sample_format() == type.sample_format() ||
           sample_format() == LpcmStreamType::SampleFormat::kAny) &&
-      channels().contains(type.frames_per_second()) &&
-      frames_per_second().contains(type.frames_per_second());
+         channels().contains(type.frames_per_second()) &&
+         frames_per_second().contains(type.frames_per_second());
 }
 
 std::unique_ptr<StreamTypeSet> CompressedAudioStreamTypeSet::Clone() const {
-  return Create(
-      encoding(),
-      sample_format(),
-      channels(),
-      frames_per_second());
+  return Create(encoding(), sample_format(), channels(), frames_per_second());
 }
 
-VideoStreamType::VideoStreamType(
-  VideoEncoding encoding,
-  VideoProfile profile,
-  PixelFormat pixel_format,
-  ColorSpace color_space,
-  uint32_t width,
-  uint32_t height,
-  uint32_t coded_width,
-  uint32_t coded_height,
-  std::unique_ptr<Bytes> encoding_details) :
-  StreamType(StreamType::Scheme::kVideo),
-  encoding_(encoding),
-  profile_(profile),
-  pixel_format_(pixel_format),
-  color_space_(color_space),
-  width_(width),
-  height_(height),
-  coded_width_(coded_width),
-  coded_height_(coded_height),
-  encoding_details_(std::move(encoding_details)) {}
+VideoStreamType::VideoStreamType(VideoEncoding encoding,
+                                 VideoProfile profile,
+                                 PixelFormat pixel_format,
+                                 ColorSpace color_space,
+                                 uint32_t width,
+                                 uint32_t height,
+                                 uint32_t coded_width,
+                                 uint32_t coded_height,
+                                 std::unique_ptr<Bytes> encoding_details)
+    : StreamType(StreamType::Scheme::kVideo),
+      encoding_(encoding),
+      profile_(profile),
+      pixel_format_(pixel_format),
+      color_space_(color_space),
+      width_(width),
+      height_(height),
+      coded_width_(coded_width),
+      coded_height_(coded_height),
+      encoding_details_(std::move(encoding_details)) {}
 
 VideoStreamType::~VideoStreamType() {}
 
@@ -295,26 +274,18 @@ const VideoStreamType* VideoStreamType::video() const {
 }
 
 std::unique_ptr<StreamType> VideoStreamType::Clone() const {
-  return Create(
-      encoding(),
-      profile(),
-      pixel_format(),
-      color_space(),
-      width(),
-      height(),
-      coded_width(),
-      coded_height(),
-      SafeClone(encoding_details()));
+  return Create(encoding(), profile(), pixel_format(), color_space(), width(),
+                height(), coded_width(), coded_height(),
+                SafeClone(encoding_details()));
 }
 
-VideoStreamTypeSet::VideoStreamTypeSet(
-  VideoStreamType::VideoEncoding encoding,
-  Range<uint32_t> width,
-  Range<uint32_t> height) :
-  StreamTypeSet(StreamType::Scheme::kVideo),
-  encoding_(encoding),
-  width_(width),
-  height_(height) {}
+VideoStreamTypeSet::VideoStreamTypeSet(VideoStreamType::VideoEncoding encoding,
+                                       Range<uint32_t> width,
+                                       Range<uint32_t> height)
+    : StreamTypeSet(StreamType::Scheme::kVideo),
+      encoding_(encoding),
+      width_(width),
+      height_(height) {}
 
 VideoStreamTypeSet::~VideoStreamTypeSet() {}
 
@@ -323,11 +294,8 @@ const VideoStreamTypeSet* VideoStreamTypeSet::video() const {
 }
 
 std::unique_ptr<StreamTypeSet> VideoStreamTypeSet::Clone() const {
-  return Create(
-      encoding(),
-      width(),
-      height());
+  return Create(encoding(), width(), height());
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

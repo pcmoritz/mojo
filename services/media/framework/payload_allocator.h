@@ -27,4 +27,4 @@ class PayloadAllocator {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_PAYLOAD_ALLOCATOR_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_PAYLOAD_ALLOCATOR_H_

@@ -26,4 +26,4 @@ bool BuildConversionPipeline(
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_

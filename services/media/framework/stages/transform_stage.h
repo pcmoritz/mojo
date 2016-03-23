@@ -29,20 +29,15 @@ class TransformStage : public Stage {
 
   PayloadAllocator* PrepareInput(size_t index) override;
 
-  void PrepareOutput(
-      size_t index,
-      PayloadAllocator* allocator,
-      const UpstreamCallback& callback) override;
+  void PrepareOutput(size_t index,
+                     PayloadAllocator* allocator,
+                     const UpstreamCallback& callback) override;
 
-  void UnprepareOutput(
-      size_t index,
-      const UpstreamCallback& callback) override;
+  void UnprepareOutput(size_t index, const UpstreamCallback& callback) override;
 
   void Update(Engine* engine) override;
 
-  void FlushInput(
-      size_t index,
-      const DownstreamCallback& callback) override;
+  void FlushInput(size_t index, const DownstreamCallback& callback) override;
 
   void FlushOutput(size_t index) override;
 

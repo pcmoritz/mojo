@@ -15,10 +15,9 @@
 namespace mojo {
 namespace media {
 
-class MediaFactoryService :
-    public ApplicationDelegate,
-    public InterfaceFactory<MediaFactory>,
-    public MediaFactory {
+class MediaFactoryService : public ApplicationDelegate,
+                            public InterfaceFactory<MediaFactory>,
+                            public MediaFactory {
  public:
   // Provides common behavior for all objects created by the factory service.
   class Product : public std::enable_shared_from_this<Product> {
@@ -51,32 +50,26 @@ class MediaFactoryService :
   // ApplicationDelegate implementation.
   void Initialize(ApplicationImpl* app) override;
 
-  bool ConfigureIncomingConnection(
-      ApplicationConnection* connection) override;
+  bool ConfigureIncomingConnection(ApplicationConnection* connection) override;
 
   // InterfaceFactory<MediaFactory> implementation.
-  void Create(
-      ApplicationConnection* connection,
-      InterfaceRequest<MediaFactory> request) override;
+  void Create(ApplicationConnection* connection,
+              InterfaceRequest<MediaFactory> request) override;
 
   // MediaFactory implementation.
-  void CreatePlayer(
-      const String& origin_url,
-      InterfaceRequest<MediaPlayer> player) override;
+  void CreatePlayer(const String& origin_url,
+                    InterfaceRequest<MediaPlayer> player) override;
 
-  void CreateSource(
-      const String& origin_url,
-      Array<MediaTypeSetPtr> allowed_media_types,
-      InterfaceRequest<MediaSource> source) override;
+  void CreateSource(const String& origin_url,
+                    Array<MediaTypeSetPtr> allowed_media_types,
+                    InterfaceRequest<MediaSource> source) override;
 
-  void CreateSink(
-      const String& destination_url,
-      MediaTypePtr media_type,
-      InterfaceRequest<MediaSink> sink) override;
+  void CreateSink(const String& destination_url,
+                  MediaTypePtr media_type,
+                  InterfaceRequest<MediaSink> sink) override;
 
-  void CreateDecoder(
-      MediaTypePtr input_media_type,
-      InterfaceRequest<MediaTypeConverter> decoder) override;
+  void CreateDecoder(MediaTypePtr input_media_type,
+                     InterfaceRequest<MediaTypeConverter> decoder) override;
 
  private:
   BindingSet<MediaFactory> bindings_;

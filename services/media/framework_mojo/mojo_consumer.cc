@@ -35,23 +35,18 @@ void MojoConsumer::SetFlushRequestedCallback(
   flush_requested_callback_ = callback;
 }
 
-void MojoConsumer::SetBuffer(
-    ScopedSharedBufferHandle buffer,
-    const SetBufferCallback& callback) {
+void MojoConsumer::SetBuffer(ScopedSharedBufferHandle buffer,
+                             const SetBufferCallback& callback) {
   buffer_.InitFromHandle(buffer.Pass());
   callback.Run();
 }
 
-void MojoConsumer::SendPacket(
-    MediaPacketPtr media_packet,
-    const SendPacketCallback& callback) {
+void MojoConsumer::SendPacket(MediaPacketPtr media_packet,
+                              const SendPacketCallback& callback) {
   DCHECK(media_packet);
   DCHECK(supply_callback_);
-  supply_callback_(PacketImpl::Create(
-      media_packet.Pass(),
-      callback,
-      task_runner_,
-      buffer_));
+  supply_callback_(
+      PacketImpl::Create(media_packet.Pass(), callback, task_runner_, buffer_));
 }
 
 void MojoConsumer::Prime(const PrimeCallback& callback) {
@@ -90,17 +85,16 @@ MojoConsumer::PacketImpl::PacketImpl(
     MediaPacketPtr media_packet,
     const SendPacketCallback& callback,
     scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-    const MappedSharedBuffer& buffer) :
-    Packet(
-        media_packet->pts,
-        media_packet->end_of_stream,
-        media_packet->payload->length,
-        media_packet->payload->length == 0 ?
-            nullptr :
-            buffer.PtrFromOffset(media_packet->payload->offset)),
-    media_packet_(media_packet.Pass()),
-    callback_(callback),
-    task_runner_(task_runner) {}
+    const MappedSharedBuffer& buffer)
+    : Packet(media_packet->pts,
+             media_packet->end_of_stream,
+             media_packet->payload->length,
+             media_packet->payload->length == 0
+                 ? nullptr
+                 : buffer.PtrFromOffset(media_packet->payload->offset)),
+      media_packet_(media_packet.Pass()),
+      callback_(callback),
+      task_runner_(task_runner) {}
 
 MojoConsumer::PacketImpl::~PacketImpl() {}
 

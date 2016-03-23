@@ -121,9 +121,7 @@ class Event {
   }
 
   // Determines whether this Event is non-null.
-  explicit operator bool() const {
-    return static_cast<bool>(impl_);
-  }
+  explicit operator bool() const { return static_cast<bool>(impl_); }
 
   // Executes the consequence when this Event occurs. If this Event hasn't
   // occurred or been cancelled when this method is called, a copy of the
@@ -151,9 +149,7 @@ class Event {
 
   // Calls Occur. This method makes an Event convertible to
   // mojo::Callback<void()>.
-  void Run() const {
-    Occur();
-  }
+  void Run() const { Occur(); }
 
  private:
   explicit Event(const std::shared_ptr<EventImpl>& impl);

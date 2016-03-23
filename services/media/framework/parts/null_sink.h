@@ -14,7 +14,7 @@ namespace media {
 class NullSink : public ActiveSink {
  public:
   static std::shared_ptr<NullSink> Create() {
-      return std::shared_ptr<NullSink>(new NullSink());
+    return std::shared_ptr<NullSink>(new NullSink());
   }
 
   ~NullSink() override;

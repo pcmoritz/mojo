@@ -12,9 +12,8 @@ namespace mojo {
 namespace media {
 
 // Just like SharedMediaBufferAllocator but implements PayloadAllocator.
-class MojoAllocator :
-    public SharedMediaBufferAllocator,
-    public PayloadAllocator {
+class MojoAllocator : public SharedMediaBufferAllocator,
+                      public PayloadAllocator {
  public:
   ~MojoAllocator() override;
 
@@ -27,4 +26,4 @@ class MojoAllocator :
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_ALLOCATOR_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_ALLOCATOR_H_

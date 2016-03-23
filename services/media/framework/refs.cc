@@ -55,8 +55,7 @@ const OutputRef& InputRef::mate() const {
   return actual().mate();
 }
 
-InputRef::InputRef(Stage* stage, size_t index) :
-    stage_(stage), index_(index) {
+InputRef::InputRef(Stage* stage, size_t index) : stage_(stage), index_(index) {
   DCHECK(valid());
 }
 
@@ -79,8 +78,8 @@ const InputRef& OutputRef::mate() const {
   return actual().mate();
 }
 
-OutputRef::OutputRef(Stage* stage, size_t index) :
-    stage_(stage), index_(index) {
+OutputRef::OutputRef(Stage* stage, size_t index)
+    : stage_(stage), index_(index) {
   DCHECK(valid());
 }
 

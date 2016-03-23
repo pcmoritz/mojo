@@ -8,8 +8,8 @@
 namespace mojo {
 namespace media {
 
-FfmpegAudioDecoder::FfmpegAudioDecoder(AvCodecContextPtr av_codec_context) :
-    FfmpegDecoderBase(std::move(av_codec_context)) {
+FfmpegAudioDecoder::FfmpegAudioDecoder(AvCodecContextPtr av_codec_context)
+    : FfmpegDecoderBase(std::move(av_codec_context)) {
   DCHECK(context());
   DCHECK(context()->channels > 0);
 
@@ -28,14 +28,13 @@ FfmpegAudioDecoder::~FfmpegAudioDecoder() {}
 
 void FfmpegAudioDecoder::Flush() {
   FfmpegDecoderBase::Flush();
-  next_pts_= Packet::kUnknownPts;
+  next_pts_ = Packet::kUnknownPts;
 }
 
-int FfmpegAudioDecoder::Decode(
-    const AVPacket& av_packet,
-    const ffmpeg::AvFramePtr& av_frame_ptr,
-    PayloadAllocator* allocator,
-    bool* frame_decoded_out) {
+int FfmpegAudioDecoder::Decode(const AVPacket& av_packet,
+                               const ffmpeg::AvFramePtr& av_frame_ptr,
+                               PayloadAllocator* allocator,
+                               bool* frame_decoded_out) {
   DCHECK(allocator);
   DCHECK(frame_decoded_out);
   DCHECK(context());
@@ -57,10 +56,7 @@ int FfmpegAudioDecoder::Decode(
 
   int frame_decoded = 0;
   int input_bytes_used = avcodec_decode_audio4(
-      context().get(),
-      av_frame_ptr.get(),
-      &frame_decoded,
-      &av_packet);
+      context().get(), av_frame_ptr.get(), &frame_decoded, &av_packet);
   *frame_decoded_out = frame_decoded != 0;
 
   // We're done with this allocator.
@@ -69,9 +65,8 @@ int FfmpegAudioDecoder::Decode(
   return input_bytes_used;
 }
 
-PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
-    const AVFrame& av_frame,
-    PayloadAllocator* allocator) {
+PacketPtr FfmpegAudioDecoder::CreateOutputPacket(const AVFrame& av_frame,
+                                                 PayloadAllocator* allocator) {
   DCHECK(allocator);
 
   int64_t pts = av_frame.pts;
@@ -81,7 +76,7 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
   }
 
   uint64_t payload_size;
-  void *payload_buffer;
+  void* payload_buffer;
 
   AvBufferContext* av_buffer_context =
       reinterpret_cast<AvBufferContext*>(av_buffer_get_opaque(av_frame.buf[0]));
@@ -96,11 +91,9 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
     payload_size = stream_type_->lpcm()->min_buffer_size(av_frame.nb_samples);
     payload_buffer = allocator->AllocatePayloadBuffer(payload_size);
 
-    lpcm_util_->Interleave(
-        av_buffer_context->buffer(),
-        av_buffer_context->size(),
-        payload_buffer,
-        av_frame.nb_samples);
+    lpcm_util_->Interleave(av_buffer_context->buffer(),
+                           av_buffer_context->size(), payload_buffer,
+                           av_frame.nb_samples);
   } else {
     // We don't need to interleave. The interleaved frames are in a buffer that
     // was allocated from the correct allocator. We take ownership of the buffer
@@ -111,10 +104,8 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(
 
   return Packet::Create(
       pts,
-      false, // The base class is responsible for end-of-stream.
-      payload_size,
-      payload_buffer,
-      allocator);
+      false,  // The base class is responsible for end-of-stream.
+      payload_size, payload_buffer, allocator);
 }
 
 PacketPtr FfmpegAudioDecoder::CreateOutputEndOfStreamPacket() {
@@ -137,11 +128,8 @@ int FfmpegAudioDecoder::AllocateBufferForAvFrame(
       static_cast<AVSampleFormat>(av_frame->format);
 
   int buffer_size = av_samples_get_buffer_size(
-      &av_frame->linesize[0],
-      av_codec_context->channels,
-      av_frame->nb_samples,
-      av_sample_format,
-      FfmpegAudioDecoder::kChannelAlign);
+      &av_frame->linesize[0], av_codec_context->channels, av_frame->nb_samples,
+      av_sample_format, FfmpegAudioDecoder::kChannelAlign);
   if (buffer_size < 0) {
     LOG(WARNING) << "av_samples_get_buffer_size failed";
     return buffer_size;
@@ -192,28 +180,23 @@ int FfmpegAudioDecoder::AllocateBufferForAvFrame(
   }
 
   av_frame->buf[0] = av_buffer_create(
-      buffer,
-      buffer_size,
-      ReleaseBufferForAvFrame,
-      av_buffer_context,
-      0); // flags
+      buffer, buffer_size, ReleaseBufferForAvFrame, av_buffer_context,
+      0);  // flags
 
   return 0;
 }
 
-void FfmpegAudioDecoder::ReleaseBufferForAvFrame(
-    void* opaque,
-    uint8_t* buffer) {
+void FfmpegAudioDecoder::ReleaseBufferForAvFrame(void* opaque,
+                                                 uint8_t* buffer) {
   AvBufferContext* av_buffer_context =
       reinterpret_cast<AvBufferContext*>(opaque);
   DCHECK(av_buffer_context);
   // Either this buffer has already been released to someone else's ownership,
   // or it's the same as the buffer parameter.
-  DCHECK(
-      av_buffer_context->buffer() == nullptr ||
-      av_buffer_context->buffer() == buffer);
+  DCHECK(av_buffer_context->buffer() == nullptr ||
+         av_buffer_context->buffer() == buffer);
   delete av_buffer_context;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -23,10 +23,10 @@ class MultistreamSource : public Part {
   // Gets a packet for the stream indicated via stream_index_out. This call
   // should always produce a packet until end-of-stream. The caller is
   // responsible for releasing the packet.
-  virtual PacketPtr PullPacket(size_t *stream_index_out) = 0;
+  virtual PacketPtr PullPacket(size_t* stream_index_out) = 0;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_MULTISTREAM_SOURCE_H_
+#endif  // MOJO_MEDIA_MODELS_MULTISTREAM_SOURCE_H_

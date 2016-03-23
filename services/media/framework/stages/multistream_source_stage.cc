@@ -8,9 +8,8 @@ namespace mojo {
 namespace media {
 
 MultistreamSourceStage::MultistreamSourceStage(
-    std::shared_ptr<MultistreamSource> source) :
-    source_(source),
-    ended_streams_(0) {
+    std::shared_ptr<MultistreamSource> source)
+    : source_(source), ended_streams_(0) {
   DCHECK(source);
   outputs_.resize(source->stream_count());
 }
@@ -40,10 +39,9 @@ PayloadAllocator* MultistreamSourceStage::PrepareInput(size_t index) {
   return nullptr;
 }
 
-void MultistreamSourceStage::PrepareOutput(
-    size_t index,
-    PayloadAllocator* allocator,
-    const UpstreamCallback& callback) {
+void MultistreamSourceStage::PrepareOutput(size_t index,
+                                           PayloadAllocator* allocator,
+                                           const UpstreamCallback& callback) {
   DCHECK(index < outputs_.size());
 
   if (allocator != nullptr) {
@@ -54,9 +52,8 @@ void MultistreamSourceStage::PrepareOutput(
   }
 }
 
-void MultistreamSourceStage::UnprepareOutput(
-    size_t index,
-    const UpstreamCallback& callback) {
+void MultistreamSourceStage::UnprepareOutput(size_t index,
+                                             const UpstreamCallback& callback) {
   DCHECK(index < outputs_.size());
   outputs_[index].SetCopyAllocator(nullptr);
 }
@@ -104,9 +101,8 @@ void MultistreamSourceStage::Update(Engine* engine) {
   }
 }
 
-void MultistreamSourceStage::FlushInput(
-    size_t index,
-    const DownstreamCallback& callback) {
+void MultistreamSourceStage::FlushInput(size_t index,
+                                        const DownstreamCallback& callback) {
   CHECK(false) << "FlushInput called on source";
 }
 

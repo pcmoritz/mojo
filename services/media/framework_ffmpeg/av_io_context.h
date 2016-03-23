@@ -47,4 +47,4 @@ struct AvIoContext {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_IO_CONTEXT_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_IO_CONTEXT_H_

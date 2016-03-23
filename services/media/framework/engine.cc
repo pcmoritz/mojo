@@ -14,43 +14,34 @@ Engine::~Engine() {
 }
 
 void Engine::PrepareInput(const InputRef& input) {
-  VisitUpstream(
-      input,
-      [] (const InputRef& input,
-          const OutputRef& output,
-          const Stage::UpstreamCallback& callback) {
-        DCHECK(!input.actual().prepared());
-        PayloadAllocator* allocator = input.stage_->PrepareInput(input.index_);
-        input.actual().set_prepared(true);
-        output.stage_->PrepareOutput(output.index_, allocator, callback);
-      });
+  VisitUpstream(input, [](const InputRef& input, const OutputRef& output,
+                          const Stage::UpstreamCallback& callback) {
+    DCHECK(!input.actual().prepared());
+    PayloadAllocator* allocator = input.stage_->PrepareInput(input.index_);
+    input.actual().set_prepared(true);
+    output.stage_->PrepareOutput(output.index_, allocator, callback);
+  });
 }
 
 void Engine::UnprepareInput(const InputRef& input) {
-  VisitUpstream(
-      input,
-      [] (const InputRef& input,
-          const OutputRef& output,
-          const Stage::UpstreamCallback& callback) {
-        DCHECK(input.actual().prepared());
-        input.stage_->UnprepareInput(input.index_);
-        output.stage_->UnprepareOutput(output.index_, callback);
-      });
+  VisitUpstream(input, [](const InputRef& input, const OutputRef& output,
+                          const Stage::UpstreamCallback& callback) {
+    DCHECK(input.actual().prepared());
+    input.stage_->UnprepareInput(input.index_);
+    output.stage_->UnprepareOutput(output.index_, callback);
+  });
 }
 
 void Engine::FlushOutput(const OutputRef& output) {
   if (!output.connected()) {
     return;
   }
-  VisitDownstream(
-      output,
-      [] (const OutputRef& output,
-          const InputRef& input,
-          const Stage::DownstreamCallback& callback) {
-        DCHECK(input.actual().prepared());
-        output.stage_->FlushOutput(output.index_);
-        input.stage_->FlushInput(input.index_, callback);
-      });
+  VisitDownstream(output, [](const OutputRef& output, const InputRef& input,
+                             const Stage::DownstreamCallback& callback) {
+    DCHECK(input.actual().prepared());
+    output.stage_->FlushOutput(output.index_);
+    input.stage_->FlushInput(input.index_, callback);
+  });
 }
 
 void Engine::RequestUpdate(Stage* stage) {
@@ -81,9 +72,8 @@ void Engine::PushToDemandBacklog(Stage* stage) {
   }
 }
 
-void Engine::VisitUpstream(
-    const InputRef& input,
-    const UpstreamVisitor& vistor) {
+void Engine::VisitUpstream(const InputRef& input,
+                           const UpstreamVisitor& vistor) {
   base::AutoLock lock(lock_);
 
   std::queue<InputRef> backlog;
@@ -98,18 +88,14 @@ void Engine::VisitUpstream(
     const OutputRef& output = input.mate();
     Stage* output_stage = output.stage_;
 
-    vistor(
-        input,
-        output,
-        [output_stage, &backlog](size_t input_index) {
-          backlog.push(InputRef(output_stage, input_index));
-        });
+    vistor(input, output, [output_stage, &backlog](size_t input_index) {
+      backlog.push(InputRef(output_stage, input_index));
+    });
   }
 }
 
-void Engine::VisitDownstream(
-    const OutputRef& output,
-    const DownstreamVisitor& vistor) {
+void Engine::VisitDownstream(const OutputRef& output,
+                             const DownstreamVisitor& vistor) {
   base::AutoLock lock(lock_);
 
   std::queue<OutputRef> backlog;
@@ -124,12 +110,9 @@ void Engine::VisitDownstream(
     const InputRef& input = output.mate();
     Stage* input_stage = input.stage_;
 
-    vistor(
-        output,
-        input,
-        [input_stage, &backlog](size_t output_index) {
-          backlog.push(OutputRef(input_stage, output_index));
-        });
+    vistor(output, input, [input_stage, &backlog](size_t output_index) {
+      backlog.push(OutputRef(input_stage, output_index));
+    });
   }
 }
 
@@ -153,7 +136,7 @@ void Engine::Update() {
   }
 }
 
-void Engine::Update(Stage *stage) {
+void Engine::Update(Stage* stage) {
   lock_.AssertAcquired();
 
   DCHECK(stage);

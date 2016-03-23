@@ -23,17 +23,18 @@ namespace {
 // StageCreator::Create creates a stage for a part. DEFINE_STAGE_CREATOR defines
 // a specialization for a particular model/stage type pair. Every new
 // model/stage type pair that's defined will need an entry here.
-template<typename T, typename Enable = void> class StageCreator;
+template <typename T, typename Enable = void>
+class StageCreator;
 
-#define DEFINE_STAGE_CREATOR(TModel, TStage) \
-template<typename T> \
-class StageCreator<T, typename std::enable_if< \
-    std::is_base_of<TModel, T>::value>::type> { \
- public: \
-  static inline Stage* Create(std::shared_ptr<T> t_ptr) { \
-    return new TStage(std::shared_ptr<TModel>(t_ptr)); \
-  } \
-};
+#define DEFINE_STAGE_CREATOR(TModel, TStage)                                 \
+  template <typename T>                                                      \
+  class StageCreator<                                                        \
+      T, typename std::enable_if<std::is_base_of<TModel, T>::value>::type> { \
+   public:                                                                   \
+    static inline Stage* Create(std::shared_ptr<T> t_ptr) {                  \
+      return new TStage(std::shared_ptr<TModel>(t_ptr));                     \
+    }                                                                        \
+  };
 
 DEFINE_STAGE_CREATOR(MultistreamSource, MultistreamSourceStage);
 DEFINE_STAGE_CREATOR(Transform, TransformStage);
@@ -42,7 +43,7 @@ DEFINE_STAGE_CREATOR(ActiveSink, ActiveSinkStage);
 
 #undef DEFINE_STAGE_CREATOR
 
-} // namespace
+}  // namespace
 
 //
 // USAGE
@@ -119,7 +120,7 @@ class Graph {
   ~Graph();
 
   // Adds a part to the graph.
-  template<typename T>
+  template <typename T>
   PartRef Add(std::shared_ptr<T> t_ptr) {
     DCHECK(t_ptr);
     return Add(StageCreator<T>::Create(t_ptr));
@@ -164,7 +165,7 @@ class Graph {
   // Adds all the parts in t (which must all have one input and one output) and
   // connects them in sequence to the output connector. Returns the output
   // connector of the last part or the output parameter if it is empty.
-  template<typename T>
+  template <typename T>
   OutputRef AddAndConnectAll(OutputRef output, const T& t) {
     for (const auto& element : t) {
       PartRef part = Add(StageCreator<T>::Create(element));

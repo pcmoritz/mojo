@@ -21,9 +21,8 @@ class MediaTest {
  public:
   using UpdateCallback = std::function<void()>;
 
-  static std::unique_ptr<MediaTest> Create(
-      mojo::ApplicationImpl* app,
-      const std::string& input_file_name);
+  static std::unique_ptr<MediaTest> Create(mojo::ApplicationImpl* app,
+                                           const std::string& input_file_name);
 
   ~MediaTest();
 
@@ -53,9 +52,8 @@ class MediaTest {
 
   // Handles a status update from the player. When called with the default
   // argument values, initiates status updates.
-  void HandleStatusUpdates(
-      uint64_t version = MediaPlayer::kInitialStatus,
-      MediaPlayerStatusPtr status = nullptr);
+  void HandleStatusUpdates(uint64_t version = MediaPlayer::kInitialStatus,
+                           MediaPlayerStatusPtr status = nullptr);
 
   MediaPlayerPtr media_player_;
   MediaState state_;

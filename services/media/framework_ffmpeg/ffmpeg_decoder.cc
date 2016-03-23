@@ -10,9 +10,8 @@
 namespace mojo {
 namespace media {
 
-Result FfmpegDecoder::Create(
-    const StreamType& stream_type,
-    std::shared_ptr<Decoder>* decoder_out) {
+Result FfmpegDecoder::Create(const StreamType& stream_type,
+                             std::shared_ptr<Decoder>* decoder_out) {
   DCHECK(decoder_out);
 
   AvCodecContextPtr av_codec_context(AvCodecContext::Create(stream_type));
@@ -46,5 +45,5 @@ Result FfmpegDecoder::Create(
   return Result::kOk;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

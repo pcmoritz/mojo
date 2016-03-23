@@ -11,12 +11,12 @@
 namespace mojo {
 namespace media {
 
-template<typename T>
+template <typename T>
 std::unique_ptr<T> SafeClone(const std::unique_ptr<T>& t_ptr) {
   return t_ptr ? t_ptr.get()->Clone() : nullptr;
 }
 
-template<typename T>
+template <typename T>
 std::unique_ptr<std::vector<std::unique_ptr<T>>> SafeClone(
     const std::unique_ptr<std::vector<std::unique_ptr<T>>>& vec) {
   if (vec == nullptr) {
@@ -37,4 +37,4 @@ std::unique_ptr<std::vector<std::unique_ptr<T>>> SafeClone(
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_SAFE_CLONE_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_SAFE_CLONE_H_

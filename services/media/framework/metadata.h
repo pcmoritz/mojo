@@ -20,14 +20,13 @@ class Metadata;
 // TODO(dalesat): Probably needs to be extensible. Consider using map-like.
 class Metadata {
  public:
-  static std::unique_ptr<Metadata> Create(
-      uint64_t duration_ns,
-      const std::string& title,
-      const std::string& artist,
-      const std::string& album,
-      const std::string& publisher,
-      const std::string& genre,
-      const std::string& composer);
+  static std::unique_ptr<Metadata> Create(uint64_t duration_ns,
+                                          const std::string& title,
+                                          const std::string& artist,
+                                          const std::string& album,
+                                          const std::string& publisher,
+                                          const std::string& genre,
+                                          const std::string& composer);
 
   ~Metadata();
 
@@ -46,25 +45,18 @@ class Metadata {
   const std::string& composer() const { return composer_; }
 
   std::unique_ptr<Metadata> Clone() const {
-    return Create(
-        duration_ns_,
-        title_,
-        artist_,
-        album_,
-        publisher_,
-        genre_,
-        composer_);
+    return Create(duration_ns_, title_, artist_, album_, publisher_, genre_,
+                  composer_);
   }
 
  private:
-  Metadata(
-      uint64_t duration_ns,
-      const std::string& title,
-      const std::string& artist,
-      const std::string& album,
-      const std::string& publisher,
-      const std::string& genre,
-      const std::string& composer);
+  Metadata(uint64_t duration_ns,
+           const std::string& title,
+           const std::string& artist,
+           const std::string& album,
+           const std::string& publisher,
+           const std::string& genre,
+           const std::string& composer);
 
   uint64_t duration_ns_;
   std::string title_;
@@ -80,4 +72,4 @@ class Metadata {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_METADATA_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_METADATA_H_

@@ -20,9 +20,8 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that renders streams from an origin specified by URL.
-class MediaPlayerImpl
-    : public MediaFactoryService::Product,
-      public MediaPlayer {
+class MediaPlayerImpl : public MediaFactoryService::Product,
+                        public MediaPlayer {
  public:
   static std::shared_ptr<MediaPlayerImpl> Create(
       const String& originUrl,
@@ -32,8 +31,8 @@ class MediaPlayerImpl
   ~MediaPlayerImpl() override;
 
   // MediaPlayer implementation.
-  void GetStatus(uint64_t version_last_seen, const GetStatusCallback& callback)
-      override;
+  void GetStatus(uint64_t version_last_seen,
+                 const GetStatusCallback& callback) override;
 
   void Play() override;
 
@@ -56,10 +55,9 @@ class MediaPlayerImpl
     MediaProducerPtr decoded_producer_;
   };
 
-  MediaPlayerImpl(
-      const String& originUrl,
-      InterfaceRequest<MediaPlayer> request,
-      MediaFactoryService* owner);
+  MediaPlayerImpl(const String& originUrl,
+                  InterfaceRequest<MediaPlayer> request,
+                  MediaFactoryService* owner);
 
   // Handles events in paused state.
   void WhenPaused();
@@ -88,11 +86,10 @@ class MediaPlayerImpl
 
   // Creates a sink for a stream.
   // TODO(dalesat): Use raw pointers rather than const std::unique_ptr<>&.
-  void CreateSink(
-      const std::unique_ptr<Stream>& stream,
-      const MediaTypePtr& input_media_type,
-      const String& url,
-      Event event);
+  void CreateSink(const std::unique_ptr<Stream>& stream,
+                  const MediaTypePtr& input_media_type,
+                  const String& url,
+                  Event event);
 
   // Increments the status version and runs pending status request callbacks.
   void StatusUpdated();
@@ -102,16 +99,14 @@ class MediaPlayerImpl
 
   // Handles a status update from the source. When called with the default
   // argument values, initiates source status updates.
-  void HandleSourceStatusUpdates(
-      uint64_t version = MediaSource::kInitialStatus,
-      MediaSourceStatusPtr status = nullptr);
+  void HandleSourceStatusUpdates(uint64_t version = MediaSource::kInitialStatus,
+                                 MediaSourceStatusPtr status = nullptr);
 
   // Handles a status update from a sink. When called with the default
   // argument values, initiates sink status updates.
-  void HandleSinkStatusUpdates(
-      const std::unique_ptr<Stream>& stream,
-      uint64_t version = MediaSink::kInitialStatus,
-      MediaSinkStatusPtr status = nullptr);
+  void HandleSinkStatusUpdates(const std::unique_ptr<Stream>& stream,
+                               uint64_t version = MediaSink::kInitialStatus,
+                               MediaSinkStatusPtr status = nullptr);
 
   Event event_;
   Binding<MediaPlayer> binding_;

@@ -9,31 +9,22 @@
 namespace mojo {
 namespace media {
 
-Packet::Packet(
-    int64_t pts,
-    bool end_of_stream,
-    size_t size,
-    void* payload) :
-    pts_(pts),
-    end_of_stream_(end_of_stream),
-    size_(size),
-    payload_(payload) {
+Packet::Packet(int64_t pts, bool end_of_stream, size_t size, void* payload)
+    : pts_(pts), end_of_stream_(end_of_stream), size_(size), payload_(payload) {
   DCHECK((size == 0) == (payload == nullptr));
 }
 
 class PacketImpl : public Packet {
  public:
-  PacketImpl(
-      int64_t pts,
-      bool end_of_stream,
-      size_t size,
-      void* payload,
-      PayloadAllocator* allocator) :
-      Packet(pts, end_of_stream, size, payload),
-      allocator_(allocator) {}
+  PacketImpl(int64_t pts,
+             bool end_of_stream,
+             size_t size,
+             void* payload,
+             PayloadAllocator* allocator)
+      : Packet(pts, end_of_stream, size, payload), allocator_(allocator) {}
 
  protected:
-  ~PacketImpl() override {};
+  ~PacketImpl() override{};
 
   void Release() override {
     // In the default implementation, payload() will be nullptr if and only if
@@ -51,43 +42,31 @@ class PacketImpl : public Packet {
 };
 
 // static
-PacketPtr Packet::Create(
-    int64_t pts,
-    bool end_of_stream,
-    size_t size,
-    void* payload,
-    PayloadAllocator* allocator) {
+PacketPtr Packet::Create(int64_t pts,
+                         bool end_of_stream,
+                         size_t size,
+                         void* payload,
+                         PayloadAllocator* allocator) {
   DCHECK(payload == nullptr || allocator != nullptr);
-  return PacketPtr(new PacketImpl(
-      pts,
-      end_of_stream,
-      size,
-      payload,
-      allocator));
+  return PacketPtr(
+      new PacketImpl(pts, end_of_stream, size, payload, allocator));
 }
 
 // static
-PacketPtr Packet::CreateNoAllocator(
-    int64_t pts,
-    bool end_of_stream,
-    size_t size,
-    void* payload) {
-  return PacketPtr(new PacketImpl(
-      pts,
-      end_of_stream,
-      size,
-      payload,
-      nullptr));
+PacketPtr Packet::CreateNoAllocator(int64_t pts,
+                                    bool end_of_stream,
+                                    size_t size,
+                                    void* payload) {
+  return PacketPtr(new PacketImpl(pts, end_of_stream, size, payload, nullptr));
 }
 
 // static
 PacketPtr Packet::CreateEndOfStream(int64_t pts) {
-  return PacketPtr(new PacketImpl(
-      pts,
-      true, // end_of_stream
-      0, // size
-      nullptr, // payload
-      nullptr)); // allocator
+  return PacketPtr(new PacketImpl(pts,
+                                  true,       // end_of_stream
+                                  0,          // size
+                                  nullptr,    // payload
+                                  nullptr));  // allocator
 }
 
 }  // namespace media

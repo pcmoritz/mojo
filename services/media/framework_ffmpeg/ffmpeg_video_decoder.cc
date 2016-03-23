@@ -8,18 +8,17 @@
 namespace mojo {
 namespace media {
 
-FfmpegVideoDecoder::FfmpegVideoDecoder(AvCodecContextPtr av_codec_context) :
-    FfmpegDecoderBase(std::move(av_codec_context)) {
+FfmpegVideoDecoder::FfmpegVideoDecoder(AvCodecContextPtr av_codec_context)
+    : FfmpegDecoderBase(std::move(av_codec_context)) {
   DCHECK(context());
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder() {}
 
-int FfmpegVideoDecoder::Decode(
-    const AVPacket& av_packet,
-    const ffmpeg::AvFramePtr& av_frame_ptr,
-    PayloadAllocator* allocator,
-    bool* frame_decoded_out) {
+int FfmpegVideoDecoder::Decode(const AVPacket& av_packet,
+                               const ffmpeg::AvFramePtr& av_frame_ptr,
+                               PayloadAllocator* allocator,
+                               bool* frame_decoded_out) {
   DCHECK(av_frame_ptr);
   DCHECK(allocator);
   DCHECK(frame_decoded_out);
@@ -27,28 +26,19 @@ int FfmpegVideoDecoder::Decode(
 
   int frame_decoded = 0;
   int input_bytes_used = avcodec_decode_video2(
-    context().get(),
-    av_frame_ptr.get(),
-    &frame_decoded,
-    &av_packet);
+      context().get(), av_frame_ptr.get(), &frame_decoded, &av_packet);
   *frame_decoded_out = frame_decoded != 0;
   return input_bytes_used;
 }
 
-
-PacketPtr FfmpegVideoDecoder::CreateOutputPacket(
-    const AVFrame& av_frame,
-    PayloadAllocator* allocator) {
+PacketPtr FfmpegVideoDecoder::CreateOutputPacket(const AVFrame& av_frame,
+                                                 PayloadAllocator* allocator) {
   DCHECK(allocator);
 
   // End of stream is indicated when we're draining and produce no packet.
   // TODO(dalesat): This is just a copy of the audio version.
-  return Packet::Create(
-      av_frame.pts,
-      false,
-      packet_size_,
-      av_frame.data[0],
-      allocator);
+  return Packet::Create(av_frame.pts, false, packet_size_, av_frame.data[0],
+                        allocator);
 }
 
 PacketPtr FfmpegVideoDecoder::CreateOutputEndOfStreamPacket() {
@@ -66,12 +56,12 @@ int FfmpegVideoDecoder::AllocateBufferForAvFrame(
   // be sure to avoid using context().
 
   // TODO(dalesat): Not sure why/if this is needed.
-  //int result = av_image_check_size(
+  // int result = av_image_check_size(
   //    av_codec_context->width,
   //    av_codec_context->height,
   //    0,
   //    NULL);
-  //if (result < 0) {
+  // if (result < 0) {
   //  DCHECK(false) << "av_image_check_size failed";
   //  return result;
   //}
@@ -81,10 +71,10 @@ int FfmpegVideoDecoder::AllocateBufferForAvFrame(
       std::max(av_codec_context->width, av_codec_context->coded_width);
   int coded_height =
       std::max(av_codec_context->height, av_codec_context->coded_height);
-  DCHECK_EQ(coded_width, av_codec_context->coded_width) <<
-      "coded width is less than width";
-  DCHECK_EQ(coded_height, av_codec_context->coded_height) <<
-      "coded height is less than height";
+  DCHECK_EQ(coded_width, av_codec_context->coded_width)
+      << "coded width is less than width";
+  DCHECK_EQ(coded_height, av_codec_context->coded_height)
+      << "coded height is less than height";
 
   // TODO(dalesat): Fill in av_frame->data and av_frame->data for each plane.
 
@@ -94,20 +84,20 @@ int FfmpegVideoDecoder::AllocateBufferForAvFrame(
   av_frame->reordered_opaque = av_codec_context->reordered_opaque;
 
   av_frame->buf[0] = av_buffer_create(
-      av_frame->data[0], // Because this is the first chunk in the buffer.
-      0, // TODO(dalesat): Provide this.
+      av_frame->data[0],  // Because this is the first chunk in the buffer.
+      0,                  // TODO(dalesat): Provide this.
       ReleaseBufferForAvFrame,
-      nullptr, // opaque
-      0); // flags
+      nullptr,  // opaque
+      0);       // flags
 
   return 0;
 }
 
-void FfmpegVideoDecoder::ReleaseBufferForAvFrame(
-  void* opaque, uint8_t* buffer) {
+void FfmpegVideoDecoder::ReleaseBufferForAvFrame(void* opaque,
+                                                 uint8_t* buffer) {
   // Nothing to do.
   // TODO(dalesat): Can we get rid of this method altogether?
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

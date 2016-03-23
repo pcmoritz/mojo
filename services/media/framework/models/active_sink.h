@@ -34,4 +34,4 @@ class ActiveSink : public Part {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_ACTIVE_SINK_H_
+#endif  // MOJO_MEDIA_MODELS_ACTIVE_SINK_H_

@@ -55,16 +55,14 @@ void ExtraDataFromBytes(const Bytes& bytes, const AvCodecContextPtr& context) {
 // Creates a StreamType from an AVCodecContext describing an LPCM type.
 std::unique_ptr<StreamType> StreamTypeFromLpcmCodecContext(
     const AVCodecContext& from) {
-  return LpcmStreamType::Create(
-      Convert(from.sample_fmt),
-      from.channels,
-      from.sample_rate);
+  return LpcmStreamType::Create(Convert(from.sample_fmt), from.channels,
+                                from.sample_rate);
 }
 
 // Creates a StreamType from an AVCodecContext describing a compressed audio
 // type.
-std::unique_ptr<StreamType>
-StreamTypeFromCompressedAudioCodecContext(const AVCodecContext& from) {
+std::unique_ptr<StreamType> StreamTypeFromCompressedAudioCodecContext(
+    const AVCodecContext& from) {
   CompressedAudioStreamType::AudioEncoding encoding;
   switch (from.codec_id) {
     case CODEC_ID_VORBIS:
@@ -76,13 +74,9 @@ StreamTypeFromCompressedAudioCodecContext(const AVCodecContext& from) {
   }
 
   return CompressedAudioStreamType::Create(
-      encoding,
-      Convert(from.sample_fmt),
-      from.channels,
-      from.sample_rate,
-      from.extradata_size == 0 ?
-          nullptr :
-          Bytes::Create(from.extradata, from.extradata_size));
+      encoding, Convert(from.sample_fmt), from.channels, from.sample_rate,
+      from.extradata_size == 0 ? nullptr : Bytes::Create(from.extradata,
+                                                         from.extradata_size));
 }
 
 // Converts AVColorSpace and AVColorRange to ColorSpace.
@@ -133,7 +127,7 @@ int FfmpegProfileFromVideoProfile(VideoStreamType::VideoProfile video_profile) {
     case VideoStreamType::VideoProfile::kH264MultiviewHigh:
     default:
       return FF_PROFILE_UNKNOWN;
-   }
+  }
 }
 
 // Converts an AVPixelFormat to a PixelFormat.
@@ -153,7 +147,7 @@ VideoStreamType::PixelFormat PixelFormatFromAVPixelFormat(
     case AV_PIX_FMT_YUVA420P:
       return VideoStreamType::PixelFormat::kYv12A;
     default:
-    return VideoStreamType::PixelFormat::kUnknown;
+      return VideoStreamType::PixelFormat::kUnknown;
   }
 }
 
@@ -192,7 +186,7 @@ std::unique_ptr<StreamType> StreamTypeFromVideoCodecContext(
     const AVCodecContext& from) {
   VideoStreamType::VideoEncoding encoding;
   switch (from.codec_id) {
-    case AV_CODEC_ID_THEORA :
+    case AV_CODEC_ID_THEORA:
       encoding = VideoStreamType::VideoEncoding::kTheora;
       break;
     case CODEC_ID_VP8:
@@ -204,17 +198,12 @@ std::unique_ptr<StreamType> StreamTypeFromVideoCodecContext(
   }
 
   return VideoStreamType::Create(
-      encoding,
-      VideoStreamType::VideoProfile::kNotApplicable,
+      encoding, VideoStreamType::VideoProfile::kNotApplicable,
       PixelFormatFromAVPixelFormat(from.pix_fmt),
       ColorSpaceFromAVColorSpaceAndRange(from.colorspace, from.color_range),
-      from.width,
-      from.height,
-      from.coded_width,
-      from.coded_height,
-      from.extradata_size == 0 ?
-          nullptr :
-          Bytes::Create(from.extradata, from.extradata_size));
+      from.width, from.height, from.coded_width, from.coded_height,
+      from.extradata_size == 0 ? nullptr : Bytes::Create(from.extradata,
+                                                         from.extradata_size));
 }
 
 // Creates a StreamType from an AVCodecContext describing a data type.
@@ -357,7 +346,7 @@ std::unique_ptr<StreamType> AvCodecContext::GetStreamType(
     case AVMEDIA_TYPE_VIDEO:
       return StreamTypeFromVideoCodecContext(from);
     case AVMEDIA_TYPE_UNKNOWN:
-      // Treated as AVMEDIA_TYPE_DATA.
+    // Treated as AVMEDIA_TYPE_DATA.
     case AVMEDIA_TYPE_DATA:
       return StreamTypeFromDataCodecContext(from);
     case AVMEDIA_TYPE_SUBTITLE:
@@ -386,5 +375,5 @@ AvCodecContextPtr AvCodecContext::Create(const StreamType& stream_type) {
   }
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

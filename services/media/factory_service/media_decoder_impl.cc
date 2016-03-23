@@ -14,16 +14,13 @@ std::shared_ptr<MediaDecoderImpl> MediaDecoderImpl::Create(
     MediaTypePtr input_media_type,
     InterfaceRequest<MediaTypeConverter> request,
     MediaFactoryService* owner) {
-  return std::shared_ptr<MediaDecoderImpl>(new MediaDecoderImpl(
-      input_media_type.Pass(),
-      request.Pass(),
-      owner));
+  return std::shared_ptr<MediaDecoderImpl>(
+      new MediaDecoderImpl(input_media_type.Pass(), request.Pass(), owner));
 }
 
-MediaDecoderImpl::MediaDecoderImpl(
-    MediaTypePtr input_media_type,
-    InterfaceRequest<MediaTypeConverter> request,
-    MediaFactoryService* owner)
+MediaDecoderImpl::MediaDecoderImpl(MediaTypePtr input_media_type,
+                                   InterfaceRequest<MediaTypeConverter> request,
+                                   MediaFactoryService* owner)
     : MediaFactoryService::Product(owner),
       binding_(this, request.Pass()),
       consumer_(MojoConsumer::Create()),
@@ -31,9 +28,7 @@ MediaDecoderImpl::MediaDecoderImpl(
   DCHECK(input_media_type);
 
   // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() {
-    ReleaseFromOwner();
-  });
+  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   std::unique_ptr<StreamType> input_stream_type = Convert(input_media_type);
 
@@ -84,5 +79,5 @@ void MediaDecoderImpl::GetProducer(
   producer_->AddBinding(producer.Pass());
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

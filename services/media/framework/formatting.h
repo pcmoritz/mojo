@@ -52,18 +52,16 @@ std::ostream& operator<<(std::ostream& os, Demand value);
 std::ostream& operator<<(std::ostream& os, const PacketPtr& value);
 std::ostream& operator<<(std::ostream& os, StreamType::Scheme value);
 std::ostream& operator<<(std::ostream& os, LpcmStreamType::SampleFormat value);
-std::ostream& operator<<(
-    std::ostream& os,
-    CompressedAudioStreamType::AudioEncoding value);
-std::ostream& operator<<(
-    std::ostream& os,
-    VideoStreamType::VideoEncoding value);
+std::ostream& operator<<(std::ostream& os,
+                         CompressedAudioStreamType::AudioEncoding value);
+std::ostream& operator<<(std::ostream& os,
+                         VideoStreamType::VideoEncoding value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::VideoProfile value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::PixelFormat value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::ColorSpace value);
 std::ostream& operator<<(std::ostream& os, const std::unique_ptr<Bytes>& value);
 
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, Range<T> value) {
   return os << value.min << ".." << value.max;
 }
@@ -72,12 +70,10 @@ std::ostream& operator<<(std::ostream& os, Range<bool> value);
 
 // The following overloads add newlines.
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const std::unique_ptr<StreamType>& value);
-std::ostream& operator<<(
-    std::ostream& os,
-    const std::unique_ptr<StreamTypeSet>& value);
+std::ostream& operator<<(std::ostream& os,
+                         const std::unique_ptr<StreamType>& value);
+std::ostream& operator<<(std::ostream& os,
+                         const std::unique_ptr<StreamTypeSet>& value);
 std::ostream& operator<<(
     std::ostream& os,
     const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>& value);
@@ -85,7 +81,7 @@ std::ostream& operator<<(
     std::ostream& os,
     const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>& value);
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FORMATTING_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FORMATTING_H_

@@ -5,7 +5,6 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_CONSUMER_H_
 #define SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_CONSUMER_H_
 
-
 #include "base/single_thread_task_runner.h"
 #include "base/task_runner.h"
 #include "mojo/common/binding_set.h"
@@ -50,12 +49,11 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
   void SetFlushRequestedCallback(const FlushRequestedCallback& callback);
 
   // MediaConsumer implementation.
-  void SetBuffer(
-      ScopedSharedBufferHandle buffer,
-      const SetBufferCallback& callback) override;
+  void SetBuffer(ScopedSharedBufferHandle buffer,
+                 const SetBufferCallback& callback) override;
 
-  void SendPacket(MediaPacketPtr packet, const SendPacketCallback& callback)
-      override;
+  void SendPacket(MediaPacketPtr packet,
+                  const SendPacketCallback& callback) override;
 
   void Prime(const PrimeCallback& callback) override;
 
@@ -81,22 +79,18 @@ class MojoConsumer : public MojoConsumerMediaConsumer, public ActiveSource {
         const SendPacketCallback& callback,
         scoped_refptr<base::SingleThreadTaskRunner> task_runner,
         const MappedSharedBuffer& buffer) {
-      return PacketPtr(new PacketImpl(
-          media_packet.Pass(),
-          callback,
-          task_runner,
-          buffer));
+      return PacketPtr(
+          new PacketImpl(media_packet.Pass(), callback, task_runner, buffer));
     }
 
    protected:
     void Release() override;
 
    private:
-    PacketImpl(
-        MediaPacketPtr media_packet,
-        const SendPacketCallback& callback,
-        scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-        const MappedSharedBuffer& buffer);
+    PacketImpl(MediaPacketPtr media_packet,
+               const SendPacketCallback& callback,
+               scoped_refptr<base::SingleThreadTaskRunner> task_runner,
+               const MappedSharedBuffer& buffer);
 
     ~PacketImpl() override;
 

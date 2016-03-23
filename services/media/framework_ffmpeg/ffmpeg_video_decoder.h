@@ -20,24 +20,21 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
 
  protected:
   // FfmpegDecoderBase overrides.
-  int Decode(
-      const AVPacket& av_packet,
-      const ffmpeg::AvFramePtr& av_frame_ptr,
-      PayloadAllocator* allocator,
-      bool* frame_decoded_out) override;
+  int Decode(const AVPacket& av_packet,
+             const ffmpeg::AvFramePtr& av_frame_ptr,
+             PayloadAllocator* allocator,
+             bool* frame_decoded_out) override;
 
-  PacketPtr CreateOutputPacket(
-      const AVFrame& av_frame,
-      PayloadAllocator* allocator) override;
+  PacketPtr CreateOutputPacket(const AVFrame& av_frame,
+                               PayloadAllocator* allocator) override;
 
   PacketPtr CreateOutputEndOfStreamPacket() override;
 
  private:
   // Callback used by the ffmpeg decoder to acquire a buffer.
-  static int AllocateBufferForAvFrame(
-      AVCodecContext* av_codec_context,
-      AVFrame* av_frame,
-      int flags);
+  static int AllocateBufferForAvFrame(AVCodecContext* av_codec_context,
+                                      AVFrame* av_frame,
+                                      int flags);
 
   // Callback used by the ffmpeg decoder to release a buffer.
   static void ReleaseBufferForAvFrame(void* opaque, uint8_t* buffer);
@@ -48,10 +45,10 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
 
   // This is used to verify that an allocated buffer is being used as expected
   // by ffmpeg avcodec_decode_audio4. AllocateBufferForAvFrame sets it.
-  //void* packet_buffer_;
+  // void* packet_buffer_;
 };
 
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_VIDEO_DECODER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_VIDEO_DECODER_H_

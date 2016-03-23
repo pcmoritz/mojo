@@ -8,9 +8,7 @@ namespace mojo {
 namespace media {
 
 Graph::Graph() {
-  update_function_ = [this](Stage* stage) {
-    engine_.RequestUpdate(stage);
-  };
+  update_function_ = [this](Stage* stage) { engine_.RequestUpdate(stage); };
 }
 
 Graph::~Graph() {
@@ -62,27 +60,23 @@ PartRef Graph::Connect(const OutputRef& output, const InputRef& input) {
   return input.part();
 }
 
-PartRef Graph::ConnectParts(
-    PartRef upstream_part,
-    PartRef downstream_part) {
+PartRef Graph::ConnectParts(PartRef upstream_part, PartRef downstream_part) {
   DCHECK(upstream_part.valid());
   DCHECK(downstream_part.valid());
   Connect(upstream_part.output(), downstream_part.input());
   return downstream_part;
 }
 
-PartRef Graph::ConnectOutputToPart(
-    const OutputRef& output,
-    PartRef downstream_part) {
+PartRef Graph::ConnectOutputToPart(const OutputRef& output,
+                                   PartRef downstream_part) {
   DCHECK(output.valid());
   DCHECK(downstream_part.valid());
   Connect(output, downstream_part.input());
   return downstream_part;
 }
 
-PartRef Graph::ConnectPartToInput(
-    PartRef upstream_part,
-    const InputRef& input) {
+PartRef Graph::ConnectPartToInput(PartRef upstream_part,
+                                  const InputRef& input) {
   DCHECK(upstream_part.valid());
   DCHECK(input.valid());
   Connect(upstream_part.output(), input);
@@ -128,7 +122,7 @@ void Graph::DisconnectInput(const InputRef& input) {
 void Graph::RemovePartsConnectedToPart(PartRef part) {
   DCHECK(part.valid());
 
-  std::deque<PartRef> to_remove { part };
+  std::deque<PartRef> to_remove{part};
 
   while (!to_remove.empty()) {
     PartRef part = to_remove.front();

@@ -33,5 +33,5 @@ Result Reader::Create(const GURL& gurl, std::shared_ptr<Reader>* reader_out) {
   return result;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

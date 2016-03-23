@@ -29,13 +29,9 @@ AvIoContextPtr AvIoContext::Create(std::shared_ptr<Reader> reader) {
   InitFfmpeg();
 
   AVIOContext* result = avio_alloc_context(
-      static_cast<unsigned char*>(av_malloc(kBufferSize)),
-      kBufferSize,
-      0, // write_flag
-      new AvIoContext(reader),
-      &Read,
-      nullptr,
-      &Seek);
+      static_cast<unsigned char*>(av_malloc(kBufferSize)), kBufferSize,
+      0,  // write_flag
+      new AvIoContext(reader), &Read, nullptr, &Seek);
 
   // Ensure FFmpeg only tries to seek when we know how.
   result->seekable = reader->CanSeek() ? AVIO_SEEKABLE_NORMAL : 0;
@@ -110,6 +106,5 @@ int64_t AvIoContext::Seek(int64_t offset, int whence) {
   return position_;
 }
 
-
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

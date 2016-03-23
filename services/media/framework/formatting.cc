@@ -64,9 +64,8 @@ std::ostream& operator<<(std::ostream& os, const PacketPtr& value) {
   return os;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const std::unique_ptr<StreamType>& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const std::unique_ptr<StreamType>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -78,50 +77,53 @@ std::ostream& operator<<(
   switch (value->scheme()) {
     case StreamType::Scheme::kMultiplexed:
       os << begl << "std::unique_ptr<StreamType> multiplex_type: "
-          << value->multiplexed()->multiplex_type();
+         << value->multiplexed()->multiplex_type();
       os << begl << "std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>"
-          << " substream_types: "
-          << value->multiplexed()->substream_types();
+         << " substream_types: " << value->multiplexed()->substream_types();
       break;
     case StreamType::Scheme::kLpcm:
-      os << begl << "SampleFormat sample_format: "
-          << value->lpcm()->sample_format() << std::endl;
-      os << begl << "uint32_t channels: "
-          << value->lpcm()->channels() << std::endl;
-      os << begl << "uint32_t frames_per_second: "
-          << value->lpcm()->frames_per_second() << std::endl;
+      os << begl
+         << "SampleFormat sample_format: " << value->lpcm()->sample_format()
+         << std::endl;
+      os << begl << "uint32_t channels: " << value->lpcm()->channels()
+         << std::endl;
+      os << begl
+         << "uint32_t frames_per_second: " << value->lpcm()->frames_per_second()
+         << std::endl;
       break;
     case StreamType::Scheme::kCompressedAudio:
-      os << begl << "AudioEncoding encoding: "
-          << value->compressed_audio()->encoding() << std::endl;
+      os << begl
+         << "AudioEncoding encoding: " << value->compressed_audio()->encoding()
+         << std::endl;
       os << begl << "SampleFormat sample_format: "
-          << value->compressed_audio()->sample_format() << std::endl;
-      os << begl << "uint32_t channels: "
-          << value->compressed_audio()->channels() << std::endl;
+         << value->compressed_audio()->sample_format() << std::endl;
+      os << begl
+         << "uint32_t channels: " << value->compressed_audio()->channels()
+         << std::endl;
       os << begl << "uint32_t frames_per_second: "
-          << value->compressed_audio()->frames_per_second() << std::endl;
+         << value->compressed_audio()->frames_per_second() << std::endl;
       os << begl << "std::unique_ptr<Bytes> encoding_details: "
-          << value->compressed_audio()->encoding_details() << std::endl;
+         << value->compressed_audio()->encoding_details() << std::endl;
       break;
     case StreamType::Scheme::kVideo:
-      os << begl << "VideoEncoding encoding: "
-          << value->video()->encoding() << std::endl;
-      os << begl << "VideoProfile profile: "
-          << value->video()->profile() << std::endl;
-      os << begl << "PixelFormat pixel_format: "
-          << value->video()->pixel_format() << std::endl;
-      os << begl << "ColorSpace color_space: "
-          << value->video()->color_space() << std::endl;
-      os << begl << "uint32_t width: "
-          << value->video()->width() << std::endl;
-      os << begl << "uint32_t height: "
-          << value->video()->height() << std::endl;
-      os << begl << "uint32_t coded_width: "
-          << value->video()->coded_width() << std::endl;
-      os << begl << "uint32_t coded_height: "
-          << value->video()->coded_height() << std::endl;
+      os << begl << "VideoEncoding encoding: " << value->video()->encoding()
+         << std::endl;
+      os << begl << "VideoProfile profile: " << value->video()->profile()
+         << std::endl;
+      os << begl
+         << "PixelFormat pixel_format: " << value->video()->pixel_format()
+         << std::endl;
+      os << begl << "ColorSpace color_space: " << value->video()->color_space()
+         << std::endl;
+      os << begl << "uint32_t width: " << value->video()->width() << std::endl;
+      os << begl << "uint32_t height: " << value->video()->height()
+         << std::endl;
+      os << begl << "uint32_t coded_width: " << value->video()->coded_width()
+         << std::endl;
+      os << begl << "uint32_t coded_height: " << value->video()->coded_height()
+         << std::endl;
       os << begl << "std::unique_ptr<Bytes> encoding_details: "
-          << value->video()->encoding_details() << std::endl;
+         << value->video()->encoding_details() << std::endl;
       break;
     default:
       break;
@@ -130,9 +132,8 @@ std::ostream& operator<<(
   return os << outdent;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const std::unique_ptr<StreamTypeSet>& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const std::unique_ptr<StreamTypeSet>& value) {
   if (!value) {
     return os << "<nullptr>" << std::endl;
   } else {
@@ -144,36 +145,38 @@ std::ostream& operator<<(
   switch (value->scheme()) {
     case StreamType::Scheme::kMultiplexed:
       os << begl << "std::unique_ptr<StreamTypeSet> multiplex_type_set: "
-          << value->multiplexed()->multiplex_type_set();
+         << value->multiplexed()->multiplex_type_set();
       os << begl << "std::unique_ptr<std::vector<std::unique_ptr<"
-          << "StreamTypeSet>>> substream_type_sets: "
-          << value->multiplexed()->substream_type_sets();
+         << "StreamTypeSet>>> substream_type_sets: "
+         << value->multiplexed()->substream_type_sets();
       break;
     case StreamType::Scheme::kLpcm:
-      os << begl << "SampleFormat sample_format: "
-          << value->lpcm()->sample_format() << std::endl;
-      os << begl << "Range<uint32_t> channels: "
-          << value->lpcm()->channels() << std::endl;
+      os << begl
+         << "SampleFormat sample_format: " << value->lpcm()->sample_format()
+         << std::endl;
+      os << begl << "Range<uint32_t> channels: " << value->lpcm()->channels()
+         << std::endl;
       os << begl << "Range<uint32_t> frames_per_second: "
-          << value->lpcm()->frames_per_second() << std::endl;
+         << value->lpcm()->frames_per_second() << std::endl;
       break;
     case StreamType::Scheme::kCompressedAudio:
-      os << begl << "AudioEncoding encoding: "
-          << value->compressed_audio()->encoding() << std::endl;
+      os << begl
+         << "AudioEncoding encoding: " << value->compressed_audio()->encoding()
+         << std::endl;
       os << begl << "SampleFormat sample_format: "
-          << value->compressed_audio()->sample_format() << std::endl;
+         << value->compressed_audio()->sample_format() << std::endl;
       os << begl << "Range<uint32_t> channels: "
-          << value->compressed_audio()->channels() << std::endl;
+         << value->compressed_audio()->channels() << std::endl;
       os << begl << "Range<uint32_t> frames_per_second: "
-          << value->compressed_audio()->frames_per_second() << std::endl;
+         << value->compressed_audio()->frames_per_second() << std::endl;
       break;
     case StreamType::Scheme::kVideo:
-      os << begl << "VideoEncoding encoding: "
-          << value->video()->encoding() << std::endl;
-      os << begl << "Range<uint32_t> width: "
-          << value->video()->width() << std::endl;
-      os << begl << "Range<uint32_t> height: "
-          << value->video()->height() << std::endl;
+      os << begl << "VideoEncoding encoding: " << value->video()->encoding()
+         << std::endl;
+      os << begl << "Range<uint32_t> width: " << value->video()->width()
+         << std::endl;
+      os << begl << "Range<uint32_t> height: " << value->video()->height()
+         << std::endl;
       break;
     default:
       break;
@@ -270,9 +273,8 @@ std::ostream& operator<<(std::ostream& os, LpcmStreamType::SampleFormat value) {
   return os;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    CompressedAudioStreamType::AudioEncoding value) {
+std::ostream& operator<<(std::ostream& os,
+                         CompressedAudioStreamType::AudioEncoding value) {
   switch (value) {
     case CompressedAudioStreamType::AudioEncoding::kUnknown:
       return os << "kUnknown";
@@ -284,9 +286,8 @@ std::ostream& operator<<(
   return os;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    VideoStreamType::VideoEncoding value) {
+std::ostream& operator<<(std::ostream& os,
+                         VideoStreamType::VideoEncoding value) {
   switch (value) {
     case VideoStreamType::VideoEncoding::kUnknown:
       return os << "kUnknown";
@@ -300,9 +301,8 @@ std::ostream& operator<<(
   return os;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    VideoStreamType::VideoProfile value) {
+std::ostream& operator<<(std::ostream& os,
+                         VideoStreamType::VideoProfile value) {
   switch (value) {
     case VideoStreamType::VideoProfile::kUnknown:
       return os << "kUnknown";
@@ -388,9 +388,8 @@ std::ostream& operator<<(std::ostream& os, VideoStreamType::ColorSpace value) {
   return os;
 }
 
-std::ostream& operator<<(
-    std::ostream& os,
-    const std::unique_ptr<Bytes>& value) {
+std::ostream& operator<<(std::ostream& os,
+                         const std::unique_ptr<Bytes>& value) {
   if (value == nullptr) {
     return os << "<nullptr>";
   } else {
@@ -403,10 +402,10 @@ std::ostream& operator<<(std::ostream& os, Range<bool> value) {
     return os << "true";
   } else if (value.max) {
     return os << "false..true";
-  }  else {
+  } else {
     return os << "false";
   }
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

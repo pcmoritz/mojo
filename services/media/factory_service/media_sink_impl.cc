@@ -19,17 +19,13 @@ std::shared_ptr<MediaSinkImpl> MediaSinkImpl::Create(
     InterfaceRequest<MediaSink> request,
     MediaFactoryService* owner) {
   return std::shared_ptr<MediaSinkImpl>(new MediaSinkImpl(
-      destination_url,
-      media_type.Pass(),
-      request.Pass(),
-      owner));
+      destination_url, media_type.Pass(), request.Pass(), owner));
 }
 
-MediaSinkImpl::MediaSinkImpl(
-    const String& destination_url,
-    MediaTypePtr media_type,
-    InterfaceRequest<MediaSink> request,
-    MediaFactoryService* owner)
+MediaSinkImpl::MediaSinkImpl(const String& destination_url,
+                             MediaTypePtr media_type,
+                             InterfaceRequest<MediaSink> request,
+                             MediaFactoryService* owner)
     : MediaFactoryService::Product(owner),
       binding_(this, request.Pass()),
       consumer_(MojoConsumer::Create()),
@@ -38,9 +34,7 @@ MediaSinkImpl::MediaSinkImpl(
   DCHECK(media_type);
 
   // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() {
-    ReleaseFromOwner();
-  });
+  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   // TODO(dalesat): Support file and network urls.
   // TODO(dalesat): Support mojo services in a reasonable way.
@@ -65,14 +59,13 @@ MediaSinkImpl::MediaSinkImpl(
         });
       });
 
-  producer_->SetStatusCallback(
-      [this](MediaState state) {
-        producer_state_ = state;
-        StatusUpdated();
-        if (state == MediaState::ENDED) {
-          Pause();
-        }
-      });
+  producer_->SetStatusCallback([this](MediaState state) {
+    producer_state_ = state;
+    StatusUpdated();
+    if (state == MediaState::ENDED) {
+      Pause();
+    }
+  });
 
   if (destination_url != "mojo:audio_server") {
     LOG(ERROR) << "mojo:audio_server is the only supported destination";
@@ -83,68 +76,63 @@ MediaSinkImpl::MediaSinkImpl(
   }
 
   // TODO(dalesat): Once we have c++14, get rid of this shared pointer hack.
-  std::shared_ptr<StreamType>
-      captured_stream_type(Convert(media_type).release());
+  std::shared_ptr<StreamType> captured_stream_type(
+      Convert(media_type).release());
 
   // An AudioTrackController knows how to talk to an audio track, interrogating
   // it for supported stream types and configuring it for the chosen stream
   // type.
   controller_.reset(new AudioTrackController(destination_url, app()));
 
-  controller_->GetSupportedMediaTypes(
-      [this, consumer_ref, producer_ref, captured_stream_type]
-      (std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
+  controller_->GetSupportedMediaTypes([this, consumer_ref, producer_ref,
+                                       captured_stream_type](
+      std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
           supported_stream_types) {
-        std::unique_ptr<StreamType> producer_stream_type;
+    std::unique_ptr<StreamType> producer_stream_type;
 
-        // Add transforms to the pipeline to convert from stream_type to a
-        // type supported by the track.
-        OutputRef out = consumer_ref.output();
-        bool result = BuildConversionPipeline(
-            *captured_stream_type,
-            *supported_stream_types,
-            &graph_,
-            &out,
-            &producer_stream_type);
-        if (!result) {
-          // Failed to build conversion pipeline.
-          producer_state_ = MediaState::FAULT;
-          StatusUpdated();
-          return;
-        }
+    // Add transforms to the pipeline to convert from stream_type to a
+    // type supported by the track.
+    OutputRef out = consumer_ref.output();
+    bool result =
+        BuildConversionPipeline(*captured_stream_type, *supported_stream_types,
+                                &graph_, &out, &producer_stream_type);
+    if (!result) {
+      // Failed to build conversion pipeline.
+      producer_state_ = MediaState::FAULT;
+      StatusUpdated();
+      return;
+    }
 
-        graph_.ConnectOutputToPart(out, producer_ref);
+    graph_.ConnectOutputToPart(out, producer_ref);
 
-        switch (producer_stream_type->scheme()) {
-          case StreamType::Scheme::kLpcm:
-            frames_per_second_ =
-                producer_stream_type->lpcm()->frames_per_second();
-            break;
-          case StreamType::Scheme::kCompressedAudio:
-            frames_per_second_ =
-                producer_stream_type->compressed_audio()->frames_per_second();
-            break;
-          default:
-            // Unsupported producer stream type.
-            producer_state_ = MediaState::FAULT;
-            StatusUpdated();
-            return;
-        }
+    switch (producer_stream_type->scheme()) {
+      case StreamType::Scheme::kLpcm:
+        frames_per_second_ = producer_stream_type->lpcm()->frames_per_second();
+        break;
+      case StreamType::Scheme::kCompressedAudio:
+        frames_per_second_ =
+            producer_stream_type->compressed_audio()->frames_per_second();
+        break;
+      default:
+        // Unsupported producer stream type.
+        producer_state_ = MediaState::FAULT;
+        StatusUpdated();
+        return;
+    }
 
-        controller_->Configure(
-            std::move(producer_stream_type),
-            [this]
-                (MediaConsumerPtr consumer, RateControlPtr rate_control) {
-                  DCHECK(consumer);
-                  DCHECK(rate_control);
-                  rate_control_ = rate_control.Pass();
-                  producer_->Connect(consumer.Pass(), [this]() {
-                    graph_.Prepare();
-                    ready_.Occur();
-                    MaybeSetRate();
-                  });
-                });
-      });
+    controller_->Configure(
+        std::move(producer_stream_type),
+        [this](MediaConsumerPtr consumer, RateControlPtr rate_control) {
+          DCHECK(consumer);
+          DCHECK(rate_control);
+          rate_control_ = rate_control.Pass();
+          producer_->Connect(consumer.Pass(), [this]() {
+            graph_.Prepare();
+            ready_.Occur();
+            MaybeSetRate();
+          });
+        });
+  });
 }
 
 MediaSinkImpl::~MediaSinkImpl() {}
@@ -167,9 +155,8 @@ void MediaSinkImpl::GetConsumer(InterfaceRequest<MediaConsumer> consumer) {
   consumer_->AddBinding(consumer.Pass());
 }
 
-void MediaSinkImpl::GetStatus(
-    uint64_t version_last_seen,
-    const GetStatusCallback& callback) {
+void MediaSinkImpl::GetStatus(uint64_t version_last_seen,
+                              const GetStatusCallback& callback) {
   if (version_last_seen < status_version_) {
     RunStatusCallback(callback);
   } else {
@@ -197,9 +184,9 @@ void MediaSinkImpl::StatusUpdated() {
 
 void MediaSinkImpl::RunStatusCallback(const GetStatusCallback& callback) const {
   MediaSinkStatusPtr status = MediaSinkStatus::New();
-  status->state = (producer_state_ == MediaState::PAUSED && rate_ != 0.0) ?
-      MediaState::PLAYING :
-      producer_state_;
+  status->state = (producer_state_ == MediaState::PAUSED && rate_ != 0.0)
+                      ? MediaState::PLAYING
+                      : producer_state_;
   status->timeline_transform = status_transform_.Clone();
   callback.Run(status_version_, status.Pass());
 }
@@ -216,17 +203,13 @@ void MediaSinkImpl::MaybeSetRate() {
       static_cast<uint32_t>(frames_per_second_ * target_rate_), 1);
 
   // Local time rate in seconds_per_tick.
-  LinearTransform::Ratio local_seconds_per_tick(
-      LocalDuration::period::num,
-      LocalDuration::period::den);
+  LinearTransform::Ratio local_seconds_per_tick(LocalDuration::period::num,
+                                                LocalDuration::period::den);
 
   // Desired rate in frames per local tick.
   LinearTransform::Ratio rate_frames_per_tick;
-  bool success =
-      LinearTransform::Ratio::Compose(
-          local_seconds_per_tick,
-          rate_frames_per_second,
-          &rate_frames_per_tick);
+  bool success = LinearTransform::Ratio::Compose(
+      local_seconds_per_tick, rate_frames_per_second, &rate_frames_per_tick);
   DCHECK(success)
       << "LinearTransform::Ratio::Compose reports loss of precision";
 
@@ -234,13 +217,12 @@ void MediaSinkImpl::MaybeSetRate() {
   // For now, it's hard-coded to be 30ms in the future.
   // The local time when we want the rate to change.
   int64_t start_local_time =
-      (LocalClock::now().time_since_epoch() + std::chrono::milliseconds(30)).
-          count();
+      (LocalClock::now().time_since_epoch() + std::chrono::milliseconds(30))
+          .count();
 
   // The media time corresponding to start_local_time.
   int64_t start_media_time;
-  if (flushed_ &&
-      producer_->GetFirstPtsSinceFlush() != Packet::kUnknownPts) {
+  if (flushed_ && producer_->GetFirstPtsSinceFlush() != Packet::kUnknownPts) {
     // We're getting started initially or after a flush/prime, so the media
     // time corresponding to start_local_time should be the PTS of
     // the first packet.
@@ -272,10 +254,9 @@ void MediaSinkImpl::MaybeSetRate() {
   // Get the frame rate in frames per local tick.
   LinearTransform::Ratio frame_rate_frames_per_second(frames_per_second_, 1);
   LinearTransform::Ratio frame_rate_frames_per_tick;
-  success = LinearTransform::Ratio::Compose(
-      local_seconds_per_tick,
-      frame_rate_frames_per_second,
-      &frame_rate_frames_per_tick);
+  success = LinearTransform::Ratio::Compose(local_seconds_per_tick,
+                                            frame_rate_frames_per_second,
+                                            &frame_rate_frames_per_tick);
   DCHECK(success)
       << "LinearTransform::Ratio::Compose reports loss of precision";
 
@@ -289,8 +270,7 @@ void MediaSinkImpl::MaybeSetRate() {
   // Translate the current transform quad so the presentation time units
   // are the same as the local time units.
   success = local_to_presentation.DoReverseTransform(
-      start_media_time,
-      &status_transform_->quad->reference_offset);
+      start_media_time, &status_transform_->quad->reference_offset);
   DCHECK(success)
       << "LinearTransform::DoReverseTransform reports loss of precision";
   status_transform_->quad->target_offset = start_local_time;
@@ -303,13 +283,12 @@ void MediaSinkImpl::MaybeSetRate() {
   status_transform_->quad->reference_delta =
       static_cast<int32_t>(presentation_delta);
   status_transform_->quad->target_delta = rate_frames_per_tick.denominator;
-  LinearTransform::Ratio::Reduce(
-      &status_transform_->quad->reference_delta,
-      &status_transform_->quad->target_delta);
+  LinearTransform::Ratio::Reduce(&status_transform_->quad->reference_delta,
+                                 &status_transform_->quad->target_delta);
 
   rate_ = target_rate_;
   StatusUpdated();
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

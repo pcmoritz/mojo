@@ -60,9 +60,7 @@ class FfmpegDemuxImpl : public FfmpegDemux {
       return PacketPtr(new DemuxPacket(std::move(av_packet)));
     }
 
-    AVPacket& av_packet() {
-      return *av_packet_;
-    }
+    AVPacket& av_packet() { return *av_packet_; }
 
    protected:
     ~DemuxPacket() override {}
@@ -70,13 +68,13 @@ class FfmpegDemuxImpl : public FfmpegDemux {
     void Release() override { delete this; }
 
    private:
-    DemuxPacket(ffmpeg::AvPacketPtr av_packet) :
-        Packet(
-            (av_packet->pts == AV_NOPTS_VALUE) ? kUnknownPts : av_packet->pts,
-            false,
-            static_cast<size_t>(av_packet->size),
-            av_packet->data),
-        av_packet_(std::move(av_packet)) {
+    DemuxPacket(ffmpeg::AvPacketPtr av_packet)
+        : Packet(
+              (av_packet->pts == AV_NOPTS_VALUE) ? kUnknownPts : av_packet->pts,
+              false,
+              static_cast<size_t>(av_packet->size),
+              av_packet->data),
+          av_packet_(std::move(av_packet)) {
       DCHECK(av_packet_->size >= 0);
     }
 
@@ -93,9 +91,8 @@ class FfmpegDemuxImpl : public FfmpegDemux {
   PacketPtr PullEndOfStreamPacket(size_t* stream_index_out);
 
   // Copies metadata from the specified source into map.
-  void CopyMetadata(
-      AVDictionary* source,
-      std::map<std::string, std::string>& map);
+  void CopyMetadata(AVDictionary* source,
+                    std::map<std::string, std::string>& map);
 
   std::shared_ptr<Reader> reader_;
   AvFormatContextPtr format_context_;
@@ -103,7 +100,7 @@ class FfmpegDemuxImpl : public FfmpegDemux {
   std::vector<DemuxStream*> streams_;
   std::unique_ptr<Metadata> metadata_;
   int64_t next_pts_;
-  int next_stream_to_end_ = -1; // -1: don't end, streams_.size(): stop.
+  int next_stream_to_end_ = -1;  // -1: don't end, streams_.size(): stop.
 };
 
 // static
@@ -147,14 +144,11 @@ Result FfmpegDemuxImpl::Init(std::shared_ptr<Reader> reader) {
     CopyMetadata(format_context_->streams[i]->metadata, metadata_map);
   }
 
-  metadata_ = Metadata::Create(
-      format_context_->duration * kNanosecondsPerMicrosecond,
-      metadata_map["TITLE"],
-      metadata_map["ARTIST"],
-      metadata_map["ALBUM"],
-      metadata_map["PUBLISHER"],
-      metadata_map["GENRE"],
-      metadata_map["COMPOSER"]);
+  metadata_ =
+      Metadata::Create(format_context_->duration * kNanosecondsPerMicrosecond,
+                       metadata_map["TITLE"], metadata_map["ARTIST"],
+                       metadata_map["ALBUM"], metadata_map["PUBLISHER"],
+                       metadata_map["GENRE"], metadata_map["COMPOSER"]);
 
   return Result::kOk;
 }
@@ -201,8 +195,7 @@ PacketPtr FfmpegDemuxImpl::PullPacket(size_t* stream_index_out) {
     return PullEndOfStreamPacket(stream_index_out);
   }
 
-  *stream_index_out =
-      static_cast<size_t>(av_packet->stream_index);
+  *stream_index_out = static_cast<size_t>(av_packet->stream_index);
   // TODO(dalesat): What if the packet has no PTS or duration?
   next_pts_ = av_packet->pts + av_packet->duration;
 
@@ -221,17 +214,16 @@ PacketPtr FfmpegDemuxImpl::PullEndOfStreamPacket(size_t* stream_index_out) {
   return Packet::CreateEndOfStream(next_pts_);
 }
 
-void FfmpegDemuxImpl::CopyMetadata(
-    AVDictionary* source,
-    std::map<std::string, std::string>& map) {
+void FfmpegDemuxImpl::CopyMetadata(AVDictionary* source,
+                                   std::map<std::string, std::string>& map) {
   if (source == nullptr) {
     return;
   }
 
-  for (AVDictionaryEntry *entry =
-      av_dict_get(source, "", nullptr, AV_DICT_IGNORE_SUFFIX);
-      entry != nullptr;
-      entry = av_dict_get(source, "", entry, AV_DICT_IGNORE_SUFFIX)) {
+  for (AVDictionaryEntry* entry =
+           av_dict_get(source, "", nullptr, AV_DICT_IGNORE_SUFFIX);
+       entry != nullptr;
+       entry = av_dict_get(source, "", entry, AV_DICT_IGNORE_SUFFIX)) {
     if (map.find(entry->key) == map.end()) {
       map.emplace(entry->key, entry->value);
     }
@@ -240,8 +232,8 @@ void FfmpegDemuxImpl::CopyMetadata(
 
 FfmpegDemuxImpl::FfmpegDemuxStream::FfmpegDemuxStream(
     const AVFormatContext& format_context,
-    size_t index) :
-    stream_(format_context.streams[index]), index_(index) {
+    size_t index)
+    : stream_(format_context.streams[index]), index_(index) {
   stream_type_ = AvCodecContext::GetStreamType(*stream_->codec);
 }
 
@@ -256,5 +248,5 @@ std::unique_ptr<StreamType> FfmpegDemuxImpl::FfmpegDemuxStream::stream_type()
   return SafeClone(stream_type_);
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

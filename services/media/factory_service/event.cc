@@ -169,9 +169,7 @@ void FirstEventImpl::Init() {
     }
   }
 
-  std::function<void()> consequence = [this]() {
-    Finished();
-  };
+  std::function<void()> consequence = [this]() { Finished(); };
 
   for (Event& precursor : precursors_) {
     precursor.When(consequence);

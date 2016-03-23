@@ -23,5 +23,5 @@ void InitFfmpeg() {
   }
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

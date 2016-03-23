@@ -23,4 +23,4 @@ enum class Result {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_RESULT_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_RESULT_H_

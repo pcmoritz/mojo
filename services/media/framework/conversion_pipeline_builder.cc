@@ -13,22 +13,21 @@ namespace media {
 namespace {
 
 enum class AddResult {
-  kFailed, // Can't convert.
-  kProgressed, // Added a conversion transform.
-  kFinished // Done adding conversion transforms.
+  kFailed,      // Can't convert.
+  kProgressed,  // Added a conversion transform.
+  kFinished     // Done adding conversion transforms.
 };
 
 // Produces a score for in_type with respect to out_type_set. The score
 // is used to compare type sets to see which represents the best goal for
 // conversion. Higher scores are preferred. A score of zero indicates that
 // in_type is incompatible with out_type_set.
-int Score(
-    const LpcmStreamType& in_type,
-    const LpcmStreamTypeSet& out_type_set) {
+int Score(const LpcmStreamType& in_type,
+          const LpcmStreamTypeSet& out_type_set) {
   // TODO(dalesat): Plenty of room for more subtlety here. Maybe actually
   // measure conversion costs (cpu, quality, etc) and reflect them here.
 
-  int score = 1; // We can convert anything, so 1 is the minimum score.
+  int score = 1;  // We can convert anything, so 1 is the minimum score.
 
   if (in_type.sample_format() == out_type_set.sample_format() ||
       out_type_set.sample_format() == LpcmStreamType::SampleFormat::kAny) {
@@ -50,7 +49,7 @@ int Score(
         break;
       default:
         NOTREACHED() << "unsupported sample format "
-            << out_type_set.sample_format();
+                     << out_type_set.sample_format();
     }
   }
 
@@ -58,15 +57,14 @@ int Score(
     // Prefer not to mixdown/up.
     score += 10;
   } else {
-    return 0; // TODO(dalesat): Remove when we have mixdown/up.
+    return 0;  // TODO(dalesat): Remove when we have mixdown/up.
   }
 
-  if (out_type_set.frames_per_second().
-      contains(in_type.frames_per_second())) {
+  if (out_type_set.frames_per_second().contains(in_type.frames_per_second())) {
     // Very much prefer not to resample.
     score += 50;
   } else {
-    return 0; // TODO(dalesat): Remove when we have resamplers.
+    return 0;  // TODO(dalesat): Remove when we have resamplers.
   }
 
   return score;
@@ -150,7 +148,7 @@ AddResult AddTransformsForCompressedAudio(
   // Need to decode. Create a decoder and go from there.
   std::shared_ptr<Decoder> decoder;
   Result result = Decoder::Create(in_type, &decoder);
-  if (result !=  Result::kOk) {
+  if (result != Result::kOk) {
     // No decoder found.
     *out_type = nullptr;
     return AddResult::kFailed;
@@ -166,12 +164,11 @@ AddResult AddTransformsForCompressedAudio(
 // (in_type) and the output lpcm stream type set for the type we need to convert
 // to (out_type_set). If the call succeeds, *out_type is set to the new output
 // type. Otherwise, *out_type is set to nullptr.
-AddResult AddTransformsForLpcm(
-    const LpcmStreamType& in_type,
-    const LpcmStreamTypeSet& out_type_set,
-    Graph* graph,
-    OutputRef* output,
-    std::unique_ptr<StreamType>* out_type) {
+AddResult AddTransformsForLpcm(const LpcmStreamType& in_type,
+                               const LpcmStreamTypeSet& out_type_set,
+                               Graph* graph,
+                               OutputRef* output,
+                               std::unique_ptr<StreamType>* out_type) {
   DCHECK(graph);
   DCHECK(out_type);
 
@@ -179,9 +176,11 @@ AddResult AddTransformsForLpcm(
   // transforms that handle more than one conversion.
   if (in_type.sample_format() != out_type_set.sample_format() &&
       out_type_set.sample_format() != LpcmStreamType::SampleFormat::kAny) {
-    *output = graph->ConnectOutputToPart(
-        *output,
-        graph->Add(LpcmReformatter::Create(in_type, out_type_set))).output();
+    *output =
+        graph
+            ->ConnectOutputToPart(*output, graph->Add(LpcmReformatter::Create(
+                                               in_type, out_type_set)))
+            .output();
   }
 
   if (!out_type_set.channels().contains(in_type.channels())) {
@@ -200,11 +199,10 @@ AddResult AddTransformsForLpcm(
 
   // Build the resulting media type.
   *out_type = LpcmStreamType::Create(
-      out_type_set.sample_format() == LpcmStreamType::SampleFormat::kAny ?
-          in_type.sample_format() :
-          out_type_set.sample_format(),
-      in_type.channels(),
-      in_type.frames_per_second());
+      out_type_set.sample_format() == LpcmStreamType::SampleFormat::kAny
+          ? in_type.sample_format()
+          : out_type_set.sample_format(),
+      in_type.channels(), in_type.frames_per_second());
 
   return AddResult::kFinished;
 }
@@ -239,15 +237,11 @@ AddResult AddTransformsForLpcm(
       *out_type = in_type.Clone();
       return AddResult::kFinished;
     case StreamType::Scheme::kLpcm:
-      return AddTransformsForLpcm(
-          in_type,
-          *(*best)->lpcm(),
-          graph,
-          output,
-          out_type);
+      return AddTransformsForLpcm(in_type, *(*best)->lpcm(), graph, output,
+                                  out_type);
     default:
       NOTREACHED() << "FindBestLpcm produced unexpected type set scheme"
-          << (*best)->scheme();
+                   << (*best)->scheme();
       return AddResult::kFailed;
   }
 }
@@ -267,22 +261,13 @@ AddResult AddTransforms(
 
   switch (in_type.scheme()) {
     case StreamType::Scheme::kLpcm:
-      return AddTransformsForLpcm(
-          *in_type.lpcm(),
-          out_type_sets,
-          graph,
-          output,
-          out_type);
+      return AddTransformsForLpcm(*in_type.lpcm(), out_type_sets, graph, output,
+                                  out_type);
     case StreamType::Scheme::kCompressedAudio:
       return AddTransformsForCompressedAudio(
-          *in_type.compressed_audio(),
-          out_type_sets,
-          graph,
-          output,
-          out_type);
+          *in_type.compressed_audio(), out_type_sets, graph, output, out_type);
     default:
-      NOTREACHED() << "conversion not supported for scheme"
-          << in_type.scheme();
+      NOTREACHED() << "conversion not supported for scheme" << in_type.scheme();
       *out_type = nullptr;
       return AddResult::kFailed;
   }
@@ -304,12 +289,8 @@ bool BuildConversionPipeline(
   const StreamType* type_to_convert = &in_type;
   std::unique_ptr<StreamType> converted_type;
   while (true) {
-    switch (AddTransforms(
-        *type_to_convert,
-        out_type_sets,
-        graph,
-        &out,
-        &converted_type)) {
+    switch (AddTransforms(*type_to_convert, out_type_sets, graph, &out,
+                          &converted_type)) {
       case AddResult::kFailed:
         // Failed to find a suitable conversion. Return the pipeline to its
         // original state.

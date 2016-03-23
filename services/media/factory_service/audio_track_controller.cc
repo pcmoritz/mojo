@@ -14,9 +14,8 @@
 namespace mojo {
 namespace media {
 
-AudioTrackController::AudioTrackController(
-    const String& url,
-    ApplicationImpl* app) {
+AudioTrackController::AudioTrackController(const String& url,
+                                           ApplicationImpl* app) {
   // TODO(dalesat): Handle connection errors.
   DCHECK(app);
 
@@ -50,5 +49,5 @@ void AudioTrackController::Configure(
   callback(consumer.Pass(), rate_control.Pass());
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

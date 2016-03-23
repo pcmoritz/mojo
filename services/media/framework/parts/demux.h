@@ -35,9 +35,8 @@ class Demux : public MultistreamSource {
   };
 
   // Creates a Demux object for a given reader.
-  static Result Create(
-      std::shared_ptr<Reader> reader,
-      std::shared_ptr<Demux>* demux_out);
+  static Result Create(std::shared_ptr<Reader> reader,
+                       std::shared_ptr<Demux>* demux_out);
 
   ~Demux() override {}
 
@@ -65,4 +64,4 @@ class Demux : public MultistreamSource {
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_PARTS_DEMUX_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_PARTS_DEMUX_H_

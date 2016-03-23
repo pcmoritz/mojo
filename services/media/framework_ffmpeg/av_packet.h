@@ -15,14 +15,12 @@ namespace media {
 namespace ffmpeg {
 
 struct AVPacketDeleter {
-  inline void operator()(AVPacket* ptr) const {
-    av_free_packet(ptr);
-  }
+  inline void operator()(AVPacket* ptr) const { av_free_packet(ptr); }
 };
 
 using AvPacketPtr = std::unique_ptr<AVPacket, AVPacketDeleter>;
 
-struct AvPacket{
+struct AvPacket {
   static AvPacketPtr Create() {
     AVPacket* av_packet = new AVPacket();
     av_init_packet(av_packet);
@@ -34,4 +32,4 @@ struct AvPacket{
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_PACKET_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_PACKET_H_

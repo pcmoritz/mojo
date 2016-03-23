@@ -14,21 +14,17 @@ namespace media {
 namespace ffmpeg {
 
 struct AVFrameDeleter {
-  inline void operator()(AVFrame* ptr) const {
-    av_frame_free(&ptr);
-  }
+  inline void operator()(AVFrame* ptr) const { av_frame_free(&ptr); }
 };
 
 using AvFramePtr = std::unique_ptr<AVFrame, AVFrameDeleter>;
 
-struct AvFrame{
-  static AvFramePtr Create() {
-    return AvFramePtr(av_frame_alloc());
-  }
+struct AvFrame {
+  static AvFramePtr Create() { return AvFramePtr(av_frame_alloc()); }
 };
 
 }  // namespace ffmpeg
 }  // namespace media
 }  // namespace mojo
 
-#endif // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_FRAME_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_FRAME_H_

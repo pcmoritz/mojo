@@ -19,9 +19,8 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that decodes a stream.
-class MediaDecoderImpl
-    : public MediaFactoryService::Product,
-      public MediaTypeConverter {
+class MediaDecoderImpl : public MediaFactoryService::Product,
+                         public MediaTypeConverter {
  public:
   static std::shared_ptr<MediaDecoderImpl> Create(
       MediaTypePtr input_media_type,
@@ -38,10 +37,9 @@ class MediaDecoderImpl
   void GetProducer(InterfaceRequest<MediaProducer> producer) override;
 
  private:
-  MediaDecoderImpl(
-      MediaTypePtr input_media_type,
-      InterfaceRequest<MediaTypeConverter> request,
-      MediaFactoryService* owner);
+  MediaDecoderImpl(MediaTypePtr input_media_type,
+                   InterfaceRequest<MediaTypeConverter> request,
+                   MediaFactoryService* owner);
 
   Binding<MediaTypeConverter> binding_;
   Graph graph_;

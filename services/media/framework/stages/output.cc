@@ -9,9 +9,7 @@
 namespace mojo {
 namespace media {
 
-Output::Output() :
-    demand_(Demand::kNegative),
-    copy_allocator_(nullptr) {}
+Output::Output() : demand_(Demand::kNegative), copy_allocator_(nullptr) {}
 
 Output::~Output() {}
 
@@ -51,7 +49,7 @@ void Output::SupplyPacket(PacketPtr packet, Engine* engine) const {
   if (copy_allocator_ != nullptr) {
     // Need to copy the packet due to an allocation conflict.
     size_t size = packet->size();
-    void *buffer;
+    void* buffer;
 
     if (size == 0) {
       buffer = nullptr;
@@ -64,12 +62,8 @@ void Output::SupplyPacket(PacketPtr packet, Engine* engine) const {
       memcpy(buffer, packet->payload(), size);
     }
 
-    packet = Packet::Create(
-        packet->pts(),
-        packet->end_of_stream(),
-        size,
-        buffer,
-        copy_allocator_);
+    packet = Packet::Create(packet->pts(), packet->end_of_stream(), size,
+                            buffer, copy_allocator_);
   }
 
   if (actual_mate().SupplyPacketFromOutput(std::move(packet))) {

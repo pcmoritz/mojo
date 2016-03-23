@@ -67,5 +67,5 @@ bool FileReader::CanSeek() const {
   return true;
 }
 
-} // namespace media
-} // namespace mojo
+}  // namespace media
+}  // namespace mojo

@@ -36,4 +36,4 @@ class ActiveSource : public Part {
 }  // namespace media
 }  // namespace mojo
 
-#endif // MOJO_MEDIA_MODELS_ACTIVE_SOURCE_H_
+#endif  // MOJO_MEDIA_MODELS_ACTIVE_SOURCE_H_
