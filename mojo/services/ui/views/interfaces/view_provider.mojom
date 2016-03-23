@@ -7,6 +7,7 @@ module mojo.ui;
 
 import "mojo/public/interfaces/application/service_provider.mojom";
 import "mojo/services/ui/views/interfaces/views.mojom";
+import "mojo/services/ui/views/interfaces/view_token.mojom";
 
 // Provides a View upon request.
 //
