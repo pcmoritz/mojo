@@ -109,3 +109,26 @@ interface InterfaceFoo {  // Interface comment.
 		t.Fatalf("\nExpected:\n%v\n\n*****\n\nActual:\n%v eof", original, actual)
 	}
 }
+
+func TestFormatNoExtraFinalBlankLine(t *testing.T) {
+	original := `interface ImagePipe {
+  // Some comment.
+  FlushImages();
+
+};
+`
+
+	expected := `interface ImagePipe {
+  // Some comment.
+  FlushImages();
+};
+`
+	actual, err := FormatMojom("test.mojom", original)
+	if err != nil {
+		t.Fatalf("Parser was not supposed to fail: %s", err.Error())
+	}
+
+	if expected != actual {
+		t.Fatalf("\nExpected:\n%v\n\n*****\n\nActual:\n%v eof", expected, actual)
+	}
+}

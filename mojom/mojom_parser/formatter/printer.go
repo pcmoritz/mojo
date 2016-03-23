@@ -574,7 +574,11 @@ func (p *printer) writeAboveComments(el mojom.MojomElement) {
 func (p *printer) writeFinalComments(container mojom.DeclaredObjectsContainer) {
 	el := container.(mojom.MojomElement)
 	attachedComments := el.AttachedComments()
-	if attachedComments == nil || len(attachedComments.Final) == 0 {
+	if attachedComments == nil {
+		return
+	}
+	finalComments := trimEmptyLinesEnd(attachedComments.Final)
+	if len(finalComments) == 0 {
 		return
 	}
 
@@ -582,11 +586,11 @@ func (p *printer) writeFinalComments(container mojom.DeclaredObjectsContainer) {
 	// container.
 	if len(container.GetDeclaredObjects()) > 0 {
 		p.nl()
-		if attachedComments.Final[0].Kind == lexer.EmptyLine {
+		if finalComments[0].Kind == lexer.EmptyLine {
 			p.nl()
 		}
 	}
-	p.writeCommentBlocks(attachedComments.Final, false)
+	p.writeCommentBlocks(finalComments, false)
 }
 
 // writeLeftComments writes the comments left of a MojomElement.
