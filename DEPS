@@ -24,14 +24,14 @@ vars = {
   'base_revision': '82833117dada3473e590e2ecf1ba6250193e5f9d',
   'angle_revision': '46ccef1992a8ede16a596c3dd73cff13c047267d',
   'buildtools_revision': '222bd42ce39d1bd8f08fe089b066f49c469e1cdf',
-  'dart_revision': '202e077815e78e25482f3a0c82589aeb4065c441',
-  'dart_root_certificates_revision': 'c3a41df63afacec62fcb8135196177e35fe72f71',
+  'dart_revision': 'a414043ce3e6d10ecbb27ffa50b05fb7f41ee754',
+  'dart_root_certificates_revision': '218d6a723fab86a7b80aa5f9b591d5a51d2955eb',
   'dart_observatory_packages_revision': 'cf90eb9077177d3d6b3fd5e8289477c2385c026a',
   'pdfium_revision': 'ae4256f45df69bbfdf722a6ec17e1e851911ae4e',
   'boringssl_revision': '642f1498d056dbba3e50ed5a232ab2f482626dec',
   'lss_revision': '6f97298fe3794e92c8c896a6bc06e0b36e4c3de3',
   'nacl_revision': 'f5bc68c59b147b66d553dc6fc17426682cf138e2',
-  'tonic_revision': '7e6944c008443b7753388a904bdeaf3461f5d889',
+  'tonic_revision': 'e41f72c684e0da61304ebd6f3147d0fe23ffbb56',
 }
 
 # Only these hosts are allowed for dependencies in this DEPS file.
