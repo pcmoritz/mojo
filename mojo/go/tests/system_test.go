@@ -257,19 +257,29 @@ func TestSharedBuffer(t *testing.T) {
 	var h0, h1 system.SharedBufferHandle
 	var buf []byte
 	var r system.MojoResult
+	const kBufSize = 100
 
-	if r, h0 = core.CreateSharedBuffer(nil, 100); r != system.MOJO_RESULT_OK {
+	if r, h0 = core.CreateSharedBuffer(nil, kBufSize); r != system.MOJO_RESULT_OK {
 		t.Fatalf("CreateSharedBuffer failed:%v", r)
 	}
 	if !h0.IsValid() {
 		t.Fatalf("CreateSharedBuffer returned an invalid handle h0:%v", h0)
 	}
-	if r, buf = h0.MapBuffer(0, 100, system.MOJO_MAP_BUFFER_FLAG_NONE); r != system.MOJO_RESULT_OK {
+	if r, buf = h0.MapBuffer(0, kBufSize, system.MOJO_MAP_BUFFER_FLAG_NONE); r != system.MOJO_RESULT_OK {
 		t.Fatalf("MapBuffer failed to map buffer with h0:%v", r)
 	}
-	if len(buf) != 100 || cap(buf) != 100 {
-		t.Fatalf("Buffer length(%d) and capacity(%d) should be %d", len(buf), cap(buf), 100)
+	if len(buf) != kBufSize || cap(buf) != kBufSize {
+		t.Fatalf("Buffer length(%d) and capacity(%d) should be %d", len(buf), cap(buf), kBufSize)
 	}
+
+	var info system.MojoBufferInformation
+	if r, info = h0.GetBufferInformation(); r != system.MOJO_RESULT_OK {
+		t.Fatalf("GetBufferInformation of h0 failed:%v", r)
+	}
+	if (info != system.MojoBufferInformation{NumBytes: kBufSize, Flags: system.MOJO_BUFFER_INFORMATION_FLAG_NONE}) {
+		t.Fatalf("GetBufferInformation of h0 incorrect:%v", info)
+	}
+
 	buf[50] = 'x'
 	if r, h1 = h0.DuplicateBufferHandle(nil); r != system.MOJO_RESULT_OK {
 		t.Fatalf("DuplicateBufferHandle of h0 failed:%v", r)
