@@ -115,7 +115,7 @@ interface MediaConsumer {
   // the pipe using the SendPacket method.
   enum SendResult {
     CONSUMED,  // Media was completely consumed.
-    FLUSHED,   // Some or all of the media was flushed before being consumed.
+    FLUSHED,  // Some or all of the media was flushed before being consumed.
   };
 
   // Sets the shared buffer in which packet payload will be located.

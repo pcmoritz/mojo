@@ -4,5 +4,6 @@
 
 [ServiceName="Pingable"]
 interface Pingable {
-  Ping(string message) => (string app_url, string connection_url, string message);
+  Ping(string message)
+      => (string app_url, string connection_url, string message);
 };

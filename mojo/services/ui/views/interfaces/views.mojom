@@ -131,5 +131,6 @@ interface ViewListener {
   // the requested |layout_params|, such as by returning a size which
   // exceeds the requested constraints; the view's connection will be closed.
   OnLayout(mojo.ui.ViewLayoutParams layout_params,
-    array<uint32> children_needing_layout) => (mojo.ui.ViewLayoutResult result);
+           array<uint32> children_needing_layout)
+      => (mojo.ui.ViewLayoutResult result);
 };

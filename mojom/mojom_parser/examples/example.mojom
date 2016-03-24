@@ -5,7 +5,9 @@
 module sample;
 
 enum EnumeratedValue {
-  VALUE1, VALUE2, VALUE3,
+  VALUE1,
+  VALUE2,
+  VALUE3,
 };
 
 struct StructuredData {

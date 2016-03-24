@@ -12,4 +12,3 @@ interface NetworkTestService {
   // Make it stop.
   Quit();
 };
-

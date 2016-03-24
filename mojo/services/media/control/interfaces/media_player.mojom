@@ -29,8 +29,8 @@ interface MediaPlayer {
   // Gets the status. To get the status immediately, call
   // GetStatus(kInitialStatus). To get updates thereafter, pass the version
   // sent in the previous callback.
-  GetStatus(uint64 version_last_seen) =>
-      (uint64 version, MediaPlayerStatus status);
+  GetStatus(uint64 version_last_seen)
+      => (uint64 version, MediaPlayerStatus status);
 };
 
 // MediaPlayer status information.
