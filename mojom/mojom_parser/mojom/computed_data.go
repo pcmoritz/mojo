@@ -270,22 +270,10 @@ func computePayloadSizeSoFar(field *StructField) uint32 {
 func (i *MojomInterface) ComputeFinalData() error {
 	for _, method := range i.MethodsByOrdinal {
 		if method.Parameters != nil {
-			// Note(rudominer) computeFieldOffsets must be invoked before computeVersionInfo.
-			if err := (*method.Parameters).computeFieldOffsets(); err != nil {
-				return err
-			}
-			if err := (*method.Parameters).computeVersionInfo(); err != nil {
-				return err
-			}
+			return method.Parameters.ComputeFinalData()
 		}
 		if method.ResponseParameters != nil {
-			// Note(rudominer) computeFieldOffsets must be invoked before computeVersionInfo.
-			if err := (*method.ResponseParameters).computeFieldOffsets(); err != nil {
-				return err
-			}
-			if err := (*method.ResponseParameters).computeVersionInfo(); err != nil {
-				return err
-			}
+			return method.ResponseParameters.ComputeFinalData()
 		}
 	}
 	return nil
