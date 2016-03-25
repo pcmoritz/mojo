@@ -38,7 +38,9 @@ def RunTests(tests, build_dir, package_root):
     test_path = os.path.join(SCRIPT_DIR, test)
     subprocess.check_call(
         [DART, '-p', package_root, '--checked', test_path,
-         '--mojo-shell', os.path.join(build_dir, 'mojo_shell'),])
+         '--mojo-shell', os.path.join(build_dir, 'mojo_shell'),
+         '--',
+         '--args-for=mojo:dart_content_handler --disable-observatory'])
 
 def main(build_dir, package_root):
   for example in EXAMPLES:
