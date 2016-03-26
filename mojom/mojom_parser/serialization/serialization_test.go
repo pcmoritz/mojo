@@ -1474,6 +1474,138 @@ func TestWithComputedData(t *testing.T) {
 	}
 
 	////////////////////////////////////////////////////////////
+	// Test Case: Method parameter versions.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInterface42 {
+		DoIt(int8 x0, [MinVersion=1] int64 x1, [MinVersion=2] int8 x2)
+		    => (int8 y0, [MinVersion=1] int64 y1);
+
+		DoItAgain(int8 x0);
+	};`
+
+		test.addTestCase("", contents)
+
+		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:MyInterface42"}
+
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyInterface42"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: test.newDeclData("MyInterface42", "MyInterface42"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				// DoIt
+				0: mojom_types.MojomMethod{
+					DeclData: test.newDeclData("DoIt", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("DoIt-request", ""),
+						Fields: []mojom_types.StructField{
+							// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+							// declarationOrder and declaredOrdinal.
+							// x0
+							mojom_types.StructField{
+								DeclData:   test.newDeclDataO(0, -1, "x0", ""),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+								Offset:     0,
+								MinVersion: 0,
+							},
+							// x1
+							mojom_types.StructField{
+								DeclData:   test.newShortDeclDataAO(1, -1, "x1", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
+								Offset:     8,
+								MinVersion: 1,
+							},
+							// x2
+							mojom_types.StructField{
+								DeclData:   test.newShortDeclDataAO(2, -1, "x2", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+								Offset:     1,
+								MinVersion: 2,
+							},
+						},
+						VersionInfo: &[]mojom_types.StructVersion{
+							mojom_types.StructVersion{
+								VersionNumber: 0,
+								NumFields:     1,
+								NumBytes:      16,
+							},
+							mojom_types.StructVersion{
+								VersionNumber: 1,
+								NumFields:     2,
+								NumBytes:      24,
+							},
+							mojom_types.StructVersion{
+								VersionNumber: 2,
+								NumFields:     3,
+								NumBytes:      24,
+							},
+						},
+					},
+					ResponseParams: &mojom_types.MojomStruct{
+						DeclData: test.newDeclData("DoIt-response", ""),
+						Fields: []mojom_types.StructField{
+							// yo
+							mojom_types.StructField{
+								DeclData:   test.newDeclDataO(0, -1, "y0", ""),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+								Offset:     0,
+								MinVersion: 0,
+							},
+							// y1
+							mojom_types.StructField{
+								DeclData:   test.newShortDeclDataAO(1, -1, "y1", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
+								Offset:     8,
+								MinVersion: 1,
+							},
+						},
+						VersionInfo: &[]mojom_types.StructVersion{
+							mojom_types.StructVersion{
+								VersionNumber: 0,
+								NumFields:     1,
+								NumBytes:      16,
+							},
+							mojom_types.StructVersion{
+								VersionNumber: 1,
+								NumFields:     2,
+								NumBytes:      24,
+							},
+						},
+					},
+				},
+
+				// DoItAgain
+				1: mojom_types.MojomMethod{
+					DeclData: test.newDeclData("DoItAgain", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("DoItAgain-request", ""),
+						Fields: []mojom_types.StructField{
+							// The fields are in ordinal order and the first two arguments to newShortDeclDataO() are
+							// declarationOrder and declaredOrdinal.
+							// x0
+							mojom_types.StructField{
+								DeclData:   test.newDeclDataO(0, -1, "x0", ""),
+								Type:       &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
+								Offset:     0,
+								MinVersion: 0,
+							},
+						},
+						VersionInfo: &[]mojom_types.StructVersion{
+							mojom_types.StructVersion{
+								VersionNumber: 0,
+								NumFields:     1,
+								NumBytes:      16,
+							},
+						},
+					},
+					Ordinal: 1,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
 	// Test Case: 3 boolean fields
 	////////////////////////////////////////////////////////////
 	{

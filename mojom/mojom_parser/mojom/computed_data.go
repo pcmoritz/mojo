@@ -270,10 +270,14 @@ func computePayloadSizeSoFar(field *StructField) uint32 {
 func (i *MojomInterface) ComputeFinalData() error {
 	for _, method := range i.MethodsByOrdinal {
 		if method.Parameters != nil {
-			return method.Parameters.ComputeFinalData()
+			if err := method.Parameters.ComputeFinalData(); err != nil {
+				return err
+			}
 		}
 		if method.ResponseParameters != nil {
-			return method.ResponseParameters.ComputeFinalData()
+			if err := method.ResponseParameters.ComputeFinalData(); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
