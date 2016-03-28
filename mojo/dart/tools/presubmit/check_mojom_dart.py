@@ -56,7 +56,13 @@ def _mojom_output_path(mojom):
 # Given a mojom.Module, return the package or None.
 def _mojom_package(mojom):
   if mojom.attributes:
-    return mojom.attributes.get('DartPackage')
+    package = mojom.attributes.get('DartPackage')
+    if package == None:
+      return package
+    package = package.strip()
+    if package == '':
+      return None
+    return package
 
 # Load and parse a .mojom file. Returns the mojom.Module or raises an Exception
 # if there was an error.
