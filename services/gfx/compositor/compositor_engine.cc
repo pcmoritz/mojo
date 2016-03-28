@@ -12,6 +12,7 @@
 #include "base/bind_helpers.h"
 #include "base/time/time.h"
 #include "mojo/services/gfx/composition/cpp/formatting.h"
+#include "mojo/skia/type_converters.h"
 #include "services/gfx/compositor/backend/gpu_output.h"
 #include "services/gfx/compositor/graph/snapshot.h"
 #include "services/gfx/compositor/render/render_frame.h"
@@ -370,7 +371,7 @@ void CompositorEngine::SnapshotRenderer(
 
   if (VLOG_IS_ON(2)) {
     std::ostringstream block_log;
-    SnapshotRendererInner(renderer_state, frame_info, &block_log);
+    SnapshotRendererInner(renderer_state, &block_log);
     if (!renderer_state->current_snapshot() ||
         renderer_state->current_snapshot()->is_blocked()) {
       DVLOG(2) << "Rendering completely blocked: " << block_log.str();
@@ -380,21 +381,22 @@ void CompositorEngine::SnapshotRenderer(
       DVLOG(2) << "Rendering unblocked";
     }
   } else {
-    SnapshotRendererInner(renderer_state, frame_info, nullptr);
+    SnapshotRendererInner(renderer_state, nullptr);
   }
 
-  if (renderer_state->current_snapshot() &&
-      !renderer_state->current_snapshot()->is_blocked()) {
+  if (renderer_state->visible_snapshot()) {
+    DCHECK(!renderer_state->visible_snapshot()->is_blocked());
     renderer_state->output()->SubmitFrame(
-        renderer_state->current_snapshot()->CreateFrame(
+        renderer_state->visible_snapshot()->CreateFrame(
             renderer_state->root_scene_viewport(), frame_info));
+  } else {
+    renderer_state->output()->SubmitFrame(RenderFrame::CreateEmpty(
+        renderer_state->root_scene_viewport().To<SkIRect>(), frame_info));
   }
 }
 
-void CompositorEngine::SnapshotRendererInner(
-    RendererState* renderer_state,
-    const mojo::gfx::composition::FrameInfo& frame_info,
-    std::ostream* block_log) {
+void CompositorEngine::SnapshotRendererInner(RendererState* renderer_state,
+                                             std::ostream* block_log) {
   if (!renderer_state->root_scene()) {
     if (block_log)
       *block_log << "No root scene" << std::endl;

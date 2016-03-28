@@ -10,10 +10,10 @@
 #include "base/macros.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 #include "skia/ext/refptr.h"
+#include "third_party/skia/include/core/SkPicture.h"
 #include "third_party/skia/include/core/SkRect.h"
 
 class SkCanvas;
-class SkPicture;
 
 namespace compositor {
 
@@ -23,20 +23,24 @@ namespace compositor {
 // std::shared_ptr.  They have no direct references to the scene graph.
 class RenderFrame {
  public:
-  RenderFrame(const skia::RefPtr<SkPicture>& picture,
-              const SkIRect& viewport,
-              const mojo::gfx::composition::FrameInfo& frame_info);
+  RenderFrame(const SkIRect& viewport,
+              const mojo::gfx::composition::FrameInfo& frame_info,
+              const skia::RefPtr<SkPicture>& picture);
   ~RenderFrame();
 
-  static std::shared_ptr<RenderFrame> Create(
-      const skia::RefPtr<SkPicture>& picture,
+  static std::shared_ptr<RenderFrame> CreateFromPicture(
       const SkIRect& viewport,
-      const mojo::gfx::composition::FrameInfo& frame_info) {
-    return std::make_shared<RenderFrame>(picture, viewport, frame_info);
+      const mojo::gfx::composition::FrameInfo& frame_info,
+      const skia::RefPtr<SkPicture>& picture) {
+    return std::make_shared<RenderFrame>(viewport, frame_info, picture);
   }
 
-  // Gets the underlying picture to rasterize.
-  const skia::RefPtr<SkPicture>& picture() const { return picture_; }
+  static std::shared_ptr<RenderFrame> CreateEmpty(
+      const SkIRect& viewport,
+      const mojo::gfx::composition::FrameInfo& frame_info) {
+    return std::make_shared<RenderFrame>(viewport, frame_info,
+                                         skia::RefPtr<SkPicture>());
+  }
 
   // Gets the frame's viewport in pixels.
   const SkIRect& viewport() const { return viewport_; }
@@ -46,15 +50,18 @@ class RenderFrame {
     return frame_info_;
   }
 
+  // Gets the underlying picture to rasterize, or null if the frame is empty.
+  const skia::RefPtr<SkPicture>& picture() const { return picture_; }
+
   // Paints the frame to a canvas.
   void Paint(SkCanvas* canvas) const;
 
  private:
   friend class RenderFrameBuilder;
 
-  skia::RefPtr<SkPicture> picture_;
   SkIRect viewport_;
   mojo::gfx::composition::FrameInfo frame_info_;
+  skia::RefPtr<SkPicture> picture_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderFrame);
 };

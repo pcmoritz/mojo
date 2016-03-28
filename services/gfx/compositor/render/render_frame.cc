@@ -11,12 +11,10 @@
 
 namespace compositor {
 
-RenderFrame::RenderFrame(const skia::RefPtr<SkPicture>& picture,
-                         const SkIRect& viewport,
-                         const mojo::gfx::composition::FrameInfo& frame_info)
-    : picture_(picture), viewport_(viewport), frame_info_(frame_info) {
-  DCHECK(picture_);
-}
+RenderFrame::RenderFrame(const SkIRect& viewport,
+                         const mojo::gfx::composition::FrameInfo& frame_info,
+                         const skia::RefPtr<SkPicture>& picture)
+    : viewport_(viewport), frame_info_(frame_info), picture_(picture) {}
 
 RenderFrame::~RenderFrame() {}
 
@@ -25,7 +23,8 @@ void RenderFrame::Paint(SkCanvas* canvas) const {
 
   // TODO: Consider using GrDrawContext instead of SkCanvas.
   canvas->clear(SK_ColorBLACK);
-  canvas->drawPicture(picture_.get());
+  if (picture_)
+    canvas->drawPicture(picture_.get());
 }
 
 }  // namespace compositor

@@ -92,10 +92,8 @@ class CompositorEngine {
                        int64_t presentation_time);
   void SnapshotRenderer(RendererState* renderer_state,
                         const mojo::gfx::composition::FrameInfo& frame_info);
-  void SnapshotRendererInner(
-      RendererState* renderer_state,
-      const mojo::gfx::composition::FrameInfo& frame_info,
-      std::ostream* block_log);
+  void SnapshotRendererInner(RendererState* renderer_state,
+                             std::ostream* block_log);
   void ScheduleFrameForRenderer(RendererState* renderer_state,
                                 Scheduler::SchedulingMode scheduling_mode);
 

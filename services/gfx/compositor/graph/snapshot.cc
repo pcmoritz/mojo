@@ -34,8 +34,9 @@ std::shared_ptr<RenderFrame> Snapshot::CreateFrame(
   SkPictureRecorder recorder;
   recorder.beginRecording(SkRect::Make(sk_viewport));
   root_scene_content_->RecordPicture(this, recorder.getRecordingCanvas());
-  return RenderFrame::Create(skia::AdoptRef(recorder.endRecordingAsPicture()),
-                             sk_viewport, frame_info);
+  return RenderFrame::CreateFromPicture(
+      sk_viewport, frame_info,
+      skia::AdoptRef(recorder.endRecordingAsPicture()));
 }
 
 void Snapshot::HitTest(const mojo::PointF& point,
