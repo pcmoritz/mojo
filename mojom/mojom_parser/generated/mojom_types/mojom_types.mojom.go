@@ -870,7 +870,6 @@ type UnionField struct {
 	DeclData *DeclarationData
 	Type Type
 	Tag uint32
-	MinVersion uint32
 }
 
 
@@ -893,9 +892,6 @@ func (s *UnionField) Encode(encoder *bindings.Encoder) error {
 		return err
 	}
 	if err := encoder.WriteUint32(s.Tag); err != nil {
-		return err
-	}
-	if err := encoder.WriteUint32(s.MinVersion); err != nil {
 		return err
 	}
 	if err := encoder.Finish(); err != nil {
@@ -957,13 +953,6 @@ func (s *UnionField) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		s.Tag = value0
-	}
-	if header.ElementsOrVersion >= 0 {
-		value0, err := decoder.ReadUint32()
-		if err != nil {
-			return err
-		}
-		s.MinVersion = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err
@@ -1089,7 +1078,6 @@ type EnumValue struct {
 	EnumTypeKey string
 	InitializerValue Value
 	IntValue int32
-	MinVersion uint32
 }
 
 
@@ -1119,9 +1107,6 @@ func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
 		}
 	}
 	if err := encoder.WriteInt32(s.IntValue); err != nil {
-		return err
-	}
-	if err := encoder.WriteUint32(s.MinVersion); err != nil {
 		return err
 	}
 	if err := encoder.Finish(); err != nil {
@@ -1195,13 +1180,6 @@ func (s *EnumValue) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		s.IntValue = value0
-	}
-	if header.ElementsOrVersion >= 0 {
-		value0, err := decoder.ReadUint32()
-		if err != nil {
-			return err
-		}
-		s.MinVersion = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err

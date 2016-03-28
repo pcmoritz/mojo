@@ -1211,7 +1211,6 @@ class UnionField extends bindings.Struct {
   DeclarationData declData = null;
   Type type = null;
   int tag = 0;
-  int minVersion = 0;
 
   UnionField() : super(kVersions.last.size);
 
@@ -1265,10 +1264,6 @@ class UnionField extends bindings.Struct {
       
       result.tag = decoder0.decodeUint32(32);
     }
-    if (mainDataHeader.version >= 0) {
-      
-      result.minVersion = decoder0.decodeUint32(36);
-    }
     return result;
   }
 
@@ -1295,21 +1290,13 @@ class UnionField extends bindings.Struct {
           "tag of struct UnionField: $e";
       rethrow;
     }
-    try {
-      encoder0.encodeUint32(minVersion, 36);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "minVersion of struct UnionField: $e";
-      rethrow;
-    }
   }
 
   String toString() {
     return "UnionField("
            "declData: $declData" ", "
            "type: $type" ", "
-           "tag: $tag" ", "
-           "minVersion: $minVersion" ")";
+           "tag: $tag" ")";
   }
 
   Map toJson() {
@@ -1317,7 +1304,6 @@ class UnionField extends bindings.Struct {
     map["declData"] = declData;
     map["type"] = type;
     map["tag"] = tag;
-    map["minVersion"] = minVersion;
     return map;
   }
 }
@@ -1434,7 +1420,6 @@ class EnumValue extends bindings.Struct {
   String enumTypeKey = null;
   Value initializerValue = null;
   int intValue = 0;
-  int minVersion = 0;
 
   EnumValue() : super(kVersions.last.size);
 
@@ -1488,10 +1473,6 @@ class EnumValue extends bindings.Struct {
       
       result.intValue = decoder0.decodeInt32(40);
     }
-    if (mainDataHeader.version >= 0) {
-      
-      result.minVersion = decoder0.decodeUint32(44);
-    }
     return result;
   }
 
@@ -1525,13 +1506,6 @@ class EnumValue extends bindings.Struct {
           "intValue of struct EnumValue: $e";
       rethrow;
     }
-    try {
-      encoder0.encodeUint32(minVersion, 44);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "minVersion of struct EnumValue: $e";
-      rethrow;
-    }
   }
 
   String toString() {
@@ -1539,8 +1513,7 @@ class EnumValue extends bindings.Struct {
            "declData: $declData" ", "
            "enumTypeKey: $enumTypeKey" ", "
            "initializerValue: $initializerValue" ", "
-           "intValue: $intValue" ", "
-           "minVersion: $minVersion" ")";
+           "intValue: $intValue" ")";
   }
 
   Map toJson() {
@@ -1549,7 +1522,6 @@ class EnumValue extends bindings.Struct {
     map["enumTypeKey"] = enumTypeKey;
     map["initializerValue"] = initializerValue;
     map["intValue"] = intValue;
-    map["minVersion"] = minVersion;
     return map;
   }
 }
