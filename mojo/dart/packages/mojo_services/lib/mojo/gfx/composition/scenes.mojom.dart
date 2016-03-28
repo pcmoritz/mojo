@@ -9,7 +9,6 @@ import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/gfx/composition/nodes.mojom.dart' as nodes_mojom;
 import 'package:mojo_services/mojo/gfx/composition/resources.mojom.dart' as resources_mojom;
-import 'package:mojo_services/mojo/gfx/composition/scene_token.mojom.dart' as scene_token_mojom;
 import 'package:mojo_services/mojo/gfx/composition/scheduling.mojom.dart' as scheduling_mojom;
 const int kSceneRootNodeId = 0;
 const int kSceneVersionNone = 0;

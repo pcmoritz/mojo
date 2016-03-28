@@ -9,7 +9,6 @@ import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/quads.mojom.dart' as quads_mojom;
-import 'package:mojo_services/mojo/surface_id.mojom.dart' as surface_id_mojom;
 
 class ResourceFormat extends bindings.MojoEnum {
   static const ResourceFormat rgba8888 = const ResourceFormat._(0);

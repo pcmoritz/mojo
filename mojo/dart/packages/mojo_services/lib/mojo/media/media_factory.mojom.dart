@@ -7,11 +7,11 @@ import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
-import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_mojom;
 import 'package:mojo_services/mojo/media/media_player.mojom.dart' as media_player_mojom;
 import 'package:mojo_services/mojo/media/media_sink.mojom.dart' as media_sink_mojom;
 import 'package:mojo_services/mojo/media/media_source.mojom.dart' as media_source_mojom;
 import 'package:mojo_services/mojo/media/media_type_converter.mojom.dart' as media_type_converter_mojom;
+import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_mojom;
 
 
 

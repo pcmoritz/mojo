@@ -8,7 +8,6 @@ import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
 import 'package:mojo/mojo/service_provider.mojom.dart' as service_provider_mojom;
-import 'package:mojo_services/mojo/ui/views.mojom.dart' as views_mojom;
 import 'package:mojo_services/mojo/ui/view_token.mojom.dart' as view_token_mojom;
 
 

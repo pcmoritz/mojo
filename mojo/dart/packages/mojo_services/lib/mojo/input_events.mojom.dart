@@ -5,7 +5,6 @@
 library input_events_mojom;
 import 'package:mojo/bindings.dart' as bindings;
 
-import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 import 'package:mojo_services/mojo/input_event_constants.mojom.dart' as input_event_constants_mojom;
 import 'package:mojo_services/mojo/input_key_codes.mojom.dart' as input_key_codes_mojom;
 

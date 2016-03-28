@@ -7,8 +7,6 @@ import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
-import 'package:mojo_services/mojo/media/media_common.mojom.dart' as media_common_mojom;
-import 'package:mojo_services/mojo/media/media_types.mojom.dart' as media_types_mojom;
 
 
 
