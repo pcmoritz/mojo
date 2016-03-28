@@ -5,9 +5,8 @@
 #ifndef SERVICES_GFX_COMPOSITOR_BACKEND_OUTPUT_H_
 #define SERVICES_GFX_COMPOSITOR_BACKEND_OUTPUT_H_
 
-#include <memory>
-
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
 
 namespace compositor {
 
@@ -29,7 +28,7 @@ class Output {
   virtual Scheduler* GetScheduler() = 0;
 
   // Submits a frame to be rendered to the display.
-  virtual void SubmitFrame(const std::shared_ptr<RenderFrame>& frame) = 0;
+  virtual void SubmitFrame(const scoped_refptr<RenderFrame>& frame) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Output);

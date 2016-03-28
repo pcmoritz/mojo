@@ -23,7 +23,7 @@ bool Snapshot::HasDependency(const SceneDef* scene) const {
   return dependencies_.find(scene->label().token()) != dependencies_.end();
 }
 
-std::shared_ptr<RenderFrame> Snapshot::CreateFrame(
+scoped_refptr<RenderFrame> Snapshot::CreateFrame(
     const mojo::Rect& viewport,
     const mojo::gfx::composition::FrameInfo& frame_info) const {
   DCHECK(!is_blocked());
@@ -34,9 +34,8 @@ std::shared_ptr<RenderFrame> Snapshot::CreateFrame(
   SkPictureRecorder recorder;
   recorder.beginRecording(SkRect::Make(sk_viewport));
   root_scene_content_->RecordPicture(this, recorder.getRecordingCanvas());
-  return RenderFrame::CreateFromPicture(
-      sk_viewport, frame_info,
-      skia::AdoptRef(recorder.endRecordingAsPicture()));
+  return new RenderFrame(sk_viewport, frame_info,
+                         skia::AdoptRef(recorder.endRecordingAsPicture()));
 }
 
 void Snapshot::HitTest(const mojo::PointF& point,

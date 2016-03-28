@@ -44,7 +44,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   // Submits a frame to be drawn.
   // If the GL context isn't ready yet, the frame will be retained unless
   // superceded by another frame.
-  void SubmitFrame(const std::shared_ptr<RenderFrame>& frame,
+  void SubmitFrame(const scoped_refptr<RenderFrame>& frame,
                    const FrameCallback& frame_callback);
 
  private:
@@ -73,7 +73,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   std::unique_ptr<mojo::skia::GaneshContext> ganesh_context_;
   std::unique_ptr<mojo::skia::GaneshFramebufferSurface> ganesh_surface_;
 
-  std::shared_ptr<RenderFrame> frame_;
+  scoped_refptr<RenderFrame> frame_;
   FrameCallback frame_callback_;
 
   mojo::Binding<ViewportParameterListener> viewport_parameter_listener_binding_;

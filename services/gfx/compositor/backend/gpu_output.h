@@ -32,7 +32,7 @@ class GpuOutput : public Output {
   ~GpuOutput() override;
 
   Scheduler* GetScheduler() override;
-  void SubmitFrame(const std::shared_ptr<RenderFrame>& frame) override;
+  void SubmitFrame(const scoped_refptr<RenderFrame>& frame) override;
 
  private:
   // Wrapper around state which is made available to the rasterizer thread.
@@ -49,7 +49,7 @@ class GpuOutput : public Output {
 
     void PostDestroy(scoped_ptr<RasterizerDelegate> self);
 
-    void PostFrame(const std::shared_ptr<RenderFrame>& frame);
+    void PostFrame(const scoped_refptr<RenderFrame>& frame);
 
    private:
     void PostSubmit();
@@ -75,7 +75,7 @@ class GpuOutput : public Output {
     std::unique_ptr<GpuRasterizer> rasterizer_;
 
     std::mutex mutex_;
-    std::queue<std::shared_ptr<RenderFrame>> frames_;  // guarded by |mutex_|
+    std::queue<scoped_refptr<RenderFrame>> frames_;  // guarded by |mutex_|
 
     DISALLOW_COPY_AND_ASSIGN(RasterizerDelegate);
   };

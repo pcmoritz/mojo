@@ -27,7 +27,7 @@ ResourceDef::Type SceneResourceDef::type() const {
   return Type::kScene;
 }
 
-ImageResourceDef::ImageResourceDef(const std::shared_ptr<RenderImage>& image)
+ImageResourceDef::ImageResourceDef(const scoped_refptr<RenderImage>& image)
     : image_(image) {
   DCHECK(image);
 }

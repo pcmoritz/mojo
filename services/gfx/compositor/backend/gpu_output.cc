@@ -51,7 +51,7 @@ Scheduler* GpuOutput::GetScheduler() {
   return scheduler_.get();
 }
 
-void GpuOutput::SubmitFrame(const std::shared_ptr<RenderFrame>& frame) {
+void GpuOutput::SubmitFrame(const scoped_refptr<RenderFrame>& frame) {
   rasterizer_delegate_->PostFrame(frame);
 }
 
@@ -85,9 +85,9 @@ void GpuOutput::RasterizerDelegate::PostDestroy(
 }
 
 void GpuOutput::RasterizerDelegate::PostFrame(
-    const std::shared_ptr<RenderFrame>& frame) {
+    const scoped_refptr<RenderFrame>& frame) {
   bool was_empty;
-  std::shared_ptr<RenderFrame> dropped_frame;
+  scoped_refptr<RenderFrame> dropped_frame;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     was_empty = frames_.empty();
@@ -121,7 +121,7 @@ void GpuOutput::RasterizerDelegate::InitializeTask(
 
 void GpuOutput::RasterizerDelegate::SubmitTask() {
   bool have_more;
-  std::shared_ptr<RenderFrame> frame;
+  scoped_refptr<RenderFrame> frame;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     DCHECK(!frames_.empty());

@@ -152,7 +152,7 @@ void GpuRasterizer::OnVSyncParametersUpdated(int64_t timebase,
   }
 }
 
-void GpuRasterizer::SubmitFrame(const std::shared_ptr<RenderFrame>& frame,
+void GpuRasterizer::SubmitFrame(const scoped_refptr<RenderFrame>& frame,
                                 const FrameCallback& frame_callback) {
   DCHECK(frame);
 

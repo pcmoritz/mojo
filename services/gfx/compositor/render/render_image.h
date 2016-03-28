@@ -5,8 +5,6 @@
 #ifndef SERVICES_GFX_COMPOSITOR_RENDER_RENDER_IMAGE_H_
 #define SERVICES_GFX_COMPOSITOR_RENDER_RENDER_IMAGE_H_
 
-#include <memory>
-
 #include <GLES2/gl2.h>
 #include <GLES2/gl2extmojo.h>
 
@@ -22,18 +20,17 @@ namespace compositor {
 
 // Describes an image which can be rendered by the compositor.
 //
-// Render objects are thread-safe, immutable, and reference counted via
-// std::shared_ptr.  They have no direct references to the scene graph.
+// Render objects are thread-safe, immutable, and reference counted.
+// They have no direct references to the scene graph.
 //
 // TODO(jeffbrown): Generalize this beyond mailbox textures.
-class RenderImage {
+class RenderImage : public base::RefCountedThreadSafe<RenderImage> {
   class Releaser;
   class Generator;
 
  public:
   RenderImage(const skia::RefPtr<SkImage>& image,
-              const std::shared_ptr<Releaser>& releaser);
-  ~RenderImage();
+              const scoped_refptr<Releaser>& releaser);
 
   // Creates a new image backed by a mailbox texture.
   // If |sync_point| is non-zero, inserts a sync point into the command stream
@@ -41,7 +38,7 @@ class RenderImage {
   // When the last reference is released, the associated release task is
   // posted to the task runner.  Returns nullptr if the mailbox texture
   // is invalid.
-  static std::shared_ptr<RenderImage> CreateFromMailboxTexture(
+  static scoped_refptr<RenderImage> CreateFromMailboxTexture(
       const GLbyte mailbox_name[GL_MAILBOX_SIZE_CHROMIUM],
       GLuint sync_point,
       uint32_t width,
@@ -57,8 +54,12 @@ class RenderImage {
   const skia::RefPtr<SkImage>& image() const { return image_; }
 
  private:
+  friend class base::RefCountedThreadSafe<RenderImage>;
+
+  ~RenderImage();
+
   skia::RefPtr<SkImage> image_;
-  std::shared_ptr<Releaser> releaser_;
+  scoped_refptr<Releaser> releaser_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderImage);
 };

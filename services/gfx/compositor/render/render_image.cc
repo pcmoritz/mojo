@@ -12,7 +12,10 @@
 
 namespace compositor {
 
-class RenderImage::Releaser {
+// Invokes the release callback when both the Generator and the RenderImage
+// have been freed.  Note that the Generator may outlive the RenderImage.
+class RenderImage::Releaser
+    : public base::RefCountedThreadSafe<RenderImage::Releaser> {
  public:
   Releaser(const scoped_refptr<base::TaskRunner>& task_runner,
            const base::Closure& release_task)
@@ -20,16 +23,18 @@ class RenderImage::Releaser {
     DCHECK(task_runner_);
   }
 
+ private:
+  friend class base::RefCountedThreadSafe<RenderImage::Releaser>;
+
   ~Releaser() { task_runner_->PostTask(FROM_HERE, release_task_); }
 
- private:
   scoped_refptr<base::TaskRunner> const task_runner_;
   base::Closure const release_task_;
 };
 
 class RenderImage::Generator : public mojo::skia::MailboxTextureImageGenerator {
  public:
-  Generator(const std::shared_ptr<Releaser>& releaser,
+  Generator(const scoped_refptr<Releaser>& releaser,
             const GLbyte mailbox_name[GL_MAILBOX_SIZE_CHROMIUM],
             GLuint sync_point,
             uint32_t width,
@@ -47,11 +52,11 @@ class RenderImage::Generator : public mojo::skia::MailboxTextureImageGenerator {
   ~Generator() override {}
 
  private:
-  std::shared_ptr<Releaser> releaser_;
+  scoped_refptr<Releaser> releaser_;
 };
 
 RenderImage::RenderImage(const skia::RefPtr<SkImage>& image,
-                         const std::shared_ptr<Releaser>& releaser)
+                         const scoped_refptr<Releaser>& releaser)
     : image_(image), releaser_(releaser) {
   DCHECK(image_);
   DCHECK(releaser_);
@@ -59,7 +64,7 @@ RenderImage::RenderImage(const skia::RefPtr<SkImage>& image,
 
 RenderImage::~RenderImage() {}
 
-std::shared_ptr<RenderImage> RenderImage::CreateFromMailboxTexture(
+scoped_refptr<RenderImage> RenderImage::CreateFromMailboxTexture(
     const GLbyte mailbox_name[GL_MAILBOX_SIZE_CHROMIUM],
     GLuint sync_point,
     uint32_t width,
@@ -67,8 +72,7 @@ std::shared_ptr<RenderImage> RenderImage::CreateFromMailboxTexture(
     mojo::gfx::composition::MailboxTextureResource::Origin origin,
     const scoped_refptr<base::TaskRunner>& task_runner,
     const base::Closure& release_task) {
-  std::shared_ptr<Releaser> releaser =
-      std::make_shared<Releaser>(task_runner, release_task);
+  scoped_refptr<Releaser> releaser = new Releaser(task_runner, release_task);
   skia::RefPtr<SkImage> image = skia::AdoptRef(SkImage::NewFromGenerator(
       new Generator(releaser, mailbox_name, sync_point, width, height,
                     origin == mojo::gfx::composition::MailboxTextureResource::
@@ -78,7 +82,7 @@ std::shared_ptr<RenderImage> RenderImage::CreateFromMailboxTexture(
   if (!image)
     return nullptr;
 
-  return std::make_shared<RenderImage>(image, releaser);
+  return new RenderImage(image, releaser);
 }
 
 }  // namespace compositor

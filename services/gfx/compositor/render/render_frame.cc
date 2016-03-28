@@ -12,6 +12,10 @@
 namespace compositor {
 
 RenderFrame::RenderFrame(const SkIRect& viewport,
+                         const mojo::gfx::composition::FrameInfo& frame_info)
+    : viewport_(viewport), frame_info_(frame_info) {}
+
+RenderFrame::RenderFrame(const SkIRect& viewport,
                          const mojo::gfx::composition::FrameInfo& frame_info,
                          const skia::RefPtr<SkPicture>& picture)
     : viewport_(viewport), frame_info_(frame_info), picture_(picture) {}

@@ -198,7 +198,7 @@ scoped_refptr<const ResourceDef> SceneDef::CreateResource(
     const mojo::gfx::composition::MailboxTextureResource::Origin origin =
         mailbox_texture_resource_decl->origin;
 
-    std::shared_ptr<RenderImage> image = RenderImage::CreateFromMailboxTexture(
+    scoped_refptr<RenderImage> image = RenderImage::CreateFromMailboxTexture(
         mailbox_name, sync_point, width, height, origin,
         base::MessageLoop::current()->task_runner(),
         base::Bind(

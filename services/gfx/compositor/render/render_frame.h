@@ -5,42 +5,31 @@
 #ifndef SERVICES_GFX_COMPOSITOR_RENDER_RENDER_FRAME_H_
 #define SERVICES_GFX_COMPOSITOR_RENDER_RENDER_FRAME_H_
 
-#include <memory>
-
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 #include "skia/ext/refptr.h"
-#include "third_party/skia/include/core/SkPicture.h"
 #include "third_party/skia/include/core/SkRect.h"
 
 class SkCanvas;
+class SkPicture;
 
 namespace compositor {
 
 // Describes a frame to be rendered.
 //
-// Render objects are thread-safe, immutable, and reference counted via
-// std::shared_ptr.  They have no direct references to the scene graph.
-class RenderFrame {
+// Render objects are thread-safe, immutable, and reference counted.
+// They have no direct references to the scene graph.
+class RenderFrame : public base::RefCountedThreadSafe<RenderFrame> {
  public:
+  // Creates an empty render frame with no content.
+  RenderFrame(const SkIRect& viewport,
+              const mojo::gfx::composition::FrameInfo& frame_info);
+
+  // Creates render frame backed by a picture.
   RenderFrame(const SkIRect& viewport,
               const mojo::gfx::composition::FrameInfo& frame_info,
               const skia::RefPtr<SkPicture>& picture);
-  ~RenderFrame();
-
-  static std::shared_ptr<RenderFrame> CreateFromPicture(
-      const SkIRect& viewport,
-      const mojo::gfx::composition::FrameInfo& frame_info,
-      const skia::RefPtr<SkPicture>& picture) {
-    return std::make_shared<RenderFrame>(viewport, frame_info, picture);
-  }
-
-  static std::shared_ptr<RenderFrame> CreateEmpty(
-      const SkIRect& viewport,
-      const mojo::gfx::composition::FrameInfo& frame_info) {
-    return std::make_shared<RenderFrame>(viewport, frame_info,
-                                         skia::RefPtr<SkPicture>());
-  }
 
   // Gets the frame's viewport in pixels.
   const SkIRect& viewport() const { return viewport_; }
@@ -57,7 +46,10 @@ class RenderFrame {
   void Paint(SkCanvas* canvas) const;
 
  private:
+  friend class base::RefCountedThreadSafe<RenderFrame>;
   friend class RenderFrameBuilder;
+
+  ~RenderFrame();
 
   SkIRect viewport_;
   mojo::gfx::composition::FrameInfo frame_info_;

@@ -6,7 +6,6 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_SNAPSHOT_H_
 
 #include <iosfwd>
-#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -66,7 +65,7 @@ class Snapshot : public base::RefCounted<Snapshot> {
 
   // Creates a frame for rendering.
   // Only valid if |!is_blocked()|.
-  std::shared_ptr<RenderFrame> CreateFrame(
+  scoped_refptr<RenderFrame> CreateFrame(
       const mojo::Rect& viewport,
       const mojo::gfx::composition::FrameInfo& frame_info) const;
 

@@ -5,8 +5,6 @@
 #ifndef SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCE_DEF_H_
 #define SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCE_DEF_H_
 
-#include <memory>
-
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
@@ -72,18 +70,18 @@ class SceneResourceDef : public ResourceDef {
 // Reference to an image expressed as a resource definition.
 class ImageResourceDef : public ResourceDef {
  public:
-  explicit ImageResourceDef(const std::shared_ptr<RenderImage>& image);
+  explicit ImageResourceDef(const scoped_refptr<RenderImage>& image);
 
   Type type() const override;
 
   // The referenced image, never null.
-  const std::shared_ptr<RenderImage>& image() const { return image_; }
+  const scoped_refptr<RenderImage>& image() const { return image_; }
 
  protected:
   ~ImageResourceDef() override;
 
  private:
-  std::shared_ptr<RenderImage> image_;
+  scoped_refptr<RenderImage> image_;
 
   DISALLOW_COPY_AND_ASSIGN(ImageResourceDef);
 };
