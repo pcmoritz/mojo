@@ -94,9 +94,9 @@ mojo::ui::ViewLayoutInfoPtr ViewState::CreateLayoutInfo() {
 const std::string& ViewState::FormattedLabel() const {
   if (formatted_label_cache_.empty()) {
     formatted_label_cache_ =
-        label_.empty()
-            ? base::StringPrintf("<%d>", view_token_->value)
-            : base::StringPrintf("<%d:%s>", view_token_->value, label_.c_str());
+        label_.empty() ? base::StringPrintf("<V%d>", view_token_->value)
+                       : base::StringPrintf("<V%d:%s>", view_token_->value,
+                                            label_.c_str());
   }
   return formatted_label_cache_;
 }

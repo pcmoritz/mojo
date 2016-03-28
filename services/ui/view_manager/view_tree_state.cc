@@ -79,8 +79,8 @@ std::unique_ptr<ViewStub> ViewTreeState::UnlinkRoot() {
 const std::string& ViewTreeState::FormattedLabel() const {
   if (formatted_label_cache_.empty()) {
     formatted_label_cache_ =
-        label_.empty() ? base::StringPrintf("<%d>", view_tree_token_->value)
-                       : base::StringPrintf("<%d:%s>", view_tree_token_->value,
+        label_.empty() ? base::StringPrintf("<T%d>", view_tree_token_->value)
+                       : base::StringPrintf("<T%d:%s>", view_tree_token_->value,
                                             label_.c_str());
   }
   return formatted_label_cache_;

@@ -17,21 +17,22 @@ SceneLabel::SceneLabel(const SceneLabel& other)
 SceneLabel::~SceneLabel() {}
 
 std::string SceneLabel::FormattedLabel() const {
-  return label_.empty() ? base::StringPrintf("<%d>", token_)
-                        : base::StringPrintf("<%d:%s>", token_, label_.c_str());
+  return label_.empty()
+             ? base::StringPrintf("<S%d>", token_)
+             : base::StringPrintf("<S%d:%s>", token_, label_.c_str());
 }
 
 std::string SceneLabel::FormattedLabelForVersion(uint32_t version) const {
-  return label_.empty() ? base::StringPrintf("<%d/%d>", token_, version)
-                        : base::StringPrintf("<%d:%s/%d>", token_,
+  return label_.empty() ? base::StringPrintf("<S%d/%d>", token_, version)
+                        : base::StringPrintf("<S%d:%s/%d>", token_,
                                              label_.c_str(), version);
 }
 
 std::string SceneLabel::FormattedLabelForNode(uint32_t version,
                                               uint32_t node_id) const {
   return label_.empty()
-             ? base::StringPrintf("<%d/%d>[%d]", token_, version, node_id)
-             : base::StringPrintf("<%d:%s/%d>[%d]", token_, label_.c_str(),
+             ? base::StringPrintf("<S%d/%d>[%d]", token_, version, node_id)
+             : base::StringPrintf("<S%d:%s/%d>[%d]", token_, label_.c_str(),
                                   version, node_id);
 }
 
