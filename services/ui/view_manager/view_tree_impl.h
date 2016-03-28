@@ -30,7 +30,6 @@ class ViewTreeImpl : public mojo::ui::ViewTree,
       mojo::InterfaceRequest<mojo::ServiceProvider> service_provider) override;
   void SetRenderer(mojo::InterfaceHandle<mojo::gfx::composition::Renderer>
                        renderer) override;
-  void RequestLayout() override;
   void GetContainer(mojo::InterfaceRequest<mojo::ui::ViewContainer>
                         view_container_request) override;
 
@@ -43,9 +42,10 @@ class ViewTreeImpl : public mojo::ui::ViewTree,
   void RemoveChild(uint32_t child_key,
                    mojo::InterfaceRequest<mojo::ui::ViewOwner>
                        transferred_view_owner_request) override;
-  void LayoutChild(uint32_t child_key,
-                   mojo::ui::ViewLayoutParamsPtr child_layout_params,
-                   const LayoutChildCallback& callback) override;
+  void SetChildProperties(
+      uint32_t child_key,
+      uint32_t child_scene_version,
+      mojo::ui::ViewPropertiesPtr child_view_properties) override;
 
   // |ServiceProvider|:
   void ConnectToService(const mojo::String& service_name,

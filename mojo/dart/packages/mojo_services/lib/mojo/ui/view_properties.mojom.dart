@@ -2,25 +2,23 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-library layouts_mojom;
+library view_properties_mojom;
 import 'package:mojo/bindings.dart' as bindings;
 
 import 'package:mojo_services/mojo/geometry.mojom.dart' as geometry_mojom;
 
 
 
-class BoxConstraints extends bindings.Struct {
+class ViewProperties extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  int minWidth = 0;
-  int maxWidth = 0;
-  int minHeight = 0;
-  int maxHeight = 0;
+  DisplayMetrics displayMetrics = null;
+  ViewLayout viewLayout = null;
 
-  BoxConstraints() : super(kVersions.last.size);
+  ViewProperties() : super(kVersions.last.size);
 
-  static BoxConstraints deserialize(bindings.Message message) {
+  static ViewProperties deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -29,11 +27,11 @@ class BoxConstraints extends bindings.Struct {
     return result;
   }
 
-  static BoxConstraints decode(bindings.Decoder decoder0) {
+  static ViewProperties decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    BoxConstraints result = new BoxConstraints();
+    ViewProperties result = new ViewProperties();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -55,19 +53,13 @@ class BoxConstraints extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.minWidth = decoder0.decodeInt32(8);
+      var decoder1 = decoder0.decodePointer(8, true);
+      result.displayMetrics = DisplayMetrics.decode(decoder1);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.maxWidth = decoder0.decodeInt32(12);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.minHeight = decoder0.decodeInt32(16);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.maxHeight = decoder0.decodeInt32(20);
+      var decoder1 = decoder0.decodePointer(16, true);
+      result.viewLayout = ViewLayout.decode(decoder1);
     }
     return result;
   }
@@ -75,64 +67,45 @@ class BoxConstraints extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInt32(minWidth, 8);
+      encoder0.encodeStruct(displayMetrics, 8, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "minWidth of struct BoxConstraints: $e";
+          "displayMetrics of struct ViewProperties: $e";
       rethrow;
     }
     try {
-      encoder0.encodeInt32(maxWidth, 12);
+      encoder0.encodeStruct(viewLayout, 16, true);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "maxWidth of struct BoxConstraints: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeInt32(minHeight, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "minHeight of struct BoxConstraints: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeInt32(maxHeight, 20);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "maxHeight of struct BoxConstraints: $e";
+          "viewLayout of struct ViewProperties: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "BoxConstraints("
-           "minWidth: $minWidth" ", "
-           "maxWidth: $maxWidth" ", "
-           "minHeight: $minHeight" ", "
-           "maxHeight: $maxHeight" ")";
+    return "ViewProperties("
+           "displayMetrics: $displayMetrics" ", "
+           "viewLayout: $viewLayout" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["minWidth"] = minWidth;
-    map["maxWidth"] = maxWidth;
-    map["minHeight"] = minHeight;
-    map["maxHeight"] = maxHeight;
+    map["displayMetrics"] = displayMetrics;
+    map["viewLayout"] = viewLayout;
     return map;
   }
 }
 
 
-class ViewLayoutParams extends bindings.Struct {
+class DisplayMetrics extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
-  BoxConstraints constraints = null;
   double devicePixelRatio = 1.0;
 
-  ViewLayoutParams() : super(kVersions.last.size);
+  DisplayMetrics() : super(kVersions.last.size);
 
-  static ViewLayoutParams deserialize(bindings.Message message) {
+  static DisplayMetrics deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -141,11 +114,11 @@ class ViewLayoutParams extends bindings.Struct {
     return result;
   }
 
-  static ViewLayoutParams decode(bindings.Decoder decoder0) {
+  static DisplayMetrics decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewLayoutParams result = new ViewLayoutParams();
+    DisplayMetrics result = new DisplayMetrics();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -167,12 +140,7 @@ class ViewLayoutParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.constraints = BoxConstraints.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.devicePixelRatio = decoder0.decodeFloat(16);
+      result.devicePixelRatio = decoder0.decodeFloat(8);
     }
     return result;
   }
@@ -180,45 +148,36 @@ class ViewLayoutParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeStruct(constraints, 8, false);
+      encoder0.encodeFloat(devicePixelRatio, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "constraints of struct ViewLayoutParams: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeFloat(devicePixelRatio, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "devicePixelRatio of struct ViewLayoutParams: $e";
+          "devicePixelRatio of struct DisplayMetrics: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "ViewLayoutParams("
-           "constraints: $constraints" ", "
+    return "DisplayMetrics("
            "devicePixelRatio: $devicePixelRatio" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["constraints"] = constraints;
     map["devicePixelRatio"] = devicePixelRatio;
     return map;
   }
 }
 
 
-class ViewLayoutInfo extends bindings.Struct {
+class ViewLayout extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
   ];
   geometry_mojom.Size size = null;
 
-  ViewLayoutInfo() : super(kVersions.last.size);
+  ViewLayout() : super(kVersions.last.size);
 
-  static ViewLayoutInfo deserialize(bindings.Message message) {
+  static ViewLayout deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -227,11 +186,11 @@ class ViewLayoutInfo extends bindings.Struct {
     return result;
   }
 
-  static ViewLayoutInfo decode(bindings.Decoder decoder0) {
+  static ViewLayout decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    ViewLayoutInfo result = new ViewLayoutInfo();
+    ViewLayout result = new ViewLayout();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -265,86 +224,13 @@ class ViewLayoutInfo extends bindings.Struct {
       encoder0.encodeStruct(size, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "size of struct ViewLayoutInfo: $e";
+          "size of struct ViewLayout: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "ViewLayoutInfo("
-           "size: $size" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["size"] = size;
-    return map;
-  }
-}
-
-
-class ViewLayoutResult extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  geometry_mojom.Size size = null;
-
-  ViewLayoutResult() : super(kVersions.last.size);
-
-  static ViewLayoutResult deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewLayoutResult decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewLayoutResult result = new ViewLayoutResult();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.size = geometry_mojom.Size.decode(decoder1);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(size, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "size of struct ViewLayoutResult: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "ViewLayoutResult("
+    return "ViewLayout("
            "size: $size" ")";
   }
 

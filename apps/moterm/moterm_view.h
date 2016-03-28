@@ -41,9 +41,8 @@ class MotermView : public mojo::ui::GaneshView,
 
  private:
   // |mojo::ui::GaneshView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
 
   // |mojo::ui::ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
@@ -87,7 +86,6 @@ class MotermView : public mojo::ui::GaneshView,
 
   void OnKeyPressed(mojo::EventPtr key_event);
 
-  mojo::Size view_size_;
   mojo::ui::Choreographer choreographer_;
   mojo::ui::InputHandler input_handler_;
 

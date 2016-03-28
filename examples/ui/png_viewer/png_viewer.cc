@@ -39,28 +39,26 @@ class PNGView : public mojo::ui::GaneshView {
 
  private:
   // |GaneshView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override {
-    size_.width = layout_params->constraints->max_width;
-    size_.height = layout_params->constraints->max_height;
-
-    auto info = mojo::ui::ViewLayoutResult::New();
-    info->size = size_.Clone();
-    callback.Run(info.Pass());
-
+  void OnPropertiesChanged(
+      uint32_t old_scene_version,
+      mojo::ui::ViewPropertiesPtr old_properties) override {
     UpdateScene();
   }
 
   void UpdateScene() {
+    if (!properties())
+      return;
+
+    const mojo::Size& size = *properties()->view_layout->size;
     mojo::RectF bounds;
-    bounds.width = size_.width;
-    bounds.height = size_.height;
+    bounds.width = size.width;
+    bounds.height = size.height;
 
     auto update = mojo::gfx::composition::SceneUpdate::New();
     mojo::gfx::composition::ResourcePtr content_resource =
         ganesh_renderer()->DrawCanvas(
-            size_, base::Bind(&PNGView::DrawContent, base::Unretained(this)));
+            size,
+            base::Bind(&PNGView::DrawContent, base::Unretained(this), size));
     DCHECK(content_resource);
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -72,28 +70,30 @@ class PNGView : public mojo::ui::GaneshView {
     update->nodes.insert(kRootNodeId, root_node.Pass());
 
     scene()->Update(update.Pass());
-    scene()->Publish(nullptr);
+
+    auto metadata = mojo::gfx::composition::SceneMetadata::New();
+    metadata->version = scene_version();
+    scene()->Publish(metadata.Pass());
   }
 
-  void DrawContent(SkCanvas* canvas) {
+  void DrawContent(const mojo::Size& size, SkCanvas* canvas) {
     canvas->clear(SK_ColorBLACK);
 
     int32_t w, h;
-    if (size_.width * image_->height() < size_.height * image_->width()) {
-      w = size_.width;
-      h = image_->height() * size_.width / image_->width();
+    if (size.width * image_->height() < size.height * image_->width()) {
+      w = size.width;
+      h = image_->height() * size.width / image_->width();
     } else {
-      w = image_->width() * size_.height / image_->height();
-      h = size_.height;
+      w = image_->width() * size.height / image_->height();
+      h = size.height;
     }
     canvas->drawImageRect(
         image_.get(), SkRect::MakeWH(image_->width(), image_->height()),
-        SkRect::MakeXYWH((size_.width - w) / 2, (size_.height - h) / 2, w, h),
+        SkRect::MakeXYWH((size.width - w) / 2, (size.height - h) / 2, w, h),
         nullptr);
   }
 
   skia::RefPtr<SkImage> image_;
-  mojo::Size size_;
 
   DISALLOW_COPY_AND_ASSIGN(PNGView);
 };

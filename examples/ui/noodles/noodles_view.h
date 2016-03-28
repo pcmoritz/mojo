@@ -74,9 +74,8 @@ class NoodlesView : public mojo::ui::BaseView,
   };
 
   // |BaseView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
 
   // |ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
@@ -95,7 +94,6 @@ class NoodlesView : public mojo::ui::BaseView,
   std::unique_ptr<base::Thread> rasterizer_thread_;
   scoped_refptr<base::SingleThreadTaskRunner> rasterizer_task_runner_;
 
-  mojo::Size size_;
   double alpha_ = 0.0;
   int wx_ = 2;
   int wy_ = 3;

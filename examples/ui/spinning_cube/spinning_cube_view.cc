@@ -66,18 +66,9 @@ SpinningCubeView::SpinningCubeView(
 
 SpinningCubeView::~SpinningCubeView() {}
 
-void SpinningCubeView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                                mojo::Array<uint32_t> children_needing_layout,
-                                const OnLayoutCallback& callback) {
-  size_.width = layout_params->constraints->max_width;
-  size_.height = layout_params->constraints->max_height;
-
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  callback.Run(info.Pass());
-
-  // Draw!
+void SpinningCubeView::OnPropertiesChanged(
+    uint32_t old_scene_version,
+    mojo::ui::ViewPropertiesPtr old_properties) {
   choreographer_.ScheduleDraw();
 }
 
@@ -146,18 +137,22 @@ void SpinningCubeView::OnEvent(mojo::EventPtr event,
 void SpinningCubeView::OnDraw(
     const mojo::gfx::composition::FrameInfo& frame_info,
     const base::TimeDelta& time_delta) {
+  if (!properties())
+    return;
+
   // Update the state of the cube.
   cube_.UpdateForTimeDelta(time_delta.InSecondsF());
 
   // Update the contents of the scene.
+  const mojo::Size& size = *properties()->view_layout->size;
   mojo::RectF bounds;
-  bounds.width = size_.width;
-  bounds.height = size_.height;
+  bounds.width = size.width;
+  bounds.height = size.height;
 
   auto update = mojo::gfx::composition::SceneUpdate::New();
   mojo::gfx::composition::ResourcePtr cube_resource = gl_renderer()->DrawGL(
-      size_, true,
-      base::Bind(&SpinningCubeView::DrawCubeWithGL, base::Unretained(this)));
+      size, true, base::Bind(&SpinningCubeView::DrawCubeWithGL,
+                             base::Unretained(this), size));
   DCHECK(cube_resource);
   update->resources.insert(kCubeImageResourceId, cube_resource.Pass());
 
@@ -171,19 +166,20 @@ void SpinningCubeView::OnDraw(
   root_node->op->get_image()->image_resource_id = kCubeImageResourceId;
   update->nodes.insert(kRootNodeId, root_node.Pass());
 
-  auto metadata = mojo::gfx::composition::SceneMetadata::New();
-  metadata->presentation_time = frame_info.presentation_time;
+  scene()->Update(update.Pass());
 
   // Publish the scene.
-  scene()->Update(update.Pass());
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
+  metadata->presentation_time = frame_info.presentation_time;
   scene()->Publish(metadata.Pass());
 
   // Loop!
   choreographer_.ScheduleDraw();
 }
 
-void SpinningCubeView::DrawCubeWithGL() {
-  cube_.set_size(size_.width, size_.height);
+void SpinningCubeView::DrawCubeWithGL(const mojo::Size& size) {
+  cube_.set_size(size.width, size.height);
   cube_.Draw();
 }
 

@@ -130,16 +130,9 @@ class PDFDocumentView : public mojo::ui::GaneshView,
 
  private:
   // |GaneshView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override {
-    size_.width = layout_params->constraints->max_width;
-    size_.height = layout_params->constraints->max_height;
-
-    auto info = mojo::ui::ViewLayoutResult::New();
-    info->size = size_.Clone();
-    callback.Run(info.Pass());
-
+  void OnPropertiesChanged(
+      uint32_t old_scene_version,
+      mojo::ui::ViewPropertiesPtr old_properties) override {
     Redraw();
   }
 
@@ -173,15 +166,19 @@ class PDFDocumentView : public mojo::ui::GaneshView,
   // |ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
               const base::TimeDelta& time_delta) override {
+    if (!properties())
+      return;
+
+    const mojo::Size& size = *properties()->view_layout->size;
     mojo::RectF bounds;
-    bounds.width = size_.width;
-    bounds.height = size_.height;
+    bounds.width = size.width;
+    bounds.height = size.height;
 
     auto update = mojo::gfx::composition::SceneUpdate::New();
     mojo::gfx::composition::ResourcePtr content_resource =
-        ganesh_renderer()->DrawCanvas(
-            size_,
-            base::Bind(&PDFDocumentView::DrawContent, base::Unretained(this)));
+        ganesh_renderer()->DrawCanvas(size,
+                                      base::Bind(&PDFDocumentView::DrawContent,
+                                                 base::Unretained(this), size));
     DCHECK(content_resource);
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -195,12 +192,15 @@ class PDFDocumentView : public mojo::ui::GaneshView,
     update->nodes.insert(kRootNodeId, root_node.Pass());
 
     scene()->Update(update.Pass());
-    scene()->Publish(nullptr);
+
+    auto metadata = mojo::gfx::composition::SceneMetadata::New();
+    metadata->version = scene_version();
+    scene()->Publish(metadata.Pass());
   }
 
-  void DrawContent(SkCanvas* canvas) {
+  void DrawContent(const mojo::Size& size, SkCanvas* canvas) {
     if (!cached_image_) {
-      cached_image_ = pdf_document_->DrawPage(page_, size_);
+      cached_image_ = pdf_document_->DrawPage(page_, size);
     }
 
     if (cached_image_) {
@@ -208,8 +208,8 @@ class PDFDocumentView : public mojo::ui::GaneshView,
       canvas->drawImageRect(
           cached_image_.get(),
           SkRect::MakeWH(cached_image_->width(), cached_image_->height()),
-          SkRect::MakeXYWH((size_.width - cached_image_->width()) / 2,
-                           (size_.height - cached_image_->height()) / 2,
+          SkRect::MakeXYWH((size.width - cached_image_->width()) / 2,
+                           (size.height - cached_image_->height()) / 2,
                            cached_image_->width(), cached_image_->height()),
           nullptr);
     } else {
@@ -240,7 +240,6 @@ class PDFDocumentView : public mojo::ui::GaneshView,
   uint32_t page_ = 0u;
   skia::RefPtr<SkImage> cached_image_;
 
-  mojo::Size size_;
   mojo::ui::Choreographer choreographer_;
   mojo::ui::InputHandler input_handler_;
 

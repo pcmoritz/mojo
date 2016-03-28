@@ -29,32 +29,26 @@ class TileView : public mojo::ui::BaseView {
     const std::string url;
     const uint32_t key;
 
-    mojo::ui::ViewLayoutParamsPtr layout_params;
     mojo::RectF layout_bounds;
+    mojo::ui::ViewPropertiesPtr view_properties;
     mojo::ui::ViewInfoPtr view_info;
+    uint32_t scene_version = 1u;
   };
 
   // |BaseView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
   void OnChildAttached(uint32_t child_key,
-                       mojo::ui::ViewInfoPtr child_view_info,
-                       const OnChildAttachedCallback& callback) override;
-  void OnChildUnavailable(uint32_t child_key,
-                          const OnChildUnavailableCallback& callback) override;
+                       mojo::ui::ViewInfoPtr child_view_info) override;
+  void OnChildUnavailable(uint32_t child_key) override;
 
   void ConnectViews();
-  void OnChildLayoutFinished(uint32_t child_key,
-                             mojo::ui::ViewLayoutInfoPtr child_layout_info);
   void UpdateScene();
 
   void OnFrameSubmitted();
 
   std::vector<std::string> view_urls_;
   std::map<uint32_t, std::unique_ptr<ViewData>> views_;
-
-  mojo::Size size_;
 
   DISALLOW_COPY_AND_ASSIGN(TileView);
 };

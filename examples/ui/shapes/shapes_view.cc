@@ -24,25 +24,20 @@ ShapesView::ShapesView(
 
 ShapesView::~ShapesView() {}
 
-void ShapesView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                          mojo::Array<uint32_t> children_needing_layout,
-                          const OnLayoutCallback& callback) {
-  size_.width = layout_params->constraints->max_width;
-  size_.height = layout_params->constraints->max_height;
-
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  callback.Run(info.Pass());
-
-  // Draw!
+void ShapesView::OnPropertiesChanged(
+    uint32_t old_scene_version,
+    mojo::ui::ViewPropertiesPtr old_properties) {
   UpdateScene();
 }
 
 void ShapesView::UpdateScene() {
+  if (!properties())
+    return;
+
+  const mojo::Size& size = *properties()->view_layout->size;
   mojo::RectF bounds;
-  bounds.width = size_.width;
-  bounds.height = size_.height;
+  bounds.width = size.width;
+  bounds.height = size.height;
 
   auto update = mojo::gfx::composition::SceneUpdate::New();
 
@@ -50,7 +45,8 @@ void ShapesView::UpdateScene() {
   // image resource in the scene.
   mojo::gfx::composition::ResourcePtr content_resource =
       ganesh_renderer()->DrawCanvas(
-          size_, base::Bind(&ShapesView::DrawContent, base::Unretained(this)));
+          size,
+          base::Bind(&ShapesView::DrawContent, base::Unretained(this), size));
   DCHECK(content_resource);
   update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -63,18 +59,21 @@ void ShapesView::UpdateScene() {
   root_node->op->get_image()->image_resource_id = kContentImageResourceId;
   update->nodes.insert(kRootNodeId, root_node.Pass());
 
-  // Submit the scene update then publish it to cause the changes to be
-  // applied.
+  // Submit the scene update.
   scene()->Update(update.Pass());
-  scene()->Publish(nullptr);
+
+  // Publish the scene update, taking care to supply the expected scene version.
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
+  scene()->Publish(metadata.Pass());
 }
 
-void ShapesView::DrawContent(SkCanvas* canvas) {
+void ShapesView::DrawContent(const mojo::Size& size, SkCanvas* canvas) {
   canvas->clear(SK_ColorCYAN);
 
   SkPaint paint;
   paint.setColor(SK_ColorGREEN);
-  SkRect rect = SkRect::MakeWH(size_.width, size_.height);
+  SkRect rect = SkRect::MakeWH(size.width, size.height);
   rect.inset(10, 10);
   canvas->drawRect(rect, paint);
 

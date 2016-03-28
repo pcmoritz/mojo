@@ -59,14 +59,39 @@ class BaseView : public mojo::ui::ViewListener,
   // This is useful if the scene will be rendered by a separate component.
   mojo::gfx::composition::ScenePtr TakeScene() { return scene_.Pass(); }
 
+  // Gets the currently requested scene version.
+  uint32_t scene_version() { return scene_version_; }
+
+  // Gets the current view properties.
+  // Returns nullptr if none.
+  mojo::ui::ViewProperties* properties() { return properties_.get(); }
+
+  // Called when properties changed.
+  // Use |scene_version()| and |properties()| to get the current values.
+  virtual void OnPropertiesChanged(uint32_t old_scene_version,
+                                   mojo::ui::ViewPropertiesPtr old_properties);
+
+  // Called when a child is attached.
+  virtual void OnChildAttached(uint32_t child_key,
+                               mojo::ui::ViewInfoPtr child_view_info);
+
+  // Called when a child becomes unavailable.
+  virtual void OnChildUnavailable(uint32_t child_key);
+
+ private:
+  // |ViewListener|:
+  void OnPropertiesChanged(
+      uint32_t scene_version,
+      mojo::ui::ViewPropertiesPtr properties,
+      const OnPropertiesChangedCallback& callback) override;
+
   // |ViewContainerListener|:
   void OnChildAttached(uint32_t child_key,
                        mojo::ui::ViewInfoPtr child_view_info,
-                       const OnChildUnavailableCallback& callback) override;
+                       const OnChildAttachedCallback& callback) override;
   void OnChildUnavailable(uint32_t child_key,
                           const OnChildUnavailableCallback& callback) override;
 
- private:
   mojo::ApplicationImpl* app_impl_;
 
   mojo::StrongBinding<mojo::ui::ViewListener> view_listener_binding_;
@@ -77,6 +102,8 @@ class BaseView : public mojo::ui::ViewListener,
   mojo::ServiceProviderPtr view_service_provider_;
   mojo::ui::ViewContainerPtr view_container_;
   mojo::gfx::composition::ScenePtr scene_;
+  uint32_t scene_version_ = mojo::gfx::composition::kSceneVersionNone;
+  mojo::ui::ViewPropertiesPtr properties_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(BaseView);
 };

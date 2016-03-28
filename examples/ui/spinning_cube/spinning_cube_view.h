@@ -26,9 +26,8 @@ class SpinningCubeView : public mojo::ui::GLView,
 
  private:
   // |GLView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
 
   // |ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
@@ -37,12 +36,10 @@ class SpinningCubeView : public mojo::ui::GLView,
   // |InputListener|:
   void OnEvent(mojo::EventPtr event, const OnEventCallback& callback) override;
 
-  void DrawCubeWithGL();
+  void DrawCubeWithGL(const mojo::Size& size);
 
   mojo::ui::Choreographer choreographer_;
   mojo::ui::InputHandler input_handler_;
-
-  mojo::Size size_;
 
   SpinningCube cube_;
 

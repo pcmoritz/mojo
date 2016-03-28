@@ -17,21 +17,20 @@ class ShadowsView : public mojo::ui::GLView,
                     public mojo::ui::ChoreographerDelegate {
  public:
   ShadowsView(mojo::ApplicationImpl* app_impl,
-             mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request);
+              mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request);
 
   ~ShadowsView() override;
 
  private:
   // |GLView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
 
   // |ChoreographerDelegate|:
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
               const base::TimeDelta& time_delta) override;
 
-  void Render();
+  void Render(const mojo::Size& size);
 
   mojo::ui::Choreographer choreographer_;
 

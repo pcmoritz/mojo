@@ -45,14 +45,45 @@ mojo::ui::ViewContainer* BaseView::GetViewContainer() {
   return view_container_.get();
 }
 
+void BaseView::OnPropertiesChanged(uint32_t old_scene_version,
+                                   mojo::ui::ViewPropertiesPtr old_properties) {
+}
+
+void BaseView::OnChildAttached(uint32_t child_key,
+                               mojo::ui::ViewInfoPtr child_view_info) {}
+
+void BaseView::OnChildUnavailable(uint32_t child_key) {}
+
+void BaseView::OnPropertiesChanged(
+    uint32_t scene_version,
+    mojo::ui::ViewPropertiesPtr properties,
+    const OnPropertiesChangedCallback& callback) {
+  DCHECK(properties);
+  DCHECK(properties->display_metrics);
+  DCHECK(properties->view_layout);
+  DCHECK(properties->view_layout->size);
+
+  uint32_t old_scene_version = scene_version_;
+  mojo::ui::ViewPropertiesPtr old_properties = properties_.Pass();
+  scene_version_ = scene_version;
+  properties_ = properties.Pass();
+
+  OnPropertiesChanged(old_scene_version, old_properties.Pass());
+  callback.Run();
+}
+
 void BaseView::OnChildAttached(uint32_t child_key,
                                mojo::ui::ViewInfoPtr child_view_info,
                                const OnChildUnavailableCallback& callback) {
+  DCHECK(child_view_info);
+
+  OnChildAttached(child_key, child_view_info.Pass());
   callback.Run();
 }
 
 void BaseView::OnChildUnavailable(uint32_t child_key,
                                   const OnChildUnavailableCallback& callback) {
+  OnChildUnavailable(child_key);
   callback.Run();
 }
 

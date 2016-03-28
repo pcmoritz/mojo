@@ -287,64 +287,6 @@ class _ViewTreeSetRendererParams extends bindings.Struct {
 }
 
 
-class _ViewTreeRequestLayoutParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _ViewTreeRequestLayoutParams() : super(kVersions.last.size);
-
-  static _ViewTreeRequestLayoutParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewTreeRequestLayoutParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewTreeRequestLayoutParams result = new _ViewTreeRequestLayoutParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_ViewTreeRequestLayoutParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
 class _ViewTreeGetContainerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(16, 0)
@@ -412,122 +354,6 @@ class _ViewTreeGetContainerParams extends bindings.Struct {
   Map toJson() {
     throw new bindings.MojoCodecError(
         'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class _ViewTreeListenerOnLayoutParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _ViewTreeListenerOnLayoutParams() : super(kVersions.last.size);
-
-  static _ViewTreeListenerOnLayoutParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _ViewTreeListenerOnLayoutParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _ViewTreeListenerOnLayoutParams result = new _ViewTreeListenerOnLayoutParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_ViewTreeListenerOnLayoutParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-class ViewTreeListenerOnLayoutResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  ViewTreeListenerOnLayoutResponseParams() : super(kVersions.last.size);
-
-  static ViewTreeListenerOnLayoutResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static ViewTreeListenerOnLayoutResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    ViewTreeListenerOnLayoutResponseParams result = new ViewTreeListenerOnLayoutResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "ViewTreeListenerOnLayoutResponseParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
   }
 }
 
@@ -650,8 +476,7 @@ class ViewTreeListenerOnRendererDiedResponseParams extends bindings.Struct {
 const int _viewTreeMethodGetTokenName = 0;
 const int _viewTreeMethodGetServiceProviderName = 1;
 const int _viewTreeMethodSetRendererName = 2;
-const int _viewTreeMethodRequestLayoutName = 3;
-const int _viewTreeMethodGetContainerName = 4;
+const int _viewTreeMethodGetContainerName = 3;
 
 class _ViewTreeServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -669,7 +494,6 @@ abstract class ViewTree {
   dynamic getToken([Function responseFactory = null]);
   void getServiceProvider(Object serviceProvider);
   void setRenderer(Object renderer);
-  void requestLayout();
   void getContainer(Object container);
 }
 
@@ -757,14 +581,6 @@ class _ViewTreeProxyCalls implements ViewTree {
       var params = new _ViewTreeSetRendererParams();
       params.renderer = renderer;
       _proxyImpl.sendMessage(params, _viewTreeMethodSetRendererName);
-    }
-    void requestLayout() {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _ViewTreeRequestLayoutParams();
-      _proxyImpl.sendMessage(params, _viewTreeMethodRequestLayoutName);
     }
     void getContainer(Object container) {
       if (!_proxyImpl.isBound) {
@@ -900,9 +716,6 @@ class ViewTreeStub extends bindings.Stub {
             message.payload);
         _impl.setRenderer(params.renderer);
         break;
-      case _viewTreeMethodRequestLayoutName:
-        _impl.requestLayout();
-        break;
       case _viewTreeMethodGetContainerName:
         var params = _ViewTreeGetContainerParams.deserialize(
             message.payload);
@@ -937,8 +750,7 @@ class ViewTreeStub extends bindings.Stub {
   }
 }
 
-const int _viewTreeListenerMethodOnLayoutName = 0;
-const int _viewTreeListenerMethodOnRendererDiedName = 1;
+const int _viewTreeListenerMethodOnRendererDiedName = 0;
 
 class _ViewTreeListenerServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -953,7 +765,6 @@ class _ViewTreeListenerServiceDescription implements service_describer.ServiceDe
 
 abstract class ViewTreeListener {
   static const String serviceName = null;
-  dynamic onLayout([Function responseFactory = null]);
   dynamic onRendererDied([Function responseFactory = null]);
 }
 
@@ -978,26 +789,6 @@ class _ViewTreeListenerProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _viewTreeListenerMethodOnLayoutName:
-        var r = ViewTreeListenerOnLayoutResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
       case _viewTreeListenerMethodOnRendererDiedName:
         var r = ViewTreeListenerOnRendererDiedResponseParams.deserialize(
             message.payload);
@@ -1036,14 +827,6 @@ class _ViewTreeListenerProxyCalls implements ViewTreeListener {
   _ViewTreeListenerProxyImpl _proxyImpl;
 
   _ViewTreeListenerProxyCalls(this._proxyImpl);
-    dynamic onLayout([Function responseFactory = null]) {
-      var params = new _ViewTreeListenerOnLayoutParams();
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _viewTreeListenerMethodOnLayoutName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
-    }
     dynamic onRendererDied([Function responseFactory = null]) {
       var params = new _ViewTreeListenerOnRendererDiedParams();
       return _proxyImpl.sendMessageWithRequestId(
@@ -1133,10 +916,6 @@ class ViewTreeListenerStub extends bindings.Stub {
   }
 
 
-  ViewTreeListenerOnLayoutResponseParams _viewTreeListenerOnLayoutResponseParamsFactory() {
-    var result = new ViewTreeListenerOnLayoutResponseParams();
-    return result;
-  }
   ViewTreeListenerOnRendererDiedResponseParams _viewTreeListenerOnRendererDiedResponseParamsFactory() {
     var result = new ViewTreeListenerOnRendererDiedResponseParams();
     return result;
@@ -1150,26 +929,6 @@ class ViewTreeListenerStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _viewTreeListenerMethodOnLayoutName:
-        var response = _impl.onLayout(_viewTreeListenerOnLayoutResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _viewTreeListenerMethodOnLayoutName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _viewTreeListenerMethodOnLayoutName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
-        break;
       case _viewTreeListenerMethodOnRendererDiedName:
         var response = _impl.onRendererDied(_viewTreeListenerOnRendererDiedResponseParamsFactory);
         if (response is Future) {

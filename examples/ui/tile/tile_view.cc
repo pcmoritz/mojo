@@ -16,7 +16,8 @@ constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
 constexpr uint32_t kViewNodeIdBase = 100;
 constexpr uint32_t kViewNodeIdSpacing = 100;
 constexpr uint32_t kViewSceneNodeIdOffset = 1;
-constexpr uint32_t kViewFallbackNodeIdOffset = 2;
+constexpr uint32_t kViewFallbackSceneNodeIdOffset = 2;
+constexpr uint32_t kViewFallbackColorNodeIdOffset = 3;
 }  // namespace
 
 TileView::TileView(
@@ -51,21 +52,17 @@ void TileView::ConnectViews() {
 }
 
 void TileView::OnChildAttached(uint32_t child_key,
-                               mojo::ui::ViewInfoPtr child_view_info,
-                               const OnChildAttachedCallback& callback) {
+                               mojo::ui::ViewInfoPtr child_view_info) {
   auto it = views_.find(child_key);
   DCHECK(it != views_.end());
 
   ViewData* view_data = it->second.get();
   view_data->view_info = child_view_info.Pass();
 
-  callback.Run();
-
   UpdateScene();
 }
 
-void TileView::OnChildUnavailable(uint32_t child_key,
-                                  const OnChildUnavailableCallback& callback) {
+void TileView::OnChildUnavailable(uint32_t child_key) {
   auto it = views_.find(child_key);
   DCHECK(it != views_.end());
   LOG(ERROR) << "View died unexpectedly: child_key=" << child_key
@@ -75,20 +72,19 @@ void TileView::OnChildUnavailable(uint32_t child_key,
   views_.erase(it);
 
   GetViewContainer()->RemoveChild(child_key, nullptr);
-  callback.Run();
 }
 
-void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                        mojo::Array<uint32_t> children_needing_layout,
-                        const OnLayoutCallback& callback) {
-  size_.width = layout_params->constraints->max_width;
-  size_.height = layout_params->constraints->max_height;
+void TileView::OnPropertiesChanged(uint32_t old_scene_version,
+                                   mojo::ui::ViewPropertiesPtr old_properties) {
+  if (!properties())
+    return;
 
   // Layout all children in a row.
   if (!views_.empty()) {
+    const mojo::Size& size = *properties()->view_layout->size;
     uint32_t index = 0;
-    uint32_t base_width = size_.width / views_.size();
-    uint32_t excess_width = size_.width % views_.size();
+    uint32_t base_width = size.width / views_.size();
+    uint32_t excess_width = size.width % views_.size();
     uint32_t x = 0;
     for (auto it = views_.begin(); it != views_.end(); ++it, ++index) {
       ViewData* view_data = it->second.get();
@@ -99,7 +95,7 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
         child_width++;
         excess_width--;
       }
-      uint32_t child_height = size_.height;
+      uint32_t child_height = size.height;
       uint32_t child_x = x;
       x += child_width;
 
@@ -108,37 +104,23 @@ void TileView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
       view_data->layout_bounds.width = child_width;
       view_data->layout_bounds.height = child_height;
 
-      mojo::ui::ViewLayoutParamsPtr params = mojo::ui::ViewLayoutParams::New();
-      params->constraints = mojo::ui::BoxConstraints::New();
-      params->constraints->min_width = child_width;
-      params->constraints->max_width = child_width;
-      params->constraints->min_height = child_height;
-      params->constraints->max_height = child_height;
-      params->device_pixel_ratio = layout_params->device_pixel_ratio;
+      auto view_properties = mojo::ui::ViewProperties::New();
+      view_properties->view_layout = mojo::ui::ViewLayout::New();
+      view_properties->view_layout->size = mojo::Size::New();
+      view_properties->view_layout->size->width = child_width;
+      view_properties->view_layout->size->height = child_height;
 
-      if (view_data->layout_params.Equals(params))
+      if (view_data->view_properties.Equals(view_properties))
         continue;  // no layout work to do
 
-      view_data->layout_params = params.Clone();
-      GetViewContainer()->LayoutChild(
-          it->first, params.Pass(),
-          base::Bind(&TileView::OnChildLayoutFinished, base::Unretained(this),
-                     it->first));
+      view_data->view_properties = view_properties.Clone();
+      view_data->scene_version++;
+      GetViewContainer()->SetChildProperties(
+          it->first, view_data->scene_version, view_properties.Pass());
     }
   }
 
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  callback.Run(info.Pass());
-
   UpdateScene();
-}
-
-void TileView::OnChildLayoutFinished(
-    uint32_t child_key,
-    mojo::ui::ViewLayoutInfoPtr child_layout_info) {
-  // TODO(jeffbrown): Delete this method once layout protocol is replaced.
 }
 
 void TileView::UpdateScene() {
@@ -159,8 +141,6 @@ void TileView::UpdateScene() {
     const uint32_t container_node_id =
         kViewNodeIdBase + view_data.key * kViewNodeIdSpacing;
     const uint32_t scene_node_id = container_node_id + kViewSceneNodeIdOffset;
-    const uint32_t fallback_node_id =
-        container_node_id + kViewFallbackNodeIdOffset;
 
     mojo::RectF extent;
     extent.width = view_data.layout_bounds.width;
@@ -190,20 +170,38 @@ void TileView::UpdateScene() {
       scene_node->op = mojo::gfx::composition::NodeOp::New();
       scene_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
       scene_node->op->get_scene()->scene_resource_id = scene_resource_id;
+      scene_node->op->get_scene()->scene_version = view_data.scene_version;
       update->nodes.insert(scene_node_id, scene_node.Pass());
       container_node->child_node_ids.push_back(scene_node_id);
     }
 
-    // Add the fallback content.
-    auto fallback_node = mojo::gfx::composition::Node::New();
-    fallback_node->op = mojo::gfx::composition::NodeOp::New();
-    fallback_node->op->set_rect(mojo::gfx::composition::RectNodeOp::New());
-    fallback_node->op->get_rect()->content_rect = extent.Clone();
-    fallback_node->op->get_rect()->color = mojo::gfx::composition::Color::New();
-    fallback_node->op->get_rect()->color->red = 255;
-    fallback_node->op->get_rect()->color->alpha = 255;
-    update->nodes.insert(fallback_node_id, fallback_node.Pass());
-    container_node->child_node_ids.push_back(fallback_node_id);
+    // TODO(jeffbrown): Reenable once everything works or make configurable.
+    if (false) {
+      // Add the fallback scene content, use last available version.
+      const uint32_t fallback_node_id =
+          container_node_id + kViewFallbackSceneNodeIdOffset;
+      auto fallback_node = mojo::gfx::composition::Node::New();
+      fallback_node->op = mojo::gfx::composition::NodeOp::New();
+      fallback_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
+      fallback_node->op->get_scene()->scene_resource_id = scene_resource_id;
+      update->nodes.insert(fallback_node_id, fallback_node.Pass());
+      container_node->child_node_ids.push_back(fallback_node_id);
+    }
+    if (false) {
+      // Add the fallback color content, fill with solid color.
+      const uint32_t fallback_node_id =
+          container_node_id + kViewFallbackColorNodeIdOffset;
+      auto fallback_node = mojo::gfx::composition::Node::New();
+      fallback_node->op = mojo::gfx::composition::NodeOp::New();
+      fallback_node->op->set_rect(mojo::gfx::composition::RectNodeOp::New());
+      fallback_node->op->get_rect()->content_rect = extent.Clone();
+      fallback_node->op->get_rect()->color =
+          mojo::gfx::composition::Color::New();
+      fallback_node->op->get_rect()->color->red = 255;
+      fallback_node->op->get_rect()->color->alpha = 255;
+      update->nodes.insert(fallback_node_id, fallback_node.Pass());
+      container_node->child_node_ids.push_back(fallback_node_id);
+    }
 
     // Add the container.
     update->nodes.insert(container_node_id, container_node.Pass());
@@ -212,10 +210,12 @@ void TileView::UpdateScene() {
 
   // Add the root node.
   update->nodes.insert(kRootNodeId, root_node.Pass());
+  scene()->Update(update.Pass());
 
   // Publish the scene.
-  scene()->Update(update.Pass());
-  scene()->Publish(nullptr);
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
+  scene()->Publish(metadata.Pass());
 }
 
 TileView::ViewData::ViewData(const std::string& url, uint32_t key)

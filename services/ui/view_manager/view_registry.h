@@ -14,7 +14,7 @@
 #include "mojo/services/ui/views/interfaces/view_trees.mojom.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
 #include "services/ui/view_manager/view_associate_table.h"
-#include "services/ui/view_manager/view_layout_request.h"
+#include "services/ui/view_manager/view_container_state.h"
 #include "services/ui/view_manager/view_state.h"
 #include "services/ui/view_manager/view_stub.h"
 #include "services/ui/view_manager/view_tree_state.h"
@@ -65,36 +65,6 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   void CreateScene(ViewState* view_state,
                    mojo::InterfaceRequest<mojo::gfx::composition::Scene> scene);
 
-  // Requests layout.
-  // Destroys |view_state| if an error occurs.
-  void RequestLayout(ViewState* view_state);
-
-  // Adds a child, reparenting it if necessary.
-  // Destroys |parent_state| if an error occurs.
-  void AddChild(ViewState* parent_state,
-                uint32_t child_key,
-                mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner);
-
-  // Removes a child.
-  // Destroys |parent_state| if an error occurs.
-  void RemoveChild(ViewState* parent_state,
-                   uint32_t child_key,
-                   mojo::InterfaceRequest<mojo::ui::ViewOwner>
-                       transferred_view_owner_request);
-
-  // Lays out a child and optionally provides its size.
-  // Destroys |parent_state| if an error occurs.
-  void LayoutChild(ViewState* parent_state,
-                   uint32_t child_key,
-                   mojo::ui::ViewLayoutParamsPtr child_layout_params,
-                   const ViewLayoutCallback& callback);
-
-  // Connects to a view service.
-  // Destroys |view_state| if an error occurs.
-  void ConnectToViewService(ViewState* view_state,
-                            const mojo::String& service_name,
-                            mojo::ScopedMessagePipeHandle client_handle);
-
   // Called when one of the view pipes is closed remotely.
   void OnViewDied(ViewState* view_state, const std::string& reason);
 
@@ -105,38 +75,44 @@ class ViewRegistry : public mojo::ui::ViewInspector {
   void SetRenderer(ViewTreeState* tree_state,
                    mojo::gfx::composition::RendererPtr renderer);
 
-  // Requests layout.
-  // Destroys |tree_state| if an error occurs.
-  void RequestLayout(ViewTreeState* tree_state);
+  // Called when one of the view tree pipes is closed remotely.
+  void OnViewTreeDied(ViewTreeState* tree_state, const std::string& reason);
 
-  // Sets the root of the view tree.
-  // Destroys |tree_state| if an error occurs.
-  void AddChild(ViewTreeState* tree_state,
+  // VIEW CONTAINER
+
+  // Adds a child, reparenting it if necessary.
+  // Destroys |container_state| if an error occurs.
+  void AddChild(ViewContainerState* container_state,
                 uint32_t child_key,
                 mojo::InterfaceHandle<mojo::ui::ViewOwner> child_view_owner);
 
-  // Removes the root of the view tree.
-  // Destroys |tree_state| if an error occurs.
-  void RemoveChild(ViewTreeState* tree_state,
+  // Removes a child.
+  // Destroys |container_state| if an error occurs.
+  void RemoveChild(ViewContainerState* container_state,
                    uint32_t child_key,
                    mojo::InterfaceRequest<mojo::ui::ViewOwner>
                        transferred_view_owner_request);
 
-  // Lays out a view tree's root and optionally provides its size.
-  // Destroys |tree_state| if an error occurs.
-  void LayoutChild(ViewTreeState* tree_state,
-                   uint32_t child_key,
-                   mojo::ui::ViewLayoutParamsPtr child_layout_params,
-                   const ViewLayoutCallback& callback);
+  // Sets a child's properties.
+  // Destroys |container_state| if an error occurs.
+  void SetChildProperties(ViewContainerState* container_state,
+                          uint32_t child_key,
+                          uint32_t child_scene_version,
+                          mojo::ui::ViewPropertiesPtr child_properties);
+
+  // SERVICE PROVIDER REQUESTS
+
+  // Connects to a view service.
+  // Destroys |view_state| if an error occurs.
+  void ConnectToViewService(ViewState* view_state,
+                            const mojo::String& service_name,
+                            mojo::ScopedMessagePipeHandle client_handle);
 
   // Connects to a view service.
   // Destroys |view_state| if an error occurs.
   void ConnectToViewTreeService(ViewTreeState* tree_state,
                                 const mojo::String& service_name,
                                 mojo::ScopedMessagePipeHandle client_handle);
-
-  // Called when one of the view tree pipes is closed remotely.
-  void OnViewTreeDied(ViewTreeState* tree_state, const std::string& reason);
 
   // VIEW INSPECTOR REQUESTS
 
@@ -154,60 +130,58 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   void UnregisterView(ViewState* view_state);
   void UnregisterViewTree(ViewTreeState* tree_state);
+  void UnregisterViewContainer(ViewContainerState* container_state);
+  void UnregisterViewStub(std::unique_ptr<ViewStub> view_stub);
+  void UnregisterChildren(ViewContainerState* container_state);
 
   // TREE MANIPULATION
 
-  ViewState* FindView(uint32_t view_token_value);
-  ViewTreeState* FindViewTree(uint32_t view_tree_token_value);
-
+  void AttachResolvedViewAndNotify(ViewStub* view_stub, ViewState* view_state);
+  void ReleaseUnavailableViewAndNotify(ViewStub* view_stub);
   void HijackView(ViewState* view_state);
-
-  void AttachViewStubAndNotify(ViewStub* view_stub, ViewState* view_state);
-  void ReleaseViewStubAndNotify(ViewStub* view_stub);
   void TransferOrUnregisterViewStub(std::unique_ptr<ViewStub> view_stub,
                                     mojo::InterfaceRequest<mojo::ui::ViewOwner>
                                         transferred_view_owner_request);
-  void UnregisterViewStub(std::unique_ptr<ViewStub> view_stub);
 
-  void OnViewAttached(base::WeakPtr<ViewStub> view_stub_weak,
-                      mojo::gfx::composition::SceneTokenPtr scene_token);
+  // VIEW PROPERTIES
 
-  // LAYOUT
-
-  void SetLayout(ViewStub* view_stub,
-                 mojo::ui::ViewLayoutParamsPtr layout_params,
-                 const ViewLayoutCallback& callback);
-  void EnqueueLayoutRequest(ViewState* view_state,
-                            mojo::ui::ViewLayoutParamsPtr layout_params);
-  void InvalidateLayout(ViewState* view_state);
-  void InvalidateLayoutForChild(ViewState* parent_state, uint32_t child_key);
-  void InvalidateLayoutForRoot(ViewTreeState* tree_state);
-
-  void IssueNextViewLayoutRequest(ViewState* view_state);
-  void IssueNextViewTreeLayoutRequest(ViewTreeState* tree_state);
-  void OnViewLayoutResult(base::WeakPtr<ViewState> view_state_weak,
-                          mojo::ui::ViewLayoutResultPtr result);
-  void OnViewTreeLayoutResult(base::WeakPtr<ViewTreeState> tree_state_weak);
+  void UpdateViewProperties(ViewState* view_state);
+  void InvalidateViewProperties(ViewState* view_state);
+  mojo::ui::ViewPropertiesPtr ResolveViewProperties(ViewState* view_state);
 
   // SCENE MANAGEMENT
 
-  void OnSceneCreated(base::WeakPtr<ViewState> view_state_weak,
-                      mojo::gfx::composition::SceneTokenPtr scene_token);
+  void OnViewSceneTokenAvailable(
+      base::WeakPtr<ViewState> view_state_weak,
+      mojo::gfx::composition::SceneTokenPtr scene_token);
+  void OnStubSceneTokenAvailable(
+      base::WeakPtr<ViewStub> view_stub_weak,
+      mojo::gfx::composition::SceneTokenPtr scene_token);
   void PublishStubScene(ViewState* view_state);
 
   // RENDERING
 
-  void UpdateViewTreeRootScene(ViewTreeState* view_tree);
+  void SetRendererRootScene(ViewTreeState* view_tree);
   void OnRendererDied(ViewTreeState* view_tree);
 
   // SIGNALING
+
+  void SendPropertiesChanged(ViewState* view_state,
+                             uint32_t scene_version,
+                             mojo::ui::ViewPropertiesPtr properties);
+
+  void SendRendererDied(ViewTreeState* tree_state);
 
   void SendChildAttached(ViewContainerState* container_state,
                          uint32_t child_key,
                          mojo::ui::ViewInfoPtr child_view_info);
   void SendChildUnavailable(ViewContainerState* container_state,
                             uint32_t child_key);
-  void SendRendererDied(ViewTreeState* tree_state);
+
+  // LOOKUP
+
+  ViewState* FindView(uint32_t view_token_value);
+  ViewTreeState* FindViewTree(uint32_t view_tree_token_value);
 
   bool IsViewStateRegisteredDebug(ViewState* view_state) {
     return view_state && FindView(view_state->view_token()->value);
@@ -215,6 +189,13 @@ class ViewRegistry : public mojo::ui::ViewInspector {
 
   bool IsViewTreeStateRegisteredDebug(ViewTreeState* tree_state) {
     return tree_state && FindViewTree(tree_state->view_tree_token()->value);
+  }
+
+  bool IsViewContainerStateRegisteredDebug(
+      ViewContainerState* container_state) {
+    return container_state &&
+           (IsViewStateRegisteredDebug(container_state->AsViewState()) ||
+            IsViewTreeStateRegisteredDebug(container_state->AsViewTreeState()));
   }
 
   mojo::gfx::composition::CompositorPtr compositor_;

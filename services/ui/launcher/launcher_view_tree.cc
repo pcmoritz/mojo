@@ -24,6 +24,8 @@ LauncherViewTree::LauncherViewTree(
       shutdown_callback_(shutdown_callback),
       view_tree_listener_binding_(this),
       view_container_listener_binding_(this) {
+  DCHECK(viewport_metrics_);
+
   // Register the view tree.
   mojo::ui::ViewTreeListenerPtr view_tree_listener;
   view_tree_listener_binding_.Bind(mojo::GetProxy(&view_tree_listener));
@@ -61,19 +63,22 @@ LauncherViewTree::~LauncherViewTree() {}
 
 void LauncherViewTree::SetRoot(mojo::ui::ViewOwnerPtr owner) {
   if (root_was_set_) {
-    view_container_->RemoveChild(root_key_, nullptr);
     root_was_set_ = false;
+    view_container_->RemoveChild(root_key_, nullptr);
   }
   if (owner) {
-    view_container_->AddChild(++root_key_, owner.Pass());
     root_was_set_ = true;
+    view_container_->AddChild(++root_key_, owner.Pass());
+    UpdateViewProperties();
   }
 }
 
 void LauncherViewTree::SetViewportMetrics(
     mojo::ViewportMetricsPtr viewport_metrics) {
+  DCHECK(viewport_metrics);
+
   viewport_metrics_ = viewport_metrics.Pass();
-  view_tree_->RequestLayout();
+  UpdateViewProperties();
 }
 
 void LauncherViewTree::DispatchEvent(mojo::EventPtr event) {
@@ -91,11 +96,6 @@ void LauncherViewTree::OnInputDispatcherConnectionError() {
   // to be able to test a view system that has graphics but no input.
   LOG(WARNING) << "Input dispatcher connection error, input will not work.";
   input_dispatcher_.reset();
-}
-
-void LauncherViewTree::OnLayout(const OnLayoutCallback& callback) {
-  LayoutRoot();
-  callback.Run();
 }
 
 void LauncherViewTree::OnChildAttached(
@@ -127,30 +127,19 @@ void LauncherViewTree::OnRendererDied(const OnRendererDiedCallback& callback) {
   callback.Run();
 }
 
-void LauncherViewTree::LayoutRoot() {
+void LauncherViewTree::UpdateViewProperties() {
   if (!root_was_set_)
     return;
 
-  auto params = mojo::ui::ViewLayoutParams::New();
-  params->constraints = mojo::ui::BoxConstraints::New();
-  params->constraints->min_width = viewport_metrics_->size->width;
-  params->constraints->max_width = viewport_metrics_->size->width;
-  params->constraints->min_height = viewport_metrics_->size->height;
-  params->constraints->max_height = viewport_metrics_->size->height;
-  params->device_pixel_ratio = viewport_metrics_->device_pixel_ratio;
-  view_container_->LayoutChild(
-      root_key_, params.Pass(),
-      base::Bind(&LauncherViewTree::OnLayoutResult, base::Unretained(this)));
-}
+  auto properties = mojo::ui::ViewProperties::New();
+  properties->display_metrics = mojo::ui::DisplayMetrics::New();
+  properties->display_metrics->device_pixel_ratio =
+      viewport_metrics_->device_pixel_ratio;
+  properties->view_layout = mojo::ui::ViewLayout::New();
+  properties->view_layout->size = viewport_metrics_->size.Clone();
 
-void LauncherViewTree::OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info) {
-  if (!info) {
-    DVLOG(1) << "Root layout: <stale>";
-    return;
-  }
-
-  DVLOG(1) << "Root layout: size.width=" << info->size->width
-           << ", size.height=" << info->size->height;
+  view_container_->SetChildProperties(
+      root_key_, mojo::gfx::composition::kSceneVersionNone, properties.Pass());
 }
 
 void LauncherViewTree::Shutdown() {

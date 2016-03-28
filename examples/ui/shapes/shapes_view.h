@@ -20,14 +20,11 @@ class ShapesView : public mojo::ui::GaneshView {
 
  private:
   // |GaneshView|:
-  void OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                mojo::Array<uint32_t> children_needing_layout,
-                const OnLayoutCallback& callback) override;
+  void OnPropertiesChanged(uint32_t old_scene_version,
+                           mojo::ui::ViewPropertiesPtr old_properties) override;
 
   void UpdateScene();
-  void DrawContent(SkCanvas* canvas);
-
-  mojo::Size size_;
+  void DrawContent(const mojo::Size& size, SkCanvas* canvas);
 
   DISALLOW_COPY_AND_ASSIGN(ShapesView);
 };

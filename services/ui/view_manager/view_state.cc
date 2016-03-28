@@ -41,34 +41,11 @@ ViewState::ViewState(ViewRegistry* registry,
 
 ViewState::~ViewState() {}
 
-void ViewState::LinkChild(uint32_t key, std::unique_ptr<ViewStub> child) {
-  DCHECK(children_.find(key) == children_.end());
-  DCHECK(child);
-  DCHECK(!child->is_linked());
-
-  child->SetParent(this, key);
-  children_.emplace(key, std::move(child));
-}
-
-std::unique_ptr<ViewStub> ViewState::UnlinkChild(uint32_t key) {
-  auto child_it = children_.find(key);
-  DCHECK(child_it != children_.end());
-  std::unique_ptr<ViewStub> child(std::move(child_it->second));
-  child->Unlink();
-  children_.erase(child_it);
-  children_needing_layout_.erase(child->key());
-  return child;
-}
-
-std::vector<std::unique_ptr<ViewStub>> ViewState::UnlinkAllChildren() {
-  std::vector<std::unique_ptr<ViewStub>> stubs;
-  for (auto& pair : children_) {
-    pair.second->Unlink();
-    stubs.push_back(std::move(pair.second));
-  }
-  children_.clear();
-  children_needing_layout_.clear();
-  return stubs;
+void ViewState::IssueProperties(mojo::ui::ViewPropertiesPtr properties) {
+  issued_scene_version_++;
+  CHECK(issued_scene_version_);
+  issued_properties_ = properties.Pass();
+  issued_properties_valid_ = !!issued_properties_;
 }
 
 void ViewState::BindOwner(
@@ -82,13 +59,8 @@ void ViewState::ReleaseOwner() {
   owner_binding_.Close();
 }
 
-mojo::ui::ViewLayoutInfoPtr ViewState::CreateLayoutInfo() {
-  if (!layout_result_)
-    return nullptr;
-
-  auto info = mojo::ui::ViewLayoutInfo::New();
-  info->size = layout_result_->size.Clone();
-  return info;
+ViewState* ViewState::AsViewState() {
+  return this;
 }
 
 const std::string& ViewState::FormattedLabel() const {

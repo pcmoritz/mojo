@@ -78,22 +78,18 @@ NoodlesView::~NoodlesView() {
                             base::Passed(&rasterizer_delegate_)));
 }
 
-void NoodlesView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                           mojo::Array<uint32_t> children_needing_layout,
-                           const OnLayoutCallback& callback) {
-  size_.width = layout_params->constraints->max_width;
-  size_.height = layout_params->constraints->max_height;
-
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  callback.Run(info.Pass());
-
+void NoodlesView::OnPropertiesChanged(
+    uint32_t old_scene_version,
+    mojo::ui::ViewPropertiesPtr old_properties) {
   choreographer_.ScheduleDraw();
 }
 
 void NoodlesView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
                          const base::TimeDelta& time_delta) {
+  if (!properties())
+    return;
+
+  const mojo::Size& size = *properties()->view_layout->size;
   choreographer_.ScheduleDraw();
 
   // Update the animation.
@@ -101,9 +97,10 @@ void NoodlesView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
 
   // Create and post a new frame to the renderer.
   auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
   metadata->presentation_time = frame_info.presentation_time;
   std::unique_ptr<Frame> frame(
-      new Frame(size_, CreatePicture(), metadata.Pass()));
+      new Frame(size, CreatePicture(), metadata.Pass()));
   if (frame_queue_->PutFrame(std::move(frame))) {
     rasterizer_task_runner_->PostTask(
         FROM_HERE, base::Bind(&RasterizerDelegate::PublishNextFrame,
@@ -121,11 +118,12 @@ skia::RefPtr<SkPicture> NoodlesView::CreatePicture() {
     wy_ = rand() % 9 + 1;
   }
 
+  const mojo::Size& size = *properties()->view_layout->size;
   SkPictureRecorder recorder;
-  SkCanvas* canvas = recorder.beginRecording(size_.width, size_.height);
+  SkCanvas* canvas = recorder.beginRecording(size.width, size.height);
 
-  double cx = size_.width * 0.5;
-  double cy = size_.height * 0.5;
+  double cx = size.width * 0.5;
+  double cy = size.height * 0.5;
   canvas->translate(cx, cy);
 
   double phase = alpha_;

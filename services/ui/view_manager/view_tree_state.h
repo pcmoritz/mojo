@@ -41,38 +41,24 @@ class ViewTreeState : public ViewContainerState {
 
   // Gets the token used to refer to this view tree globally.
   // Caller does not obtain ownership of the token.
-  mojo::ui::ViewTreeToken* view_tree_token() const {
-    return view_tree_token_.get();
+  const mojo::ui::ViewTreeTokenPtr& view_tree_token() const {
+    return view_tree_token_;
   }
 
   // Gets the view tree listener interface, never null.
   // Caller does not obtain ownership of the view tree listener.
-  mojo::ui::ViewTreeListener* view_tree_listener() const {
-    return view_tree_listener_.get();
+  const mojo::ui::ViewTreeListenerPtr& view_tree_listener() const {
+    return view_tree_listener_;
   }
 
   // The view tree's renderer.
-  mojo::gfx::composition::Renderer* renderer() const { return renderer_.get(); }
+  const mojo::gfx::composition::RendererPtr& renderer() const {
+    return renderer_;
+  }
   void SetRenderer(mojo::gfx::composition::RendererPtr renderer);
 
-  // Gets the root of the view tree, or null if there is no root.
-  ViewStub* root() const { return root_.get(); }
-
-  // Links the root of the view tree.
-  void LinkRoot(uint32_t key, std::unique_ptr<ViewStub> root);
-
-  // Unlinks the root of the view tree and returns it.
-  std::unique_ptr<ViewStub> UnlinkRoot();
-
-  // True if there is a pending layout request.
-  bool layout_request_pending() const { return layout_request_pending_; }
-  void set_layout_request_pending(bool value) {
-    layout_request_pending_ = value;
-  }
-
-  // True if a layout request has been issued.
-  bool layout_request_issued() const { return layout_request_issued_; }
-  void set_layout_request_issued(bool value) { layout_request_issued_ = value; }
+  // Gets the view tree's root view.
+  ViewStub* GetRoot() const;
 
   // Starts tracking a hit tester request.
   // The request will be satisfied by the current renderer if possible.
@@ -81,6 +67,8 @@ class ViewTreeState : public ViewContainerState {
       mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
           hit_tester_request,
       const mojo::ui::ViewInspector::GetHitTesterCallback& callback);
+
+  ViewTreeState* AsViewTreeState() override;
 
   const std::string& label() const { return label_; }
   const std::string& FormattedLabel() const override;
@@ -98,10 +86,6 @@ class ViewTreeState : public ViewContainerState {
   mojo::Binding<mojo::ui::ViewTree> view_tree_binding_;
 
   mojo::gfx::composition::RendererPtr renderer_;
-
-  std::unique_ptr<ViewStub> root_;
-  bool layout_request_pending_ = false;
-  bool layout_request_issued_ = false;
 
   std::vector<mojo::ui::ViewInspector::GetHitTesterCallback>
       pending_hit_tester_callbacks_;

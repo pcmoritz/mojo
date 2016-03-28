@@ -29,10 +29,6 @@ void ViewImpl::CreateScene(
   registry_->CreateScene(state_, scene.Pass());
 }
 
-void ViewImpl::RequestLayout() {
-  registry_->RequestLayout(state_);
-}
-
 void ViewImpl::GetContainer(
     mojo::InterfaceRequest<mojo::ui::ViewContainer> view_container_request) {
   container_bindings_.AddBinding(this, view_container_request.Pass());
@@ -57,17 +53,12 @@ void ViewImpl::RemoveChild(uint32_t child_key,
                          transferred_view_owner_request.Pass());
 }
 
-static void RunLayoutChildCallback(
-    const ViewImpl::LayoutChildCallback& callback,
-    mojo::ui::ViewLayoutInfoPtr info) {
-  callback.Run(info.Pass());
-}
-
-void ViewImpl::LayoutChild(uint32_t child_key,
-                           mojo::ui::ViewLayoutParamsPtr child_layout_params,
-                           const LayoutChildCallback& callback) {
-  registry_->LayoutChild(state_, child_key, child_layout_params.Pass(),
-                         base::Bind(&RunLayoutChildCallback, callback));
+void ViewImpl::SetChildProperties(
+    uint32_t child_key,
+    uint32_t child_scene_version,
+    mojo::ui::ViewPropertiesPtr child_view_properties) {
+  registry_->SetChildProperties(state_, child_key, child_scene_version,
+                                child_view_properties.Pass());
 }
 
 void ViewImpl::ConnectToService(const mojo::String& service_name,

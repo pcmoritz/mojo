@@ -52,9 +52,18 @@ void ViewStub::AttachView(ViewState* state,
   stub_scene_ = stub_scene.Pass();
 }
 
+void ViewStub::SetProperties(uint32_t scene_version,
+                             mojo::ui::ViewPropertiesPtr properties) {
+  DCHECK(!is_unavailable());
+
+  scene_version_ = scene_version;
+  properties_ = properties.Pass();
+}
+
 void ViewStub::SetStubSceneToken(
     mojo::gfx::composition::SceneTokenPtr stub_scene_token) {
   DCHECK(stub_scene_token);
+  DCHECK(state_);
   DCHECK(stub_scene_);
   DCHECK(!stub_scene_token_);
 
@@ -73,26 +82,26 @@ ViewState* ViewStub::ReleaseView() {
     stub_scene_.reset();
     stub_scene_token_.reset();
   }
+  scene_version_ = mojo::gfx::composition::kSceneVersionNone;
+  properties_.reset();
   unavailable_ = true;
   return state;
 }
 
-void ViewStub::SetTree(ViewTreeState* tree, uint32_t key) {
-  DCHECK(tree);
+void ViewStub::SetContainer(ViewContainerState* container, uint32_t key) {
+  DCHECK(container);
   DCHECK(!tree_ && !parent_);
 
   key_ = key;
-  SetTreeRecursively(tree);
-}
-
-void ViewStub::SetParent(ViewState* parent, uint32_t key) {
-  DCHECK(parent);
-  DCHECK(!tree_ && !parent_);
-
-  parent_ = parent;
-  key_ = key;
-  if (parent->view_stub())
-    SetTreeRecursively(parent->view_stub()->tree());
+  parent_ = container->AsViewState();
+  if (parent_) {
+    if (parent_->view_stub())
+      SetTreeRecursively(parent_->view_stub()->tree());
+  } else {
+    ViewTreeState* tree = container->AsViewTreeState();
+    DCHECK(tree);
+    SetTreeRecursively(tree);
+  }
 }
 
 void ViewStub::Unlink() {

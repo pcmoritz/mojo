@@ -6,9 +6,7 @@
 #define SERVICES_UI_VIEW_MANAGER_VIEW_STATE_H_
 
 #include <memory>
-#include <set>
 #include <string>
-#include <unordered_map>
 
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
@@ -16,20 +14,16 @@
 #include "mojo/services/ui/views/cpp/formatting.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
 #include "services/ui/view_manager/view_container_state.h"
-#include "services/ui/view_manager/view_layout_request.h"
 
 namespace view_manager {
 
 class ViewRegistry;
 class ViewImpl;
-class ViewStub;
 
 // Describes the state of a particular view.
 // This object is owned by the ViewRegistry that created it.
 class ViewState : public ViewContainerState {
  public:
-  using ChildrenMap = std::unordered_map<uint32_t, std::unique_ptr<ViewStub>>;
-
   ViewState(ViewRegistry* registry,
             mojo::ui::ViewTokenPtr view_token,
             mojo::InterfaceRequest<mojo::ui::View> view_request,
@@ -41,68 +35,51 @@ class ViewState : public ViewContainerState {
 
   // Gets the token used to refer to this view globally.
   // Caller does not obtain ownership of the token.
-  mojo::ui::ViewToken* view_token() const { return view_token_.get(); }
+  const mojo::ui::ViewTokenPtr& view_token() const { return view_token_; }
 
   // Gets the view listener interface, never null.
   // Caller does not obtain ownership of the view listener.
-  mojo::ui::ViewListener* view_listener() const { return view_listener_.get(); }
+  const mojo::ui::ViewListenerPtr& view_listener() const {
+    return view_listener_;
+  }
 
   // Gets or sets the view stub which links this view into the
   // view hierarchy, or null if the view isn't linked anywhere.
   ViewStub* view_stub() const { return view_stub_; }
   void set_view_stub(ViewStub* view_stub) { view_stub_ = view_stub; }
 
-  // The map of children, indexed by child key.
-  // The view stub pointers are never null but some view stubs may
-  // have been marked unavailable.
-  const ChildrenMap& children() const { return children_; }
-
-  // Links a child into the view tree.
-  void LinkChild(uint32_t key, std::unique_ptr<ViewStub> child);
-
-  // Unlinks a child of the view tree.
-  std::unique_ptr<ViewStub> UnlinkChild(uint32_t key);
-
-  // Unlinks all children as a single operation.
-  std::vector<std::unique_ptr<ViewStub>> UnlinkAllChildren();
-
-  // The set of children needing layout.
-  // This set must never contain non-existent or unavailable children.
-  std::set<uint32_t>& children_needing_layout() {
-    return children_needing_layout_;
-  }
-
-  // The list of pending layout requests.
-  std::vector<std::unique_ptr<ViewLayoutRequest>>& pending_layout_requests() {
-    return pending_layout_requests_;
-  }
-
-  // The layout parameters most recently processed by the view,
-  // or null if none.  These parameters are preserved across reparenting.
-  mojo::ui::ViewLayoutParams* layout_params() { return layout_params_.get(); }
-  void set_layout_params(mojo::ui::ViewLayoutParamsPtr layout_params) {
-    layout_params_ = layout_params.Pass();
-  }
-
-  // The layout result most recently provided by the view in
-  // response to the value of |layout_params|, or null if none.  These
-  // results are preserved across reparenting.
-  mojo::ui::ViewLayoutResult* layout_result() { return layout_result_.get(); }
-  void set_layout_result(mojo::ui::ViewLayoutResultPtr layout_result) {
-    layout_result_ = layout_result.Pass();
-  }
-
   // The current scene token, or null if none.
-  mojo::gfx::composition::SceneToken* scene_token() {
-    return scene_token_.get();
+  const mojo::gfx::composition::SceneTokenPtr& scene_token() {
+    return scene_token_;
   }
   void set_scene_token(mojo::gfx::composition::SceneTokenPtr scene_token) {
     scene_token_ = scene_token.Pass();
   }
 
-  // Creates layout information to return to the parent or tree.
-  // Returns null if unavailable.
-  mojo::ui::ViewLayoutInfoPtr CreateLayoutInfo();
+  // Gets the scene version the view was asked to produce.
+  // This value monotonically increases each time new properties are set.
+  // This value is preserved across reparenting.
+  uint32_t issued_scene_version() const { return issued_scene_version_; }
+
+  // Gets the properties the view was asked to apply, after applying
+  // any inherited properties from the container, or null if none set.
+  // This value is preserved across reparenting.
+  const mojo::ui::ViewPropertiesPtr& issued_properties() const {
+    return issued_properties_;
+  }
+
+  // Gets or sets whether the view's issued properties are valid for
+  // inheritance by descendants.  Cleared when preconditions change that
+  // will require reevaluation (but which might not cause reissuance if
+  // no changes are detected).
+  bool issued_properties_valid() const { return issued_properties_valid_; }
+  void set_issued_properties_valid(bool valid) {
+    issued_properties_valid_ = valid;
+  }
+
+  // Sets the requested properties and increments the scene version.
+  // Sets |issued_properties_valid()| to true if |properties| is not null.
+  void IssueProperties(mojo::ui::ViewPropertiesPtr properties);
 
   // Binds the |ViewOwner| interface to the view which has the effect of
   // tying the view's lifetime to that of the owner's pipe.
@@ -111,6 +88,8 @@ class ViewState : public ViewContainerState {
 
   // Unbinds the view from its owner.
   void ReleaseOwner();
+
+  ViewState* AsViewState() override;
 
   const std::string& label() const { return label_; }
   const std::string& FormattedLabel() const override;
@@ -128,12 +107,11 @@ class ViewState : public ViewContainerState {
 
   ViewStub* view_stub_ = nullptr;
 
-  ChildrenMap children_;
-  std::set<uint32_t> children_needing_layout_;
-  std::vector<std::unique_ptr<ViewLayoutRequest>> pending_layout_requests_;
-  mojo::ui::ViewLayoutParamsPtr layout_params_;
-  mojo::ui::ViewLayoutResultPtr layout_result_;
   mojo::gfx::composition::SceneTokenPtr scene_token_;
+
+  uint32_t issued_scene_version_ = 0u;
+  mojo::ui::ViewPropertiesPtr issued_properties_;
+  bool issued_properties_valid_ = false;
 
   base::WeakPtrFactory<ViewState> weak_factory_;  // must be last
 

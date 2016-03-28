@@ -32,7 +32,6 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener,
 
  private:
   // |ViewTreeListener|:
-  void OnLayout(const OnLayoutCallback& callback) override;
   void OnRendererDied(const OnRendererDiedCallback& callback) override;
 
   // |ViewContainerListener|:
@@ -45,8 +44,7 @@ class LauncherViewTree : public mojo::ui::ViewTreeListener,
   void OnViewTreeConnectionError();
   void OnInputDispatcherConnectionError();
 
-  void LayoutRoot();
-  void OnLayoutResult(mojo::ui::ViewLayoutInfoPtr info);
+  void UpdateViewProperties();
 
   void Shutdown();
 

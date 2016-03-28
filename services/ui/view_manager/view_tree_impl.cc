@@ -30,10 +30,6 @@ void ViewTreeImpl::SetRenderer(
       state_, mojo::gfx::composition::RendererPtr::Create(std::move(renderer)));
 }
 
-void ViewTreeImpl::RequestLayout() {
-  registry_->RequestLayout(state_);
-}
-
 void ViewTreeImpl::GetContainer(
     mojo::InterfaceRequest<mojo::ui::ViewContainer> view_container_request) {
   container_bindings_.AddBinding(this, view_container_request.Pass());
@@ -58,18 +54,12 @@ void ViewTreeImpl::RemoveChild(uint32_t child_key,
                          transferred_view_owner_request.Pass());
 }
 
-static void RunLayoutChildCallback(
-    const ViewTreeImpl::LayoutChildCallback& callback,
-    mojo::ui::ViewLayoutInfoPtr info) {
-  callback.Run(info.Pass());
-}
-
-void ViewTreeImpl::LayoutChild(
+void ViewTreeImpl::SetChildProperties(
     uint32_t child_key,
-    mojo::ui::ViewLayoutParamsPtr child_layout_params,
-    const LayoutChildCallback& callback) {
-  registry_->LayoutChild(state_, child_key, child_layout_params.Pass(),
-                         base::Bind(&RunLayoutChildCallback, callback));
+    uint32_t child_scene_version,
+    mojo::ui::ViewPropertiesPtr child_view_properties) {
+  registry_->SetChildProperties(state_, child_key, child_scene_version,
+                                child_view_properties.Pass());
 }
 
 void ViewTreeImpl::ConnectToService(

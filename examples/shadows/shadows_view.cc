@@ -29,34 +29,27 @@ ShadowsView::ShadowsView(
 
 ShadowsView::~ShadowsView() {}
 
-void ShadowsView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                           mojo::Array<uint32_t> children_needing_layout,
-                           const OnLayoutCallback& callback) {
-  size_.width = layout_params->constraints->max_width;
-  size_.height = layout_params->constraints->max_height;
-
-  // Submit the new layout information.
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = size_.Clone();
-  callback.Run(info.Pass());
-
-  // Draw!
+void ShadowsView::OnPropertiesChanged(
+    uint32_t old_scene_version,
+    mojo::ui::ViewPropertiesPtr old_properties) {
   choreographer_.ScheduleDraw();
 }
 
-void ShadowsView::OnDraw(
-    const mojo::gfx::composition::FrameInfo& frame_info,
-    const base::TimeDelta& time_delta) {
+void ShadowsView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
+                         const base::TimeDelta& time_delta) {
+  if (!properties())
+    return;
 
   // Update the contents of the scene.
+  const mojo::Size& size = *properties()->view_layout->size;
   mojo::RectF bounds;
-  bounds.width = size_.width;
-  bounds.height = size_.height;
+  bounds.width = size.width;
+  bounds.height = size.height;
 
   auto update = mojo::gfx::composition::SceneUpdate::New();
   mojo::gfx::composition::ResourcePtr content_resource = gl_renderer()->DrawGL(
-      size_, true,
-      base::Bind(&ShadowsView::Render, base::Unretained(this)));
+      size, true,
+      base::Bind(&ShadowsView::Render, base::Unretained(this), size));
   DCHECK(content_resource);
   update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -69,17 +62,17 @@ void ShadowsView::OnDraw(
   root_node->op->get_image()->content_rect = bounds.Clone();
   root_node->op->get_image()->image_resource_id = kContentImageResourceId;
   update->nodes.insert(kRootNodeId, root_node.Pass());
-
-  auto metadata = mojo::gfx::composition::SceneMetadata::New();
-  metadata->presentation_time = frame_info.presentation_time;
+  scene()->Update(update.Pass());
 
   // Publish the scene.
-  scene()->Update(update.Pass());
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
+  metadata->presentation_time = frame_info.presentation_time;
   scene()->Publish(metadata.Pass());
 }
 
-void ShadowsView::Render() {
-  renderer_->Render(size_);
+void ShadowsView::Render(const mojo::Size& size) {
+  renderer_->Render(size);
 }
 
 }  // namespace examples

@@ -5,13 +5,11 @@
 #ifndef SERVICES_UI_VIEW_MANAGER_VIEW_STUB_H_
 #define SERVICES_UI_VIEW_MANAGER_VIEW_STUB_H_
 
-#include <memory>
 #include <vector>
 
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 #include "mojo/services/ui/views/interfaces/views.mojom.h"
-#include "services/ui/view_manager/view_layout_request.h"
 
 namespace view_manager {
 
@@ -72,17 +70,26 @@ class ViewStub {
   uint32_t key() const { return key_; }
 
   // Gets the wrapped scene exposed to the container.
-  mojo::gfx::composition::Scene* stub_scene() const {
-    return stub_scene_.get();
+  const mojo::gfx::composition::ScenePtr& stub_scene() const {
+    return stub_scene_;
   }
-  const mojo::gfx::composition::SceneToken* stub_scene_token() const {
-    return stub_scene_token_.get();
+  const mojo::gfx::composition::SceneTokenPtr& stub_scene_token() const {
+    return stub_scene_token_;
   }
 
-  // A pending layout request, held until such time as the view is attached.
-  std::unique_ptr<ViewLayoutRequest>& pending_layout_request() {
-    return pending_layout_request_;
-  }
+  // Gets the scene version which the container set on this view, or 0
+  // if none set or the view has become unavailable.
+  uint32_t scene_version() const { return scene_version_; }
+
+  // Gets the properties which the container set on this view, or null
+  // if none set or the view has become unavailable.
+  const mojo::ui::ViewPropertiesPtr& properties() const { return properties_; }
+
+  // Sets the scene version and properties set by the container.
+  // May be called when the view is pending or attached but not after it
+  // has become unavailable.
+  void SetProperties(uint32_t scene_version,
+                     mojo::ui::ViewPropertiesPtr properties);
 
   // Binds the stub to the specified actual view, which must not be null.
   // Must be called at most once to apply the effects of resolving the
@@ -91,7 +98,8 @@ class ViewStub {
                   mojo::gfx::composition::ScenePtr stub_scene);
 
   // Sets the stub scene token, which must not be null.
-  // Called after |AttachView| once the scene token is known.
+  // Called after |AttachView| once the scene token is known but the view
+  // must not have been released.
   void SetStubSceneToken(
       mojo::gfx::composition::SceneTokenPtr stub_scene_token);
 
@@ -101,14 +109,8 @@ class ViewStub {
 
   // THESE METHODS SHOULD ONLY BE CALLED BY VIEW STATE OR VIEW TREE STATE
 
-  // Recursively sets the view tree to which this view and all of its
-  // descendents belong.  Must not be null.  This method must only be called
-  // on root views.
-  void SetTree(ViewTreeState* tree, uint32_t key);
-
-  // Sets the parent view state pointer, the child's key in its parent,
-  // and set its view tree to that of its parent.  Must not be null.
-  void SetParent(ViewState* parent, uint32_t key);
+  // Sets the child's container and key.  Must not be null.
+  void SetContainer(ViewContainerState* container, uint32_t key);
 
   // Resets the parent view state and tree pointers to null.
   void Unlink();
@@ -123,7 +125,9 @@ class ViewStub {
   bool unavailable_ = false;
   mojo::gfx::composition::ScenePtr stub_scene_;
   mojo::gfx::composition::SceneTokenPtr stub_scene_token_;
-  std::unique_ptr<ViewLayoutRequest> pending_layout_request_;
+
+  uint32_t scene_version_ = mojo::gfx::composition::kSceneVersionNone;
+  mojo::ui::ViewPropertiesPtr properties_;
 
   ViewTreeState* tree_ = nullptr;
   ViewState* parent_ = nullptr;

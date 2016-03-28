@@ -46,6 +46,12 @@ void ViewTreeState::SetRenderer(mojo::gfx::composition::RendererPtr renderer) {
   ClearHitTesterCallbacks(true /*renderer_changed*/);
 }
 
+ViewStub* ViewTreeState::GetRoot() const {
+  if (children().empty())
+    return nullptr;
+  return children().cbegin()->second.get();
+}
+
 void ViewTreeState::RequestHitTester(
     mojo::InterfaceRequest<mojo::gfx::composition::HitTester>
         hit_tester_request,
@@ -62,18 +68,8 @@ void ViewTreeState::ClearHitTesterCallbacks(bool renderer_changed) {
   pending_hit_tester_callbacks_.clear();
 }
 
-void ViewTreeState::LinkRoot(uint32_t key, std::unique_ptr<ViewStub> root) {
-  DCHECK(!root_);
-  DCHECK(root);
-  DCHECK(!root->is_linked());
-  root->SetTree(this, key);
-  root_ = std::move(root);
-}
-
-std::unique_ptr<ViewStub> ViewTreeState::UnlinkRoot() {
-  DCHECK(root_);
-  root_->Unlink();
-  return std::move(root_);
+ViewTreeState* ViewTreeState::AsViewTreeState() {
+  return this;
 }
 
 const std::string& ViewTreeState::FormattedLabel() const {

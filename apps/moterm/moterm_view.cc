@@ -82,17 +82,10 @@ MotermView::~MotermView() {
     driver_->Detach();
 }
 
-void MotermView::OnLayout(mojo::ui::ViewLayoutParamsPtr layout_params,
-                          mojo::Array<uint32_t> children_needing_layout,
-                          const OnLayoutCallback& callback) {
-  view_size_.width = layout_params->constraints->max_width;
-  view_size_.height = layout_params->constraints->max_height;
-
+void MotermView::OnPropertiesChanged(
+    uint32_t old_scene_version,
+    mojo::ui::ViewPropertiesPtr old_properties) {
   ScheduleDraw(true);
-
-  auto info = mojo::ui::ViewLayoutResult::New();
-  info->size = view_size_.Clone();
-  callback.Run(info.Pass());
 }
 
 void MotermView::OnEvent(mojo::EventPtr event,
@@ -195,14 +188,20 @@ void MotermView::SetSize(uint32_t rows,
                          bool reset,
                          const SetSizeCallback& callback) {
   if (!rows) {
-    rows = std::max(
-        1u, std::min(MotermModel::kMaxRows,
-                     static_cast<uint32_t>(view_size_.height) / line_height_));
+    rows =
+        properties()
+            ? static_cast<uint32_t>(properties()->view_layout->size->height) /
+                  line_height_
+            : 0u;
+    rows = std::max(1u, std::min(MotermModel::kMaxRows, rows));
   }
   if (!columns) {
-    columns = std::max(
-        1u, std::min(MotermModel::kMaxColumns,
-                     static_cast<uint32_t>(view_size_.width) / advance_width_));
+    columns =
+        properties()
+            ? static_cast<uint32_t>(properties()->view_layout->size->width) /
+                  advance_width_
+            : 0u;
+    columns = std::max(1u, std::min(MotermModel::kMaxColumns, columns));
   }
 
   model_.SetSize(MotermModel::Size(rows, columns), reset);
@@ -212,7 +211,7 @@ void MotermView::SetSize(uint32_t rows,
 }
 
 void MotermView::ScheduleDraw(bool force) {
-  if (view_size_.width == 0 || view_size_.height == 0 ||
+  if (!properties() ||
       (!model_state_changes_.IsDirty() && !force && !force_next_draw_)) {
     force_next_draw_ |= force;
     return;
@@ -223,18 +222,21 @@ void MotermView::ScheduleDraw(bool force) {
 
 void MotermView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
                         const base::TimeDelta& time_delta) {
+  if (!properties())
+    return;
+
   // TODO(vtl): Draw only the dirty region(s)?
   model_state_changes_.Reset();
 
+  const mojo::Size& size = *properties()->view_layout->size;
   mojo::RectF bounds;
-  bounds.width = view_size_.width;
-  bounds.height = view_size_.height;
+  bounds.width = size.width;
+  bounds.height = size.height;
 
   auto update = mojo::gfx::composition::SceneUpdate::New();
   mojo::gfx::composition::ResourcePtr moterm_resource =
       ganesh_renderer()->DrawCanvas(
-          view_size_,
-          base::Bind(&MotermView::DrawContent, base::Unretained(this)));
+          size, base::Bind(&MotermView::DrawContent, base::Unretained(this)));
   DCHECK(moterm_resource);
   update->resources.insert(kMotermImageResourceId, moterm_resource.Pass());
 
@@ -246,10 +248,11 @@ void MotermView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
   root_node->op->get_image()->image_resource_id = kMotermImageResourceId;
   update->nodes.insert(kRootNodeId, root_node.Pass());
 
-  auto metadata = mojo::gfx::composition::SceneMetadata::New();
-  metadata->presentation_time = frame_info.presentation_time;
-
   scene()->Update(update.Pass());
+
+  auto metadata = mojo::gfx::composition::SceneMetadata::New();
+  metadata->version = scene_version();
+  metadata->presentation_time = frame_info.presentation_time;
   scene()->Publish(metadata.Pass());
 }
 
