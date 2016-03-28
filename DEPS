@@ -32,6 +32,7 @@ vars = {
   'lss_revision': '6f97298fe3794e92c8c896a6bc06e0b36e4c3de3',
   'nacl_revision': 'f5bc68c59b147b66d553dc6fc17426682cf138e2',
   'tonic_revision': 'e41f72c684e0da61304ebd6f3147d0fe23ffbb56',
+  'gurl_revision': '561639dfb664ee4c14371f569213b9d41f4fe110',
 }
 
 # Only these hosts are allowed for dependencies in this DEPS file.
@@ -136,6 +137,9 @@ deps = {
 
   'src/third_party/libcxx/libcxxabi':
      Var('chromium_git') + '/chromium/llvm-project/libcxxabi.git' + '@' + '3a1fd0deeabcefb42463eb0ac9a570140679e605',
+
+  'src/url':
+     Var('chromium_git') + '/external/github.com/domokit/gurl' + '@' +  Var('gurl_revision'),
 }
 
 deps_os = {

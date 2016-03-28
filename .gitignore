@@ -68,6 +68,7 @@ v8.log
 /third_party/yasm/source/patched-yasm/
 /tonic/
 /tools/grit/
+/url/
 /v8/
 
 # dart packages directories and related.
