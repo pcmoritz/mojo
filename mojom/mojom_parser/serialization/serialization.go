@@ -624,7 +624,6 @@ func translateUserValueRef(r *mojom.UserValueRef) mojom_types.Value {
 		return &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
 			Identifier: r.Identifier(),
 			ValueKey:   valueKey}}
-		// We do not populate ResolvedConcreteValue because it is deprecated.
 	}
 }
 

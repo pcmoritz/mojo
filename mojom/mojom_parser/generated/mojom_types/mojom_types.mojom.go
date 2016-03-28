@@ -870,6 +870,7 @@ type UnionField struct {
 	DeclData *DeclarationData
 	Type Type
 	Tag uint32
+	MinVersion uint32
 }
 
 
@@ -892,6 +893,9 @@ func (s *UnionField) Encode(encoder *bindings.Encoder) error {
 		return err
 	}
 	if err := encoder.WriteUint32(s.Tag); err != nil {
+		return err
+	}
+	if err := encoder.WriteUint32(s.MinVersion); err != nil {
 		return err
 	}
 	if err := encoder.Finish(); err != nil {
@@ -953,6 +957,13 @@ func (s *UnionField) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		s.Tag = value0
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.MinVersion = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err
@@ -1078,6 +1089,7 @@ type EnumValue struct {
 	EnumTypeKey string
 	InitializerValue Value
 	IntValue int32
+	MinVersion uint32
 }
 
 
@@ -1107,6 +1119,9 @@ func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
 		}
 	}
 	if err := encoder.WriteInt32(s.IntValue); err != nil {
+		return err
+	}
+	if err := encoder.WriteUint32(s.MinVersion); err != nil {
 		return err
 	}
 	if err := encoder.Finish(); err != nil {
@@ -1180,6 +1195,13 @@ func (s *EnumValue) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		s.IntValue = value0
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.MinVersion = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err
@@ -1305,6 +1327,7 @@ type MojomMethod struct {
 	Parameters MojomStruct
 	ResponseParams *MojomStruct
 	Ordinal uint32
+	MinVersion uint32
 }
 
 
@@ -1337,6 +1360,9 @@ func (s *MojomMethod) Encode(encoder *bindings.Encoder) error {
 		}
 	}
 	if err := encoder.WriteUint32(s.Ordinal); err != nil {
+		return err
+	}
+	if err := encoder.WriteUint32(s.MinVersion); err != nil {
 		return err
 	}
 	if err := encoder.Finish(); err != nil {
@@ -1416,6 +1442,13 @@ func (s *MojomMethod) Decode(decoder *bindings.Decoder) error {
 		}
 		s.Ordinal = value0
 	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.MinVersion = value0
+	}
 	if err := decoder.Finish(); err != nil {
 		return err
 	}
@@ -1426,11 +1459,12 @@ type MojomInterface struct {
 	DeclData *DeclarationData
 	ServiceName *string
 	Methods map[uint32]MojomMethod
+	CurrentVersion uint32
 }
 
 
 func (s *MojomInterface) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(24, 0)
+	encoder.StartStruct(32, 0)
 	if s.DeclData == nil {
 		encoder.WriteNullPointer()
 	} else {
@@ -1504,6 +1538,9 @@ func (s *MojomInterface) Encode(encoder *bindings.Encoder) error {
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
+	if err := encoder.WriteUint32(s.CurrentVersion); err != nil {
+		return err
+	}
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
@@ -1511,7 +1548,7 @@ func (s *MojomInterface) Encode(encoder *bindings.Encoder) error {
 }
 
 var mojomInterface_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{32, 0},
+	bindings.DataHeader{40, 0},
 }
 
 func (s *MojomInterface) Decode(decoder *bindings.Decoder) error {
@@ -1648,6 +1685,13 @@ func (s *MojomInterface) Decode(decoder *bindings.Decoder) error {
 			s.Methods = map0
 		}
 	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.CurrentVersion = value0
+	}
 	if err := decoder.Finish(); err != nil {
 		return err
 	}
@@ -1657,12 +1701,11 @@ func (s *MojomInterface) Decode(decoder *bindings.Decoder) error {
 type UserValueReference struct {
 	Identifier string
 	ValueKey *string
-	ResolvedConcreteValue Value
 }
 
 
 func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(32, 0)
+	encoder.StartStruct(16, 0)
 	if err := encoder.WritePointer(); err != nil {
 		return err
 	}
@@ -1679,13 +1722,6 @@ func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
 			return err
 		}
 	}
-	if s.ResolvedConcreteValue == nil {
-		encoder.WriteNullUnion()
-	} else {
-		if err := s.ResolvedConcreteValue.Encode(encoder); err != nil {
-			return err
-		}
-	}
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
@@ -1693,7 +1729,7 @@ func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
 }
 
 var userValueReference_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{40, 0},
+	bindings.DataHeader{24, 0},
 }
 
 func (s *UserValueReference) Decode(decoder *bindings.Decoder) error {
@@ -1744,13 +1780,6 @@ func (s *UserValueReference) Decode(decoder *bindings.Decoder) error {
 				return err
 			}
 			(*s.ValueKey) = value0
-		}
-	}
-	if header.ElementsOrVersion >= 0 {
-		var err error
-		s.ResolvedConcreteValue, err = DecodeValue(decoder)
-		if err != nil {
-			return err
 		}
 	}
 	if err := decoder.Finish(); err != nil {
@@ -1936,7 +1965,6 @@ func (s *Attribute) Decode(decoder *bindings.Decoder) error {
 
 type DeclarationData struct {
 	Attributes *[]Attribute
-	MinVersion int32
 	ShortName *string
 	FullIdentifier *string
 	DeclaredOrdinal int32
@@ -1948,7 +1976,7 @@ type DeclarationData struct {
 
 
 func (s *DeclarationData) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(64, 0)
+	encoder.StartStruct(56, 0)
 	if s.Attributes == nil {
 		encoder.WriteNullPointer()
 	} else {
@@ -1967,12 +1995,6 @@ func (s *DeclarationData) Encode(encoder *bindings.Encoder) error {
 		if err := encoder.Finish(); err != nil {
 			return err
 		}
-	}
-	if err := encoder.WriteInt32(s.MinVersion); err != nil {
-		return err
-	}
-	if err := encoder.WriteInt32(s.DeclaredOrdinal); err != nil {
-		return err
 	}
 	if s.ShortName == nil {
 		encoder.WriteNullPointer()
@@ -1993,6 +2015,9 @@ func (s *DeclarationData) Encode(encoder *bindings.Encoder) error {
 		if err := encoder.WriteString((*s.FullIdentifier)); err != nil {
 			return err
 		}
+	}
+	if err := encoder.WriteInt32(s.DeclaredOrdinal); err != nil {
+		return err
 	}
 	if err := encoder.WriteInt32(s.DeclarationOrder); err != nil {
 		return err
@@ -2034,7 +2059,7 @@ func (s *DeclarationData) Encode(encoder *bindings.Encoder) error {
 }
 
 var declarationData_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{72, 0},
+	bindings.DataHeader{64, 0},
 }
 
 func (s *DeclarationData) Decode(decoder *bindings.Decoder) error {
@@ -2089,20 +2114,6 @@ func (s *DeclarationData) Decode(decoder *bindings.Decoder) error {
 		}
 	}
 	if header.ElementsOrVersion >= 0 {
-		value0, err := decoder.ReadInt32()
-		if err != nil {
-			return err
-		}
-		s.MinVersion = value0
-	}
-	if header.ElementsOrVersion >= 0 {
-		value0, err := decoder.ReadInt32()
-		if err != nil {
-			return err
-		}
-		s.DeclaredOrdinal = value0
-	}
-	if header.ElementsOrVersion >= 0 {
 		pointer0, err := decoder.ReadPointer()
 		if err != nil {
 			return err
@@ -2133,6 +2144,13 @@ func (s *DeclarationData) Decode(decoder *bindings.Decoder) error {
 			}
 			(*s.FullIdentifier) = value0
 		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadInt32()
+		if err != nil {
+			return err
+		}
+		s.DeclaredOrdinal = value0
 	}
 	if header.ElementsOrVersion >= 0 {
 		value0, err := decoder.ReadInt32()
