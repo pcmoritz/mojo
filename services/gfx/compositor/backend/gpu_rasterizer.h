@@ -36,7 +36,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   using FrameCallback = base::Callback<void(bool presented)>;
 
   GpuRasterizer(mojo::ContextProviderPtr context_provider,
-                const std::shared_ptr<VsyncScheduler>& scheduler,
+                const scoped_refptr<VsyncScheduler>& scheduler,
                 const scoped_refptr<base::TaskRunner>& task_runner,
                 const base::Closure& error_callback);
   ~GpuRasterizer() override;
@@ -65,7 +65,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   void PostErrorCallback();
 
   mojo::ContextProviderPtr context_provider_;
-  std::shared_ptr<VsyncScheduler> scheduler_;
+  scoped_refptr<VsyncScheduler> scheduler_;
   scoped_refptr<base::TaskRunner> task_runner_;
   base::Closure error_callback_;
 

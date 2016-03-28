@@ -28,7 +28,7 @@ constexpr int64_t kDefaultVsyncIntervalUs = 100000;  // deliberately sluggish
 }
 
 GpuRasterizer::GpuRasterizer(mojo::ContextProviderPtr context_provider,
-                             const std::shared_ptr<VsyncScheduler>& scheduler,
+                             const scoped_refptr<VsyncScheduler>& scheduler,
                              const scoped_refptr<base::TaskRunner>& task_runner,
                              const base::Closure& error_callback)
     : context_provider_(context_provider.Pass()),

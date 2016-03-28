@@ -10,6 +10,7 @@
 
 #include "base/callback.h"
 #include "base/macros.h"
+#include "base/memory/ref_counted.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 
 namespace compositor {
@@ -26,7 +27,7 @@ namespace compositor {
 //
 // An instance of the |Scheduler| interface is exposed by each |Output|
 // so as to express the timing requirements of the output.
-class Scheduler {
+class Scheduler : public base::RefCountedThreadSafe<Scheduler> {
  public:
   // Determines the behavior of |ScheduleFrame()|.
   enum class SchedulingMode {
@@ -38,7 +39,6 @@ class Scheduler {
   };
 
   Scheduler() = default;
-  virtual ~Scheduler() = default;
 
   // Schedules work for a frame.
   //
@@ -58,6 +58,10 @@ class Scheduler {
   // snapshots will be needed after updates and by scheduling updates in
   // advance if it is known that a snapshot will be needed on the next frame.
   virtual void ScheduleFrame(SchedulingMode scheduling_mode) = 0;
+
+ protected:
+  friend class base::RefCountedThreadSafe<Scheduler>;
+  virtual ~Scheduler() = default;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(Scheduler);

@@ -57,10 +57,10 @@ class VsyncSchedulerTest : public testing::Test {
     SchedulerCallbacks callbacks(
         base::Bind(&VsyncSchedulerTest::OnUpdate, base::Unretained(this)),
         base::Bind(&VsyncSchedulerTest::OnSnapshot, base::Unretained(this)));
-    scheduler_.reset(
+    scheduler_ =
         new VsyncScheduler(task_runner_, callbacks,
                            base::Bind(&VsyncSchedulerTest::GetTimeTicksNow,
-                                      base::Unretained(this))));
+                                      base::Unretained(this)));
 
     std::queue<ExpectedCallback> victim;
     expected_callbacks_.swap(victim);
@@ -72,7 +72,7 @@ class VsyncSchedulerTest : public testing::Test {
         base::TimeDelta::FromMicroseconds(time - GetTimeTicksNow()));
   }
 
-  std::unique_ptr<VsyncScheduler> scheduler_;
+  scoped_refptr<VsyncScheduler> scheduler_;
 
  private:
   enum class CallbackType {

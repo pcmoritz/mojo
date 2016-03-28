@@ -36,7 +36,6 @@ class VsyncScheduler : public Scheduler {
   VsyncScheduler(const scoped_refptr<base::TaskRunner>& task_runner,
                  const SchedulerCallbacks& callbacks,
                  const Clock& clock);
-  ~VsyncScheduler() override;
 
   // Starts scheduling work and sets the scheduling parameters.
   //
@@ -89,6 +88,9 @@ class VsyncScheduler : public Scheduler {
 
   // |Scheduler|:
   void ScheduleFrame(SchedulingMode scheduling_mode) override;
+
+ protected:
+  ~VsyncScheduler() override;
 
  private:
   // Internal state.  Held by a shared_ptr so that callbacks running on

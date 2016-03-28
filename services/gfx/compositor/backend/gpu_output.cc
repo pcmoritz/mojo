@@ -31,9 +31,8 @@ GpuOutput::GpuOutput(
     mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
     const SchedulerCallbacks& scheduler_callbacks,
     const base::Closure& error_callback)
-    : scheduler_(std::make_shared<VsyncScheduler>(
-          base::MessageLoop::current()->task_runner(),
-          scheduler_callbacks)),
+    : scheduler_(new VsyncScheduler(base::MessageLoop::current()->task_runner(),
+                                    scheduler_callbacks)),
       rasterizer_delegate_(make_scoped_ptr(new RasterizerDelegate())) {
   DCHECK(context_provider);
 
@@ -68,7 +67,7 @@ GpuOutput::RasterizerDelegate::~RasterizerDelegate() {}
 
 void GpuOutput::RasterizerDelegate::PostInitialize(
     mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
-    const std::shared_ptr<VsyncScheduler>& scheduler,
+    const scoped_refptr<VsyncScheduler>& scheduler,
     const scoped_refptr<base::TaskRunner>& task_runner,
     const base::Closure& error_callback) {
   task_runner_->PostTask(
@@ -111,7 +110,7 @@ void GpuOutput::RasterizerDelegate::PostSubmit() {
 
 void GpuOutput::RasterizerDelegate::InitializeTask(
     mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
-    const std::shared_ptr<VsyncScheduler>& scheduler,
+    const scoped_refptr<VsyncScheduler>& scheduler,
     const scoped_refptr<base::TaskRunner>& task_runner,
     const base::Closure& error_callback) {
   rasterizer_.reset(new GpuRasterizer(

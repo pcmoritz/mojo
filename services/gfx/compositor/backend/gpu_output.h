@@ -43,7 +43,7 @@ class GpuOutput : public Output {
 
     void PostInitialize(
         mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
-        const std::shared_ptr<VsyncScheduler>& scheduler,
+        const scoped_refptr<VsyncScheduler>& scheduler,
         const scoped_refptr<base::TaskRunner>& task_runner,
         const base::Closure& error_callback);
 
@@ -57,7 +57,7 @@ class GpuOutput : public Output {
     // Called on rasterizer thread.
     void InitializeTask(
         mojo::InterfaceHandle<mojo::ContextProvider> context_provider,
-        const std::shared_ptr<VsyncScheduler>& scheduler,
+        const scoped_refptr<VsyncScheduler>& scheduler,
         const scoped_refptr<base::TaskRunner>& task_runner,
         const base::Closure& error_callback);
 
@@ -80,7 +80,7 @@ class GpuOutput : public Output {
     DISALLOW_COPY_AND_ASSIGN(RasterizerDelegate);
   };
 
-  std::shared_ptr<VsyncScheduler> scheduler_;
+  scoped_refptr<VsyncScheduler> scheduler_;
   scoped_ptr<RasterizerDelegate> rasterizer_delegate_;  // can't use unique_ptr
                                                         // here due to
                                                         // base::Bind (sadness)
