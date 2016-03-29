@@ -266,7 +266,7 @@ func (token Token) Snippet(source string, color bool) (snippet string) {
 	end := len(source)
 	for index, rune := range source[token.SourcePosBytes:] {
 		if rune == '\n' || runeCount >= 78 {
-			end = index + begin + token.LinePosBytes
+			end = index + token.SourcePosBytes
 			break
 		}
 		runeCount++

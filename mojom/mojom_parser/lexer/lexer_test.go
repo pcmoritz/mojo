@@ -312,6 +312,26 @@ func TestTokenSnippetLongPrelude(t *testing.T) {
 	checkEq(t, expected, ts.PeekNext().Snippet(source, false))
 }
 
+// TestTokenSnippetLongPreludeWithNewLine tests snippet generation in the presence of a
+// long line with many characters preceeding the token and then a newline after the token.
+func TestTokenSnippetLongPreludeWithNewLine(t *testing.T) {
+	source := strings.Repeat(" ", 70) + "hello world\n"
+	ts := Tokenize(source)
+	expected := strings.Repeat(" ", 58) + "hello world\n"
+	expected += strings.Repeat(" ", 58) + "^^^^^"
+	checkEq(t, expected, ts.PeekNext().Snippet(source, false))
+}
+
+// TestTokenSnippetLongPreludeWithSuffix tests snippet generation in the presence of a
+// long line with many characters preceeding the token and then some characters following on the same line.
+func TestTokenSnippetLongPreludeWithLongSuffix(t *testing.T) {
+	source := strings.Repeat(" ", 70) + "hello world " + strings.Repeat("x", 10)
+	ts := Tokenize(source)
+	expected := strings.Repeat(" ", 58) + "hello world xxxxxxxx\n"
+	expected += strings.Repeat(" ", 58) + "^^^^^"
+	checkEq(t, expected, ts.PeekNext().Snippet(source, false))
+}
+
 func TestFilteredTokens(t *testing.T) {
 	source := "/* filtered1 */ hello world // filtered2"
 	ts := Tokenize(source)
