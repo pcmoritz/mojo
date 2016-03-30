@@ -11,11 +11,11 @@ import (
 	"testing"
 )
 
-// TestMinVersionErrors test the method MojomStruct.ComputeVersionInfo() which
+// TestStructFieldMinVersionErrors test the method MojomStruct.computeVersionInfo() which
 // is invoked by ComputeFinalData. This phase occurs after resolution
 // and type validation. We test that different types of errors related to
 // the MinVersion attribute are correctly detected.
-func TestMinVersionErrors(t *testing.T) {
+func TestStructFieldMinVersionErrors(t *testing.T) {
 	test := singleFileTest{}
 
 	////////////////////////////////////////////////////////////
@@ -159,6 +159,217 @@ func TestMinVersionErrors(t *testing.T) {
 			"Invalid type for field z: array<int32>.",
 			"Non-nullable reference fields are only allowed in version 0 of of a struct.",
 			"This field's MinVersion is 1."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for i, c := range test.cases {
+		// Parse anresolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		specifiedName := ""
+		if c.importedFrom == nil {
+			specifiedName = c.fileName
+		}
+		parser := MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
+			continue
+		}
+		err := descriptor.Resolve()
+		if err != nil {
+			t.Errorf("Resolution error for %s: %s", c.fileName, err)
+			continue
+		}
+
+		err = descriptor.ComputeFinalData()
+
+		if err == nil {
+			t.Errorf("Data computation unexpectedly succeeded for test case %d.", i)
+			continue
+		}
+
+		got := err.Error()
+		for _, expected := range c.expectedErrors {
+			if !strings.Contains(got, expected) {
+				t.Errorf("%s:\n*****expected to contain:\n%s\n****actual\n%s", c.fileName, expected, got)
+			}
+		}
+
+	}
+}
+
+// TestMethoddMinVersionErrors test the method MojomInterface.computeInterfaceVersion() which
+// is invoked by ComputeFinalData. This phase occurs after resolution
+// and type validation. We test that different types of errors related to
+// the MinVersion attribute are correctly detected.
+func TestMethodMinVersionErrors(t *testing.T) {
+	test := singleFileTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Float value for MinVersion on method.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		[MinVersion=1.1]
+		DoIt();
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for method DoIt: 1.1. ",
+			"The value must be a non-negative 32-bit integer value."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Float value for MinVersion on request parameter.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt([MinVersion=1.1] int32 x);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for parameter x: 1.1. ",
+			"The value must be a non-negative 32-bit integer value."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Float value for MinVersion on response parameter.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt([MinVersion=1] int32 x) => ([MinVersion=1.1] int32 y);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for response parameter y: 1.1. ",
+			"The value must be a non-negative 32-bit integer value."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for mehtods.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		[MinVersion=2]
+		DoIt();
+
+		[MinVersion=1]
+		DoItAgain();
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for method DoItAgain: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This method's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for request parameters.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt([MinVersion=2] int32 x, [MinVersion=1] int32 y);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for parameter y: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This parameter's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for response parameters.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt() => ([MinVersion=2] int32 x, [MinVersion=1] int32 y);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for response parameter y: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This response parameter's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for methods: ordinals are used.
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	interface MyInteface {
+		DoIt();
+
+		[MinVersion=1]
+		AndAgain@2();
+
+		[MinVersion=2]
+		DoItAgain@1();
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for method AndAgain: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This method's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for request parameters: ordinals are used
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt([MinVersion=1] int32 y@1, [MinVersion=2] int32 x@0);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for parameter y: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This parameter's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Min Versions must be increasing for response parameters: ordinals are used
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt() => ([MinVersion=1] int32 y@1, [MinVersion=2] int32 x@0);
+	};`
+		test.addTestCase(contents, []string{
+			"Invalid MinVersion attribute for response parameter y: 1. ",
+			"The MinVersion must be non-decreasing as a function of the ordinal.",
+			" This response parameter's MinVersion must be at least 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Non-nullable type used in request parameters.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt(int32 x, [MinVersion = 1] array<int32>? y, [MinVersion = 2] array<int32> z);
+	};`
+
+		test.addTestCase(contents, []string{
+			"Invalid type for parameter z: array<int32>.",
+			"Non-nullable reference parameters are only allowed in version 0 of of a struct.",
+			"This parameter's MinVersion is 2."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Non-nullable type used in response parameters.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInteface {
+		DoIt() => (int32 x, [MinVersion = 1] array<int32>? y, [MinVersion = 2] array<int32> z);
+	};`
+
+		test.addTestCase(contents, []string{
+			"Invalid type for response parameter z: array<int32>.",
+			"Non-nullable reference response parameters are only allowed in version 0 of of a struct.",
+			"This response parameter's MinVersion is 2."})
 	}
 
 	////////////////////////////////////////////////////////////
@@ -538,6 +749,131 @@ func TestStructsComputedData(t *testing.T) {
 			if err := checkStructVersion("InterfaceAlignment",
 				&myStructType.VersionInfo()[0], 0, 2, 24); err != nil {
 				return err
+			}
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for i, c := range test.cases {
+		// Parse and resolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		fileName := fmt.Sprintf("file%d", i)
+		parser := MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", fileName, parser.GetError().Error())
+			continue
+		}
+		err := descriptor.Resolve()
+		if err != nil {
+			t.Errorf("Resolution failed for test case %d: %s", i, err.Error())
+			continue
+		}
+
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for test case %d: %s", i, err.Error())
+			continue
+		}
+
+		if c.testFunc != nil {
+			if err := c.testFunc(descriptor); err != nil {
+				t.Errorf("%s:\n%s", fileName, err.Error())
+				continue
+			}
+		}
+	}
+}
+
+// TestInterfaceComputedData() iterates through a series of test cases.
+// For each case we expect for parsing, resolution and final data computation to succeed.
+// Then we execute a given callback test function to test that the methods
+// MojomInterface.ComputeFinalData() and MojomInterface.computeInterfaceVersion()
+//  produced the desired result.
+func TestInterfaceComputedData(t *testing.T) {
+	test := singleFileSuccessTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test that an empty interface still gets a version.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInterface {
+	};`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			myInterfaceType := descriptor.TypesByKey["TYPE_KEY:MyInterface"].(*mojom.MojomInterface)
+			if myInterfaceType.Version() != 0 {
+				return fmt.Errorf("myInterfaceType.Version()=%d", myInterfaceType.Version())
+			}
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Interface version comes from MinVersion on a method
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInterface {
+		Method1();
+		Method2();
+		[MinVersion=7]
+		Method3();
+	};`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			myInterfaceType := descriptor.TypesByKey["TYPE_KEY:MyInterface"].(*mojom.MojomInterface)
+			if myInterfaceType.Version() != 7 {
+				return fmt.Errorf("myInterfaceType.Version()=%d", myInterfaceType.Version())
+			}
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Interface version comes from MinVersion on a parameter
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInterface {
+		Method1([MinVersion=1] int8 x, [MinVersion=8] int8 y);
+		Method2();
+		[MinVersion=7]
+		Method3();
+	};`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			myInterfaceType := descriptor.TypesByKey["TYPE_KEY:MyInterface"].(*mojom.MojomInterface)
+			if myInterfaceType.Version() != 8 {
+				return fmt.Errorf("myInterfaceType.Version()=%d", myInterfaceType.Version())
+			}
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Interface version comes from MinVersion on a response parameter.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+	interface MyInterface {
+		Method1([MinVersion=1] int8 x, [MinVersion=8] int8 y);
+		Method2() => ([MinVersion=1] int8 x, [MinVersion=9] int8 y);
+		[MinVersion=7]
+		Method3();
+	};`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			myInterfaceType := descriptor.TypesByKey["TYPE_KEY:MyInterface"].(*mojom.MojomInterface)
+			if myInterfaceType.Version() != 9 {
+				return fmt.Errorf("myInterfaceType.Version()=%d", myInterfaceType.Version())
 			}
 			return nil
 		}

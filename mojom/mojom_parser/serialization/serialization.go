@@ -361,6 +361,9 @@ func translateMojomInterface(intrfc *mojom.MojomInterface) *mojom_types.UserDefi
 	for ordinal, method := range intrfc.MethodsByOrdinal {
 		mojomInterface.Value.Methods[ordinal] = translateMojomMethod(method)
 	}
+	if emitComputedPackingData {
+		mojomInterface.Value.CurrentVersion = intrfc.Version()
+	}
 
 	return &mojomInterface
 }
@@ -382,6 +385,11 @@ func translateMojomMethod(method *mojom.MojomMethod) mojom_types.MojomMethod {
 
 	// ordinal
 	mojomMethod.Ordinal = method.Ordinal
+
+	if emitComputedPackingData {
+		mojomMethod.MinVersion = method.MinVersion()
+	}
+
 	return mojomMethod
 }
 

@@ -132,10 +132,13 @@ var ErrMinVersionOutOfOrder = errors.New("MinVersion attribute value out of orde
 var ErrMinVersionNotNullable = errors.New("Non-Zero MinVersion attribute value on non-nullable field")
 
 type StructFieldMinVersionError struct {
+	// The containing struct
+	containingStruct *MojomStruct
+
 	// The field whose MinVersion is being set.
 	field *StructField
 
-	// The MinValue of the previous field. Only used for ErrMinVersionOutOfOrder
+	// The MinVersion of the previous field. Only used for ErrMinVersionOutOfOrder
 	previousValue uint32
 
 	// The LiteralValue of the attribute assignment.
@@ -152,31 +155,38 @@ type StructFieldMinVersionError struct {
 func (e *StructFieldMinVersionError) Error() string {
 	var message string
 	var token lexer.Token
+	fieldType := "field"
+	switch e.containingStruct.structType {
+	case StructTypeSyntheticRequest:
+		fieldType = "parameter"
+	case StructTypeSyntheticResponse:
+		fieldType = "response parameter"
+	}
 	switch e.err {
 	case ErrMinVersionIllformed:
-		message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+		message = fmt.Sprintf("Invalid MinVersion attribute for %s %s: %s. "+
 			"The value must be a non-negative 32-bit integer value.",
-			e.field.SimpleName(), e.literalValue)
+			fieldType, e.field.SimpleName(), e.literalValue)
 		token = *e.literalValue.token
 	case ErrMinVersionOutOfOrder:
 		if e.literalValue.token == nil {
-			message = fmt.Sprintf("Invalid missing MinVersion for field %s. "+
+			message = fmt.Sprintf("Invalid missing MinVersion for %s %s. "+
 				"The MinVersion must be non-decreasing as a function of the ordinal. "+
-				"This field must have a MinVersion attribute with a value at least %d.",
-				e.field.SimpleName(), e.previousValue)
+				"This %s must have a MinVersion attribute with a value at least %d.",
+				fieldType, e.field.SimpleName(), fieldType, e.previousValue)
 			token = e.field.NameToken()
 		} else {
-			message = fmt.Sprintf("Invalid MinVersion attribute for field %s: %s. "+
+			message = fmt.Sprintf("Invalid MinVersion attribute for %s %s: %s. "+
 				"The MinVersion must be non-decreasing as a function of the ordinal. "+
-				"This field's MinVersion must be at least %d.",
-				e.field.SimpleName(), e.literalValue.token.Text, e.previousValue)
+				"This %s's MinVersion must be at least %d.",
+				fieldType, e.field.SimpleName(), e.literalValue.token.Text, fieldType, e.previousValue)
 			token = *e.literalValue.token
 		}
 	case ErrMinVersionNotNullable:
-		message = fmt.Sprintf("Invalid type for field %s: %s. "+
-			"Non-nullable reference fields are only allowed in version 0 of of a struct. "+
-			"This field's MinVersion is %s.",
-			e.field.SimpleName(), e.field.FieldType.TypeName(), e.literalValue.token.Text)
+		message = fmt.Sprintf("Invalid type for %s %s: %s. "+
+			"Non-nullable reference %ss are only allowed in version 0 of of a struct. "+
+			"This %s's MinVersion is %s.",
+			fieldType, e.field.SimpleName(), e.field.FieldType.TypeName(), fieldType, fieldType, e.literalValue.token.Text)
 		switch fieldType := e.field.FieldType.(type) {
 		case *UserTypeRef:
 			token = fieldType.token
@@ -207,34 +217,38 @@ func (s *MojomStruct) computeVersionInfo() error {
 		if found == false {
 			if previousMinVersion != 0 {
 				return &StructFieldMinVersionError{
-					field:         field,
-					previousValue: previousMinVersion,
-					literalValue:  MakeStringLiteralValue("", nil),
-					err:           ErrMinVersionOutOfOrder,
+					containingStruct: s,
+					field:            field,
+					previousValue:    previousMinVersion,
+					literalValue:     MakeStringLiteralValue("", nil),
+					err:              ErrMinVersionOutOfOrder,
 				}
 			}
 		} else {
 			if !ok {
 				return &StructFieldMinVersionError{
-					field:        field,
-					literalValue: literalValue,
-					err:          ErrMinVersionIllformed,
+					containingStruct: s,
+					field:            field,
+					literalValue:     literalValue,
+					err:              ErrMinVersionIllformed,
 				}
 			}
 			if value < previousMinVersion {
 				return &StructFieldMinVersionError{
-					field:         field,
-					previousValue: previousMinVersion,
-					literalValue:  literalValue,
-					err:           ErrMinVersionOutOfOrder,
+					containingStruct: s,
+					field:            field,
+					previousValue:    previousMinVersion,
+					literalValue:     literalValue,
+					err:              ErrMinVersionOutOfOrder,
 				}
 			}
 		}
 		if value != 0 && !field.FieldType.AllowedInNonZeroStructVersion() {
 			return &StructFieldMinVersionError{
-				field:        field,
-				literalValue: literalValue,
-				err:          ErrMinVersionNotNullable,
+				containingStruct: s,
+				field:            field,
+				literalValue:     literalValue,
+				err:              ErrMinVersionNotNullable,
 			}
 		}
 		field.minVersion = int64(value)
@@ -267,8 +281,8 @@ func computePayloadSizeSoFar(field *StructField) uint32 {
 
 ////////////////////////  Interfaces  ////////////////////////
 
-func (i *MojomInterface) ComputeFinalData() error {
-	for _, method := range i.MethodsByOrdinal {
+func (intrfc *MojomInterface) ComputeFinalData() error {
+	for _, method := range intrfc.MethodsByOrdinal {
 		if method.Parameters != nil {
 			if err := method.Parameters.ComputeFinalData(); err != nil {
 				return err
@@ -277,6 +291,115 @@ func (i *MojomInterface) ComputeFinalData() error {
 		if method.ResponseParameters != nil {
 			if err := method.ResponseParameters.ComputeFinalData(); err != nil {
 				return err
+			}
+		}
+	}
+	return intrfc.computeInterfaceVersion()
+}
+
+type MethodMinVersionError struct {
+	// The method whose MinVersion is being set.
+	method *MojomMethod
+
+	// The MinVersion of the previous method. Only used for ErrMinVersionOutOfOrder
+	previousValue uint32
+
+	// The LiteralValue of the attribute assignment.
+	// NOTE: We use the following convention: literalValue.token == nil indicates that
+	// there was no MinVersion attribute on the given method. This can only happen with
+	// ErrMinVersionOutOfOrder
+	literalValue LiteralValue
+
+	// The type of error (ErrMinVersionIllfromed, ErrMinVersionOutOfOrder, ErrMinVersionNotNullable)
+	err error
+}
+
+// MethodMinVersionError implements error.
+func (e *MethodMinVersionError) Error() string {
+	var message string
+	var token lexer.Token
+	switch e.err {
+	case ErrMinVersionIllformed:
+		message = fmt.Sprintf("Invalid MinVersion attribute for method %s: %s. "+
+			"The value must be a non-negative 32-bit integer value.",
+			e.method.SimpleName(), e.literalValue)
+		token = *e.literalValue.token
+	case ErrMinVersionOutOfOrder:
+		if e.literalValue.token == nil {
+			message = fmt.Sprintf("Invalid missing MinVersion for method %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This method must have a MinVersion attribute with a value at least %d.",
+				e.method.SimpleName(), e.previousValue)
+			token = e.method.NameToken()
+		} else {
+			message = fmt.Sprintf("Invalid MinVersion attribute for method %s: %s. "+
+				"The MinVersion must be non-decreasing as a function of the ordinal. "+
+				"This method's MinVersion must be at least %d.",
+				e.method.SimpleName(), e.literalValue.token.Text, e.previousValue)
+			token = *e.literalValue.token
+		}
+	default:
+		panic("Unexpected type of MethodMinVersionError")
+	}
+	return UserErrorMessage(e.method.OwningFile(), token, message)
+}
+
+// computeInterfaceVersion computes and sets the |minVersion| field of each
+// of each method in |intrfc| and the |versionNumber| field of |intrfc| itself.
+func (intrfc *MojomInterface) computeInterfaceVersion() error {
+	previousMinVersion := uint32(0)
+	intrfc.versionNumber = 0
+	// Iterate through the methods in ordinal order.
+	for _, method := range intrfc.MethodsInOrdinalOrder() {
+		// Look for |MinVersion| attributes and validate them.
+		value, literalValue, found, ok := method.minVersionAttribute()
+		if found == false {
+			if previousMinVersion != 0 {
+				return &MethodMinVersionError{
+					method:        method,
+					previousValue: previousMinVersion,
+					literalValue:  MakeStringLiteralValue("", nil),
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		} else {
+			if !ok {
+				return &MethodMinVersionError{
+					method:       method,
+					literalValue: literalValue,
+					err:          ErrMinVersionIllformed,
+				}
+			}
+			if value < previousMinVersion {
+				return &MethodMinVersionError{
+					method:        method,
+					previousValue: previousMinVersion,
+					literalValue:  literalValue,
+					err:           ErrMinVersionOutOfOrder,
+				}
+			}
+		}
+		method.minVersion = int64(value)
+		previousMinVersion = value
+		// The |versionNumber| for the interface is at least as big as the
+		// |minVersions| of each of its methods.
+		if method.minVersion > intrfc.versionNumber {
+			intrfc.versionNumber = method.minVersion
+		}
+		// The |versionNumber| for the interface is at least as big as the
+		// greatest version number of its parameter structs.
+		if method.Parameters != nil {
+			versions := method.Parameters.VersionInfo()
+			paramsMaxVersion := uint32(versions[len(versions)-1].VersionNumber)
+			if paramsMaxVersion > intrfc.Version() {
+				intrfc.versionNumber = int64(paramsMaxVersion)
+			}
+		}
+		if method.ResponseParameters != nil {
+			versions := method.ResponseParameters.VersionInfo()
+			paramsMaxVersion := uint32(versions[len(versions)-1].VersionNumber)
+			if paramsMaxVersion > intrfc.Version() {
+				intrfc.versionNumber = int64(paramsMaxVersion)
 			}
 		}
 	}

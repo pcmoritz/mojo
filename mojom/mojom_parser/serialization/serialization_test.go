@@ -1474,7 +1474,7 @@ func TestWithComputedData(t *testing.T) {
 	}
 
 	////////////////////////////////////////////////////////////
-	// Test Case: Method parameter versions.
+	// Test Case: Method  and parameter versions.
 	////////////////////////////////////////////////////////////
 	{
 		contents := `
@@ -1482,7 +1482,11 @@ func TestWithComputedData(t *testing.T) {
 		DoIt(int8 x0, [MinVersion=1] int64 x1, [MinVersion=2] int8 x2)
 		    => (int8 y0, [MinVersion=1] int64 y1);
 
+		[MinVersion=1]
 		DoItAgain(int8 x0);
+
+		[MinVersion=2]
+		AndAgain();
 	};`
 
 		test.addTestCase("", contents)
@@ -1490,7 +1494,8 @@ func TestWithComputedData(t *testing.T) {
 		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:MyInterface42"}
 
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyInterface42"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
-			DeclData: test.newDeclData("MyInterface42", "MyInterface42"),
+			DeclData:       test.newDeclData("MyInterface42", "MyInterface42"),
+			CurrentVersion: 2,
 			Methods: map[uint32]mojom_types.MojomMethod{
 				// DoIt
 				0: mojom_types.MojomMethod{
@@ -1575,7 +1580,7 @@ func TestWithComputedData(t *testing.T) {
 
 				// DoItAgain
 				1: mojom_types.MojomMethod{
-					DeclData: test.newDeclData("DoItAgain", ""),
+					DeclData: test.newDeclDataA("DoItAgain", "", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("DoItAgain-request", ""),
 						Fields: []mojom_types.StructField{
@@ -1597,7 +1602,26 @@ func TestWithComputedData(t *testing.T) {
 							},
 						},
 					},
-					Ordinal: 1,
+					Ordinal:    1,
+					MinVersion: 1,
+				},
+
+				// AndAgain
+				2: mojom_types.MojomMethod{
+					DeclData: test.newDeclDataA("AndAgain", "", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("AndAgain-request", ""),
+						Fields:   []mojom_types.StructField{},
+						VersionInfo: &[]mojom_types.StructVersion{
+							mojom_types.StructVersion{
+								VersionNumber: 0,
+								NumFields:     0,
+								NumBytes:      8,
+							},
+						},
+					},
+					Ordinal:    2,
+					MinVersion: 2,
 				},
 			},
 		}}

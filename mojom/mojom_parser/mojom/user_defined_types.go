@@ -446,7 +446,7 @@ func (s *MojomStruct) FieldsInOrdinalOrder() []*StructField {
 
 func (s *MojomStruct) VersionInfo() []StructVersion {
 	if s.versionInfo == nil {
-		panic("The method ComputeVersionInfo() must be invoked first.")
+		panic("The method computeVersionInfo() must be invoked first.")
 	}
 	return s.versionInfo
 }
@@ -578,7 +578,7 @@ func (s MojomStruct) ParameterString() string {
 }
 
 type StructField struct {
-	DeclarationData
+	VersionedDeclarationData
 
 	FieldType    TypeRef
 	DefaultValue ValueRef
@@ -591,9 +591,6 @@ type StructField struct {
 
 	// A valid |bit| value is a uint8. We use -1 to indicate unset.
 	bit int16
-
-	// A valid min version is a unt32. We use -1 to indicate unset.
-	minVersion int64
 }
 
 func NewStructField(declData DeclarationData, fieldType TypeRef, defaultValue ValueRef) *StructField {
@@ -602,7 +599,7 @@ func NewStructField(declData DeclarationData, fieldType TypeRef, defaultValue Va
 	field.DeclarationData = declData
 	field.offset = -1
 	field.bit = -1
-	field.minVersion = -1
+	field.VersionedDeclarationData.init()
 	return &field
 }
 
@@ -646,38 +643,6 @@ func (f *StructField) Scope() *Scope {
 
 func (f *StructField) KindString() string {
 	return "field"
-}
-
-const minVersionAttributeName = "MinVersion"
-
-// minVersionAttribute() Attempts to return a uint32 corresponding to the "MinVersion" attribute of this field.
-// If found = false then no such attribute could be found and the rest of the return values should be ignored.
-// If found = true then |literalValue| is the LiteralValue of the found attribute. In this case:
-//    If ok = false then |literalValue| does not contain a uint32 and |value| should be ignored.
-//    If ok = true then |literalValue| contains the uint32 value in |value|.
-func (f *StructField) minVersionAttribute() (value uint32, literalValue LiteralValue, found, ok bool) {
-	if f.attributes == nil {
-		return 0, LiteralValue{}, false, false
-	}
-	for _, attribute := range f.attributes.List {
-		if attribute.Key == minVersionAttributeName {
-			value, ok := uint32Value(attribute.Value)
-			return value, attribute.Value, true, ok
-		}
-	}
-	return 0, LiteralValue{}, false, false
-}
-
-// MinVersion() returns the computed value of MinVersion for this field. This method should only be invoked
-// after the method ComputeVersionInfo() has been invoked on the containing MojomStruct and returned a nil error.
-// This method is different than the minVersionAttribute() method in that it does not just return a value
-// for fields that have the "MinVersion" attribute explicitly specified. Rather it returns a computed value for
-// every field after the "MinVersion" attributes for every field have been checked and validated.
-func (f *StructField) MinVersion() uint32 {
-	if f.minVersion < 0 {
-		panic("The method ComputeVersionInfo() must first be invoked for the containing struct.")
-	}
-	return uint32(f.minVersion)
 }
 
 func (f *StructField) Offset() uint32 {
@@ -735,6 +700,17 @@ type MojomInterface struct {
 	// "ServiceName=" attribute then this field contains the value of that
 	// attribute, otherwise this is null.
 	ServiceName *string
+
+	// Valid versionNumbers are uint32s. We use -1 to mean unset.
+	// The versionNumber of a MojomInterface is the maximum value of
+	// of the MinVersion values of all of its methods and parameters.
+	// This value is computed in computeInterfaceVersion() and accessed
+	// via Version(). Initially it is -1.
+	versionNumber int64
+
+	// methodsInOrdinalOrder is computed by ComputeMethodOrdinals()
+	// and accessed via MethodsInOrdinalOrder(). Initially it is nil.
+	methodsInOrdinalOrder []*MojomMethod
 }
 
 func NewMojomInterface(declData DeclarationData) *MojomInterface {
@@ -754,6 +730,7 @@ func NewMojomInterface(declData DeclarationData) *MojomInterface {
 			}
 		}
 	}
+	mojomInterface.versionNumber = -1
 	return mojomInterface
 }
 
@@ -789,6 +766,13 @@ func (MojomInterface) IsAssignmentCompatibleWith(value LiteralValue) bool {
 	return false
 }
 
+func (intrfc *MojomInterface) Version() uint32 {
+	if intrfc.versionNumber < 0 {
+		panic("The method ComputeFinalData() must first be invoked.")
+	}
+	return uint32(intrfc.versionNumber)
+}
+
 type MethodOrdinalError struct {
 	Ord            int64        // The attemted ordinal
 	InterfaceName  string       // The name of the interface in which the problem occurs.
@@ -817,8 +801,9 @@ func (e *MethodOrdinalError) Error() string {
 }
 
 func (intrfc *MojomInterface) ComputeMethodOrdinals() error {
+	methodOrdinals := make([]uint32, len(intrfc.methodsByLexicalOrder))
 	nextOrdinal := uint32(0)
-	for _, method := range intrfc.methodsByLexicalOrder {
+	for i, method := range intrfc.methodsByLexicalOrder {
 		if method.declaredOrdinal < 0 {
 			method.Ordinal = nextOrdinal
 		} else {
@@ -834,10 +819,23 @@ func (intrfc *MojomInterface) ComputeMethodOrdinals() error {
 				InterfaceName: intrfc.SimpleName(), Method: method,
 				ExistingMethod: existingMethod, Err: ErrOrdinalDuplicate}
 		}
+		methodOrdinals[i] = method.Ordinal
 		intrfc.MethodsByOrdinal[method.Ordinal] = method
 		nextOrdinal = method.Ordinal + 1
 	}
+	sort.Sort(utils.UInt32Slice(methodOrdinals))
+	intrfc.methodsInOrdinalOrder = make([]*MojomMethod, len(methodOrdinals))
+	for i, ordinal := range methodOrdinals {
+		intrfc.methodsInOrdinalOrder[i] = intrfc.MethodsByOrdinal[ordinal]
+	}
 	return nil
+}
+
+func (intrfc *MojomInterface) MethodsInOrdinalOrder() []*MojomMethod {
+	if intrfc.methodsInOrdinalOrder == nil {
+		panic("ComputeMethodOrdinals() must be invoked first.")
+	}
+	return intrfc.methodsInOrdinalOrder
 }
 
 func (m *MojomInterface) String() string {
@@ -855,7 +853,7 @@ func (m *MojomInterface) String() string {
 }
 
 type MojomMethod struct {
-	DeclarationData
+	VersionedDeclarationData
 
 	// The ordinal field differs from the declaredOrdinal field
 	// in DeclarationData because every method eventually gets
@@ -874,6 +872,7 @@ func NewMojomMethod(declData DeclarationData, params, responseParams *MojomStruc
 	mojomMethod.DeclarationData = declData
 	mojomMethod.Parameters = params
 	mojomMethod.ResponseParameters = responseParams
+	mojomMethod.VersionedDeclarationData.init()
 	return mojomMethod
 }
 
@@ -1443,6 +1442,55 @@ func (b BuiltInConstantValue) AttachedComments() *AttachedComments {
 
 func (b BuiltInConstantValue) NewAttachedComments() *AttachedComments {
 	panic("BuiltInConstantValue cannot have attached comments.")
+}
+
+/////////////////////////////////////////////////////////////
+// VersionedDeclarationData
+/////////////////////////////////////////////////////////////
+
+// VrsionedDeclarationData is a mixin that should be added to objects that
+// support the "MinVersion" attribute.
+type VersionedDeclarationData struct {
+	DeclarationData
+
+	// A valid min version is a unt32. We use -1 to indicate unset.
+	minVersion int64
+}
+
+func (v *VersionedDeclarationData) init() {
+	v.minVersion = -1
+}
+
+const minVersionAttributeName = "MinVersion"
+
+// minVersionAttribute() Attempts to return a uint32 corresponding to the "MinVersion" attribute of this object.
+// If found = false then no such attribute could be found and the rest of the return values should be ignored.
+// If found = true then |literalValue| is the LiteralValue of the found attribute. In this case:
+//    If ok = false then |literalValue| does not contain a uint32 and |value| should be ignored.
+//    If ok = true then |literalValue| contains the uint32 value in |value|.
+func (v *VersionedDeclarationData) minVersionAttribute() (value uint32, literalValue LiteralValue, found, ok bool) {
+	if v.attributes == nil {
+		return 0, LiteralValue{}, false, false
+	}
+	for _, attribute := range v.attributes.List {
+		if attribute.Key == minVersionAttributeName {
+			value, ok := uint32Value(attribute.Value)
+			return value, attribute.Value, true, ok
+		}
+	}
+	return 0, LiteralValue{}, false, false
+}
+
+// MinVersion() returns the computed value of MinVersion for this object. This method should only be invoked
+// after the method computeVersionInfo() has been invoked on the containing MojomStruct and returned a nil error.
+// This method is different than the minVersionAttribute() method in that it does not just return a value
+// for objects that have the "MinVersion" attribute explicitly specified. Rather it returns a computed value for
+// every object after the "MinVersion" attributes for every object in the container have been checked and validated.
+func (v *VersionedDeclarationData) MinVersion() uint32 {
+	if v.minVersion < 0 {
+		panic("The method computeVersionInfo() must first be invoked for the containing object.")
+	}
+	return uint32(v.minVersion)
 }
 
 /////////////////////////////////////////////////////////////
