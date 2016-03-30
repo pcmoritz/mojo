@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "services/media/framework/stages/multistream_source_stage.h"
+#include "services/media/framework/stages/util.h"
 
 namespace mojo {
 namespace media {
@@ -22,7 +23,7 @@ size_t MultistreamSourceStage::input_count() const {
 
 Input& MultistreamSourceStage::input(size_t index) {
   CHECK(false) << "input requested from source";
-  return *(static_cast<Input*>(nullptr));
+  abort();
 }
 
 size_t MultistreamSourceStage::output_count() const {
@@ -61,16 +62,8 @@ void MultistreamSourceStage::UnprepareOutput(size_t index,
 void MultistreamSourceStage::Update(Engine* engine) {
   DCHECK(engine);
 
-  bool has_positive_demand = false;
-  for (Output& output : outputs_) {
-    if (output.demand() == Demand::kPositive) {
-      has_positive_demand = true;
-      break;
-    }
-  }
-
   while (true) {
-    if (cached_packet_ && has_positive_demand) {
+    if (cached_packet_ && HasPositiveDemand(outputs_)) {
       DCHECK(cached_packet_output_index_ < outputs_.size());
       Output& output = outputs_[cached_packet_output_index_];
 

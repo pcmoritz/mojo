@@ -9,6 +9,7 @@
 
 #include "services/media/framework/engine.h"
 #include "services/media/framework/refs.h"
+#include "services/media/framework/stages/active_multistream_source_stage.h"
 #include "services/media/framework/stages/active_sink_stage.h"
 #include "services/media/framework/stages/active_source_stage.h"
 #include "services/media/framework/stages/multistream_source_stage.h"
@@ -40,6 +41,7 @@ DEFINE_STAGE_CREATOR(MultistreamSource, MultistreamSourceStage);
 DEFINE_STAGE_CREATOR(Transform, TransformStage);
 DEFINE_STAGE_CREATOR(ActiveSource, ActiveSourceStage);
 DEFINE_STAGE_CREATOR(ActiveSink, ActiveSinkStage);
+DEFINE_STAGE_CREATOR(ActiveMultistreamSource, ActiveMultistreamSourceStage);
 
 #undef DEFINE_STAGE_CREATOR
 

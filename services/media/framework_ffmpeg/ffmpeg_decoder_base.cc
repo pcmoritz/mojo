@@ -11,7 +11,7 @@ namespace media {
 
 FfmpegDecoderBase::FfmpegDecoderBase(AvCodecContextPtr av_codec_context)
     : av_codec_context_(std::move(av_codec_context)),
-      av_frame_ptr_(av_frame_alloc()) {
+      av_frame_ptr_(ffmpeg::AvFrame::Create()) {
   DCHECK(av_codec_context_);
 }
 

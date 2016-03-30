@@ -38,7 +38,7 @@ size_t ActiveSinkStage::output_count() const {
 
 Output& ActiveSinkStage::output(size_t index) {
   CHECK(false) << "output requested from sink";
-  return *(static_cast<Output*>(nullptr));
+  abort();
 }
 
 PayloadAllocator* ActiveSinkStage::PrepareInput(size_t index) {

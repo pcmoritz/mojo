@@ -62,8 +62,6 @@ class MediaTestApp : public mojo::ApplicationDelegate {
       std::cout << "    genre      <none>" << std::endl;
       std::cout << "    composer   <none>" << std::endl << std::endl;
       std::cout << std::endl << std::endl << kUp << std::flush;
-    } else {
-      std::cout << std::endl;
     }
 
     CreateNewMediaTest();
@@ -136,7 +134,7 @@ class MediaTestApp : public mojo::ApplicationDelegate {
       // Do nothing.
     } else if (metadata) {
       metadata_shown_ = true;
-      std::cout << "    duration   " << std::setprecision(1)
+      std::cout << "    duration   " << std::fixed << std::setprecision(1)
                 << double(metadata->duration) / ns_per_second << " seconds"
                 << clear_line() << std::endl;
       std::cout << "    title      "
@@ -158,7 +156,7 @@ class MediaTestApp : public mojo::ApplicationDelegate {
                 << (metadata->composer ? metadata->composer : "<none>")
                 << clear_line() << std::endl
                 << std::endl;
-    } else {
+    } else if (paint_) {
       std::cout << "    duration   <none>" << kClearLine << std::endl;
       std::cout << "    title      <none>" << kClearLine << std::endl;
       std::cout << "    artist     <none>" << kClearLine << std::endl;

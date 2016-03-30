@@ -11,8 +11,7 @@
 namespace mojo {
 namespace media {
 
-// Synchronous source of packets for multiple streams. This is currently used
-// by Demux, though it would be better if Demux were asynchronous.
+// Synchronous source of packets for multiple streams.
 class MultistreamSource : public Part {
  public:
   ~MultistreamSource() override {}

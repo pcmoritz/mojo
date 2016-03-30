@@ -30,7 +30,7 @@ size_t ActiveSourceStage::input_count() const {
 
 Input& ActiveSourceStage::input(size_t index) {
   CHECK(false) << "input requested from source";
-  return *(static_cast<Input*>(nullptr));
+  abort();
 }
 
 size_t ActiveSourceStage::output_count() const {
