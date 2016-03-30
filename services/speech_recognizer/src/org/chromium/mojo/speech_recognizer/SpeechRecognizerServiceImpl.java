@@ -133,9 +133,11 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
             // The enum in the mojom for SpeechRecognizerService matches the
             // errors that come from Android's RecognizerService.
             result_or_error.setErrorCode(error);
-            mCallback.call(result_or_error);
 
-            mCallback = null;
+            if (mCallback != null) {
+                mCallback.call(result_or_error);
+                mCallback = null;
+            }
         }
         @Override
         public void onResults(Bundle results) {
@@ -158,8 +160,10 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
             result_or_error.setResults(
                     candidates.toArray(new UtteranceCandidate[candidates.size()]));
 
-            mCallback.call(result_or_error);
-            mCallback = null;
+            if (mCallback != null) {
+                mCallback.call(result_or_error);
+                mCallback = null;
+            }
         }
         @Override
         public void onPartialResults(Bundle partialResults) {}
