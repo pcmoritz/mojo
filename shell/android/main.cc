@@ -28,6 +28,7 @@
 #include "mojo/common/binding_set.h"
 #include "mojo/message_pump/message_pump_mojo.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
+#include "services/ui/launcher/launcher.mojom.h"
 #include "shell/android/android_handler_loader.h"
 #include "shell/android/java_application_loader.h"
 #include "shell/android/native_viewport_application_loader.h"
@@ -83,7 +84,7 @@ struct InternalShellData {
   // Shell context, accessible on the shell thread
   scoped_ptr<Context> context;
 
-  // Shell runner (thread delegate), to be uesd by the shell thread.
+  // Shell runner (thread delegate), to be used by the shell thread.
   scoped_ptr<MojoShellRunner> shell_runner;
 
   // Thread to run the shell on.
@@ -104,6 +105,9 @@ struct InternalShellData {
 
   // Binding set to the shell implementation.
   mojo::BindingSet<mojo::Shell> shell_bindings;
+
+  // Launcher proxy
+  launcher::LauncherPtr launcher;
 };
 
 LazyInstance<InternalShellData> g_internal_data = LAZY_INSTANCE_INITIALIZER;
@@ -209,10 +213,16 @@ void BindShellImpl(mojo::ScopedMessagePipeHandle shell_handle) {
       g_internal_data.Get().shell_impl.get(), shell.Pass());
 }
 
-void StartApplicationByURL(std::string url) {
+void EmbedApplicationByURL(std::string url) {
   DCHECK(g_internal_data.Get().shell_task_runner->RunsTasksOnCurrentThread());
 
-  g_internal_data.Get().context->Run(GURL(url));
+  if (!g_internal_data.Get().launcher) {
+    Context* context = g_internal_data.Get().context.get();
+    context->application_manager()->ConnectToService(
+        GURL("mojo:launcher"), &g_internal_data.Get().launcher);
+  }
+
+  g_internal_data.Get().launcher->Launch(url);
 }
 
 void UploadCrashes(const base::FilePath& dumps_path) {
@@ -330,7 +340,7 @@ static void AddApplicationURL(JNIEnv* env, jclass clazz, jstring jurl) {
 static void StartApplicationURL(JNIEnv* env, jclass clazz, jstring jurl) {
   std::string url = base::android::ConvertJavaStringToUTF8(env, jurl);
   g_internal_data.Get().shell_task_runner->PostTask(
-      FROM_HERE, base::Bind(&StartApplicationByURL, url));
+      FROM_HERE, base::Bind(&EmbedApplicationByURL, url));
 }
 
 static void BindShell(JNIEnv* env, jclass clazz, jint shell_handle) {

@@ -6,20 +6,19 @@
 #define SERVICES_UI_LAUNCHER_LAUNCHER_APP_H_
 
 #include <memory>
+#include <unordered_map>
 
+#include "mojo/common/binding_set.h"
 #include "mojo/common/tracing_impl.h"
 #include "mojo/public/cpp/application/application_delegate.h"
-#include "mojo/services/gfx/composition/interfaces/compositor.mojom.h"
-#include "mojo/services/native_viewport/interfaces/native_viewport.mojom.h"
-#include "mojo/services/native_viewport/interfaces/native_viewport_event_dispatcher.mojom.h"
-#include "mojo/services/ui/views/interfaces/view_manager.mojom.h"
+#include "services/ui/launcher/launch_instance.h"
+#include "services/ui/launcher/launcher.mojom.h"
 
 namespace launcher {
 
-class LauncherViewTree;
-
 class LauncherApp : public mojo::ApplicationDelegate,
-                    public mojo::NativeViewportEventDispatcher {
+                    public mojo::InterfaceFactory<Launcher>,
+                    public Launcher {
  public:
   LauncherApp();
   ~LauncherApp() override;
@@ -27,39 +26,25 @@ class LauncherApp : public mojo::ApplicationDelegate,
  private:
   // |ApplicationDelegate|:
   void Initialize(mojo::ApplicationImpl* app_impl) override;
+  bool ConfigureIncomingConnection(
+      mojo::ApplicationConnection* connection) override;
 
-  // |NativeViewportEventDispatcher|:
-  void OnEvent(mojo::EventPtr event,
-               const mojo::Callback<void()>& callback) override;
+  // mojo::InterfaceRequest<Launcher> implementation
+  void Create(mojo::ApplicationConnection* connection,
+              mojo::InterfaceRequest<Launcher> request) override;
 
-  void OnCompositorConnectionError();
-  void OnViewManagerConnectionError();
+  // |Launcher|:
+  void Launch(const mojo::String& application_url) override;
 
-  void InitViewport();
-  void OnViewportConnectionError();
-  void OnViewportCreated(mojo::ViewportMetricsPtr metrics);
-  void OnViewportMetricsChanged(mojo::ViewportMetricsPtr metrics);
-  void RequestUpdatedViewportMetrics();
-
-  void LaunchClient(std::string app_url);
-
-  void UpdateClientView();
-
-  void Shutdown();
+  void OnLaunchTermination(uint32_t id);
 
   mojo::ApplicationImpl* app_impl_;
   mojo::TracingImpl tracing_;
 
-  mojo::gfx::composition::CompositorPtr compositor_;
-  mojo::ui::ViewManagerPtr view_manager_;
-
-  mojo::NativeViewportPtr viewport_;
-  mojo::Binding<NativeViewportEventDispatcher>
-      viewport_event_dispatcher_binding_;
-
-  std::unique_ptr<LauncherViewTree> view_tree_;
-
-  mojo::ui::ViewOwnerPtr client_view_owner_;
+  mojo::BindingSet<Launcher> bindings_;
+  std::unordered_map<uint32_t, std::unique_ptr<LaunchInstance>>
+      launch_instances_;
+  uint32_t next_id_;
 
   DISALLOW_COPY_AND_ASSIGN(LauncherApp);
 };

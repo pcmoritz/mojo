@@ -12,13 +12,10 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_impl.h"
-#include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
-#include "services/ui/launcher/launcher_view_tree.h"
 
 namespace launcher {
 
-LauncherApp::LauncherApp()
-    : app_impl_(nullptr), viewport_event_dispatcher_binding_(this) {}
+LauncherApp::LauncherApp() : app_impl_(nullptr), next_id_(0u) {}
 
 LauncherApp::~LauncherApp() {}
 
@@ -34,106 +31,39 @@ void LauncherApp::Initialize(mojo::ApplicationImpl* app_impl) {
   tracing_.Initialize(app_impl_);
   TRACE_EVENT0("launcher", __func__);
 
-  if (command_line->GetArgs().size() != 1) {
-    LOG(ERROR) << "Invalid arguments.\n\n"
-                  "Usage: mojo_shell \"mojo:launcher <app url>\"";
+  for (size_t i = 0; i < command_line->GetArgs().size(); ++i) {
+    Launch(command_line->GetArgs()[i]);
+  }
+}
+
+bool LauncherApp::ConfigureIncomingConnection(
+    mojo::ApplicationConnection* connection) {
+  // Only present the launcher interface to the shell.
+  if (connection->GetRemoteApplicationURL().empty()) {
+    connection->AddService<Launcher>(this);
+  }
+  return true;
+}
+
+void LauncherApp::Create(mojo::ApplicationConnection* connection,
+                         mojo::InterfaceRequest<Launcher> request) {
+  bindings_.AddBinding(this, request.Pass());
+}
+
+void LauncherApp::Launch(const mojo::String& application_url) {
+  uint32_t next_id = next_id_++;
+  std::unique_ptr<LaunchInstance> instance(new LaunchInstance(
+      app_impl_, application_url, base::Bind(&LauncherApp::OnLaunchTermination,
+                                             base::Unretained(this), next_id)));
+  instance->Launch();
+  launch_instances_.emplace(next_id, std::move(instance));
+}
+
+void LauncherApp::OnLaunchTermination(uint32_t id) {
+  launch_instances_.erase(id);
+  if (launch_instances_.empty()) {
     app_impl_->Terminate();
-    return;
   }
-
-  app_impl_->ConnectToService("mojo:compositor_service", &compositor_);
-  compositor_.set_connection_error_handler(base::Bind(
-      &LauncherApp::OnCompositorConnectionError, base::Unretained(this)));
-
-  app_impl_->ConnectToService("mojo:view_manager_service", &view_manager_);
-  view_manager_.set_connection_error_handler(base::Bind(
-      &LauncherApp::OnViewManagerConnectionError, base::Unretained(this)));
-
-  InitViewport();
-  LaunchClient(command_line->GetArgs()[0]);
-}
-
-void LauncherApp::OnCompositorConnectionError() {
-  LOG(ERROR) << "Exiting due to compositor connection error.";
-  Shutdown();
-}
-
-void LauncherApp::OnViewManagerConnectionError() {
-  LOG(ERROR) << "Exiting due to view manager connection error.";
-  Shutdown();
-}
-
-void LauncherApp::InitViewport() {
-  app_impl_->ConnectToService("mojo:native_viewport_service", &viewport_);
-  viewport_.set_connection_error_handler(base::Bind(
-      &LauncherApp::OnViewportConnectionError, base::Unretained(this)));
-
-  mojo::NativeViewportEventDispatcherPtr dispatcher;
-  viewport_event_dispatcher_binding_.Bind(GetProxy(&dispatcher));
-  viewport_->SetEventDispatcher(dispatcher.Pass());
-
-  // Match the Nexus 5 aspect ratio initially.
-  auto size = mojo::Size::New();
-  size->width = 320;
-  size->height = 640;
-
-  auto requested_configuration = mojo::SurfaceConfiguration::New();
-  viewport_->Create(
-      size.Clone(), requested_configuration.Pass(),
-      base::Bind(&LauncherApp::OnViewportCreated, base::Unretained(this)));
-}
-
-void LauncherApp::OnViewportConnectionError() {
-  LOG(ERROR) << "Exiting due to viewport connection error.";
-  Shutdown();
-}
-
-void LauncherApp::OnViewportCreated(mojo::ViewportMetricsPtr metrics) {
-  viewport_->Show();
-
-  mojo::ContextProviderPtr context_provider;
-  viewport_->GetContextProvider(GetProxy(&context_provider));
-
-  view_tree_.reset(new LauncherViewTree(
-      compositor_.get(), view_manager_.get(), context_provider.Pass(),
-      metrics.Pass(),
-      base::Bind(&LauncherApp::Shutdown, base::Unretained(this))));
-  view_tree_->SetRoot(client_view_owner_.Pass());
-
-  RequestUpdatedViewportMetrics();
-}
-
-void LauncherApp::OnViewportMetricsChanged(mojo::ViewportMetricsPtr metrics) {
-  if (view_tree_) {
-    view_tree_->SetViewportMetrics(metrics.Pass());
-    RequestUpdatedViewportMetrics();
-  }
-}
-
-void LauncherApp::RequestUpdatedViewportMetrics() {
-  viewport_->RequestMetrics(base::Bind(&LauncherApp::OnViewportMetricsChanged,
-                                       base::Unretained(this)));
-}
-
-void LauncherApp::OnEvent(mojo::EventPtr event,
-                          const mojo::Callback<void()>& callback) {
-  if (view_tree_)
-    view_tree_->DispatchEvent(event.Pass());
-  callback.Run();
-}
-
-void LauncherApp::LaunchClient(std::string app_url) {
-  DVLOG(1) << "Launching " << app_url;
-
-  mojo::ui::ViewProviderPtr client_view_provider;
-  app_impl_->ConnectToService(app_url, &client_view_provider);
-
-  client_view_provider->CreateView(mojo::GetProxy(&client_view_owner_), nullptr,
-                                   nullptr);
-}
-
-void LauncherApp::Shutdown() {
-  app_impl_->Terminate();
 }
 
 }  // namespace launcher

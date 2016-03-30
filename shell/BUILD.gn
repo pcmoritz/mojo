@@ -82,6 +82,7 @@ if (!mojo_use_prebuilt_mojo_shell) {
                "//mojo/android:libsystem_java",
                "//mojo/common",
                "//services/native_viewport:lib",
+               "//services/ui/launcher:bindings",
                "//shell/application_manager",
                "//ui/gl",
              ]

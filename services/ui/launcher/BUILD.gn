@@ -3,10 +3,13 @@
 # found in the LICENSE file.
 
 import("//mojo/public/mojo_application.gni")
+import("//mojo/public/tools/bindings/mojom.gni")
 import("//testing/test.gni")
 
 mojo_native_application("launcher") {
   sources = [
+    "launch_instance.cc",
+    "launch_instance.h",
     "launcher_app.cc",
     "launcher_app.h",
     "launcher_view_tree.cc",
@@ -15,8 +18,10 @@ mojo_native_application("launcher") {
   ]
 
   deps = [
+    ":bindings",
     "//base",
     "//mojo/application",
+    "//mojo/common",
     "//mojo/common:tracing_impl",
     "//mojo/environment:chromium",
     "//mojo/public/cpp/bindings:bindings",
@@ -26,5 +31,11 @@ mojo_native_application("launcher") {
     "//mojo/services/ui/input/interfaces",
     "//mojo/services/ui/views/cpp",
     "//mojo/services/ui/views/interfaces",
+  ]
+}
+
+mojom("bindings") {
+  sources = [
+    "launcher.mojom",
   ]
 }
