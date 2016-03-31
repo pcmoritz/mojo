@@ -745,6 +745,7 @@ func (i *MojomInterface) AddMethod(method *MojomMethod) DuplicateNameError {
 		return err
 	}
 	i.methodsByName[method.simpleName] = method
+	method.lexicalPosition = int32(len(i.methodsByLexicalOrder))
 	i.methodsByLexicalOrder = append(i.methodsByLexicalOrder, method)
 	i.DeclaredObjects = append(i.DeclaredObjects, method)
 	return nil

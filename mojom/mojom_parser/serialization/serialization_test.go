@@ -697,7 +697,7 @@ func TestSingleFileSerialization(t *testing.T) {
 			DeclData: test.newDeclData("EchoService", "test.EchoService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: test.newDeclData("EchoString", ""),
+					DeclData: test.newDeclDataO(0, -1, "EchoString", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("EchoString-request", ""),
 						Fields: []mojom_types.StructField{
@@ -718,7 +718,7 @@ func TestSingleFileSerialization(t *testing.T) {
 					},
 				},
 				1: mojom_types.MojomMethod{
-					DeclData: test.newDeclData("DelayedEchoString", ""),
+					DeclData: test.newDeclDataO(1, -1, "DelayedEchoString", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("DelayedEchoString-request", ""),
 						Fields: []mojom_types.StructField{
@@ -740,6 +740,48 @@ func TestSingleFileSerialization(t *testing.T) {
 								Type:     &mojom_types.TypeStringType{mojom_types.StringType{true}},
 							},
 						},
+					},
+					Ordinal: 1,
+				},
+			},
+		}}
+
+		test.endTestCase()
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Explicit Method Ordinals. Tests the DeclarationOrder field.
+	////////////////////////////////////////////////////////////
+	{
+
+		contents := `
+	interface MyInterface {
+      Method1@1();
+      Method0@0();
+    };`
+
+		test.addTestCase("", contents)
+
+		// DeclaredMojomObjects
+		test.expectedFile().DeclaredMojomObjects.Interfaces = &[]string{"TYPE_KEY:MyInterface"}
+
+		// interface EchoService
+		test.expectedGraph().ResolvedTypes["TYPE_KEY:MyInterface"] = &mojom_types.UserDefinedTypeInterfaceType{mojom_types.MojomInterface{
+			DeclData: test.newDeclData("MyInterface", "MyInterface"),
+			Methods: map[uint32]mojom_types.MojomMethod{
+				0: mojom_types.MojomMethod{
+					DeclData: test.newDeclDataO(1, 0, "Method0", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("Method0-request", ""),
+						Fields:   []mojom_types.StructField{},
+					},
+					Ordinal: 0,
+				},
+				1: mojom_types.MojomMethod{
+					DeclData: test.newDeclDataO(0, 1, "Method1", ""),
+					Parameters: mojom_types.MojomStruct{
+						DeclData: test.newDeclData("Method1-request", ""),
+						Fields:   []mojom_types.StructField{},
 					},
 					Ordinal: 1,
 				},
@@ -775,7 +817,7 @@ func TestSingleFileSerialization(t *testing.T) {
 			ServiceName: stringPointer("my.test.EchoService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: test.newDeclData("EchoString", ""),
+					DeclData: test.newDeclDataO(0, -1, "EchoString", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("EchoString-request", ""),
 						Fields: []mojom_types.StructField{
@@ -1499,7 +1541,7 @@ func TestWithComputedData(t *testing.T) {
 			Methods: map[uint32]mojom_types.MojomMethod{
 				// DoIt
 				0: mojom_types.MojomMethod{
-					DeclData: test.newDeclData("DoIt", ""),
+					DeclData: test.newDeclDataO(0, -1, "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -1580,7 +1622,7 @@ func TestWithComputedData(t *testing.T) {
 
 				// DoItAgain
 				1: mojom_types.MojomMethod{
-					DeclData: test.newDeclDataA("DoItAgain", "", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
+					DeclData: test.newShortDeclDataAO(1, -1, "DoItAgain", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{1}}}),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("DoItAgain-request", ""),
 						Fields: []mojom_types.StructField{
@@ -1608,7 +1650,7 @@ func TestWithComputedData(t *testing.T) {
 
 				// AndAgain
 				2: mojom_types.MojomMethod{
-					DeclData: test.newDeclDataA("AndAgain", "", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
+					DeclData: test.newShortDeclDataAO(2, -1, "AndAgain", &[]mojom_types.Attribute{{"MinVersion", &mojom_types.LiteralValueInt8Value{2}}}),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: test.newDeclData("AndAgain-request", ""),
 						Fields:   []mojom_types.StructField{},
@@ -2785,7 +2827,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			DeclData: newDeclData(test.fileNameA(), "InterfaceA", "a.b.c.InterfaceA"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameA(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -2824,7 +2866,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameB(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -2900,7 +2942,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			ServiceName: stringPointer("AwesomeService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameA(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -2939,7 +2981,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameB(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -3020,7 +3062,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			ServiceName: stringPointer("AwesomeService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameA(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -3060,7 +3102,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 				&[]mojom_types.Attribute{{"ServiceName", &mojom_types.LiteralValueInt8Value{42}}}),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameB(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -3141,7 +3183,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			ServiceName: stringPointer("AwesomeService"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameA(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameA(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameA(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
@@ -3199,7 +3241,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 			DeclData: newDeclData(test.fileNameB(), "InterfaceB", "b.c.d.InterfaceB"),
 			Methods: map[uint32]mojom_types.MojomMethod{
 				0: mojom_types.MojomMethod{
-					DeclData: newDeclData(test.fileNameB(), "DoIt", ""),
+					DeclData: newDeclDataO(0, -1, test.fileNameB(), "DoIt", ""),
 					Parameters: mojom_types.MojomStruct{
 						DeclData: newDeclData(test.fileNameB(), "DoIt-request", ""),
 						Fields: []mojom_types.StructField{
