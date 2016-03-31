@@ -27,19 +27,24 @@ class MediaTest {
   ~MediaTest();
 
   // Registers a callback signalling that the app should update its view.
-  void RegisterUpdateCallback(const UpdateCallback& callback);
+  void RegisterUpdateCallback(const UpdateCallback& callback) {
+    update_callback_ = callback;
+  }
 
   // Starts playback.
-  void Play();
+  void Play() { media_player_->Play(); }
 
   // Pauses playback.
-  void Pause();
+  void Pause() { media_player_->Pause(); }
 
   // Seeks to the position indicated in nanoseconds from the start of the media.
-  void Seek(int64_t position_ns);
+  void Seek(int64_t position_ns) { media_player_->Seek(position_ns); }
+
+  // Returns the previous state of the player.
+  MediaState previous_state() const { return previous_state_; }
 
   // Returns the current state of the player.
-  MediaState state() const;
+  MediaState state() const { return state_; }
 
   // Returns the current presentation time in nanoseconds.
   int64_t position_ns() const;
@@ -56,7 +61,8 @@ class MediaTest {
                            MediaPlayerStatusPtr status = nullptr);
 
   MediaPlayerPtr media_player_;
-  MediaState state_;
+  MediaState previous_state_ = MediaState::UNPREPARED;
+  MediaState state_ = MediaState::UNPREPARED;
   LinearTransform transform_ = LinearTransform(0, 0, 1, 0);
   MediaMetadataPtr metadata_;
   UpdateCallback update_callback_;

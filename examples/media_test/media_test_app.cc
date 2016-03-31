@@ -34,34 +34,36 @@ class MediaTestApp : public mojo::ApplicationDelegate {
 
     if (input_file_names_.empty()) {
       std::cout << "Please provide the names of the files you want to play;"
-                << " for example:" << std::endl;
-      std::cout << "mojo/devtools/common/mojo_run \\" << std::endl;
-      std::cout << "    \"https://core.mojoapps.io/media_test.mojo \\"
-                << std::endl;
-      std::cout << "    file:///usr/local/google/home/you/superstition.ogg \\"
-                << std::endl;
-      std::cout << "    file:///usr/local/google/home/you/higherground.ogg\""
+                << " for example:" << std::endl
+                << "mojo/devtools/common/mojo_run \\" << std::endl
+                << "    \"https://core.mojoapps.io/media_test.mojo \\"
                 << std::endl
+                << "    http:/localhost/superstition.ogg \\" << std::endl
+                << "    http:/localhost/higherground.ogg\"" << std::endl
                 << std::endl;
       base::MessageLoop::current()->Quit();
       return;
     }
 
-    std::cout << "    <enter>         play/pause" << std::endl;
-    std::cout << "    n<enter>        next file" << std::endl;
-    std::cout << "    p<enter>        previous file" << std::endl;
-    std::cout << "    <digit><enter>  seek (0% - 90%)" << std::endl;
-    std::cout << "    q<enter>        quit" << std::endl << std::endl;
+    std::cout << "    <enter>         play/pause" << std::endl
+              << "    n<enter>        next file" << std::endl
+              << "    p<enter>        previous file" << std::endl
+              << "    <digit><enter>  seek (0% - 90%)" << std::endl
+              << "    q<enter>        quit" << std::endl
+              << std::endl;
 
     if (paint_) {
-      std::cout << "    duration   <none>" << std::endl;
-      std::cout << "    title      <none>" << std::endl;
-      std::cout << "    artist     <none>" << std::endl;
-      std::cout << "    album      <none>" << std::endl;
-      std::cout << "    publisher  <none>" << std::endl;
-      std::cout << "    genre      <none>" << std::endl;
-      std::cout << "    composer   <none>" << std::endl << std::endl;
-      std::cout << std::endl << std::endl << kUp << std::flush;
+      std::cout << "    duration   <none>" << std::endl
+                << "    title      <none>" << std::endl
+                << "    artist     <none>" << std::endl
+                << "    album      <none>" << std::endl
+                << "    publisher  <none>" << std::endl
+                << "    genre      <none>" << std::endl
+                << "    composer   <none>" << std::endl
+                << std::endl
+                << std::endl
+                << std::endl
+                << kUp << std::flush;
     }
 
     CreateNewMediaTest();
@@ -109,7 +111,8 @@ class MediaTestApp : public mojo::ApplicationDelegate {
   }
 
   void HandleMediaTestUpdateCallback() {
-    if (media_test_->state() == MediaState::ENDED) {
+    if (media_test_->state() == MediaState::ENDED &&
+        media_test_->previous_state() != MediaState::ENDED) {
       // MediaTest doesn't appreciate being deleted in this callback.
       // Next time Poll runs, we move on to the next file.
       base::MessageLoop::current()->PostTask(
@@ -136,35 +139,35 @@ class MediaTestApp : public mojo::ApplicationDelegate {
       metadata_shown_ = true;
       std::cout << "    duration   " << std::fixed << std::setprecision(1)
                 << double(metadata->duration) / ns_per_second << " seconds"
-                << clear_line() << std::endl;
-      std::cout << "    title      "
+                << clear_line() << std::endl
+                << "    title      "
                 << (metadata->title ? metadata->title : "<none>")
-                << clear_line() << std::endl;
-      std::cout << "    artist     "
+                << clear_line() << std::endl
+                << "    artist     "
                 << (metadata->artist ? metadata->artist : "<none>")
-                << clear_line() << std::endl;
-      std::cout << "    album      "
+                << clear_line() << std::endl
+                << "    album      "
                 << (metadata->album ? metadata->album : "<none>")
-                << clear_line() << std::endl;
-      std::cout << "    publisher  "
+                << clear_line() << std::endl
+                << "    publisher  "
                 << (metadata->publisher ? metadata->publisher : "<none>")
-                << clear_line() << std::endl;
-      std::cout << "    genre      "
+                << clear_line() << std::endl
+                << "    genre      "
                 << (metadata->genre ? metadata->genre : "<none>")
-                << clear_line() << std::endl;
-      std::cout << "    composer   "
+                << clear_line() << std::endl
+                << "    composer   "
                 << (metadata->composer ? metadata->composer : "<none>")
                 << clear_line() << std::endl
                 << std::endl;
     } else if (paint_) {
-      std::cout << "    duration   <none>" << kClearLine << std::endl;
-      std::cout << "    title      <none>" << kClearLine << std::endl;
-      std::cout << "    artist     <none>" << kClearLine << std::endl;
-      std::cout << "    album      <none>" << kClearLine << std::endl;
-      std::cout << "    publisher  <none>" << kClearLine << std::endl;
-      std::cout << "    genre      <none>" << kClearLine << std::endl;
-      std::cout << "    composer   <none>" << kClearLine << std::endl;
-      std::cout << std::endl;
+      std::cout << "    duration   <none>" << kClearLine << std::endl
+                << "    title      <none>" << kClearLine << std::endl
+                << "    artist     <none>" << kClearLine << std::endl
+                << "    album      <none>" << kClearLine << std::endl
+                << "    publisher  <none>" << kClearLine << std::endl
+                << "    genre      <none>" << kClearLine << std::endl
+                << "    composer   <none>" << kClearLine << std::endl
+                << std::endl;
     }
     std::cout << "    " << state_string() << clear_line() << std::endl;
   }

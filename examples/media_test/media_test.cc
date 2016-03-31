@@ -31,26 +31,6 @@ MediaTest::MediaTest(mojo::ApplicationImpl* app,
 
 MediaTest::~MediaTest() {}
 
-void MediaTest::RegisterUpdateCallback(const UpdateCallback& callback) {
-  update_callback_ = callback;
-}
-
-void MediaTest::Play() {
-  media_player_->Play();
-}
-
-void MediaTest::Pause() {
-  media_player_->Pause();
-}
-
-void MediaTest::Seek(int64_t position_ns) {
-  media_player_->Seek(position_ns);
-}
-
-MediaState MediaTest::state() const {
-  return state_;
-}
-
 int64_t MediaTest::position_ns() const {
   // Apply the transform to the current time.
   int64_t position;
@@ -74,6 +54,7 @@ void MediaTest::HandleStatusUpdates(uint64_t version,
                                     MediaPlayerStatusPtr status) {
   if (status) {
     // Process status received from the player.
+    previous_state_ = state_;
     state_ = status->state;
 
     // Create a linear transform that translates local time to presentation
