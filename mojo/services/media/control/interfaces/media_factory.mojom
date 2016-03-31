@@ -10,6 +10,7 @@ import "mojo/services/media/control/interfaces/media_player.mojom";
 import "mojo/services/media/control/interfaces/media_sink.mojom";
 import "mojo/services/media/control/interfaces/media_source.mojom";
 import "mojo/services/media/core/interfaces/media_type_converter.mojom";
+import "mojo/services/media/core/interfaces/seeking_reader.mojom";
 
 // Exposed by the factory service to create media-related agents.
 [ServiceName="mojo::media::MediaFactory"]
@@ -34,4 +35,7 @@ interface MediaFactory {
 
   // Creates a decoder.
   CreateDecoder(MediaType input_media_type, MediaTypeConverter& decoder);
+
+  // Creates a network reader.
+  CreateNetworkReader(string url, SeekingReader& reader);
 };

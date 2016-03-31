@@ -7,6 +7,7 @@
 #include "services/media/factory_service/media_player_impl.h"
 #include "services/media/factory_service/media_sink_impl.h"
 #include "services/media/factory_service/media_source_impl.h"
+#include "services/media/factory_service/network_reader_impl.h"
 
 namespace mojo {
 namespace media {
@@ -62,6 +63,13 @@ void MediaFactoryService::CreateDecoder(
     InterfaceRequest<MediaTypeConverter> decoder) {
   products_.insert(std::static_pointer_cast<Product>(
       MediaDecoderImpl::Create(input_media_type.Pass(), decoder.Pass(), this)));
+}
+
+void MediaFactoryService::CreateNetworkReader(
+    const String& url,
+    InterfaceRequest<SeekingReader> reader) {
+  products_.insert(std::static_pointer_cast<Product>(
+      NetworkReaderImpl::Create(url, reader.Pass(), this)));
 }
 
 }  // namespace media

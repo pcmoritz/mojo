@@ -71,6 +71,9 @@ class MediaFactoryService : public ApplicationDelegate,
   void CreateDecoder(MediaTypePtr input_media_type,
                      InterfaceRequest<MediaTypeConverter> decoder) override;
 
+  void CreateNetworkReader(const String& url,
+                           InterfaceRequest<SeekingReader> reader) override;
+
  private:
   BindingSet<MediaFactory> bindings_;
   ApplicationImpl* app_;
