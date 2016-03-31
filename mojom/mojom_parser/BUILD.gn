@@ -13,6 +13,9 @@ action("mojom_tool") {
   inputs = [
     "generated/mojom_files/mojom_files.mojom.go",
     "generated/mojom_types/mojom_types.mojom.go",
+    "integration_tests/comment_merger_test.go",
+    "integration_tests/computed_data_test.go",
+    "integration_tests/resolution_test.go",
     "lexer/lexer.go",
     "lexer/token_stream.go",
     "lexer/tokens.go",
@@ -22,11 +25,9 @@ action("mojom_tool") {
     "mojom/types.go",
     "mojom/user_defined_types.go",
     "mojom/utils.go",
-    "parser/computed_data_test.go",
     "parser/parse_driver.go",
     "parser/parser.go",
     "parser/parsing.go",
-    "parser/resolution_test.go",
     "serialization/serialization.go",
     "utils/sort_utils.go",
   ]

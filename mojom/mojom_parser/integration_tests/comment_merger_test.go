@@ -3,6 +3,7 @@ package parser
 import (
 	"mojom/mojom_parser/lexer"
 	"mojom/mojom_parser/mojom"
+	"mojom/mojom_parser/parser"
 	"testing"
 )
 
@@ -34,7 +35,7 @@ func TestAttachComments(t *testing.T) {
 	`
 
 	descriptor := mojom.NewMojomDescriptor()
-	parser := MakeParser("TestAttachComments", "TestAttachComments", source, descriptor, nil)
+	parser := parser.MakeParser("TestAttachComments", "TestAttachComments", source, descriptor, nil)
 	parser.Parse()
 
 	if !parser.OK() {
@@ -79,7 +80,7 @@ func TestAttachComments(t *testing.T) {
 
 func TestEmptyFile(t *testing.T) {
 	descriptor := mojom.NewMojomDescriptor()
-	parser := MakeParser("TestEmptyFile", "TestEmptyFile", "", descriptor, nil)
+	parser := parser.MakeParser("TestEmptyFile", "TestEmptyFile", "", descriptor, nil)
 	parser.Parse()
 
 	mojomFile := parser.GetMojomFile()
@@ -97,7 +98,7 @@ func TestNoComments(t *testing.T) {
 	};
 	`
 	descriptor := mojom.NewMojomDescriptor()
-	parser := MakeParser("TestNoComments", "TestNoComments", source, descriptor, nil)
+	parser := parser.MakeParser("TestNoComments", "TestNoComments", source, descriptor, nil)
 	parser.Parse()
 
 	mojomFile := parser.GetMojomFile()
@@ -111,7 +112,7 @@ func TestOnlyComments(t *testing.T) {
 	// Hello world of comments
 			`
 	descriptor := mojom.NewMojomDescriptor()
-	parser := MakeParser("TestOnlyComments", "TestOnlyComments", source, descriptor, nil)
+	parser := parser.MakeParser("TestOnlyComments", "TestOnlyComments", source, descriptor, nil)
 	parser.Parse()
 
 	mojomFile := parser.GetMojomFile()

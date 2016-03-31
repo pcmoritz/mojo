@@ -7,6 +7,7 @@ package parser
 import (
 	"fmt"
 	"mojom/mojom_parser/mojom"
+	"mojom/mojom_parser/parser"
 	"strings"
 	"testing"
 )
@@ -115,7 +116,7 @@ func TestSingleFileResolutionErrors(t *testing.T) {
 		if c.importedFrom == nil {
 			specifiedName = c.fileName
 		}
-		parser := MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
+		parser := parser.MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
 		parser.Parse()
 		if !parser.OK() {
 			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
@@ -783,7 +784,7 @@ func TestSingleFileValueValidationErrors(t *testing.T) {
 		if c.importedFrom == nil {
 			specifiedName = c.fileName
 		}
-		parser := MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
+		parser := parser.MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
 		parser.Parse()
 		if !parser.OK() {
 			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
@@ -975,7 +976,7 @@ func TestSingleFileTypeValidationErrors(t *testing.T) {
 		if c.importedFrom == nil {
 			specifiedName = c.fileName
 		}
-		parser := MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
+		parser := parser.MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
 		parser.Parse()
 		if !parser.OK() {
 			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
@@ -1063,7 +1064,7 @@ func TestSingleFileResolutionSuccess(t *testing.T) {
 		// Parse and resolve the mojom input.
 		descriptor := mojom.NewMojomDescriptor()
 		fileName := fmt.Sprintf("file%d", i)
-		parser := MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
+		parser := parser.MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
 		parser.Parse()
 		if !parser.OK() {
 			t.Errorf("Parsing error for %s: %s", fileName, parser.GetError().Error())
@@ -1346,7 +1347,7 @@ func TestFindReachableTypes(t *testing.T) {
 		// Parse and resolve the mojom input.
 		descriptor := mojom.NewMojomDescriptor()
 		fileName := fmt.Sprintf("file%d", i)
-		parser := MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
+		parser := parser.MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
 		parser.Parse()
 		if !parser.OK() {
 			t.Errorf("Parsing error for %s: %s", fileName, parser.GetError().Error())
