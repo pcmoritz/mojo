@@ -181,20 +181,11 @@ void AccountsDbManager::OnCredentialsFileReadResponse(
   if (bytes_read.size() != 0) {
     // Deserialize data from file
     const char* data = reinterpret_cast<const char*>(&bytes_read[0]);
-
-    // Validate the file contents before deserializing
-    mojo::internal::BoundsChecker bounds_checker(data, bytes_read.size(), 0);
-    std::string error;
-    mojo::internal::ValidationError verror =
-        internal::CredentialStore_Data::Validate(data, &bounds_checker, &error);
-    if (verror != mojo::internal::ValidationError::NONE) {
-      LOG(ERROR) << "Validation() error on accounts db ["
-                 << ValidationErrorToString(verror) << "][" << error << "]";
+    if (!creds_store_.Deserialize((void*)data, bytes_read.size())) {
+      LOG(ERROR) << "Deserialize() error on accounts db.";
       error_ = CREDENTIALS_DB_VALIDATE_ERROR;
       return;
     }
-
-    creds_store_.Deserialize((void*)data);
     // When we have multiple versions, this is not a fatal error, but a sign
     // that we need to update (or reinitialize) the db.
     CHECK_EQ(creds_store_.version, kCredsDbVersion);
@@ -219,17 +210,12 @@ void AccountsDbManager::OnAuthorizationsFileReadResponse(
   if (bytes_read.size() != 0) {
     // Deserialize data from file
     const char* data = reinterpret_cast<const char*>(&bytes_read[0]);
-
-    // Validate the file contents before deserializing
-    mojo::internal::BoundsChecker bounds_checker(data, bytes_read.size(), 0);
-    if (internal::Db_Data::Validate(data, &bounds_checker, nullptr) !=
-        mojo::internal::ValidationError::NONE) {
-      LOG(ERROR) << "Validation() error on auth db.";
+    if (!auth_grants_.Deserialize((void*)data, bytes_read.size())) {
+      LOG(ERROR) << "Deserialize() error on auth db.";
       error_ = AUTHORIZATIONS_DB_VALIDATE_ERROR;
       return;
     }
 
-    auth_grants_.Deserialize((void*)data);
     // When we have multiple versions, this is not a fatal error, but a sign
     // that we need to update (or reinitialize) the db.
     CHECK_EQ(auth_grants_.version, kAuthDbVersion);

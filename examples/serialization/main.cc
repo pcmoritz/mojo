@@ -19,8 +19,7 @@ int main() {
 
   char buf[1000];
   MOJO_CHECK(in.Serialize(buf, sizeof(buf)));
-
-  out.Deserialize(buf);
+  MOJO_CHECK(out.Deserialize(buf, sizeof(buf)));
   MOJO_CHECK(out.a == 1);
   MOJO_CHECK(out.b == 2.0f);
   MOJO_CHECK(out.c == "hello world!");

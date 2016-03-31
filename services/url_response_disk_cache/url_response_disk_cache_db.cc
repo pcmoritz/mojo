@@ -16,7 +16,6 @@
 #include "base/time/time.h"
 #include "leveldb/comparator.h"
 #include "leveldb/db.h"
-#include "mojo/public/cpp/bindings/lib/fixed_buffer.h"
 #include "services/url_response_disk_cache/url_response_disk_cache_entry.mojom.h"
 
 namespace mojo {
@@ -26,40 +25,20 @@ namespace {
 // character.
 const char kVersionKey[] = "\1version";
 
-// TODO(vardhan): Rework these to use the public Serialize/Deserialize
-// functions.
+// T is a |StructPtr|.
 template <typename T>
 void Serialize(T input, std::string* output) {
-  typedef typename mojo::internal::WrapperTraits<T>::DataType DataType;
-  size_t size = GetSerializedSize_(*input);
-
+  size_t size = input->GetSerializedSize();
   output->clear();
   output->resize(size);
 
-  mojo::internal::FixedBuffer buf;
-  buf.Initialize(&output->at(0), size);
-
-  DataType data_type;
-  Serialize_(input.get(), &buf, &data_type);
-  std::vector<Handle> handles;
-  data_type->EncodePointersAndHandles(&handles);
+  input->Serialize(&output->at(0), size);
 }
 
 template <typename T>
 bool Deserialize(void* data, size_t size, T* output) {
-  typedef typename mojo::internal::WrapperTraits<T>::DataType DataType;
-  mojo::internal::BoundsChecker bounds_checker(data, size, 0);
-  if (std::remove_pointer<DataType>::type::Validate(data, &bounds_checker,
-                                                    nullptr) !=
-      mojo::internal::ValidationError::NONE)
-    return false;
-
-  DataType data_type = reinterpret_cast<DataType>(data);
-  std::vector<Handle> handles;
-  data_type->DecodePointersAndHandles(&handles);
   *output = mojo::internal::RemoveStructPtr<T>::type::New();
-  Deserialize_(data_type, output->get());
-  return true;
+  return (*output)->Deserialize(data, size);
 }
 
 template <typename T>
