@@ -33,6 +33,8 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
 
     private SpeechRecognizerService.ListenResponse mCallback;
 
+    private boolean mReadyForSpeech = false;
+
     SpeechRecognizerServiceImpl(Context context) {
         mContext = context;
         mMainHandler = new Handler(mContext.getMainLooper());
@@ -70,16 +72,14 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "startListening");
+
                 // Ignore the result of requestAudioFocus() since a failure only indicates that
                 // we'll be listening in a slightly noise environment.
                 mAudioManager.requestAudioFocus(null, AudioManager.USE_DEFAULT_STREAM_TYPE,
                         AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE);
 
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
-                mSpeechRecognizer.startListening(intent);
+                startListening();
             }
         });
     }
@@ -113,9 +113,21 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         throw e;
     }
 
+    private void startListening() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+
+        mReadyForSpeech = false;
+        mSpeechRecognizer.startListening(intent);
+    }
+
     class SpeechListener implements RecognitionListener {
         @Override
-        public void onReadyForSpeech(Bundle params) {}
+        public void onReadyForSpeech(Bundle params) {
+            Log.d(TAG, "onReadyForSpeech");
+            mReadyForSpeech = true;
+        }
         @Override
         public void onBeginningOfSpeech() {}
         @Override
@@ -126,9 +138,18 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         public void onEndOfSpeech() {}
         @Override
         public void onError(int error) {
-            mAudioManager.abandonAudioFocus(null);
             Log.d(TAG, "onError " + error);
 
+            // There is a bug in Google Now that causes speech recognition to prematurely
+            // fail if "OK Google Detection" is set to listen "from any screen".
+            // (See http://b.android.com/179293).
+            if (!mReadyForSpeech && error == SpeechRecognizer.ERROR_NO_MATCH) {
+                mSpeechRecognizer.cancel();
+                startListening();
+                return;
+            }
+
+            mAudioManager.abandonAudioFocus(null);
             ResultOrError result_or_error = new ResultOrError();
             // The enum in the mojom for SpeechRecognizerService matches the
             // errors that come from Android's RecognizerService.
@@ -142,7 +163,6 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         @Override
         public void onResults(Bundle results) {
             mAudioManager.abandonAudioFocus(null);
-
             ArrayList<String> utterances =
                     results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             float[] confidences = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
