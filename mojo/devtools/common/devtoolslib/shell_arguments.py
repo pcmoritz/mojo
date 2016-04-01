@@ -11,6 +11,8 @@ shell_config.ShellConfig.
 import os.path
 import urlparse
 
+from devtoolslib import download
+from devtoolslib import paths
 from devtoolslib.android_shell import AndroidShell
 from devtoolslib.linux_shell import LinuxShell
 from devtoolslib.shell_config import ShellConfigurationException
@@ -193,6 +195,20 @@ def get_shell(shell_config, shell_args):
   Throws:
     ShellConfigurationException if shell abstraction could not be configured.
   """
+  platform = 'android-arm' if shell_config.android else 'linux-x64'
+
+  shell_path = shell_config.shell_path
+  if not shell_path and shell_config.mojo_version:
+    download_dir = os.path.join(paths.DEVTOOLS_ROOT, '_prebuilt')
+    shell_path = download.download_shell(shell_config.mojo_version, platform,
+                                         download_dir, shell_config.verbose)
+  if shell_config.verbose:
+    if shell_path:
+      print('Using shell binary at ' + shell_path)
+    else:
+      print('No shell path given, only running on Android with pre-installed '
+            'shell will be possible.')
+
   if shell_config.android:
     shell = AndroidShell(shell_config.adb_path, shell_config.target_device,
                          logcat_tags=shell_config.logcat_tags,
@@ -201,13 +217,14 @@ def get_shell(shell_config, shell_args):
     device_status, error = shell.check_device()
     if not device_status:
       raise ShellConfigurationException('Device check failed: ' + error)
-    if shell_config.shell_path:
-      shell.install_apk(shell_config.shell_path)
+    if shell_path:
+      shell.install_apk(shell_path)
   else:
-    if not shell_config.shell_path:
+    if not shell_path:
       raise ShellConfigurationException('Can not run without a shell binary. '
-                                        'Please pass --shell-path.')
-    shell = LinuxShell(shell_config.shell_path)
+                                        'Please pass --mojo-version or '
+                                        '--shell-path.')
+    shell = LinuxShell(shell_path)
     if shell_config.use_osmesa:
       shell_args.append('--args-for=mojo:native_viewport_service --use-osmesa')
 
@@ -215,7 +232,9 @@ def get_shell(shell_config, shell_args):
                                shell_config.map_origin_list,
                                shell_config.reuse_servers)
 
+  # Configure origin for mojo: urls.
   if shell_config.origin:
+    # If origin was set on the command line, this takes precedence.
     if _is_web_url(shell_config.origin):
       shell_args.append('--origin=' + shell_config.origin)
     else:
@@ -223,6 +242,13 @@ def get_shell(shell_config, shell_args):
       shell_args.extend(configure_local_origin(shell, shell_config.origin,
                                                local_origin_port,
                                                shell_config.reuse_servers))
+  elif shell_config.mojo_version:
+    # Otherwise we infer the origin from the mojo_version.
+    web_origin = "https://storage.googleapis.com/mojo/services/%s/%s" % (
+        platform, shell_config.mojo_version)
+    if shell_config.verbose:
+      print('Inferring origin from `MOJO_VERSION` as: ' + web_origin)
+    shell_args.append('--origin=' + web_origin)
 
   if shell_config.content_handlers:
     for (mime_type,

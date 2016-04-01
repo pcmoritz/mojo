@@ -4,17 +4,33 @@
 Android device.
 
 ```sh
-mojo_run APP_URL  # Run on the host.
+mojo_run APP_URL  # Run on Linux host.
 mojo_run APP_URL --android  # Run on Android device.
 mojo_run "APP_URL APP_ARGUMENTS"  # Run an app with startup arguments
 ```
 
-Unless running within a Mojo checkout, we need to indicate the path to the shell
-binary:
+## mojo version
+
+`mojo_run` will download mojo shell and configure it to use `mojo:` apps built
+at the corresponding version, if you pass the git commit sha of the
+https://github.com/domokit/mojo repository as `--mojo-version`:
 
 ```sh
-mojo_run --shell-path path/to/shell/binary APP_URL
+mojo_run APP_URL --mojo-version SOME_HASH
 ```
+
+If your project uses a pinned version of mojo, you can put the pinned hash in
+a `MOJO_VERSION` file in any ancestor directory of `mojo_run`. This will make
+`mojo_run` infer the parameter automatically.
+
+If you don't want to use prebuilt binaries at the given version, you can
+configure the shell binary and the origin to use manually:
+
+```sh
+mojo_run APP_URL --shell-path path/to/shell/binary --origin ORIGIN_URL
+```
+
+## Running applications in a view
 
 Some applications implement ViewProvider and are run embedded in a view. To run
 these, you can pass the app url using the `--embed` flag:
@@ -65,12 +81,3 @@ and the following in another:
 mkdir ~/another_home
 HOME=~/another_home mojo_run APP_URL --reuse-servers
 ```
-
-## Setting default mojo origin
-
-When run outside of the `domokit/mojo` repository, `mojo_run` needs `--origin`
-parameter to indicate where binaries of the core mojo services come from. If a
-`MOJO_VERSION` file is present among ancestors of `mojo_run` and `--origin`
-parameter is not set, origin will point to Google Storage location storing
-binaries of core mojo services built at the git revision indicated in
-`MOJO_VERSION`.

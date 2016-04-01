@@ -12,6 +12,8 @@ import collections
 import os.path
 import sys
 
+DEVTOOLS_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+
 
 def find_ancestor_with(relpath, start_path=None):
   """Returns the lowest ancestor of this file that contains |relpath|."""
