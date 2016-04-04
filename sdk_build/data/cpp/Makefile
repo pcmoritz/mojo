@@ -48,8 +48,9 @@ CXX_MAKE_SO_FLAGS := $(CXXFLAGS) -shared -ldl -Wl,--fatal-warnings \
 
 # Build patterns ---------------------------------------------------------------
 
-$(GEN_DIR)/%.mojom.cc $(GEN_DIR)/%.mojom.h $(GEN_DIR)/%.mojom-internal.h: \
-		%.mojom | $(GEN_DIR)
+$(GEN_DIR)/%.mojom.cc $(GEN_DIR)/%.mojom.h $(GEN_DIR)/%.mojom-internal.h \
+		$(GEN_DIR)/%.mojom-common.cc $(GEN_DIR)/%.mojom-common.h \
+		$(GEN_DIR)/%.mojom-sync.cc $(GEN_DIR)/%.mojom-sync.h: %.mojom | $(GEN_DIR)
 	$(MOJOM_BINDINGS_GENERATOR) --use_bundled_pylibs -d . -I . -o $(GEN_DIR) \
 			--no-gen-imports --no-generate-type-info $<
 
@@ -64,7 +65,9 @@ $(OBJ_DIR)/%.o: %.cc
 # "Functions" (to use with $(call function_name,...)) --------------------------
 
 # Function to get a list of generated .cc files from a list of .mojom files.
-cc_files_from_mojom_files = $(patsubst %.mojom,$(GEN_DIR)/%.mojom.cc,$(1))
+cc_files_from_mojom_files = $(patsubst %.mojom,$(GEN_DIR)/%.mojom.cc,$(1)) \
+		$(patsubst %.mojom,$(GEN_DIR)/%.mojom-common.cc,$(1)) \
+		$(patsubst %.mojom,$(GEN_DIR)/%.mojom-sync.cc,$(1))
 
 # Function to get a list of generated .o files from a list of .c files.
 o_files_from_c_files = $(patsubst %.c,$(OBJ_DIR)/%.o,$(1))
