@@ -79,16 +79,21 @@ MojoResult DataPipeConsumerDispatcher::SetDataPipeConsumerOptionsImplNoLock(
     UserPointer<const MojoDataPipeConsumerOptions> options) {
   mutex().AssertHeld();
 
-  UserOptionsReader<MojoDataPipeConsumerOptions> reader(options);
-  if (!reader.is_valid())
-    return MOJO_RESULT_INVALID_ARGUMENT;
+  // The default of 0 means 1 element (however big that is).
+  uint32_t read_threshold_num_bytes = 0;
+  if (!options.IsNull()) {
+    UserOptionsReader<MojoDataPipeConsumerOptions> reader(options);
+    if (!reader.is_valid())
+      return MOJO_RESULT_INVALID_ARGUMENT;
 
-  if (!OPTIONS_STRUCT_HAS_MEMBER(MojoDataPipeConsumerOptions,
-                                 read_threshold_num_bytes, reader))
-    return MOJO_RESULT_OK;
+    if (!OPTIONS_STRUCT_HAS_MEMBER(MojoDataPipeConsumerOptions,
+                                   read_threshold_num_bytes, reader))
+      return MOJO_RESULT_OK;
 
-  return data_pipe_->ConsumerSetOptions(
-      reader.options().read_threshold_num_bytes);
+    read_threshold_num_bytes = reader.options().read_threshold_num_bytes;
+  }
+
+  return data_pipe_->ConsumerSetOptions(read_threshold_num_bytes);
 }
 
 MojoResult DataPipeConsumerDispatcher::GetDataPipeConsumerOptionsImplNoLock(

@@ -1250,11 +1250,9 @@ TEST_F(CoreTest, DataPipeSetGetConsumerOptions) {
   EXPECT_EQ(kCoptsSize, copts.struct_size);
   EXPECT_EQ(16u, copts.read_threshold_num_bytes);
 
-  // Default read threshold.
-  copts.struct_size = kCoptsSize;
-  copts.read_threshold_num_bytes = 0;
+  // Can also set to default by passing null.
   EXPECT_EQ(MOJO_RESULT_OK,
-            core()->SetDataPipeConsumerOptions(ch, MakeUserPointer(&copts)));
+            core()->SetDataPipeConsumerOptions(ch, NullUserPointer()));
   copts = MojoDataPipeConsumerOptions();
   EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeConsumerOptions(
                                 ch, MakeUserPointer(&copts), kCoptsSize));
