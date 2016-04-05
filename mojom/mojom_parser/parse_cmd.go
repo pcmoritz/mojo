@@ -39,31 +39,7 @@ import (
 	"mojom/mojom_parser/serialization"
 	"os"
 	"path/filepath"
-	"strings"
 )
-
-// DirectoryList holds the result of parsing a command-line flag
-// that accepts a comma-separated list of directory paths. This
-// type satisfies the flag.Value interface.
-type DirectoryList []string
-
-func (dl *DirectoryList) String() string {
-	return fmt.Sprintf("%v", *dl)
-}
-
-func (dl *DirectoryList) Set(args string) error {
-	for _, name := range strings.Split(args, ",") {
-		info, err := os.Stat(name)
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			return fmt.Errorf("%s is not a directory.", name)
-		}
-		*dl = append(*dl, name)
-	}
-	return nil
-}
 
 // parseCmd implements the parse command for the mojom tool.
 // The slice of strings |args| is the list of arguments passed on the command
@@ -93,32 +69,8 @@ func parseCmd(args []string) {
 	}
 
 	fileNames := flagSet.Args()
-	if len(fileNames) == 0 {
-		fmt.Fprintln(os.Stderr, "No .mojom files given.")
-		printUsage()
-		os.Exit(1)
-	}
 
-	parseDriver := parser.NewDriver(directoryListFlag, *debug, *metaDataOnly)
-
-	// Do the parsing
-	descriptor, err := parseDriver.ParseFiles(fileNames)
-	if err != nil {
-		log.Fatalln(err.Error())
-	} else if *debug {
-		fmt.Println("Parsing complete.")
-	}
-
-	// Serialize the result.
-	bytes, debug_string, err := serialization.Serialize(descriptor, *debug)
-	if err != nil {
-		log.Fatalf("Serialization error: %s\n", err)
-	}
-
-	// In debug mode print out the debug information.
-	if *debug {
-		PrintDebugOutput(debug_string, descriptor)
-	}
+	bytes := parse(fileNames, directoryListFlag, printUsage, *metaDataOnly, *debug)
 
 	// Emit the output to a file or standard out.
 	if len(*outFile) == 0 {
@@ -138,7 +90,45 @@ func parseCmd(args []string) {
 	}
 }
 
-func PrintDebugOutput(debugString string, descriptor *mojom.MojomDescriptor) {
+// parse parses a list of mojom files and returns a serialized MojomFileGraph.
+//
+// fileNames is a list of paths to the .mojom files to be parsed.
+// importPaths is a list of directories where imports should be looked up.
+// printUsage is a function which prints the usage of the invoked mojom tool command.
+// metaDataOnly limits parsing to module statements and file attributes.
+// debug if true causes the parse tree and other debug information to be printed to standard out.
+func parse(fileNames []string, importPaths DirectoryList, printUsage func(), metaDataOnly, debug bool) []byte {
+	if len(fileNames) == 0 {
+		fmt.Fprintln(os.Stderr, "No .mojom files given.")
+		printUsage()
+		os.Exit(1)
+	}
+
+	parseDriver := parser.NewDriver(importPaths, debug, metaDataOnly)
+
+	// Do the parsing
+	descriptor, err := parseDriver.ParseFiles(fileNames)
+	if err != nil {
+		log.Fatalln(err.Error())
+	} else if debug {
+		fmt.Println("Parsing complete.")
+	}
+
+	// Serialize the result.
+	bytes, debug_string, err := serialization.Serialize(descriptor, debug)
+	if err != nil {
+		log.Fatalf("Serialization error: %s\n", err)
+	}
+
+	// In debug mode print out the debug information.
+	if debug {
+		printDebugOutput(debug_string, descriptor)
+	}
+
+	return bytes
+}
+
+func printDebugOutput(debugString string, descriptor *mojom.MojomDescriptor) {
 	fmt.Println("\n\n=============================================")
 	fmt.Println("\n Pre-Serialized Go Object:")
 	fmt.Printf("\n%s\n", descriptor.String())

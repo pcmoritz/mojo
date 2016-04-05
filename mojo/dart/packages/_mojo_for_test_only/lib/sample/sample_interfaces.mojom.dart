@@ -1055,64 +1055,6 @@ class _IntegerAccessorSetIntegerParams extends bindings.Struct {
 }
 
 
-class _SampleInterfaceSampleMethod0Params extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _SampleInterfaceSampleMethod0Params() : super(kVersions.last.size);
-
-  static _SampleInterfaceSampleMethod0Params deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _SampleInterfaceSampleMethod0Params decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _SampleInterfaceSampleMethod0Params result = new _SampleInterfaceSampleMethod0Params();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_SampleInterfaceSampleMethod0Params("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
 class _SampleInterfaceSampleMethod1Params extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -1284,6 +1226,64 @@ class SampleInterfaceSampleMethod1ResponseParams extends bindings.Struct {
     Map map = new Map();
     map["out1"] = out1;
     map["out2"] = out2;
+    return map;
+  }
+}
+
+
+class _SampleInterfaceSampleMethod0Params extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _SampleInterfaceSampleMethod0Params() : super(kVersions.last.size);
+
+  static _SampleInterfaceSampleMethod0Params deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _SampleInterfaceSampleMethod0Params decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _SampleInterfaceSampleMethod0Params result = new _SampleInterfaceSampleMethod0Params();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_SampleInterfaceSampleMethod0Params("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
     return map;
   }
 }
@@ -2059,8 +2059,8 @@ class IntegerAccessorStub extends bindings.Stub {
   }
 }
 
-const int _sampleInterfaceMethodSampleMethod0Name = 0;
 const int _sampleInterfaceMethodSampleMethod1Name = 1;
+const int _sampleInterfaceMethodSampleMethod0Name = 0;
 const int _sampleInterfaceMethodSampleMethod2Name = 2;
 
 class _SampleInterfaceServiceDescription implements service_describer.ServiceDescription {
@@ -2076,8 +2076,8 @@ class _SampleInterfaceServiceDescription implements service_describer.ServiceDes
 
 abstract class SampleInterface {
   static const String serviceName = null;
-  void sampleMethod0();
   dynamic sampleMethod1(int in1,String in2,[Function responseFactory = null]);
+  void sampleMethod0();
   void sampleMethod2();
 }
 
@@ -2140,14 +2140,6 @@ class _SampleInterfaceProxyCalls implements SampleInterface {
   _SampleInterfaceProxyImpl _proxyImpl;
 
   _SampleInterfaceProxyCalls(this._proxyImpl);
-    void sampleMethod0() {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _SampleInterfaceSampleMethod0Params();
-      _proxyImpl.sendMessage(params, _sampleInterfaceMethodSampleMethod0Name);
-    }
     dynamic sampleMethod1(int in1,String in2,[Function responseFactory = null]) {
       var params = new _SampleInterfaceSampleMethod1Params();
       params.in1 = in1;
@@ -2157,6 +2149,14 @@ class _SampleInterfaceProxyCalls implements SampleInterface {
           _sampleInterfaceMethodSampleMethod1Name,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    void sampleMethod0() {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _SampleInterfaceSampleMethod0Params();
+      _proxyImpl.sendMessage(params, _sampleInterfaceMethodSampleMethod0Name);
     }
     void sampleMethod2() {
       if (!_proxyImpl.isBound) {
@@ -2262,9 +2262,6 @@ class SampleInterfaceStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _sampleInterfaceMethodSampleMethod0Name:
-        _impl.sampleMethod0();
-        break;
       case _sampleInterfaceMethodSampleMethod1Name:
         var params = _SampleInterfaceSampleMethod1Params.deserialize(
             message.payload);
@@ -2286,6 +2283,9 @@ class SampleInterfaceStub extends bindings.Stub {
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
+        break;
+      case _sampleInterfaceMethodSampleMethod0Name:
+        _impl.sampleMethod0();
         break;
       case _sampleInterfaceMethodSampleMethod2Name:
         _impl.sampleMethod2();
@@ -2332,7 +2332,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xb3W7jRBS243QJu1Rkty2k7J930UJuWqdFgoir9CIiFVSqVKjYG1ZpMjRGjR1sBy1vw+U+Bo/C5V7uG8C4mbMZn8z4p3XsSelIo6n/Mj6fv/OdmTPThjYrdda2WIvPQ1tDLb7vb9Y2aa3SarLjNmt/Zu2EtY9o3aT1x5fH3Vffd19+6/fHkwuy23Wm4/D6l7Q+FVw/dAJyTryDwYD4vutd9tMQ3HfsuX/YQ+LJfufksgl/zfu1PyBaj713Hb13eGzQOqpEj+sfR4/f7IpxecvajhYtLdTPv6zg+6B8xN4P8Nmg9R6tCLaF/sPn1mj9hdZTWq2ROyaWNx26Y9shnjV2f3Mt3xvM/phMzy7sgWUDLL51ZjtD2zn3rYD4gW/Nuns1v2E3fG4860/n+NHi+HDJG12LLWnx6UmeX2d2nh788FOXttu03o/iswvXRDiFz1cKwCmJ94CXiQ1k+BkJeHUQXscSvD6lNaQw9qcn9Nwnc9zw5QXcwuO7BeAm6heOKxxEDXYM9zXvRHloIr+sVdLxUONwFZ2H8oDh8R0JGHZivm0XxDcT4fU2pS5piEdtib2fMZvn9u545PcpfSmx3VCWbXeN61cXxC0NxTMZTn8Z+eD0kGl2BCd/4jo+KRUn7C91PWpvG73XHS1dSetHzYR4N+wHfZn/bBeAjwiHMM60JfEM+FTRxDi+FuCgc+MiXDB/TYH+GVx/oD9HtnNKPN92nSiewZ8TIsPzqwL1SJPoOR7nJMVLzF9T4Oe6oJ8Kqw1NHB9a+mL41TN8z9fX/J56wveE8ycJceZhyXEmL/2EOHOiWJxZVf2EeKSqfhoF66dxTf0M8dz5H+mnkaCfUN5dcZ7Xifme4beE+T3MY9C0X5jHKGOe0uTyHWscnhWGYZXDYY27/w27ebTOTmwwPBvx85mmsZz5THcwck8Cj0Ig1tv7JccZmMflFWfm9qoRZ7COiXRVF/jbsuLLh6y/vibnw2ZBuMTpvUzHls0jiK8RHikw31tFHj1XmEcyHe5VI2m7VDjpMToM+d45n3whXg9K1uGmsSz/8SNCrMp439RXw49CXmyV4EdZcaldARc9BS5nMbg8VUxf+HH1sv0M5gdRP5sHqls/y+5nO7d+JsTlG4X9DMdxwK1tiPO5cThVuO+Ay2Omw6G/HRHf75+TY3tCen1neEEEuG2UFM/B/nrG8bBs3v6C2S60m4vsKo+LqwrpzEYJOqNfY36VN5++oPVJDJ8ggt3yKT2fDhXmE9bnf2BfkZFuXwSPkxGDE+QXQ16FOVKM02ZJegz2djL6j2w+2WA2gZ0gwSr7y5pC/rLJ/l61fP9182O9nPJjsD+L4x+XHVNbt1Xj4aMbzEOZ7teY4Fcz4FyNwTlcQ/qA8fHQCRZw3ipZ99/p+eg+rJcxO9+PvFX2N41bOyvb37YK0v2r6nTefOHHCTO+zGT6li/p+fJYIb4k7S9OwqWDeJO0vxjvs0f7i/HlBfzMktbtTS6+GmjdHq4bHM4tdsG8G78ulJV/0K/MP0N+rb/H+YgEI3fYEvDwuXYz9htD/ixirwL5o6z7jWX8aGdcN9RjeCPjx54Ap2cl86NhLI8fewrwI+s+waLi1z2mY7azJ4xfz9i5MvYJFrl+McdhX4rDiwLzY3pO64SjnPwK4jb2q7LzrKquE8J82J0GezI+fV0Cn7LmM/L2Mw6XfRkuBzcsnxG3zojHhWnXGeH/F7LE/X0B3p/f4HHh/gqOC/8LAAD//ycEy8+YPQAA";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xb3XLbRBSWLKeYlgxuk4BD/9QyBd8kdsIMeLhyLjw4A5nJEOhQbjqKvcRiYslIClN4Gi77GDwKl73sG8Aq3lOvjnf1k8jSOnhndjb68+p8+s53ds9uGtq01FnbZi0+D20Ntfi+v1nbpLVKq8mOO6z9ibUT1j6gdZPWH14c915+23vxtW+NJ+dkt+dcjMPrn9P6WHD90AnIGfEOBgPi+6532U9DcN+x5/5uD4kn+52Tyyb8Ne8Xa0C0PnvvOnrv8NigdVSJHtc/jB6/3hXj8oa1XS1a2qiff1nB90H5gL0f4LNB6x1aEWxz/YfPrdH6M63f09oauWPSsv60HLs1dn91W743mP4xuTg9twctGyDxW6e2M7SdM78VED/wW9OuXs5u2A2fG8/60zl+tDk+XPJG12JLWnz6kufXmZ3PD777sUfbbVrvRvHZhWsinMLnKwXglMR7wMvEBjL8jAS8ugivYwleH9MaUhj70yN67qMZbvjyHG7h8e0CcBP1C8cVDqIGO4b7mreiPDSRX9Yq6XiocbiKzkO5x/D4hgQMO/H7bxfENxPh9SalLmmIRx2JvZ8wm2f27njktwv6YmK7oSza7pom1qUGeo+aFo/TX0Y+ON1nmh3ByZ+4jk9KxQn7S12P2ttB73VLS1fS+lEzId4NrcCS+c92AfiIcAjjTEcSz4BPFU38/CsBDjo3LsIF89cU6J/B9Qf6c2Q7z4nn264TxTP4Y0JkeH5RoB5pEj3H45ykeIn5awr8XBf0U2G1oYnjQ1ufD796hu/56prfU0/4nnD+JCHO3C85zuSlnxBnThSLM8uqnxCPVNVPo2D9NK6pnyGeO/8j/TQS9BPK2yvO87ox3zP8ljC/h3kMmvYL8xhlzFOaXL5jjcOzwjCscjiscfe/ZjeP1tmJDYZnI34+0zQWM5/pDUbuSeBRGMR23i05zsA8Lq84M7NXjTiDdUykq7rA3xYVX95n/VmanA+bBeESp/cyHVs0jyC+RnikwHxvGXn0VGEeyXS4X42k7VLhpMfoMOR7Z3zyhXjdK1mHm8ai/MePCLEq431TXw4/CnmxVYIfZcWldgVc9BS4nMbg8lgxfeHH1Yv2M5gfRP1sFqhWfpbdz3ZWfibE5SuF/QzHccCtY4jzuXE4VbjvgMtDpsOhvx0R37fOyLE9IX3LGZ4TAW4bJcVzsL+ecTwsm7c/Y7YL7eYiu8rj4qpCOrNRgs7o15hf5c2nz2h9FMMniGArPqXn06HCfML6/A/sKzLS7YvgcTJicIL8YsirMEeKcdosSY/B3m5G/5HNJxvMJrATJFhlf1lTyF822d/Llu+/bn6sn1N+DPZncfzjsmNq67ZqPHxwg3ko0/0aE/xqBpyrMTiHa0jvMT4eOsEczlsl6/5bPR/dh/UyZue7kbfK/qZxa2dl+9tWQbp/VZ3Omy/8OGHKl6lMr/iSni8PFeJL0v7iJFy6iDdJ+4vxPnu0vxhfnsPPLGnd3uTiq4HW7eG6wT3XZhfM2/HrQln5B/3K/DPk1/o7nI9IMHKHbYE9T7Wbsd8Y8mcRexXIH2XdbyzjRyfjuqEewxsZP/YEOD0pmR8NY3H82FOAH1n3CRYVv+4wHbOdPaEOPmHnytgnWOT6xQyHfSkOzwrMj+k5rROOcvIriNvYr8rOs6q6TgjzYfci2JPx6csS+JQ1n5G3n3G47MtwObhh+Yy4dUY8Lky7zgj/v5Al7u8L8P70Bo8L95dwXPhfAAAA//+HL5ihmD0AAA==";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

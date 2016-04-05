@@ -29,8 +29,9 @@ func main() {
 	log.SetFlags(0)
 	checkVersion(os.Args)
 	commands := NewCommandSet()
-	commands.AddCommand("parse", parseCmd, "Parses mojom files.")
 	commands.AddCommand("fmt", fmtCmd, "Formats a mojom file.")
+	commands.AddCommand("gen", genCmd, "Generates bindings from mojom files.")
+	commands.AddCommand("parse", parseCmd, "Parses mojom files.")
 	commands.AddHelpCommand()
 	commands.RunCommand(os.Args)
 }
