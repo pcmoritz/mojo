@@ -15,8 +15,6 @@ mojo_native_application("media_factory") {
   sources = [
     "audio_track_controller.cc",
     "audio_track_controller.h",
-    "event.cc",
-    "event.h",
     "factory_service.cc",
     "factory_service.h",
     "main.cc",
@@ -30,9 +28,6 @@ mojo_native_application("media_factory") {
     "media_source_impl.h",
     "network_reader_impl.cc",
     "network_reader_impl.h",
-    "rule_set.cc",
-    "rule_set.h",
-    "watched.h",
   ]
 
   deps = [

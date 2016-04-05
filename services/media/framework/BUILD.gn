@@ -8,6 +8,8 @@ import("$mojo_sdk_root/mojo/public/mojo_sdk.gni")
 
 source_set("framework") {
   sources = [
+    "callback_joiner.cc",
+    "callback_joiner.h",
     "conversion_pipeline_builder.cc",
     "conversion_pipeline_builder.h",
     "engine.cc",
@@ -74,6 +76,7 @@ source_set("framework") {
 
   deps = [
     "//base",
+    "//mojo/public/cpp/bindings:callback",
     "//url",
   ]
 }

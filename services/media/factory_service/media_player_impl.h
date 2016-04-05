@@ -14,7 +14,6 @@
 #include "mojo/services/media/common/interfaces/media_transport.mojom.h"
 #include "mojo/services/media/control/interfaces/media_factory.mojom.h"
 #include "services/media/factory_service/factory_service.h"
-#include "services/media/factory_service/watched.h"
 
 namespace mojo {
 namespace media {
@@ -43,11 +42,29 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
  private:
   const int64_t kNotSeeking = std::numeric_limits<int64_t>::max();
 
+  // Internal state.
+  enum class State {
+    kWaiting,  // Waiting for some work to complete.
+    kPaused,
+    kWaitingForSinksToPlay,
+    kPlaying,
+    kWaitingForSinksToPause
+  };
+
+  // For matching sink states.
+  enum class SinkState {
+    kPaused,
+    kPlaying,
+    kEnded,
+    kPausedOrEnded,
+    kPlayingOrEnded
+  };
+
   struct Stream {
     Stream();
     ~Stream();
     bool enabled_ = false;
-    Watched<MediaState> state_;
+    MediaState state_ = MediaState::UNPREPARED;
     MediaSourceStreamDescriptorPtr descriptor_;
     MediaTypeConverterPtr decoder_;
     MediaSinkPtr sink_;
@@ -59,37 +76,38 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                   InterfaceRequest<MediaPlayer> request,
                   MediaFactoryService* owner);
 
-  // Handles events in paused state.
-  void WhenPaused();
+  // Prepares the source.
+  void PrepareSource();
 
-  // Handles events in playing state.
-  void WhenPlaying();
+  // Takes action based on current state.
+  void Update();
 
-  // Handles events when seeking in paused state.
+  // Handles seeking in paused state.
   void WhenPausedAndSeeking();
 
-  // Handles events when seeking with flushed pipeline.
+  // Handles seeking in paused state with flushed pipeline.
   void WhenFlushedAndSeeking();
 
-  // Tells the sinks to change state and returns an Event that occurs when this
-  // is accomplished.
-  Event ChangeSinkStates(MediaState media_state);
+  // Tells the sinks to change state.
+  void ChangeSinkStates(MediaState media_state);
 
-  // Returns an Event the occurs when all sinks are in the indicated state.
-  Event AllSinkStatesBecome(MediaState media_state);
+  // Determines if all the enabled sinks have the specified state.
+  bool AllSinksAre(SinkState sink_state);
 
   // Sets the reported_media_state_ field, calling StatusUpdated as needed.
   void SetReportedMediaState(MediaState media_state);
 
   // Prepares a stream.
-  Event PrepareStream(const std::unique_ptr<Stream>& stream, const String& url);
+  void PrepareStream(const std::unique_ptr<Stream>& stream,
+                     const String& url,
+                     const std::function<void()>& callback);
 
   // Creates a sink for a stream.
   // TODO(dalesat): Use raw pointers rather than const std::unique_ptr<>&.
   void CreateSink(const std::unique_ptr<Stream>& stream,
                   const MediaTypePtr& input_media_type,
                   const String& url,
-                  Event event);
+                  const std::function<void()>& callback);
 
   // Increments the status version and runs pending status request callbacks.
   void StatusUpdated();
@@ -108,16 +126,16 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                                uint64_t version = MediaSink::kInitialStatus,
                                MediaSinkStatusPtr status = nullptr);
 
-  Event event_;
   Binding<MediaPlayer> binding_;
   MediaFactoryPtr factory_;
   MediaSourcePtr source_;
   std::vector<std::unique_ptr<Stream>> streams_;
+  State state_ = State::kWaiting;
   uint64_t status_version_ = 1u;
   bool flushed_ = true;
   MediaState reported_media_state_ = MediaState::UNPREPARED;
-  Watched<MediaState> target_state_;
-  Watched<int64_t> target_position_;
+  MediaState target_state_ = MediaState::PAUSED;
+  int64_t target_position_ = kNotSeeking;
   TimelineTransformPtr transform_;
   MediaMetadataPtr metadata_;
   std::deque<GetStatusCallback> pending_status_requests_;

@@ -13,9 +13,9 @@
 #include "mojo/services/media/common/cpp/linear_transform.h"
 #include "mojo/services/media/control/interfaces/media_sink.mojom.h"
 #include "services/media/factory_service/audio_track_controller.h"
-#include "services/media/factory_service/event.h"
 #include "services/media/factory_service/factory_service.h"
 #include "services/media/framework/graph.h"
+#include "services/media/framework/incident.h"
 #include "services/media/framework/parts/decoder.h"
 #include "services/media/framework_mojo/mojo_consumer.h"
 #include "services/media/framework_mojo/mojo_producer.h"
@@ -68,7 +68,7 @@ class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
   // the current rate.
   void MaybeSetRate();
 
-  Event ready_ = Event::Create();
+  Incident ready_;
   Binding<MediaSink> binding_;
   Graph graph_;
   std::shared_ptr<MojoConsumer> consumer_;

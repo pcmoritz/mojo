@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
-#include "services/media/factory_service/event.h"
 #include "services/media/factory_service/media_source_impl.h"
+#include "services/media/framework/callback_joiner.h"
 #include "services/media/framework/conversion_pipeline_builder.h"
 #include "services/media/framework/formatting.h"
 #include "services/media/framework/parts/reader.h"
@@ -131,36 +131,25 @@ void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
 }
 
 void MediaSourceImpl::Prime(const PrimeCallback& callback) {
-  std::vector<Event> stream_primed_events;
+  std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
   for (auto& stream : streams_) {
-    Event stream_primed = Event::Create();
-    stream_primed_events.push_back(stream_primed);
-    stream->PrimeConnection(stream_primed);
+    stream->PrimeConnection(callback_joiner->NewCallback());
   }
 
-  Event all_streams_primed = Event::All(stream_primed_events);
-
-  // Capture all_streams_primed so it doesn't get deleted before it occurs.
-  all_streams_primed.When([callback, all_streams_primed]() { callback.Run(); });
+  callback_joiner->WhenJoined(callback);
 }
 
 void MediaSourceImpl::Flush(const FlushCallback& callback) {
   graph_.FlushAllOutputs(demux_part_);
 
-  std::vector<Event> stream_flushed_events;
+  std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
   for (auto& stream : streams_) {
-    Event stream_flushed = Event::Create();
-    stream_flushed_events.push_back(stream_flushed);
-    stream->FlushConnection(stream_flushed);
+    stream->FlushConnection(callback_joiner->NewCallback());
   }
 
-  Event all_streams_flushed = Event::All(stream_flushed_events);
-
-  // Capture all_streams_flushed so it doesn't get deleted before it occurs.
-  all_streams_flushed.When(
-      [callback, all_streams_flushed]() { callback.Run(); });
+  callback_joiner->WhenJoined(callback);
 }
 
 void MediaSourceImpl::Seek(int64_t position, const FlushCallback& callback) {
@@ -258,6 +247,8 @@ void MediaSourceImpl::Stream::PrimeConnection(
     const MojoProducer::PrimeConnectionCallback callback) {
   if (producer_ != nullptr) {
     producer_->PrimeConnection(callback);
+  } else {
+    callback.Run();
   }
 }
 
@@ -265,6 +256,8 @@ void MediaSourceImpl::Stream::FlushConnection(
     const MojoProducer::FlushConnectionCallback callback) {
   if (producer_ != nullptr) {
     producer_->FlushConnection(callback);
+  } else {
+    callback.Run();
   }
 }
 
