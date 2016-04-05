@@ -140,6 +140,13 @@ class Core {
                             MojoWriteDataFlags flags);
   MojoResult EndWriteData(MojoHandle data_pipe_producer_handle,
                           uint32_t num_bytes_written);
+  MojoResult SetDataPipeConsumerOptions(
+      MojoHandle data_pipe_consumer_handle,
+      UserPointer<const MojoDataPipeConsumerOptions> options);
+  MojoResult GetDataPipeConsumerOptions(
+      MojoHandle data_pipe_consumer_handle,
+      UserPointer<MojoDataPipeConsumerOptions> options,
+      uint32_t options_num_bytes);
   MojoResult ReadData(MojoHandle data_pipe_consumer_handle,
                       UserPointer<void> elements,
                       UserPointer<uint32_t> num_bytes,

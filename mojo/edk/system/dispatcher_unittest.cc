@@ -68,6 +68,10 @@ TEST(DispatcherTest, Basic) {
                               MOJO_WRITE_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, d->EndWriteData(0));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->SetDataPipeConsumerOptions(NullUserPointer()));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->GetDataPipeConsumerOptions(NullUserPointer(), 0));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
             d->ReadData(NullUserPointer(), NullUserPointer(),
                         MOJO_READ_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
@@ -117,6 +121,10 @@ TEST(DispatcherTest, Basic) {
                               MOJO_WRITE_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, d->EndWriteData(0));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->SetDataPipeConsumerOptions(NullUserPointer()));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->GetDataPipeConsumerOptions(NullUserPointer(), 0));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
             d->ReadData(NullUserPointer(), NullUserPointer(),
                         MOJO_READ_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
@@ -151,6 +159,8 @@ enum class DispatcherOp {
   WRITE_DATA,
   BEGIN_WRITE_DATA,
   END_WRITE_DATA,
+  SET_DATA_PIPE_CONSUMER_OPTIONS,
+  GET_DATA_PIPE_CONSUMER_OPTIONS,
   READ_DATA,
   BEGIN_READ_DATA,
   END_READ_DATA,
@@ -202,6 +212,14 @@ void ThreadSafetyStressHelper(ManualResetWaitableEvent* event,
       break;
     case DispatcherOp::END_WRITE_DATA:
       EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, dispatcher->EndWriteData(0));
+      break;
+    case DispatcherOp::SET_DATA_PIPE_CONSUMER_OPTIONS:
+      EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+                dispatcher->SetDataPipeConsumerOptions(NullUserPointer()));
+      break;
+    case DispatcherOp::GET_DATA_PIPE_CONSUMER_OPTIONS:
+      EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+                dispatcher->GetDataPipeConsumerOptions(NullUserPointer(), 0));
       break;
     case DispatcherOp::READ_DATA:
       EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
