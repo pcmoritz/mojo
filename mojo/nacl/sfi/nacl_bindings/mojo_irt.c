@@ -214,6 +214,34 @@ static MojoResult irt_MojoEndWriteData(
   return result;
 };
 
+static MojoResult irt_MojoSetDataPipeConsumerOptions(
+    MojoHandle data_pipe_consumer_handle,
+    const struct MojoDataPipeConsumerOptions* options) {
+  uint32_t params[4];
+  MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
+  params[0] = 12;
+  params[1] = (uint32_t)(&data_pipe_consumer_handle);
+  params[2] = (uint32_t)(options);
+  params[3] = (uint32_t)(&result);
+  DoMojoCall(params, sizeof(params));
+  return result;
+};
+
+static MojoResult irt_MojoGetDataPipeConsumerOptions(
+    MojoHandle data_pipe_consumer_handle,
+    struct MojoDataPipeConsumerOptions* options,
+    uint32_t options_num_bytes) {
+  uint32_t params[5];
+  MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
+  params[0] = 13;
+  params[1] = (uint32_t)(&data_pipe_consumer_handle);
+  params[2] = (uint32_t)(options);
+  params[3] = (uint32_t)(&options_num_bytes);
+  params[4] = (uint32_t)(&result);
+  DoMojoCall(params, sizeof(params));
+  return result;
+};
+
 static MojoResult irt_MojoReadData(
     MojoHandle data_pipe_consumer_handle,
     void* elements,
@@ -221,7 +249,7 @@ static MojoResult irt_MojoReadData(
     MojoReadDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 12;
+  params[0] = 14;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(elements);
   params[3] = (uint32_t)(num_bytes);
@@ -238,7 +266,7 @@ static MojoResult irt_MojoBeginReadData(
     MojoReadDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 13;
+  params[0] = 15;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(buffer);
   params[3] = (uint32_t)(buffer_num_bytes);
@@ -253,7 +281,7 @@ static MojoResult irt_MojoEndReadData(
     uint32_t num_bytes_read) {
   uint32_t params[4];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 14;
+  params[0] = 16;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(&num_bytes_read);
   params[3] = (uint32_t)(&result);
@@ -267,7 +295,7 @@ static MojoResult irt_MojoCreateSharedBuffer(
     MojoHandle* shared_buffer_handle) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 15;
+  params[0] = 17;
   params[1] = (uint32_t)(options);
   params[2] = (uint32_t)(&num_bytes);
   params[3] = (uint32_t)(shared_buffer_handle);
@@ -282,7 +310,7 @@ static MojoResult irt_MojoDuplicateBufferHandle(
     MojoHandle* new_buffer_handle) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 16;
+  params[0] = 18;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(options);
   params[3] = (uint32_t)(new_buffer_handle);
@@ -297,7 +325,7 @@ static MojoResult irt_MojoGetBufferInformation(
     uint32_t info_num_bytes) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 17;
+  params[0] = 19;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(info);
   params[3] = (uint32_t)(&info_num_bytes);
@@ -314,7 +342,7 @@ static MojoResult irt_MojoMapBuffer(
     MojoMapBufferFlags flags) {
   uint32_t params[7];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 18;
+  params[0] = 20;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(&offset);
   params[3] = (uint32_t)(&num_bytes);
@@ -328,7 +356,7 @@ static MojoResult irt_MojoMapBuffer(
 static MojoResult irt_MojoUnmapBuffer(void* buffer) {
   uint32_t params[3];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 19;
+  params[0] = 21;
   params[1] = (uint32_t)(&buffer);
   params[2] = (uint32_t)(&result);
   DoMojoCall(params, sizeof(params));
@@ -348,6 +376,8 @@ struct nacl_irt_mojo kIrtMojo = {
   &irt_MojoWriteData,
   &irt_MojoBeginWriteData,
   &irt_MojoEndWriteData,
+  &irt_MojoSetDataPipeConsumerOptions,
+  &irt_MojoGetDataPipeConsumerOptions,
   &irt_MojoReadData,
   &irt_MojoBeginReadData,
   &irt_MojoEndReadData,
