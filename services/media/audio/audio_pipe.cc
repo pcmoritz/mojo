@@ -131,6 +131,22 @@ void AudioPipe::OnPacketReceived(MediaPacketStatePtr state) {
                            std::move(regions),
                            start_pts,
                            next_pts_)));
+
+   if (!prime_callback_.is_null()) {
+     // Prime was requested. Call the callback to indicate priming is complete.
+     // TODO(dalesat): Don't do this until low water mark is reached.
+     prime_callback_.Run();
+     prime_callback_.reset();
+   }
+}
+
+void AudioPipe::OnPrimeRequested(const PrimeCallback& cbk) {
+  if (!prime_callback_.is_null()) {
+    // Prime was already requested. Complete the old one and warn.
+    LOG(WARNING) << "multiple prime requests received";
+    prime_callback_.Run();
+  }
+  prime_callback_ = cbk;
 }
 
 bool AudioPipe::OnFlushRequested(const FlushCallback& cbk) {

@@ -76,6 +76,7 @@ class MediaPipeBase : public MediaConsumer {
 
   // Interface to be implemented by derived classes
   virtual void OnPacketReceived(MediaPacketStatePtr state) = 0;
+  virtual void OnPrimeRequested(const PrimeCallback& cbk) = 0;
   virtual bool OnFlushRequested(const FlushCallback& cbk) = 0;
 
   MappedSharedBufferPtr buffer_;

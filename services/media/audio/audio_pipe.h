@@ -81,6 +81,7 @@ class AudioPipe : public MediaPipeBase {
 
  protected:
   void OnPacketReceived(MediaPacketStatePtr state) override;
+  void OnPrimeRequested(const PrimeCallback& cbk) override;
   bool OnFlushRequested(const FlushCallback& cbk) override;
 
  private:
@@ -90,6 +91,8 @@ class AudioPipe : public MediaPipeBase {
   // State used for timestamp interpolation
   bool next_pts_known_ = 0;
   int64_t next_pts_;
+
+  PrimeCallback prime_callback_;
 };
 
 }  // namespace audio

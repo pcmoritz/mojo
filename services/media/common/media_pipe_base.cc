@@ -137,7 +137,7 @@ void MediaPipeBase::SendPacket(MediaPacketPtr packet,
 }
 
 void MediaPipeBase::Prime(const PrimeCallback& cbk) {
-  cbk.Run();
+  OnPrimeRequested(cbk);
 }
 
 void MediaPipeBase::Flush(const FlushCallback& cbk) {
