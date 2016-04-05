@@ -50,5 +50,7 @@ func TestCheckMethodWithEmptyResponse(t *testing.T) {
 			t.Fatal("proxy returned from the call before the stub sent the response")
 		}
 		v.mu.Unlock()
+		proxy.Close_Proxy()
+		stub.Close()
 	}
 }
