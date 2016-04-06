@@ -54,12 +54,12 @@ func outputFileByFilePath(fileName string, config GeneratorConfig) string {
 func createAndOpen(outPath string) (file Writer) {
 	// Create the directory that will contain the output.
 	outDir := path.Dir(outPath)
-	if err := os.MkdirAll(outDir, os.ModeDir|0770); err != nil && !os.IsExist(err) {
+	if err := os.MkdirAll(outDir, os.ModeDir|0777); err != nil && !os.IsExist(err) {
 		log.Fatalln(err.Error())
 	}
 
 	var err error
-	file, err = os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0660)
+	file, err = os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
