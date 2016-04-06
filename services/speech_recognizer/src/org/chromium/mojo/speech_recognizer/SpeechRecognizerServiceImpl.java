@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.chromium.mojo.system.MojoException;
@@ -31,7 +32,7 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
 
     private AudioManager mAudioManager;
 
-    private SpeechRecognizerService.ListenResponse mCallback;
+    private SpeechRecognizerListener mListener;
 
     private boolean mReadyForSpeech = false;
 
@@ -39,7 +40,7 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         mContext = context;
         mMainHandler = new Handler(mContext.getMainLooper());
 
-        mCallback = null;
+        mListener = null;
 
         mMainHandler.post(new Runnable() {
             @Override
@@ -60,14 +61,12 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
      *        SpeechRecognizerService.ListenResponse)
      */
     @Override
-    public void listen(SpeechRecognizerService.ListenResponse callback) {
-        if (mCallback != null) {
-            ResultOrError result_or_error = new ResultOrError();
-            result_or_error.setErrorCode(Error.RECOGNIZER_BUSY);
-            callback.call(result_or_error);
+    public void listen(SpeechRecognizerListener listener) {
+        if (mListener != null) {
+            listener.onRecognizerError(Error.RECOGNIZER_BUSY);
         }
 
-        mCallback = callback;
+        mListener = listener;
 
         mMainHandler.post(new Runnable() {
             @Override
@@ -117,6 +116,7 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
         mReadyForSpeech = false;
         mSpeechRecognizer.startListening(intent);
@@ -131,7 +131,11 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         @Override
         public void onBeginningOfSpeech() {}
         @Override
-        public void onRmsChanged(float rmsdB) {}
+        public void onRmsChanged(float rmsdB) {
+            if (mListener != null) {
+                mListener.onSoundLevelChanged(rmsdB);
+            }
+        }
         @Override
         public void onBufferReceived(byte[] buffer) {}
         @Override
@@ -150,19 +154,27 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
             }
 
             mAudioManager.abandonAudioFocus(null);
-            ResultOrError result_or_error = new ResultOrError();
-            // The enum in the mojom for SpeechRecognizerService matches the
-            // errors that come from Android's RecognizerService.
-            result_or_error.setErrorCode(error);
-
-            if (mCallback != null) {
-                mCallback.call(result_or_error);
-                mCallback = null;
+            if (mListener != null) {
+                // The enum in the mojom for SpeechRecognizerService matches the
+                // errors that come from Android's RecognizerService.
+                mListener.onRecognizerError(error);
+                mListener = null;
             }
         }
         @Override
         public void onResults(Bundle results) {
             mAudioManager.abandonAudioFocus(null);
+            processResults(results);
+            mListener = null;
+        }
+        @Override
+        public void onPartialResults(Bundle partialResults) {
+            processResults(partialResults);
+        }
+        @Override
+        public void onEvent(int eventType, Bundle params) {}
+
+        private void processResults(Bundle results) {
             ArrayList<String> utterances =
                     results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             float[] confidences = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
@@ -171,23 +183,19 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
             for (int i = 0; i < utterances.size(); i++) {
                 UtteranceCandidate candidate = new UtteranceCandidate();
                 candidate.text = utterances.get(i);
-                candidate.confidenceScore = confidences[i];
-
-                candidates.add(candidate);
+                if (confidences != null) {
+                    candidate.confidenceScore = confidences[i];
+                } else {
+                    candidate.confidenceScore = 0;
+                }
+                if (!TextUtils.isEmpty(candidate.text)) {
+                    candidates.add(candidate);
+                }
             }
 
-            ResultOrError result_or_error = new ResultOrError();
-            result_or_error.setResults(
-                    candidates.toArray(new UtteranceCandidate[candidates.size()]));
-
-            if (mCallback != null) {
-                mCallback.call(result_or_error);
-                mCallback = null;
+            if (mListener != null) {
+                mListener.onResults(candidates.toArray(new UtteranceCandidate[candidates.size()]));
             }
         }
-        @Override
-        public void onPartialResults(Bundle partialResults) {}
-        @Override
-        public void onEvent(int eventType, Bundle params) {}
     }
 }

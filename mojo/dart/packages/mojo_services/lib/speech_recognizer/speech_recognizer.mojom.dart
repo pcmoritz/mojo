@@ -197,10 +197,247 @@ class UtteranceCandidate extends bindings.Struct {
 }
 
 
+class _SpeechRecognizerListenerOnRecognizerErrorParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  Error errorCode = null;
+
+  _SpeechRecognizerListenerOnRecognizerErrorParams() : super(kVersions.last.size);
+
+  static _SpeechRecognizerListenerOnRecognizerErrorParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _SpeechRecognizerListenerOnRecognizerErrorParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _SpeechRecognizerListenerOnRecognizerErrorParams result = new _SpeechRecognizerListenerOnRecognizerErrorParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+        result.errorCode = Error.decode(decoder0, 8);
+        if (result.errorCode == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable Error.');
+        }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeEnum(errorCode, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "errorCode of struct _SpeechRecognizerListenerOnRecognizerErrorParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_SpeechRecognizerListenerOnRecognizerErrorParams("
+           "errorCode: $errorCode" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["errorCode"] = errorCode;
+    return map;
+  }
+}
+
+
+class _SpeechRecognizerListenerOnResultsParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  List<UtteranceCandidate> results = null;
+
+  _SpeechRecognizerListenerOnResultsParams() : super(kVersions.last.size);
+
+  static _SpeechRecognizerListenerOnResultsParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _SpeechRecognizerListenerOnResultsParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _SpeechRecognizerListenerOnResultsParams result = new _SpeechRecognizerListenerOnResultsParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(8, false);
+      {
+        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        result.results = new List<UtteranceCandidate>(si1.numElements);
+        for (int i1 = 0; i1 < si1.numElements; ++i1) {
+          
+          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
+          result.results[i1] = UtteranceCandidate.decode(decoder2);
+        }
+      }
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      if (results == null) {
+        encoder0.encodeNullPointer(8, false);
+      } else {
+        var encoder1 = encoder0.encodePointerArray(results.length, 8, bindings.kUnspecifiedArrayLength);
+        for (int i0 = 0; i0 < results.length; ++i0) {
+          encoder1.encodeStruct(results[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
+        }
+      }
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "results of struct _SpeechRecognizerListenerOnResultsParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_SpeechRecognizerListenerOnResultsParams("
+           "results: $results" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["results"] = results;
+    return map;
+  }
+}
+
+
+class _SpeechRecognizerListenerOnSoundLevelChangedParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  double rmsDb = 0.0;
+
+  _SpeechRecognizerListenerOnSoundLevelChangedParams() : super(kVersions.last.size);
+
+  static _SpeechRecognizerListenerOnSoundLevelChangedParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _SpeechRecognizerListenerOnSoundLevelChangedParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _SpeechRecognizerListenerOnSoundLevelChangedParams result = new _SpeechRecognizerListenerOnSoundLevelChangedParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.rmsDb = decoder0.decodeFloat(8);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeFloat(rmsDb, 8);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "rmsDb of struct _SpeechRecognizerListenerOnSoundLevelChangedParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_SpeechRecognizerListenerOnSoundLevelChangedParams("
+           "rmsDb: $rmsDb" ")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    map["rmsDb"] = rmsDb;
+    return map;
+  }
+}
+
+
 class _SpeechRecognizerServiceListenParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
+    const bindings.StructDataHeader(16, 0)
   ];
+  Object listener = null;
 
   _SpeechRecognizerServiceListenParams() : super(kVersions.last.size);
 
@@ -237,72 +474,9 @@ class _SpeechRecognizerServiceListenParams extends bindings.Struct {
         'Message newer than the last known version cannot be shorter than '
         'required by the last known version.');
     }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_SpeechRecognizerServiceListenParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-class SpeechRecognizerServiceListenResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
-  ];
-  ResultOrError resultOrError = null;
-
-  SpeechRecognizerServiceListenResponseParams() : super(kVersions.last.size);
-
-  static SpeechRecognizerServiceListenResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static SpeechRecognizerServiceListenResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    SpeechRecognizerServiceListenResponseParams result = new SpeechRecognizerServiceListenResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
     if (mainDataHeader.version >= 0) {
       
-        result.resultOrError = ResultOrError.decode(decoder0, 8);
-        if (result.resultOrError == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable ResultOrError.');
-        }
+      result.listener = decoder0.decodeServiceInterface(8, false, SpeechRecognizerListenerProxy.newFromEndpoint);
     }
     return result;
   }
@@ -310,23 +484,22 @@ class SpeechRecognizerServiceListenResponseParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeUnion(resultOrError, 8, false);
+      encoder0.encodeInterface(listener, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "resultOrError of struct SpeechRecognizerServiceListenResponseParams: $e";
+          "listener of struct _SpeechRecognizerServiceListenParams: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "SpeechRecognizerServiceListenResponseParams("
-           "resultOrError: $resultOrError" ")";
+    return "_SpeechRecognizerServiceListenParams("
+           "listener: $listener" ")";
   }
 
   Map toJson() {
-    Map map = new Map();
-    map["resultOrError"] = resultOrError;
-    return map;
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
   }
 }
 
@@ -388,129 +561,228 @@ class _SpeechRecognizerServiceStopListeningParams extends bindings.Struct {
   }
 }
 
+const int _speechRecognizerListenerMethodOnRecognizerErrorName = 0;
+const int _speechRecognizerListenerMethodOnResultsName = 1;
+const int _speechRecognizerListenerMethodOnSoundLevelChangedName = 2;
 
+class _SpeechRecognizerListenerServiceDescription implements service_describer.ServiceDescription {
+  dynamic getTopLevelInterface([Function responseFactory]) =>
+      responseFactory(null);
 
-enum ResultOrErrorTag {
-  errorCode,
-  results,
-  unknown
+  dynamic getTypeDefinition(String typeKey, [Function responseFactory]) =>
+      responseFactory(null);
+
+  dynamic getAllTypeDefinitions([Function responseFactory]) =>
+      responseFactory(null);
 }
 
-class ResultOrError extends bindings.Union {
-  static final _tagToInt = const {
-    ResultOrErrorTag.errorCode: 0,
-    ResultOrErrorTag.results: 1,
-  };
+abstract class SpeechRecognizerListener {
+  static const String serviceName = null;
+  void onRecognizerError(Error errorCode);
+  void onResults(List<UtteranceCandidate> results);
+  void onSoundLevelChanged(double rmsDb);
+}
 
-  static final _intToTag = const {
-    0: ResultOrErrorTag.errorCode,
-    1: ResultOrErrorTag.results,
-  };
 
-  var _data;
-  ResultOrErrorTag _tag = ResultOrErrorTag.unknown;
+class _SpeechRecognizerListenerProxyImpl extends bindings.Proxy {
+  _SpeechRecognizerListenerProxyImpl.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) : super.fromEndpoint(endpoint);
 
-  ResultOrErrorTag get tag => _tag;
-  Error get errorCode {
-    if (_tag != ResultOrErrorTag.errorCode) {
-      throw new bindings.UnsetUnionTagError(_tag, ResultOrErrorTag.errorCode);
-    }
-    return _data;
+  _SpeechRecognizerListenerProxyImpl.fromHandle(core.MojoHandle handle) :
+      super.fromHandle(handle);
+
+  _SpeechRecognizerListenerProxyImpl.unbound() : super.unbound();
+
+  static _SpeechRecognizerListenerProxyImpl newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For _SpeechRecognizerListenerProxyImpl"));
+    return new _SpeechRecognizerListenerProxyImpl.fromEndpoint(endpoint);
   }
 
-  set errorCode(Error value) {
-    _tag = ResultOrErrorTag.errorCode;
-    _data = value;
-  }
-  List<UtteranceCandidate> get results {
-    if (_tag != ResultOrErrorTag.results) {
-      throw new bindings.UnsetUnionTagError(_tag, ResultOrErrorTag.results);
-    }
-    return _data;
-  }
+  service_describer.ServiceDescription get serviceDescription =>
+    new _SpeechRecognizerListenerServiceDescription();
 
-  set results(List<UtteranceCandidate> value) {
-    _tag = ResultOrErrorTag.results;
-    _data = value;
-  }
-
-  static ResultOrError decode(bindings.Decoder decoder0, int offset) {
-    int size = decoder0.decodeUint32(offset);
-    if (size == 0) {
-      return null;
-    }
-    ResultOrError result = new ResultOrError();
-
-    
-    ResultOrErrorTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
-    switch (tag) {
-      case ResultOrErrorTag.errorCode:
-        
-          result.errorCode = Error.decode(decoder0, offset + 8);
-          if (result.errorCode == null) {
-            throw new bindings.MojoCodecError(
-              'Trying to decode null union for non-nullable Error.');
-          }
-        break;
-      case ResultOrErrorTag.results:
-        
-        var decoder1 = decoder0.decodePointer(offset + 8, false);
-        {
-          var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-          result.results = new List<UtteranceCandidate>(si1.numElements);
-          for (int i1 = 0; i1 < si1.numElements; ++i1) {
-            
-            var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-            result.results[i1] = UtteranceCandidate.decode(decoder2);
-          }
-        }
-        break;
+  void handleResponse(bindings.ServiceMessage message) {
+    switch (message.header.type) {
       default:
-        throw new bindings.MojoCodecError("Bad union tag: $tag");
-    }
-
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder0, int offset) {
-    
-    encoder0.encodeUint32(16, offset);
-    encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
-    switch (_tag) {
-      case ResultOrErrorTag.errorCode:
-        encoder0.encodeEnum(errorCode, offset + 8);
+        proxyError("Unexpected message type: ${message.header.type}");
+        close(immediate: true);
         break;
-      case ResultOrErrorTag.results:
-        if (results == null) {
-          encoder0.encodeNullPointer(offset + 8, false);
-        } else {
-          var encoder1 = encoder0.encodePointerArray(results.length, offset + 8, bindings.kUnspecifiedArrayLength);
-          for (int i0 = 0; i0 < results.length; ++i0) {
-            encoder1.encodeStruct(results[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-          }
-        }
-        break;
-      default:
-        throw new bindings.MojoCodecError("Bad union tag: $_tag");
     }
   }
 
   String toString() {
-    String result = "ResultOrError(";
-    switch (_tag) {
-      case ResultOrErrorTag.errorCode:
-        result += "errorCode";
-        break;
-      case ResultOrErrorTag.results:
-        result += "results";
-        break;
-      default:
-        result += "unknown";
-    }
-    result += ": $_data)";
-    return result;
+    var superString = super.toString();
+    return "_SpeechRecognizerListenerProxyImpl($superString)";
   }
 }
+
+
+class _SpeechRecognizerListenerProxyCalls implements SpeechRecognizerListener {
+  _SpeechRecognizerListenerProxyImpl _proxyImpl;
+
+  _SpeechRecognizerListenerProxyCalls(this._proxyImpl);
+    void onRecognizerError(Error errorCode) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _SpeechRecognizerListenerOnRecognizerErrorParams();
+      params.errorCode = errorCode;
+      _proxyImpl.sendMessage(params, _speechRecognizerListenerMethodOnRecognizerErrorName);
+    }
+    void onResults(List<UtteranceCandidate> results) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _SpeechRecognizerListenerOnResultsParams();
+      params.results = results;
+      _proxyImpl.sendMessage(params, _speechRecognizerListenerMethodOnResultsName);
+    }
+    void onSoundLevelChanged(double rmsDb) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _SpeechRecognizerListenerOnSoundLevelChangedParams();
+      params.rmsDb = rmsDb;
+      _proxyImpl.sendMessage(params, _speechRecognizerListenerMethodOnSoundLevelChangedName);
+    }
+}
+
+
+class SpeechRecognizerListenerProxy implements bindings.ProxyBase {
+  final bindings.Proxy impl;
+  SpeechRecognizerListener ptr;
+
+  SpeechRecognizerListenerProxy(_SpeechRecognizerListenerProxyImpl proxyImpl) :
+      impl = proxyImpl,
+      ptr = new _SpeechRecognizerListenerProxyCalls(proxyImpl);
+
+  SpeechRecognizerListenerProxy.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) :
+      impl = new _SpeechRecognizerListenerProxyImpl.fromEndpoint(endpoint) {
+    ptr = new _SpeechRecognizerListenerProxyCalls(impl);
+  }
+
+  SpeechRecognizerListenerProxy.fromHandle(core.MojoHandle handle) :
+      impl = new _SpeechRecognizerListenerProxyImpl.fromHandle(handle) {
+    ptr = new _SpeechRecognizerListenerProxyCalls(impl);
+  }
+
+  SpeechRecognizerListenerProxy.unbound() :
+      impl = new _SpeechRecognizerListenerProxyImpl.unbound() {
+    ptr = new _SpeechRecognizerListenerProxyCalls(impl);
+  }
+
+  factory SpeechRecognizerListenerProxy.connectToService(
+      bindings.ServiceConnector s, String url, [String serviceName]) {
+    SpeechRecognizerListenerProxy p = new SpeechRecognizerListenerProxy.unbound();
+    s.connectToService(url, p, serviceName);
+    return p;
+  }
+
+  static SpeechRecognizerListenerProxy newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For SpeechRecognizerListenerProxy"));
+    return new SpeechRecognizerListenerProxy.fromEndpoint(endpoint);
+  }
+
+  String get serviceName => SpeechRecognizerListener.serviceName;
+
+  Future close({bool immediate: false}) => impl.close(immediate: immediate);
+
+  Future responseOrError(Future f) => impl.responseOrError(f);
+
+  Future get errorFuture => impl.errorFuture;
+
+  int get version => impl.version;
+
+  Future<int> queryVersion() => impl.queryVersion();
+
+  void requireVersion(int requiredVersion) {
+    impl.requireVersion(requiredVersion);
+  }
+
+  String toString() {
+    return "SpeechRecognizerListenerProxy($impl)";
+  }
+}
+
+
+class SpeechRecognizerListenerStub extends bindings.Stub {
+  SpeechRecognizerListener _impl = null;
+
+  SpeechRecognizerListenerStub.fromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint, [this._impl])
+      : super.fromEndpoint(endpoint);
+
+  SpeechRecognizerListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
+      : super.fromHandle(handle);
+
+  SpeechRecognizerListenerStub.unbound() : super.unbound();
+
+  static SpeechRecognizerListenerStub newFromEndpoint(
+      core.MojoMessagePipeEndpoint endpoint) {
+    assert(endpoint.setDescription("For SpeechRecognizerListenerStub"));
+    return new SpeechRecognizerListenerStub.fromEndpoint(endpoint);
+  }
+
+
+
+  dynamic handleMessage(bindings.ServiceMessage message) {
+    if (bindings.ControlMessageHandler.isControlMessage(message)) {
+      return bindings.ControlMessageHandler.handleMessage(this,
+                                                          0,
+                                                          message);
+    }
+    assert(_impl != null);
+    switch (message.header.type) {
+      case _speechRecognizerListenerMethodOnRecognizerErrorName:
+        var params = _SpeechRecognizerListenerOnRecognizerErrorParams.deserialize(
+            message.payload);
+        _impl.onRecognizerError(params.errorCode);
+        break;
+      case _speechRecognizerListenerMethodOnResultsName:
+        var params = _SpeechRecognizerListenerOnResultsParams.deserialize(
+            message.payload);
+        _impl.onResults(params.results);
+        break;
+      case _speechRecognizerListenerMethodOnSoundLevelChangedName:
+        var params = _SpeechRecognizerListenerOnSoundLevelChangedParams.deserialize(
+            message.payload);
+        _impl.onSoundLevelChanged(params.rmsDb);
+        break;
+      default:
+        throw new bindings.MojoCodecError("Unexpected message name");
+        break;
+    }
+    return null;
+  }
+
+  SpeechRecognizerListener get impl => _impl;
+  set impl(SpeechRecognizerListener d) {
+    assert(_impl == null);
+    _impl = d;
+  }
+
+  String toString() {
+    var superString = super.toString();
+    return "SpeechRecognizerListenerStub($superString)";
+  }
+
+  int get version => 0;
+
+  static service_describer.ServiceDescription _cachedServiceDescription;
+  static service_describer.ServiceDescription get serviceDescription {
+    if (_cachedServiceDescription == null) {
+      _cachedServiceDescription = new _SpeechRecognizerListenerServiceDescription();
+    }
+    return _cachedServiceDescription;
+  }
+}
+
 const int _speechRecognizerServiceMethodListenName = 0;
 const int _speechRecognizerServiceMethodStopListeningName = 1;
 
@@ -527,7 +799,7 @@ class _SpeechRecognizerServiceServiceDescription implements service_describer.Se
 
 abstract class SpeechRecognizerService {
   static const String serviceName = "speech_recognizer::SpeechRecognizerService";
-  dynamic listen([Function responseFactory = null]);
+  void listen(Object listener);
   void stopListening();
 }
 
@@ -552,26 +824,6 @@ class _SpeechRecognizerServiceProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _speechRecognizerServiceMethodListenName:
-        var r = SpeechRecognizerServiceListenResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
       default:
         proxyError("Unexpected message type: ${message.header.type}");
         close(immediate: true);
@@ -590,13 +842,14 @@ class _SpeechRecognizerServiceProxyCalls implements SpeechRecognizerService {
   _SpeechRecognizerServiceProxyImpl _proxyImpl;
 
   _SpeechRecognizerServiceProxyCalls(this._proxyImpl);
-    dynamic listen([Function responseFactory = null]) {
+    void listen(Object listener) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
       var params = new _SpeechRecognizerServiceListenParams();
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _speechRecognizerServiceMethodListenName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
+      params.listener = listener;
+      _proxyImpl.sendMessage(params, _speechRecognizerServiceMethodListenName);
     }
     void stopListening() {
       if (!_proxyImpl.isBound) {
@@ -687,11 +940,6 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
   }
 
 
-  SpeechRecognizerServiceListenResponseParams _speechRecognizerServiceListenResponseParamsFactory(ResultOrError resultOrError) {
-    var result = new SpeechRecognizerServiceListenResponseParams();
-    result.resultOrError = resultOrError;
-    return result;
-  }
 
   dynamic handleMessage(bindings.ServiceMessage message) {
     if (bindings.ControlMessageHandler.isControlMessage(message)) {
@@ -702,24 +950,9 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
     assert(_impl != null);
     switch (message.header.type) {
       case _speechRecognizerServiceMethodListenName:
-        var response = _impl.listen(_speechRecognizerServiceListenResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _speechRecognizerServiceMethodListenName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _speechRecognizerServiceMethodListenName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
+        var params = _SpeechRecognizerServiceListenParams.deserialize(
+            message.payload);
+        _impl.listen(params.listener);
         break;
       case _speechRecognizerServiceMethodStopListeningName:
         _impl.stopListening();
