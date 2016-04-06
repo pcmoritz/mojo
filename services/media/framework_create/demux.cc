@@ -8,16 +8,8 @@
 namespace mojo {
 namespace media {
 
-Result Demux::Create(std::shared_ptr<Reader> reader,
-                     std::shared_ptr<Demux>* demux_out) {
-  std::shared_ptr<Demux> demux = FfmpegDemux::Create();
-
-  Result result = demux->Init(reader);
-  if (result == Result::kOk) {
-    *demux_out = demux;
-  }
-
-  return result;
+std::shared_ptr<Demux> Demux::Create(std::shared_ptr<Reader> reader) {
+  return FfmpegDemux::Create(reader);
 }
 
 }  // namespace media

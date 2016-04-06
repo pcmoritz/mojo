@@ -13,6 +13,7 @@
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/media/common/interfaces/media_transport.mojom.h"
 #include "mojo/services/media/control/interfaces/media_factory.mojom.h"
+#include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "services/media/factory_service/factory_service.h"
 
 namespace mojo {
@@ -23,7 +24,7 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                         public MediaPlayer {
  public:
   static std::shared_ptr<MediaPlayerImpl> Create(
-      const String& originUrl,
+      InterfaceHandle<SeekingReader> reader,
       InterfaceRequest<MediaPlayer> request,
       MediaFactoryService* owner);
 
@@ -72,7 +73,7 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
     MediaProducerPtr decoded_producer_;
   };
 
-  MediaPlayerImpl(const String& originUrl,
+  MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
                   InterfaceRequest<MediaPlayer> request,
                   MediaFactoryService* owner);
 

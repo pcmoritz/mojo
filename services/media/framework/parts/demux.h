@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "services/media/framework/metadata.h"
-#include "services/media/framework/models/multistream_source.h"
+#include "services/media/framework/models/active_multistream_source.h"
 #include "services/media/framework/packet.h"
 #include "services/media/framework/parts/reader.h"
 #include "services/media/framework/result.h"
@@ -20,8 +20,10 @@ namespace media {
 
 // Abstract base class for sources that parse input from a reader and
 // produce one or more output streams.
-class Demux : public MultistreamSource {
+class Demux : public ActiveMultistreamSource {
  public:
+  using SeekCallback = std::function<void()>;
+
   // Represents a stream produced by the demux.
   class DemuxStream {
     // TODO(dalesat): Replace this class with stream_type_, unless more stuff
@@ -35,30 +37,25 @@ class Demux : public MultistreamSource {
   };
 
   // Creates a Demux object for a given reader.
-  static Result Create(std::shared_ptr<Reader> reader,
-                       std::shared_ptr<Demux>* demux_out);
+  static std::shared_ptr<Demux> Create(std::shared_ptr<Reader> reader);
 
   ~Demux() override {}
 
-  // TODO(dalesat): Don't let the demux talk to the reader. We're doing it this
-  // way now because of ffmpeg's synchronous read call. Ideally, the demux
-  // would tell its owner how much data it needs from the reader, and the
-  // owner would later hand over the data and possibly get a packet back.
+  // Calls the callback when the initial streams and metadata have
+  // established. THE CALLBACK MAY BE CALLED ON AN ARBITRARY THREAD.
+  virtual void WhenInitialized(std::function<void(Result)> callback) = 0;
 
-  // TODO(dalesat): Make the demux use an allocator. Ffmpeg demuxes don't
-  // support this.
-
-  // Initializes the demux.
-  virtual Result Init(std::shared_ptr<Reader> reader) = 0;
-
-  // Gets the current metadata.
+  // Gets the current metadata. This method should not be called until the
+  // WhenInitialized callback has been called.
   virtual std::unique_ptr<Metadata> metadata() const = 0;
 
-  // Gets the stream collection.
+  // Gets the stream collection. This method should not be called until the
+  // WhenInitialized callback has been called.
   virtual const std::vector<DemuxStream*>& streams() const = 0;
 
-  // Seeks to the specified position.
-  virtual void Seek(int64_t position) = 0;
+  // Seeks to the specified position and calls the callback. THE CALLBACK MAY
+  // BE CALLED ON AN ARBITRARY THREAD.
+  virtual void Seek(int64_t position, const SeekCallback& callback) = 0;
 };
 
 }  // namespace media

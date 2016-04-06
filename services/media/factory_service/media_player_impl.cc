@@ -13,18 +13,18 @@ namespace media {
 
 // static
 std::shared_ptr<MediaPlayerImpl> MediaPlayerImpl::Create(
-    const String& origin_url,
+    InterfaceHandle<SeekingReader> reader,
     InterfaceRequest<MediaPlayer> request,
     MediaFactoryService* owner) {
   return std::shared_ptr<MediaPlayerImpl>(
-      new MediaPlayerImpl(origin_url, request.Pass(), owner));
+      new MediaPlayerImpl(reader.Pass(), request.Pass(), owner));
 }
 
-MediaPlayerImpl::MediaPlayerImpl(const String& origin_url,
+MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
                                  InterfaceRequest<MediaPlayer> request,
                                  MediaFactoryService* owner)
     : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
-  DCHECK(origin_url);
+  DCHECK(reader);
 
   state_ = State::kWaiting;
 
@@ -33,7 +33,7 @@ MediaPlayerImpl::MediaPlayerImpl(const String& origin_url,
 
   app()->ConnectToService("mojo:media_factory", &factory_);
 
-  factory_->CreateSource(origin_url,
+  factory_->CreateSource(reader.Pass(),
                          nullptr,  // allowed_media_types
                          GetProxy(&source_));
 

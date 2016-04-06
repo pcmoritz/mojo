@@ -104,7 +104,6 @@ void MojoConsumer::PacketImpl::RunCallback(const SendPacketCallback& callback) {
 }
 
 void MojoConsumer::PacketImpl::Release() {
-  // TODO(dalesat): Is there a cleaner way to do this?
   task_runner_->PostTask(FROM_HERE, base::Bind(&RunCallback, callback_));
   delete this;
 }

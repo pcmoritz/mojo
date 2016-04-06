@@ -17,14 +17,14 @@ import "mojo/services/media/core/interfaces/seeking_reader.mojom";
 interface MediaFactory {
   // Creates a player.
   // TODO(dalesat): Add means of specifying destinations.
-  CreatePlayer(string origin_url, MediaPlayer& player);
+  CreatePlayer(SeekingReader reader, MediaPlayer& player);
 
   // Creates a source. If allowed_media_types is supplied, conversions will be
   // added to each stream as needed to make the media type of the stream match
   // one of the allowed types. If a stream cannot be converted to one of the
   // allowed types, its media type will have the scheme NONE, and the stream
   // will not be usable.
-  CreateSource(string origin_url,
+  CreateSource(SeekingReader reader,
                array<MediaTypeSet>? allowed_media_types,
                MediaSource& source);
 

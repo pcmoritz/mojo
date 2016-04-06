@@ -36,13 +36,10 @@ source_set("framework") {
     "packet.h",
     "parts/decoder.h",
     "parts/demux.h",
-    "parts/file_reader.cc",
-    "parts/file_reader.h",
     "parts/lpcm_reformatter.cc",
     "parts/lpcm_reformatter.h",
     "parts/null_sink.cc",
     "parts/null_sink.h",
-    "parts/reader.cc",
     "parts/reader.h",
     "payload_allocator.cc",
     "payload_allocator.h",
@@ -76,6 +73,7 @@ source_set("framework") {
 
   deps = [
     "//base",
+    "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings:callback",
     "//url",
   ]

@@ -24,7 +24,9 @@ MediaTest::MediaTest(mojo::ApplicationImpl* app,
   MediaFactoryPtr factory;
   app->ConnectToService("mojo:media_factory", &factory);
 
-  factory->CreatePlayer(input_file_name, GetProxy(&media_player_));
+  SeekingReaderPtr reader;
+  factory->CreateNetworkReader(input_file_name, GetProxy(&reader));
+  factory->CreatePlayer(reader.Pass(), GetProxy(&media_player_));
 
   HandleStatusUpdates();
 }

@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "base/bind.h"
 #include "base/logging.h"
+#include "base/message_loop/message_loop.h"
 #include "services/media/factory_service/media_source_impl.h"
 #include "services/media/framework/callback_joiner.h"
 #include "services/media/framework/conversion_pipeline_builder.h"
 #include "services/media/framework/formatting.h"
-#include "services/media/framework/parts/reader.h"
+#include "services/media/framework_mojo/mojo_reader.h"
 #include "services/media/framework_mojo/mojo_type_conversions.h"
 #include "url/gurl.h"
 
@@ -16,66 +18,81 @@ namespace media {
 
 // static
 std::shared_ptr<MediaSourceImpl> MediaSourceImpl::Create(
-    const String& origin_url,
+    InterfaceHandle<SeekingReader> reader,
     const Array<MediaTypeSetPtr>& allowed_media_types,
     InterfaceRequest<MediaSource> request,
     MediaFactoryService* owner) {
   return std::shared_ptr<MediaSourceImpl>(new MediaSourceImpl(
-      origin_url, allowed_media_types, request.Pass(), owner));
+      reader.Pass(), allowed_media_types, request.Pass(), owner));
 }
 
 MediaSourceImpl::MediaSourceImpl(
-    const String& origin_url,
+    InterfaceHandle<SeekingReader> reader,
     const Array<MediaTypeSetPtr>& allowed_media_types,
     InterfaceRequest<MediaSource> request,
     MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
-  DCHECK(origin_url);
+    : MediaFactoryService::Product(owner),
+      binding_(this, request.Pass()),
+      allowed_media_types_(allowed_media_types.Clone()) {
+  DCHECK(reader);
+
+  task_runner_ = base::MessageLoop::current()->task_runner();
+  DCHECK(task_runner_);
 
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  GURL gurl = GURL(origin_url);
-
-  // TODO(dalesat): Support mojo urls for capture scenarios.
-
-  Result result = Reader::Create(gurl, &reader_);
-  if (result != Result::kOk) {
-    NOTREACHED() << "couldn't create reader: " << result;
+  reader_ = MojoReader::Create(reader.Pass());
+  if (!reader_) {
+    NOTREACHED() << "couldn't create reader";
     state_ = MediaState::FAULT;
     return;
   }
 
-  result = Demux::Create(reader_, &demux_);
-  if (result != Result::kOk) {
-    NOTREACHED() << "couldn't create demux: " << result;
+  demux_ = Demux::Create(reader_);
+  if (!demux_) {
+    NOTREACHED() << "couldn't create demux";
     state_ = MediaState::FAULT;
     return;
   }
 
+  demux_->WhenInitialized([this](Result result) {
+    task_runner_->PostTask(FROM_HERE,
+                           base::Bind(&MediaSourceImpl::OnDemuxInitialized,
+                                      base::Unretained(this), result));
+  });
+}
+
+MediaSourceImpl::~MediaSourceImpl() {}
+
+void MediaSourceImpl::OnDemuxInitialized(Result result) {
   demux_part_ = graph_.Add(demux_);
 
   auto demux_streams = demux_->streams();
   for (auto demux_stream : demux_streams) {
     streams_.push_back(std::unique_ptr<Stream>(new Stream(
         demux_part_.output(demux_stream->index()), demux_stream->stream_type(),
-        Convert(allowed_media_types), &graph_)));
+        Convert(allowed_media_types_), &graph_)));
   }
+
+  allowed_media_types_.reset();
+
+  init_complete_.Occur();
 }
 
-MediaSourceImpl::~MediaSourceImpl() {}
-
 void MediaSourceImpl::GetStreams(const GetStreamsCallback& callback) {
-  auto result = Array<MediaSourceStreamDescriptorPtr>::New(streams_.size());
-  for (size_t i = 0; i < streams_.size(); i++) {
-    MediaSourceStreamDescriptorPtr descriptor =
-        MediaSourceStreamDescriptor::New();
-    descriptor->index = i;
-    descriptor->media_type = streams_[i]->media_type();
-    descriptor->original_media_type = streams_[i]->original_media_type();
-    result[i] = descriptor.Pass();
-  }
-  callback.Run(result.Pass());
+  init_complete_.When([this, callback]() {
+    auto result = Array<MediaSourceStreamDescriptorPtr>::New(streams_.size());
+    for (size_t i = 0; i < streams_.size(); i++) {
+      MediaSourceStreamDescriptorPtr descriptor =
+          MediaSourceStreamDescriptor::New();
+      descriptor->index = i;
+      descriptor->media_type = streams_[i]->media_type();
+      descriptor->original_media_type = streams_[i]->original_media_type();
+      result[i] = descriptor.Pass();
+    }
+    callback.Run(result.Pass());
+  });
 }
 
 void MediaSourceImpl::GetClockDisposition(
@@ -94,6 +111,8 @@ void MediaSourceImpl::SetMasterClock(InterfaceHandle<Clock> master_clock) {
 
 void MediaSourceImpl::GetProducer(uint32_t stream_index,
                                   InterfaceRequest<MediaProducer> producer) {
+  DCHECK(init_complete_.occurred());
+
   if (stream_index >= streams_.size()) {
     return;
   }
@@ -104,6 +123,8 @@ void MediaSourceImpl::GetProducer(uint32_t stream_index,
 void MediaSourceImpl::GetPullModeProducer(
     uint32_t stream_index,
     InterfaceRequest<MediaPullModeProducer> producer) {
+  DCHECK(init_complete_.occurred());
+
   if (stream_index >= streams_.size()) {
     return;
   }
@@ -121,6 +142,8 @@ void MediaSourceImpl::GetStatus(uint64_t version_last_seen,
 }
 
 void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
+  DCHECK(init_complete_.occurred());
+
   for (auto& stream : streams_) {
     stream->EnsureSink();
   }
@@ -131,6 +154,8 @@ void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
 }
 
 void MediaSourceImpl::Prime(const PrimeCallback& callback) {
+  DCHECK(init_complete_.occurred());
+
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
   for (auto& stream : streams_) {
@@ -141,6 +166,8 @@ void MediaSourceImpl::Prime(const PrimeCallback& callback) {
 }
 
 void MediaSourceImpl::Flush(const FlushCallback& callback) {
+  DCHECK(init_complete_.occurred());
+
   graph_.FlushAllOutputs(demux_part_);
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
@@ -152,8 +179,16 @@ void MediaSourceImpl::Flush(const FlushCallback& callback) {
   callback_joiner->WhenJoined(callback);
 }
 
-void MediaSourceImpl::Seek(int64_t position, const FlushCallback& callback) {
-  demux_->Seek(position);
+void MediaSourceImpl::Seek(int64_t position, const SeekCallback& callback) {
+  DCHECK(init_complete_.occurred());
+
+  demux_->Seek(position, [this, callback]() {
+    task_runner_->PostTask(FROM_HERE, base::Bind(&RunSeekCallback, callback));
+  });
+}
+
+// static
+void MediaSourceImpl::RunSeekCallback(const SeekCallback& callback) {
   callback.Run();
 }
 

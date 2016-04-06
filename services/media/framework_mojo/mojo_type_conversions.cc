@@ -8,6 +8,66 @@
 namespace mojo {
 namespace media {
 
+Result ConvertResult(MojoResult mojo_result) {
+  switch (mojo_result) {
+    case MOJO_RESULT_OK:
+      return Result::kOk;
+    case MOJO_RESULT_INTERNAL:
+      return Result::kInternalError;
+    case MOJO_RESULT_UNIMPLEMENTED:
+      return Result::kUnsupportedOperation;
+    case MOJO_RESULT_INVALID_ARGUMENT:
+      return Result::kInvalidArgument;
+    case MOJO_RESULT_NOT_FOUND:
+      return Result::kNotFound;
+    case MOJO_RESULT_CANCELLED:
+    case MOJO_RESULT_UNKNOWN:
+    case MOJO_RESULT_DEADLINE_EXCEEDED:
+    case MOJO_RESULT_ALREADY_EXISTS:
+    case MOJO_RESULT_PERMISSION_DENIED:
+    case MOJO_RESULT_RESOURCE_EXHAUSTED:
+    case MOJO_RESULT_FAILED_PRECONDITION:
+    case MOJO_RESULT_ABORTED:
+    case MOJO_RESULT_OUT_OF_RANGE:
+    case MOJO_RESULT_UNAVAILABLE:
+    case MOJO_RESULT_DATA_LOSS:
+    case MOJO_RESULT_BUSY:
+    case MOJO_RESULT_SHOULD_WAIT:
+    default:
+      break;
+  }
+  return Result::kUnknownError;
+}
+
+Result Convert(MediaResult media_result) {
+  switch (media_result) {
+    case MediaResult::OK:
+      return Result::kOk;
+    case MediaResult::INTERNAL_ERROR:
+      return Result::kInternalError;
+    case MediaResult::UNSUPPORTED_OPERATION:
+    case MediaResult::NOT_IMPLEMENTED:
+      return Result::kUnsupportedOperation;
+    case MediaResult::INVALID_ARGUMENT:
+      return Result::kInvalidArgument;
+    case MediaResult::NOT_FOUND:
+      return Result::kNotFound;
+    case MediaResult::UNKNOWN_ERROR:
+    case MediaResult::UNSUPPORTED_CONFIG:
+    case MediaResult::INSUFFICIENT_RESOURCES:
+    case MediaResult::BAD_STATE:
+    case MediaResult::BUF_OVERFLOW:
+    case MediaResult::FLUSHED:
+    case MediaResult::BUSY:
+    case MediaResult::PROTOCOL_ERROR:
+    case MediaResult::ALREADY_EXISTS:
+    case MediaResult::SHUTTING_DOWN:
+    case MediaResult::CONNECTION_LOST:
+      break;
+  }
+  return Result::kUnknownError;
+}
+
 StreamType::Scheme Convert(MediaTypeScheme media_type_scheme) {
   switch (media_type_scheme) {
     case MediaTypeScheme::UNKNOWN:

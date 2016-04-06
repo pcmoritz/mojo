@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <limits>
+
 #include "base/logging.h"
 #include "services/media/framework/parts/reader.h"
 #include "services/media/framework_ffmpeg/av_io_context.h"
@@ -14,7 +16,8 @@ namespace mojo {
 namespace media {
 
 void AVIOContextDeleter::operator()(AVIOContext* context) const {
-  AvIoContext* av_io_context = reinterpret_cast<AvIoContext*>(context->opaque);
+  AvIoContextOpaque* av_io_context =
+      reinterpret_cast<AvIoContextOpaque*>(context->opaque);
   DCHECK(av_io_context);
   delete av_io_context;
   av_free(context->buffer);
@@ -28,52 +31,83 @@ AvIoContextPtr AvIoContext::Create(std::shared_ptr<Reader> reader) {
 
   InitFfmpeg();
 
-  AVIOContext* result = avio_alloc_context(
+  AvIoContextOpaque* avIoContextOpaque = new AvIoContextOpaque(reader);
+
+  AVIOContext* avIoContext = avio_alloc_context(
       static_cast<unsigned char*>(av_malloc(kBufferSize)), kBufferSize,
       0,  // write_flag
-      new AvIoContext(reader), &Read, nullptr, &Seek);
+      avIoContextOpaque, &AvIoContextOpaque::Read, nullptr,
+      &AvIoContextOpaque::Seek);
 
   // Ensure FFmpeg only tries to seek when we know how.
-  result->seekable = reader->CanSeek() ? AVIO_SEEKABLE_NORMAL : 0;
+  avIoContext->seekable =
+      avIoContextOpaque->can_seek() ? AVIO_SEEKABLE_NORMAL : 0;
 
   // Ensure writing is disabled.
-  result->write_flag = 0;
+  avIoContext->write_flag = 0;
 
-  return AvIoContextPtr(result);
+  return AvIoContextPtr(avIoContext);
 }
 
 // static
-int AvIoContext::Read(void* opaque, uint8_t* buf, int buf_size) {
-  AvIoContext* av_io_context = reinterpret_cast<AvIoContext*>(opaque);
+int AvIoContextOpaque::Read(void* opaque, uint8_t* buf, int buf_size) {
+  AvIoContextOpaque* av_io_context =
+      reinterpret_cast<AvIoContextOpaque*>(opaque);
   return av_io_context->Read(buf, buf_size);
 }
 
 // static
-int64_t AvIoContext::Seek(void* opaque, int64_t offset, int whence) {
-  AvIoContext* av_io_context = reinterpret_cast<AvIoContext*>(opaque);
+int64_t AvIoContextOpaque::Seek(void* opaque, int64_t offset, int whence) {
+  AvIoContextOpaque* av_io_context =
+      reinterpret_cast<AvIoContextOpaque*>(opaque);
   return av_io_context->Seek(offset, whence);
 }
 
-AvIoContext::~AvIoContext() {}
+AvIoContextOpaque::~AvIoContextOpaque() {}
 
-AvIoContext::AvIoContext(std::shared_ptr<Reader> reader) : reader_(reader) {
-  can_seek_ = reader_->CanSeek();
+AvIoContextOpaque::AvIoContextOpaque(std::shared_ptr<Reader> reader)
+    : reader_(reader) {
+  reader->Describe([this](Result result, size_t size, bool can_seek) {
+    describe_result_ = result;
+    size_ = size == Reader::kUnknownSize ? -1 : static_cast<int64_t>(size);
+    can_seek_ = can_seek;
+    CallbackComplete();
+  });
 
-  size_t size = reader_->GetSize();
-  size_ = size == Reader::kFailed ? -1 : static_cast<int64_t>(size);
+  WaitForCallback();
 }
 
-int AvIoContext::Read(uint8_t* buffer, size_t bytes_to_read) {
-  size_t bytes_read = reader_->Read(buffer, bytes_to_read);
-  if (bytes_read == Reader::kFailed) {
+int AvIoContextOpaque::Read(uint8_t* buffer, size_t bytes_to_read) {
+  DCHECK(position_ >= 0);
+
+  if (position_ >= size_) {
+    return 0;
+  }
+
+  DCHECK(static_cast<uint64_t>(position_) < std::numeric_limits<size_t>::max());
+
+  Result read_at_result;
+  size_t read_at_bytes_read;
+  reader_->ReadAt(static_cast<size_t>(position_), buffer, bytes_to_read,
+                  [this, &read_at_result, &read_at_bytes_read](
+                      Result result, size_t bytes_read) {
+                    read_at_result = result;
+                    read_at_bytes_read = bytes_read;
+                    CallbackComplete();
+                  });
+
+  WaitForCallback();
+
+  if (read_at_result != Result::kOk) {
     LOG(ERROR) << "read failed";
     return AVERROR(EIO);
   }
-  position_ += bytes_read;
-  return bytes_read;
+
+  position_ += read_at_bytes_read;
+  return read_at_bytes_read;
 }
 
-int64_t AvIoContext::Seek(int64_t offset, int whence) {
+int64_t AvIoContextOpaque::Seek(int64_t offset, int whence) {
   switch (whence) {
     case SEEK_SET:
       position_ = offset;
@@ -83,26 +117,23 @@ int64_t AvIoContext::Seek(int64_t offset, int whence) {
       break;
     case SEEK_END:
       if (size_ == -1) {
+        LOG(WARNING) << "whence of SEEK_END, size unknown";
         return AVERROR(EIO);
       }
       position_ = size_ + offset;
       break;
     case AVSEEK_SIZE:
       if (size_ == -1) {
+        LOG(WARNING) << "whence of AVSEEK_SIZE, size unknown";
         return AVERROR(EIO);
       }
       return size_;
     default:
-      NOTREACHED();
+      LOG(ERROR) << "unrecognized whence value " << whence;
       return AVERROR(EIO);
   }
 
   CHECK(size_ == -1 || position_ < size_) << "position out of range";
-  int64_t result = reader_->SetPosition(position_);
-  if (result == -1) {
-    LOG(ERROR) << "seek failed";
-    return AVERROR(EIO);
-  }
   return position_;
 }
 

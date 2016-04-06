@@ -20,7 +20,7 @@ class _MediaFactoryCreatePlayerParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  String originUrl = null;
+  Object reader = null;
   Object player = null;
 
   _MediaFactoryCreatePlayerParams() : super(kVersions.last.size);
@@ -60,7 +60,7 @@ class _MediaFactoryCreatePlayerParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.originUrl = decoder0.decodeString(8, false);
+      result.reader = decoder0.decodeServiceInterface(8, false, seeking_reader_mojom.SeekingReaderProxy.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -72,10 +72,10 @@ class _MediaFactoryCreatePlayerParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeString(originUrl, 8, false);
+      encoder0.encodeInterface(reader, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "originUrl of struct _MediaFactoryCreatePlayerParams: $e";
+          "reader of struct _MediaFactoryCreatePlayerParams: $e";
       rethrow;
     }
     try {
@@ -89,7 +89,7 @@ class _MediaFactoryCreatePlayerParams extends bindings.Struct {
 
   String toString() {
     return "_MediaFactoryCreatePlayerParams("
-           "originUrl: $originUrl" ", "
+           "reader: $reader" ", "
            "player: $player" ")";
   }
 
@@ -104,7 +104,7 @@ class _MediaFactoryCreateSourceParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
   ];
-  String originUrl = null;
+  Object reader = null;
   List<media_types_mojom.MediaTypeSet> allowedMediaTypes = null;
   Object source = null;
 
@@ -145,7 +145,7 @@ class _MediaFactoryCreateSourceParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.originUrl = decoder0.decodeString(8, false);
+      result.reader = decoder0.decodeServiceInterface(8, false, seeking_reader_mojom.SeekingReaderProxy.newFromEndpoint);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -172,10 +172,10 @@ class _MediaFactoryCreateSourceParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeString(originUrl, 8, false);
+      encoder0.encodeInterface(reader, 8, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "originUrl of struct _MediaFactoryCreateSourceParams: $e";
+          "reader of struct _MediaFactoryCreateSourceParams: $e";
       rethrow;
     }
     try {
@@ -203,7 +203,7 @@ class _MediaFactoryCreateSourceParams extends bindings.Struct {
 
   String toString() {
     return "_MediaFactoryCreateSourceParams("
-           "originUrl: $originUrl" ", "
+           "reader: $reader" ", "
            "allowedMediaTypes: $allowedMediaTypes" ", "
            "source: $source" ")";
   }
@@ -500,8 +500,8 @@ class _MediaFactoryServiceDescription implements service_describer.ServiceDescri
 
 abstract class MediaFactory {
   static const String serviceName = "mojo::media::MediaFactory";
-  void createPlayer(String originUrl, Object player);
-  void createSource(String originUrl, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source);
+  void createPlayer(Object reader, Object player);
+  void createSource(Object reader, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source);
   void createSink(String destinationUrl, media_types_mojom.MediaType mediaType, Object sink);
   void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder);
   void createNetworkReader(String url, Object reader);
@@ -546,23 +546,23 @@ class _MediaFactoryProxyCalls implements MediaFactory {
   _MediaFactoryProxyImpl _proxyImpl;
 
   _MediaFactoryProxyCalls(this._proxyImpl);
-    void createPlayer(String originUrl, Object player) {
+    void createPlayer(Object reader, Object player) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
       var params = new _MediaFactoryCreatePlayerParams();
-      params.originUrl = originUrl;
+      params.reader = reader;
       params.player = player;
       _proxyImpl.sendMessage(params, _mediaFactoryMethodCreatePlayerName);
     }
-    void createSource(String originUrl, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source) {
+    void createSource(Object reader, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
       var params = new _MediaFactoryCreateSourceParams();
-      params.originUrl = originUrl;
+      params.reader = reader;
       params.allowedMediaTypes = allowedMediaTypes;
       params.source = source;
       _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateSourceName);
@@ -691,12 +691,12 @@ class MediaFactoryStub extends bindings.Stub {
       case _mediaFactoryMethodCreatePlayerName:
         var params = _MediaFactoryCreatePlayerParams.deserialize(
             message.payload);
-        _impl.createPlayer(params.originUrl, params.player);
+        _impl.createPlayer(params.reader, params.player);
         break;
       case _mediaFactoryMethodCreateSourceName:
         var params = _MediaFactoryCreateSourceParams.deserialize(
             message.payload);
-        _impl.createSource(params.originUrl, params.allowedMediaTypes, params.source);
+        _impl.createSource(params.reader, params.allowedMediaTypes, params.source);
         break;
       case _mediaFactoryMethodCreateSinkName:
         var params = _MediaFactoryCreateSinkParams.deserialize(

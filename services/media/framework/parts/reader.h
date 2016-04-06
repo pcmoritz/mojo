@@ -8,6 +8,7 @@
 #include <limits>
 #include <memory>
 
+#include "mojo/public/cpp/application/application_impl.h"
 #include "services/media/framework/result.h"
 #include "url/gurl.h"
 
@@ -15,37 +16,28 @@ namespace mojo {
 namespace media {
 
 // Abstract base class for objects that read raw data on behalf of demuxes.
-// This model is synchronous, because that's how ffmpeg works.
-// TODO(dalesat): Make this model async and deal with it in FfmpegDemux.
 class Reader {
  public:
-  static constexpr size_t kFailed = std::numeric_limits<size_t>::max();
+  using DescribeCallback =
+      std::function<void(Result result, size_t size, bool can_seek)>;
+  using ReadAtCallback = std::function<void(Result result, size_t bytes_read)>;
 
-  // Creates a Reader object for a given url.
-  static Result Create(const GURL& gurl, std::shared_ptr<Reader>* reader_out);
+  static constexpr size_t kUnknownSize = std::numeric_limits<size_t>::max();
 
   virtual ~Reader() {}
 
-  // Initializes the reader.
-  virtual Result Init(const GURL& gurl) = 0;
+  // Returns a result, the file size and whether the reader supports seeking
+  // via a callback. The returned size is kUnknownSize if the content size isn't
+  // known.
+  virtual void Describe(const DescribeCallback& callback) = 0;
 
-  // Reads the given number of bytes into the buffer and returns the number of
-  // bytes read. Returns kFailed if the operation fails.
-  virtual size_t Read(uint8_t* buffer, size_t bytes_to_read) = 0;
-
-  // Gets the current position or -1 if the operation fails.
-  virtual int64_t GetPosition() const = 0;
-
-  // Seeks to the given position and returns it. Returns -1 if the operation
-  // fails.
-  virtual int64_t SetPosition(int64_t position) = 0;
-
-  // Returns the file size. Returns kFailed if the operation fails or the size
-  // isn't known.
-  virtual size_t GetSize() const = 0;
-
-  // Returns true if this object supports seeking, false otherwise.
-  virtual bool CanSeek() const = 0;
+  // Reads the specified number of bytes into the buffer from the specified
+  // position and returns a result and the number of bytes read via the
+  // callback.
+  virtual void ReadAt(size_t position,
+                      uint8_t* buffer,
+                      size_t bytes_to_read,
+                      const ReadAtCallback& callback) = 0;
 };
 
 }  // namespace media

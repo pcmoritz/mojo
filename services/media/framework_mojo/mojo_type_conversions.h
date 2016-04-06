@@ -5,13 +5,21 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_TYPE_CONVERSIONS_H_
 #define SERVICES_MEDIA_FRAMEWORK_MOJO_MOJO_TYPE_CONVERSIONS_H_
 
+#include "mojo/services/media/common/interfaces/media_common.mojom.h"
 #include "mojo/services/media/common/interfaces/media_metadata.mojom.h"
 #include "mojo/services/media/common/interfaces/media_types.mojom.h"
 #include "services/media/framework/metadata.h"
+#include "services/media/framework/result.h"
 #include "services/media/framework/stream_type.h"
 
 namespace mojo {
 namespace media {
+
+// Converts a MojoResult into a Result.
+Result ConvertResult(MojoResult mojo_result);
+
+// Converts a MediaResult into a Result.
+Result Convert(MediaResult media_result);
 
 // Creates a StreamType::Scheme from a MediaTypeScheme.
 StreamType::Scheme Convert(MediaTypeScheme media_type_scheme);

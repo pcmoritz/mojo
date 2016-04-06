@@ -14,7 +14,7 @@ namespace media {
 
 class FfmpegDemux : public Demux {
  public:
-  static std::shared_ptr<Demux> Create();
+  static std::shared_ptr<Demux> Create(std::shared_ptr<Reader> reader);
 };
 
 }  // namespace media

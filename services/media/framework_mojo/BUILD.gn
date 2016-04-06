@@ -14,6 +14,8 @@ source_set("framework_mojo") {
     "mojo_producer.h",
     "mojo_pull_mode_producer.cc",
     "mojo_pull_mode_producer.h",
+    "mojo_reader.cc",
+    "mojo_reader.h",
     "mojo_type_conversions.cc",
     "mojo_type_conversions.h",
   ]
@@ -26,6 +28,8 @@ source_set("framework_mojo") {
     "//mojo/services/media/common/cpp",
     "//mojo/services/media/common/interfaces",
     "//mojo/services/media/control/interfaces",
+    "//mojo/services/media/core/interfaces",
+    "//mojo/services/network/interfaces",
     "//services/media/framework",
     "//third_party/modp_b64",
   ]

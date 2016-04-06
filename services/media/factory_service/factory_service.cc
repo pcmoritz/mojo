@@ -38,17 +38,17 @@ void MediaFactoryService::Create(ApplicationConnection* connection,
   bindings_.AddBinding(this, request.Pass());
 }
 
-void MediaFactoryService::CreatePlayer(const String& origin_url,
+void MediaFactoryService::CreatePlayer(InterfaceHandle<SeekingReader> reader,
                                        InterfaceRequest<MediaPlayer> player) {
   products_.insert(std::static_pointer_cast<Product>(
-      MediaPlayerImpl::Create(origin_url, player.Pass(), this)));
+      MediaPlayerImpl::Create(reader.Pass(), player.Pass(), this)));
 }
 
-void MediaFactoryService::CreateSource(const String& origin_url,
+void MediaFactoryService::CreateSource(InterfaceHandle<SeekingReader> reader,
                                        Array<MediaTypeSetPtr> media_types,
                                        InterfaceRequest<MediaSource> source) {
-  products_.insert(std::static_pointer_cast<Product>(
-      MediaSourceImpl::Create(origin_url, media_types, source.Pass(), this)));
+  products_.insert(std::static_pointer_cast<Product>(MediaSourceImpl::Create(
+      reader.Pass(), media_types, source.Pass(), this)));
 }
 
 void MediaFactoryService::CreateSink(const String& destination_url,

@@ -7,10 +7,13 @@
 
 #include <vector>
 
+#include "base/single_thread_task_runner.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/media/control/interfaces/media_source.mojom.h"
+#include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "services/media/factory_service/factory_service.h"
 #include "services/media/framework/graph.h"
+#include "services/media/framework/incident.h"
 #include "services/media/framework/parts/decoder.h"
 #include "services/media/framework/parts/demux.h"
 #include "services/media/framework/parts/null_sink.h"
@@ -26,7 +29,7 @@ class MediaSourceImpl : public MediaFactoryService::Product,
                         public MediaSource {
  public:
   static std::shared_ptr<MediaSourceImpl> Create(
-      const String& origin_url,
+      InterfaceHandle<SeekingReader> reader,
       const Array<MediaTypeSetPtr>& allowed_media_types,
       InterfaceRequest<MediaSource> request,
       MediaFactoryService* owner);
@@ -62,7 +65,7 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   void Seek(int64_t position, const SeekCallback& callback) override;
 
  private:
-  MediaSourceImpl(const String& origin_url,
+  MediaSourceImpl(InterfaceHandle<SeekingReader> reader,
                   const Array<MediaTypeSetPtr>& allowed_media_types,
                   InterfaceRequest<MediaSource> request,
                   MediaFactoryService* owner);
@@ -108,17 +111,25 @@ class MediaSourceImpl : public MediaFactoryService::Product,
     std::shared_ptr<NullSink> null_sink_;
   };
 
+  // Handles the completion of demux initialization.
+  void OnDemuxInitialized(Result result);
+
   // Increments the status version and runs pending status request callbacks.
   void StatusUpdated();
 
   // Runs status request callback.
   void RunStatusCallback(const GetStatusCallback& callback) const;
 
+  static void RunSeekCallback(const SeekCallback& callback);
+
+  scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
   Binding<MediaSource> binding_;
+  Array<MediaTypeSetPtr> allowed_media_types_;
   Graph graph_;
   PartRef demux_part_;
   std::shared_ptr<Reader> reader_;
   std::shared_ptr<Demux> demux_;
+  Incident init_complete_;
   std::vector<std::unique_ptr<Stream>> streams_;
   uint64_t status_version_ = 1;
   MediaState state_ = MediaState::UNPREPARED;

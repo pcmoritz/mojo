@@ -57,10 +57,10 @@ class MediaFactoryService : public ApplicationDelegate,
               InterfaceRequest<MediaFactory> request) override;
 
   // MediaFactory implementation.
-  void CreatePlayer(const String& origin_url,
+  void CreatePlayer(InterfaceHandle<SeekingReader> reader,
                     InterfaceRequest<MediaPlayer> player) override;
 
-  void CreateSource(const String& origin_url,
+  void CreateSource(InterfaceHandle<SeekingReader> reader,
                     Array<MediaTypeSetPtr> allowed_media_types,
                     InterfaceRequest<MediaSource> source) override;
 

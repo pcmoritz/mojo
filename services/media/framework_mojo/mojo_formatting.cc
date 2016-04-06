@@ -320,6 +320,84 @@ std::ostream& operator<<(std::ostream& os, const TimelineTransformPtr& value) {
   return os << outdent;
 }
 
+std::ostream& operator<<(std::ostream& os, const HttpHeaderPtr& value) {
+  if (!value) {
+    return os << "<nullptr>" << std::endl;
+  } else {
+    return os << value->name << ":" << value->value << std::endl;
+  }
+}
+
+std::ostream& operator<<(std::ostream& os, const URLRequestPtr& value) {
+  if (!value) {
+    return os << "<nullptr>" << std::endl;
+  } else {
+    os << std::endl;
+  }
+
+  os << indent;
+  os << begl << "mojo::String url: " << value->url << std::endl;
+  os << begl << "mojo::String method: " << value->method << std::endl;
+  os << begl << "mojo::Array<mojo::HttpHeaderPtr> headers: " << value->headers;
+  os << begl
+     << "mojo::Array<mojo::ScopedDataPipeConsumerHandle> body: " << value->body;
+  os << begl << "uint32_t response_body_buffer_size: "
+     << value->response_body_buffer_size << std::endl;
+  os << begl << "bool auto_follow_redirects: " << value->auto_follow_redirects
+     << std::endl;
+  os << begl << "URLRequest::CacheMode cache_mode: " << value->cache_mode
+     << std::endl;
+  return os << outdent;
+}
+
+std::ostream& operator<<(std::ostream& os, const URLResponsePtr& value) {
+  if (!value) {
+    return os << "<nullptr>" << std::endl;
+  } else {
+    os << std::endl;
+  }
+
+  os << indent;
+  os << begl << "mojo::NetworkErrorPtr error: " << value->error;
+  os << begl << "mojo::ScopedDataPipeConsumerHandle body: " << value->body
+     << std::endl;
+  os << begl << "mojo::String url: " << value->url << std::endl;
+  os << begl << "uint32_t status_code: " << value->status_code << std::endl;
+  os << begl << "mojo::String status_line: " << value->status_line << std::endl;
+  os << begl << "mojo::Array<mojo::HttpHeaderPtr> headers: " << value->headers;
+  os << begl << "mojo::String mime_type: " << value->mime_type << std::endl;
+  os << begl << "mojo::String charset: " << value->charset << std::endl;
+  os << begl << "mojo::String redirect_method: " << value->redirect_method
+     << std::endl;
+  os << begl << "mojo::String redirect_url: " << value->redirect_url
+     << std::endl;
+  os << begl << "mojo::String redirect_referrer: " << value->redirect_referrer
+     << std::endl;
+  return os << outdent;
+}
+
+std::ostream& operator<<(std::ostream& os, const NetworkErrorPtr& value) {
+  if (!value) {
+    return os << "<nullptr>" << std::endl;
+  } else {
+    os << std::endl;
+  }
+
+  os << indent;
+  os << begl << "int32_t code: " << value->code << std::endl;
+  os << begl << "mojo::String description: " << value->description << std::endl;
+  return os << outdent;
+}
+
+std::ostream& operator<<(std::ostream& os,
+                         const ScopedDataPipeConsumerHandle& value) {
+  if (value.is_valid()) {
+    return os << "<valid>";
+  } else {
+    return os << "<not valid>";
+  }
+}
+
 const char* StringFromMediaTypeScheme(MediaTypeScheme value) {
   switch (value) {
     case MediaTypeScheme::UNKNOWN:

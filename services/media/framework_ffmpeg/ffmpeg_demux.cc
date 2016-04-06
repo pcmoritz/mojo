@@ -2,9 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <condition_variable>
 #include <map>
+#include <mutex>
+#include <thread>
 
 #include "base/logging.h"
+#include "services/media/framework/incident.h"
 #include "services/media/framework/safe_clone.h"
 #include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/av_format_context.h"
@@ -17,25 +21,29 @@ namespace media {
 
 class FfmpegDemuxImpl : public FfmpegDemux {
  public:
-  FfmpegDemuxImpl();
+  FfmpegDemuxImpl(std::shared_ptr<Reader> reader);
 
   ~FfmpegDemuxImpl() override;
 
   // Demux implementation.
-  Result Init(std::shared_ptr<Reader> reader) override;
+  void WhenInitialized(std::function<void(Result)> callback) override;
 
   std::unique_ptr<Metadata> metadata() const override;
 
   const std::vector<DemuxStream*>& streams() const override;
 
-  void Seek(int64_t position) override;
+  void Seek(int64_t position, const SeekCallback& callback) override;
 
-  // MultistreamSource implementation.
+  // ActiveMultistreamSource implementation.
   size_t stream_count() const override;
 
-  PacketPtr PullPacket(size_t* stream_index_out) override;
+  void SetSupplyCallback(const SupplyCallback& supply_callback) override;
+
+  void RequestPacket() override;
 
  private:
+  static constexpr int64_t kNotSeeking = std::numeric_limits<int64_t>::max();
+
   class FfmpegDemuxStream : public DemuxStream {
    public:
     FfmpegDemuxStream(const AVFormatContext& format_context, size_t index);
@@ -81,59 +89,126 @@ class FfmpegDemuxImpl : public FfmpegDemux {
     ffmpeg::AvPacketPtr av_packet_;
   };
 
-  struct AVFormatContextDeleter {
-    inline void operator()(AVFormatContext* ptr) const {
-      avformat_free_context(ptr);
-    }
-  };
+  // Runs in the ffmpeg thread doing the real work.
+  void Worker();
 
-  // Produces an end-of-stream packet for next_stream_to_end_.
+  // Produces a packet. Called from the ffmpeg thread only.
+  PacketPtr PullPacket(size_t* stream_index_out);
+
+  // Produces an end-of-stream packet for next_stream_to_end_. Called from the
+  // ffmpeg thread only.
   PacketPtr PullEndOfStreamPacket(size_t* stream_index_out);
 
   // Copies metadata from the specified source into map.
   void CopyMetadata(AVDictionary* source,
                     std::map<std::string, std::string>& map);
 
+  std::mutex mutex_;
+  std::condition_variable condition_variable_;
+  std::thread ffmpeg_thread_;
+
+  // These are protected by mutex_.
+  int64_t seek_position_ = kNotSeeking;
+  SeekCallback seek_callback_;
+  bool packet_requested_ = false;
+  bool terminating_ = false;
+
+  // These should be stable after init until the desctructor terminates.
   std::shared_ptr<Reader> reader_;
+  std::vector<DemuxStream*> streams_;
+  Incident init_complete_;
+  Result result_;
+
+  // After Init, only the ffmpeg thread accesses these.
   AvFormatContextPtr format_context_;
   AvIoContextPtr io_context_;
-  std::vector<DemuxStream*> streams_;
-  std::unique_ptr<Metadata> metadata_;
   int64_t next_pts_;
   int next_stream_to_end_ = -1;  // -1: don't end, streams_.size(): stop.
+
+  SupplyCallback supply_callback_;
+  std::unique_ptr<Metadata> metadata_;
 };
 
 // static
-std::shared_ptr<Demux> FfmpegDemux::Create() {
-  return std::shared_ptr<Demux>(new FfmpegDemuxImpl());
+std::shared_ptr<Demux> FfmpegDemux::Create(std::shared_ptr<Reader> reader) {
+  return std::shared_ptr<Demux>(new FfmpegDemuxImpl(reader));
 }
 
-FfmpegDemuxImpl::FfmpegDemuxImpl() {}
+FfmpegDemuxImpl::FfmpegDemuxImpl(std::shared_ptr<Reader> reader)
+    : reader_(reader) {
+  ffmpeg_thread_ = std::thread(std::bind(&FfmpegDemuxImpl::Worker, this));
+}
 
-FfmpegDemuxImpl::~FfmpegDemuxImpl() {}
+FfmpegDemuxImpl::~FfmpegDemuxImpl() {
+  {
+    std::unique_lock<std::mutex> lock(mutex_);
+    terminating_ = true;
+    condition_variable_.notify_all();
+  }
 
-Result FfmpegDemuxImpl::Init(std::shared_ptr<Reader> reader) {
+  if (ffmpeg_thread_.joinable()) {
+    ffmpeg_thread_.join();
+  }
+}
+
+void FfmpegDemuxImpl::WhenInitialized(std::function<void(Result)> callback) {
+  init_complete_.When([this, callback]() { callback(result_); });
+}
+
+std::unique_ptr<Metadata> FfmpegDemuxImpl::metadata() const {
+  return SafeClone(metadata_);
+}
+
+const std::vector<Demux::DemuxStream*>& FfmpegDemuxImpl::streams() const {
+  return streams_;
+}
+
+void FfmpegDemuxImpl::Seek(int64_t position, const SeekCallback& callback) {
+  std::unique_lock<std::mutex> lock(mutex_);
+  seek_position_ = position;
+  seek_callback_ = callback;
+  condition_variable_.notify_all();
+}
+
+size_t FfmpegDemuxImpl::stream_count() const {
+  return streams_.size();
+}
+
+void FfmpegDemuxImpl::SetSupplyCallback(const SupplyCallback& supply_callback) {
+  supply_callback_ = supply_callback;
+}
+
+void FfmpegDemuxImpl::RequestPacket() {
+  std::unique_lock<std::mutex> lock(mutex_);
+  packet_requested_ = true;
+  condition_variable_.notify_all();
+}
+
+void FfmpegDemuxImpl::Worker() {
   static constexpr uint64_t kNanosecondsPerMicrosecond = 1000;
 
-  reader_ = reader;
-
-  io_context_ = AvIoContext::Create(reader);
+  io_context_ = AvIoContext::Create(reader_);
   if (!io_context_) {
     LOG(ERROR) << "AvIoContext::Create failed";
-    return Result::kInternalError;
+    result_ = Result::kInternalError;
+    init_complete_.Occur();
+    return;
   }
 
   format_context_ = AvFormatContext::OpenInput(io_context_);
   if (!format_context_) {
     LOG(ERROR) << "AvFormatContext::OpenInput failed";
-    return Result::kInternalError;
+    result_ = Result::kInternalError;
+    init_complete_.Occur();
+    return;
   }
 
-  // TODO(dalesat): This synchronous operation may take a long time.
   int r = avformat_find_stream_info(format_context_.get(), nullptr);
   if (r < 0) {
     LOG(ERROR) << "avformat_find_stream_info failed, result " << r;
-    return Result::kInternalError;
+    result_ = Result::kInternalError;
+    init_complete_.Occur();
+    return;
   }
 
   std::map<std::string, std::string> metadata_map;
@@ -150,30 +225,52 @@ Result FfmpegDemuxImpl::Init(std::shared_ptr<Reader> reader) {
                        metadata_map["ALBUM"], metadata_map["PUBLISHER"],
                        metadata_map["GENRE"], metadata_map["COMPOSER"]);
 
-  return Result::kOk;
-}
+  result_ = Result::kOk;
+  init_complete_.Occur();
 
-std::unique_ptr<Metadata> FfmpegDemuxImpl::metadata() const {
-  return SafeClone(metadata_);
-}
+  while (true) {
+    bool packet_requested;
+    int64_t seek_position;
+    SeekCallback seek_callback;
 
-const std::vector<Demux::DemuxStream*>& FfmpegDemuxImpl::streams() const {
-  return streams_;
-}
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      if (!packet_requested_ && !terminating_ &&
+          seek_position_ == kNotSeeking) {
+        condition_variable_.wait(lock);
+      }
 
-void FfmpegDemuxImpl::Seek(int64_t position) {
-  int r = av_seek_frame(format_context_.get(), -1, position / 1000, 0);
-  if (r < 0) {
-    LOG(WARNING) << "av_seek_frame failed, result " << r;
+      if (terminating_) {
+        return;
+      }
+
+      packet_requested = packet_requested_;
+      packet_requested_ = false;
+
+      seek_position = seek_position_;
+      seek_position_ = kNotSeeking;
+
+      seek_callback_.swap(seek_callback);
+    }
+
+    if (seek_position != kNotSeeking) {
+      int r = av_seek_frame(format_context_.get(), -1, seek_position / 1000, 0);
+      if (r < 0) {
+        LOG(WARNING) << "av_seek_frame failed, result " << r;
+      }
+      next_stream_to_end_ = -1;
+      seek_callback();
+    }
+
+    if (packet_requested) {
+      size_t stream_index;
+      PacketPtr packet = PullPacket(&stream_index);
+      DCHECK(packet);
+
+      DCHECK(supply_callback_);
+      supply_callback_(stream_index, std::move(packet));
+    }
   }
-  next_stream_to_end_ = -1;
-}
-
-size_t FfmpegDemuxImpl::stream_count() const {
-  if (!format_context_) {
-    return 0;
-  }
-  return format_context_->nb_streams;
 }
 
 PacketPtr FfmpegDemuxImpl::PullPacket(size_t* stream_index_out) {
