@@ -18,6 +18,7 @@ import (
 )
 
 func main() {
+	log.SetFlags(0)
 	config := common.GetCliConfig(os.Args)
 	common.GenerateOutput(WriteDepsFile, config)
 }
