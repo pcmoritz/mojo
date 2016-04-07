@@ -39,9 +39,6 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
     SpeechRecognizerServiceImpl(Context context) {
         mContext = context;
         mMainHandler = new Handler(mContext.getMainLooper());
-
-        mListener = null;
-
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -64,6 +61,7 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
     public void listen(SpeechRecognizerListener listener) {
         if (mListener != null) {
             listener.onRecognizerError(Error.RECOGNIZER_BUSY);
+            return;
         }
 
         mListener = listener;
@@ -164,17 +162,17 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
         @Override
         public void onResults(Bundle results) {
             mAudioManager.abandonAudioFocus(null);
-            processResults(results);
+            processResults(results, true);
             mListener = null;
         }
         @Override
         public void onPartialResults(Bundle partialResults) {
-            processResults(partialResults);
+            processResults(partialResults, false);
         }
         @Override
         public void onEvent(int eventType, Bundle params) {}
 
-        private void processResults(Bundle results) {
+        private void processResults(Bundle results, boolean complete) {
             ArrayList<String> utterances =
                     results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             float[] confidences = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
@@ -194,7 +192,8 @@ final class SpeechRecognizerServiceImpl implements SpeechRecognizerService {
             }
 
             if (mListener != null) {
-                mListener.onResults(candidates.toArray(new UtteranceCandidate[candidates.size()]));
+                mListener.onResults(
+                        candidates.toArray(new UtteranceCandidate[candidates.size()]), complete);
             }
         }
     }

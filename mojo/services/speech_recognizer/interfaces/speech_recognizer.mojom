@@ -31,8 +31,9 @@ interface SpeechRecognizerListener {
   // Called when an error occurs.
   OnRecognizerError(Error error_code);
 
-  // Called when the recognizer receives results.
-  OnResults(array<UtteranceCandidate> results);
+  // Called when the recognizer receives results.  |complete| will be true if
+  // the recognizer has stopped listening with these results.
+  OnResults(array<UtteranceCandidate> results, bool complete);
 
   // Called when sound level changes.
   OnSoundLevelChanged(float rmsDb);

@@ -275,9 +275,10 @@ class _SpeechRecognizerListenerOnRecognizerErrorParams extends bindings.Struct {
 
 class _SpeechRecognizerListenerOnResultsParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
+    const bindings.StructDataHeader(24, 0)
   ];
   List<UtteranceCandidate> results = null;
+  bool complete = false;
 
   _SpeechRecognizerListenerOnResultsParams() : super(kVersions.last.size);
 
@@ -327,6 +328,10 @@ class _SpeechRecognizerListenerOnResultsParams extends bindings.Struct {
         }
       }
     }
+    if (mainDataHeader.version >= 0) {
+      
+      result.complete = decoder0.decodeBool(16, 0);
+    }
     return result;
   }
 
@@ -346,16 +351,25 @@ class _SpeechRecognizerListenerOnResultsParams extends bindings.Struct {
           "results of struct _SpeechRecognizerListenerOnResultsParams: $e";
       rethrow;
     }
+    try {
+      encoder0.encodeBool(complete, 16, 0);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "complete of struct _SpeechRecognizerListenerOnResultsParams: $e";
+      rethrow;
+    }
   }
 
   String toString() {
     return "_SpeechRecognizerListenerOnResultsParams("
-           "results: $results" ")";
+           "results: $results" ", "
+           "complete: $complete" ")";
   }
 
   Map toJson() {
     Map map = new Map();
     map["results"] = results;
+    map["complete"] = complete;
     return map;
   }
 }
@@ -579,7 +593,7 @@ class _SpeechRecognizerListenerServiceDescription implements service_describer.S
 abstract class SpeechRecognizerListener {
   static const String serviceName = null;
   void onRecognizerError(Error errorCode);
-  void onResults(List<UtteranceCandidate> results);
+  void onResults(List<UtteranceCandidate> results, bool complete);
   void onSoundLevelChanged(double rmsDb);
 }
 
@@ -631,13 +645,14 @@ class _SpeechRecognizerListenerProxyCalls implements SpeechRecognizerListener {
       params.errorCode = errorCode;
       _proxyImpl.sendMessage(params, _speechRecognizerListenerMethodOnRecognizerErrorName);
     }
-    void onResults(List<UtteranceCandidate> results) {
+    void onResults(List<UtteranceCandidate> results, bool complete) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
         return;
       }
       var params = new _SpeechRecognizerListenerOnResultsParams();
       params.results = results;
+      params.complete = complete;
       _proxyImpl.sendMessage(params, _speechRecognizerListenerMethodOnResultsName);
     }
     void onSoundLevelChanged(double rmsDb) {
@@ -747,7 +762,7 @@ class SpeechRecognizerListenerStub extends bindings.Stub {
       case _speechRecognizerListenerMethodOnResultsName:
         var params = _SpeechRecognizerListenerOnResultsParams.deserialize(
             message.payload);
-        _impl.onResults(params.results);
+        _impl.onResults(params.results, params.complete);
         break;
       case _speechRecognizerListenerMethodOnSoundLevelChangedName:
         var params = _SpeechRecognizerListenerOnSoundLevelChangedParams.deserialize(
