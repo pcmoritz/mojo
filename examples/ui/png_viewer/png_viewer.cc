@@ -49,25 +49,32 @@ class PNGView : public mojo::ui::GaneshView {
     if (!properties())
       return;
 
-    const mojo::Size& size = *properties()->view_layout->size;
-    mojo::RectF bounds;
-    bounds.width = size.width;
-    bounds.height = size.height;
-
     auto update = mojo::gfx::composition::SceneUpdate::New();
-    mojo::gfx::composition::ResourcePtr content_resource =
-        ganesh_renderer()->DrawCanvas(
-            size,
-            base::Bind(&PNGView::DrawContent, base::Unretained(this), size));
-    DCHECK(content_resource);
-    update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
-    auto root_node = mojo::gfx::composition::Node::New();
-    root_node->op = mojo::gfx::composition::NodeOp::New();
-    root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
-    root_node->op->get_image()->content_rect = bounds.Clone();
-    root_node->op->get_image()->image_resource_id = kContentImageResourceId;
-    update->nodes.insert(kRootNodeId, root_node.Pass());
+    const mojo::Size& size = *properties()->view_layout->size;
+    if (size.width > 0 && size.height > 0) {
+      mojo::RectF bounds;
+      bounds.width = size.width;
+      bounds.height = size.height;
+
+      mojo::gfx::composition::ResourcePtr content_resource =
+          ganesh_renderer()->DrawCanvas(
+              size,
+              base::Bind(&PNGView::DrawContent, base::Unretained(this), size));
+      DCHECK(content_resource);
+      update->resources.insert(kContentImageResourceId,
+                               content_resource.Pass());
+
+      auto root_node = mojo::gfx::composition::Node::New();
+      root_node->op = mojo::gfx::composition::NodeOp::New();
+      root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
+      root_node->op->get_image()->content_rect = bounds.Clone();
+      root_node->op->get_image()->image_resource_id = kContentImageResourceId;
+      update->nodes.insert(kRootNodeId, root_node.Pass());
+    } else {
+      auto root_node = mojo::gfx::composition::Node::New();
+      update->nodes.insert(kRootNodeId, root_node.Pass());
+    }
 
     scene()->Update(update.Pass());
 

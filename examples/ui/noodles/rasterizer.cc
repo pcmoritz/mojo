@@ -28,24 +28,30 @@ Rasterizer::~Rasterizer() {}
 void Rasterizer::PublishFrame(std::unique_ptr<Frame> frame) {
   DCHECK(frame);
 
-  mojo::RectF bounds;
-  bounds.width = frame->size().width;
-  bounds.height = frame->size().height;
-
   auto update = mojo::gfx::composition::SceneUpdate::New();
-  mojo::gfx::composition::ResourcePtr content_resource =
-      ganesh_renderer_.DrawCanvas(
-          frame->size(),
-          base::Bind(&Frame::Paint, base::Unretained(frame.get())));
-  DCHECK(content_resource);
-  update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
-  auto root_node = mojo::gfx::composition::Node::New();
-  root_node->op = mojo::gfx::composition::NodeOp::New();
-  root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
-  root_node->op->get_image()->content_rect = bounds.Clone();
-  root_node->op->get_image()->image_resource_id = kContentImageResourceId;
-  update->nodes.insert(kRootNodeId, root_node.Pass());
+  if (frame->size().width > 0 && frame->size().height > 0) {
+    mojo::RectF bounds;
+    bounds.width = frame->size().width;
+    bounds.height = frame->size().height;
+
+    mojo::gfx::composition::ResourcePtr content_resource =
+        ganesh_renderer_.DrawCanvas(
+            frame->size(),
+            base::Bind(&Frame::Paint, base::Unretained(frame.get())));
+    DCHECK(content_resource);
+    update->resources.insert(kContentImageResourceId, content_resource.Pass());
+
+    auto root_node = mojo::gfx::composition::Node::New();
+    root_node->op = mojo::gfx::composition::NodeOp::New();
+    root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
+    root_node->op->get_image()->content_rect = bounds.Clone();
+    root_node->op->get_image()->image_resource_id = kContentImageResourceId;
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  } else {
+    auto root_node = mojo::gfx::composition::Node::New();
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  }
 
   scene_->Update(update.Pass());
   scene_->Publish(frame->TakeSceneMetadata());

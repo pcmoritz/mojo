@@ -144,27 +144,34 @@ void SpinningCubeView::OnDraw(
   cube_.UpdateForTimeDelta(time_delta.InSecondsF());
 
   // Update the contents of the scene.
-  const mojo::Size& size = *properties()->view_layout->size;
-  mojo::RectF bounds;
-  bounds.width = size.width;
-  bounds.height = size.height;
-
   auto update = mojo::gfx::composition::SceneUpdate::New();
-  mojo::gfx::composition::ResourcePtr cube_resource = gl_renderer()->DrawGL(
-      size, true, base::Bind(&SpinningCubeView::DrawCubeWithGL,
-                             base::Unretained(this), size));
-  DCHECK(cube_resource);
-  update->resources.insert(kCubeImageResourceId, cube_resource.Pass());
 
-  auto root_node = mojo::gfx::composition::Node::New();
-  root_node->content_transform = mojo::Transform::New();
-  mojo::SetIdentityTransform(root_node->content_transform.get());
-  root_node->hit_test_behavior = mojo::gfx::composition::HitTestBehavior::New();
-  root_node->op = mojo::gfx::composition::NodeOp::New();
-  root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
-  root_node->op->get_image()->content_rect = bounds.Clone();
-  root_node->op->get_image()->image_resource_id = kCubeImageResourceId;
-  update->nodes.insert(kRootNodeId, root_node.Pass());
+  const mojo::Size& size = *properties()->view_layout->size;
+  if (size.width > 0 && size.height > 0) {
+    mojo::RectF bounds;
+    bounds.width = size.width;
+    bounds.height = size.height;
+
+    mojo::gfx::composition::ResourcePtr cube_resource = gl_renderer()->DrawGL(
+        size, true, base::Bind(&SpinningCubeView::DrawCubeWithGL,
+                               base::Unretained(this), size));
+    DCHECK(cube_resource);
+    update->resources.insert(kCubeImageResourceId, cube_resource.Pass());
+
+    auto root_node = mojo::gfx::composition::Node::New();
+    root_node->content_transform = mojo::Transform::New();
+    mojo::SetIdentityTransform(root_node->content_transform.get());
+    root_node->hit_test_behavior =
+        mojo::gfx::composition::HitTestBehavior::New();
+    root_node->op = mojo::gfx::composition::NodeOp::New();
+    root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
+    root_node->op->get_image()->content_rect = bounds.Clone();
+    root_node->op->get_image()->image_resource_id = kCubeImageResourceId;
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  } else {
+    auto root_node = mojo::gfx::composition::Node::New();
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  }
 
   scene()->Update(update.Pass());
 

@@ -34,30 +34,35 @@ void ShapesView::UpdateScene() {
   if (!properties())
     return;
 
-  const mojo::Size& size = *properties()->view_layout->size;
-  mojo::RectF bounds;
-  bounds.width = size.width;
-  bounds.height = size.height;
-
   auto update = mojo::gfx::composition::SceneUpdate::New();
 
-  // Draw the content of the view to a texture and include it as an
-  // image resource in the scene.
-  mojo::gfx::composition::ResourcePtr content_resource =
-      ganesh_renderer()->DrawCanvas(
-          size,
-          base::Bind(&ShapesView::DrawContent, base::Unretained(this), size));
-  DCHECK(content_resource);
-  update->resources.insert(kContentImageResourceId, content_resource.Pass());
+  const mojo::Size& size = *properties()->view_layout->size;
+  if (size.width > 0 && size.height > 0) {
+    mojo::RectF bounds;
+    bounds.width = size.width;
+    bounds.height = size.height;
 
-  // Add a root node to the scene graph to draw the image resource to
-  // the screen such that it fills the entire view.
-  auto root_node = mojo::gfx::composition::Node::New();
-  root_node->op = mojo::gfx::composition::NodeOp::New();
-  root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
-  root_node->op->get_image()->content_rect = bounds.Clone();
-  root_node->op->get_image()->image_resource_id = kContentImageResourceId;
-  update->nodes.insert(kRootNodeId, root_node.Pass());
+    // Draw the content of the view to a texture and include it as an
+    // image resource in the scene.
+    mojo::gfx::composition::ResourcePtr content_resource =
+        ganesh_renderer()->DrawCanvas(
+            size,
+            base::Bind(&ShapesView::DrawContent, base::Unretained(this), size));
+    DCHECK(content_resource);
+    update->resources.insert(kContentImageResourceId, content_resource.Pass());
+
+    // Add a root node to the scene graph to draw the image resource to
+    // the screen such that it fills the entire view.
+    auto root_node = mojo::gfx::composition::Node::New();
+    root_node->op = mojo::gfx::composition::NodeOp::New();
+    root_node->op->set_image(mojo::gfx::composition::ImageNodeOp::New());
+    root_node->op->get_image()->content_rect = bounds.Clone();
+    root_node->op->get_image()->image_resource_id = kContentImageResourceId;
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  } else {
+    auto root_node = mojo::gfx::composition::Node::New();
+    update->nodes.insert(kRootNodeId, root_node.Pass());
+  }
 
   // Submit the scene update.
   scene()->Update(update.Pass());
