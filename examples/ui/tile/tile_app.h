@@ -9,6 +9,8 @@
 
 namespace examples {
 
+struct TileParams;
+
 class TileApp : public mojo::ui::ViewProviderApp {
  public:
   TileApp();
@@ -21,6 +23,8 @@ class TileApp : public mojo::ui::ViewProviderApp {
       mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) override;
 
  private:
+  bool ParseParams(const std::string& connection_url, TileParams* params);
+
   DISALLOW_COPY_AND_ASSIGN(TileApp);
 };
 

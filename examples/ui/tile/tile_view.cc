@@ -16,16 +16,20 @@ constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
 constexpr uint32_t kViewNodeIdBase = 100;
 constexpr uint32_t kViewNodeIdSpacing = 100;
 constexpr uint32_t kViewSceneNodeIdOffset = 1;
-constexpr uint32_t kViewFallbackSceneNodeIdOffset = 2;
-constexpr uint32_t kViewFallbackColorNodeIdOffset = 3;
+constexpr uint32_t kViewFallbackColorNodeIdOffset = 2;
+constexpr uint32_t kViewFallbackDimLayerNodeIdOffset = 3;
+constexpr uint32_t kViewFallbackDimSceneNodeIdOffset = 4;
 }  // namespace
+
+TileParams::TileParams() {}
+
+TileParams::~TileParams() {}
 
 TileView::TileView(
     mojo::ApplicationImpl* app_impl,
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
-    const std::vector<std::string>& view_urls)
-    : BaseView(app_impl, view_owner_request.Pass(), "Tile"),
-      view_urls_(view_urls) {
+    const TileParams& params)
+    : BaseView(app_impl, view_owner_request.Pass(), "Tile"), params_(params) {
   ConnectViews();
 }
 
@@ -33,7 +37,7 @@ TileView::~TileView() {}
 
 void TileView::ConnectViews() {
   uint32_t child_key = 0;
-  for (const auto& url : view_urls_) {
+  for (const auto& url : params_.view_urls) {
     // Start connecting to the view provider.
     mojo::ui::ViewProviderPtr provider;
     app_impl()->ConnectToService(url, &provider);
@@ -82,33 +86,44 @@ void TileView::OnPropertiesChanged(uint32_t old_scene_version,
   // Layout all children in a row.
   if (!views_.empty()) {
     const mojo::Size& size = *properties()->view_layout->size;
+    const bool vertical =
+        (params_.orientation_mode == TileParams::OrientationMode::kVertical);
+
     uint32_t index = 0;
-    uint32_t base_width = size.width / views_.size();
-    uint32_t excess_width = size.width % views_.size();
-    uint32_t x = 0;
+    uint32_t space = vertical ? size.height : size.width;
+    uint32_t base = space / views_.size();
+    uint32_t excess = space % views_.size();
+    uint32_t offset = 0;
     for (auto it = views_.begin(); it != views_.end(); ++it, ++index) {
       ViewData* view_data = it->second.get();
 
       // Distribute any excess width among the leading children.
-      uint32_t child_width = base_width;
-      if (excess_width) {
-        child_width++;
-        excess_width--;
+      uint32_t extent = base;
+      if (excess) {
+        extent++;
+        excess--;
       }
-      uint32_t child_height = size.height;
-      uint32_t child_x = x;
-      x += child_width;
 
-      view_data->layout_bounds.x = child_x;
-      view_data->layout_bounds.y = 0;
-      view_data->layout_bounds.width = child_width;
-      view_data->layout_bounds.height = child_height;
+      if (vertical) {
+        view_data->layout_bounds.x = 0;
+        view_data->layout_bounds.y = offset;
+        view_data->layout_bounds.width = size.width;
+        view_data->layout_bounds.height = extent;
+      } else {
+        view_data->layout_bounds.x = offset;
+        view_data->layout_bounds.y = 0;
+        view_data->layout_bounds.width = extent;
+        view_data->layout_bounds.height = size.height;
+      }
+      offset += extent;
 
       auto view_properties = mojo::ui::ViewProperties::New();
       view_properties->view_layout = mojo::ui::ViewLayout::New();
       view_properties->view_layout->size = mojo::Size::New();
-      view_properties->view_layout->size->width = child_width;
-      view_properties->view_layout->size->height = child_height;
+      view_properties->view_layout->size->width =
+          view_data->layout_bounds.width;
+      view_properties->view_layout->size->height =
+          view_data->layout_bounds.height;
 
       if (view_data->view_properties.Equals(view_properties))
         continue;  // no layout work to do
@@ -140,7 +155,6 @@ void TileView::UpdateScene() {
         kViewResourceIdBase + view_data.key * kViewResourceIdSpacing;
     const uint32_t container_node_id =
         kViewNodeIdBase + view_data.key * kViewNodeIdSpacing;
-    const uint32_t scene_node_id = container_node_id + kViewSceneNodeIdOffset;
 
     mojo::RectF extent;
     extent.width = view_data.layout_bounds.width;
@@ -155,8 +169,6 @@ void TileView::UpdateScene() {
     SetTranslationTransform(container_node->content_transform.get(),
                             view_data.layout_bounds.x,
                             view_data.layout_bounds.y, 0.f);
-    container_node->combinator =
-        mojo::gfx::composition::Node::Combinator::FALLBACK;
 
     // If we have the view, add it to the scene.
     if (view_data.view_info) {
@@ -166,41 +178,64 @@ void TileView::UpdateScene() {
           view_data.view_info->scene_token.Clone();
       update->resources.insert(scene_resource_id, scene_resource.Pass());
 
+      const uint32_t scene_node_id = container_node_id + kViewSceneNodeIdOffset;
       auto scene_node = mojo::gfx::composition::Node::New();
       scene_node->op = mojo::gfx::composition::NodeOp::New();
       scene_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
       scene_node->op->get_scene()->scene_resource_id = scene_resource_id;
-      scene_node->op->get_scene()->scene_version = view_data.scene_version;
+      if (params_.version_mode == TileParams::VersionMode::kExact)
+        scene_node->op->get_scene()->scene_version = view_data.scene_version;
       update->nodes.insert(scene_node_id, scene_node.Pass());
       container_node->child_node_ids.push_back(scene_node_id);
     }
 
-    // TODO(jeffbrown): Reenable once everything works or make configurable.
-    if (false) {
-      // Add the fallback scene content, use last available version.
-      const uint32_t fallback_node_id =
-          container_node_id + kViewFallbackSceneNodeIdOffset;
-      auto fallback_node = mojo::gfx::composition::Node::New();
-      fallback_node->op = mojo::gfx::composition::NodeOp::New();
-      fallback_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
-      fallback_node->op->get_scene()->scene_resource_id = scene_resource_id;
-      update->nodes.insert(fallback_node_id, fallback_node.Pass());
-      container_node->child_node_ids.push_back(fallback_node_id);
-    }
-    if (false) {
-      // Add the fallback color content, fill with solid color.
-      const uint32_t fallback_node_id =
+    if (params_.combinator_mode == TileParams::CombinatorMode::kPrune) {
+      container_node->combinator =
+          mojo::gfx::composition::Node::Combinator::PRUNE;
+    } else if (params_.combinator_mode ==
+               TileParams::CombinatorMode::kFallbackFlash) {
+      container_node->combinator =
+          mojo::gfx::composition::Node::Combinator::FALLBACK;
+
+      const uint32_t color_node_id =
           container_node_id + kViewFallbackColorNodeIdOffset;
-      auto fallback_node = mojo::gfx::composition::Node::New();
-      fallback_node->op = mojo::gfx::composition::NodeOp::New();
-      fallback_node->op->set_rect(mojo::gfx::composition::RectNodeOp::New());
-      fallback_node->op->get_rect()->content_rect = extent.Clone();
-      fallback_node->op->get_rect()->color =
-          mojo::gfx::composition::Color::New();
-      fallback_node->op->get_rect()->color->red = 255;
-      fallback_node->op->get_rect()->color->alpha = 255;
-      update->nodes.insert(fallback_node_id, fallback_node.Pass());
-      container_node->child_node_ids.push_back(fallback_node_id);
+      auto color_node = mojo::gfx::composition::Node::New();
+      color_node->op = mojo::gfx::composition::NodeOp::New();
+      color_node->op->set_rect(mojo::gfx::composition::RectNodeOp::New());
+      color_node->op->get_rect()->content_rect = extent.Clone();
+      color_node->op->get_rect()->color = mojo::gfx::composition::Color::New();
+      color_node->op->get_rect()->color->red = 255;
+      color_node->op->get_rect()->color->alpha = 255;
+      update->nodes.insert(color_node_id, color_node.Pass());
+      container_node->child_node_ids.push_back(color_node_id);
+    } else if (params_.combinator_mode ==
+               TileParams::CombinatorMode::kFallbackDim) {
+      container_node->combinator =
+          mojo::gfx::composition::Node::Combinator::FALLBACK;
+
+      const uint32_t dim_node_id =
+          container_node_id + kViewFallbackDimLayerNodeIdOffset;
+      auto dim_node = mojo::gfx::composition::Node::New();
+      dim_node->combinator = mojo::gfx::composition::Node::Combinator::PRUNE;
+      dim_node->op = mojo::gfx::composition::NodeOp::New();
+      dim_node->op->set_layer(mojo::gfx::composition::LayerNodeOp::New());
+      dim_node->op->get_layer()->layer_rect = extent.Clone();
+      dim_node->op->get_layer()->blend = mojo::gfx::composition::Blend::New();
+      dim_node->op->get_layer()->blend->alpha = 200;
+
+      if (view_data.view_info) {
+        const uint32_t scene_node_id =
+            container_node_id + kViewFallbackDimSceneNodeIdOffset;
+        auto scene_node = mojo::gfx::composition::Node::New();
+        scene_node->op = mojo::gfx::composition::NodeOp::New();
+        scene_node->op->set_scene(mojo::gfx::composition::SceneNodeOp::New());
+        scene_node->op->get_scene()->scene_resource_id = scene_resource_id;
+        update->nodes.insert(scene_node_id, scene_node.Pass());
+        dim_node->child_node_ids.push_back(scene_node_id);
+      }
+
+      update->nodes.insert(dim_node_id, dim_node.Pass());
+      container_node->child_node_ids.push_back(dim_node_id);
     }
 
     // Add the container.

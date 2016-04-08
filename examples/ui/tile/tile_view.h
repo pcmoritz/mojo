@@ -7,17 +7,44 @@
 
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "mojo/ui/base_view.h"
 
 namespace examples {
 
+struct TileParams {
+  enum class VersionMode {
+    kAny,    // specify |kSceneVersionNone|
+    kExact,  // specify exact version
+  };
+  enum class CombinatorMode {
+    kMerge,          // use merge combinator
+    kPrune,          // use prune combinator
+    kFallbackFlash,  // use fallback combinator with red flash
+    kFallbackDim,    // use fallback combinator with old content dimmed
+  };
+  enum class OrientationMode {
+    kHorizontal,
+    kVertical,
+  };
+
+  TileParams();
+  ~TileParams();
+
+  VersionMode version_mode = VersionMode::kAny;
+  CombinatorMode combinator_mode = CombinatorMode::kPrune;
+  OrientationMode orientation_mode = OrientationMode::kHorizontal;
+
+  std::vector<std::string> view_urls;
+};
+
 class TileView : public mojo::ui::BaseView {
  public:
   TileView(mojo::ApplicationImpl* app_impl_,
            mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
-           const std::vector<std::string>& view_urls);
+           const TileParams& tile_params);
 
   ~TileView() override;
 
@@ -47,7 +74,7 @@ class TileView : public mojo::ui::BaseView {
 
   void OnFrameSubmitted();
 
-  std::vector<std::string> view_urls_;
+  TileParams params_;
   std::map<uint32_t, std::unique_ptr<ViewData>> views_;
 
   DISALLOW_COPY_AND_ASSIGN(TileView);
