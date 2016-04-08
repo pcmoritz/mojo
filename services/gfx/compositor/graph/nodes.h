@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_GFX_COMPOSITOR_GRAPH_NODE_DEF_H_
-#define SERVICES_GFX_COMPOSITOR_GRAPH_NODE_DEF_H_
+#ifndef SERVICES_GFX_COMPOSITOR_GRAPH_NODES_H_
+#define SERVICES_GFX_COMPOSITOR_GRAPH_NODES_H_
 
 #include <iosfwd>
 #include <memory>
@@ -25,23 +25,23 @@ class SceneContentBuilder;
 class SceneDef;
 class TransformPair;
 
-// Represents a scene graph node.
+// Base class for nodes in a scene graph.
 //
 // The base class mainly acts as a container for other nodes and does not
 // draw any content of its own.
 //
 // Instances of this class are immutable and reference counted so they may
 // be shared by multiple versions of the same scene.
-class NodeDef : public base::RefCounted<NodeDef> {
+class Node : public base::RefCounted<Node> {
  public:
   using Combinator = mojo::gfx::composition::Node::Combinator;
 
-  NodeDef(uint32_t node_id,
-          std::unique_ptr<TransformPair> content_transform,
-          mojo::RectFPtr content_clip,
-          mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-          Combinator combinator,
-          const std::vector<uint32_t>& child_node_ids);
+  Node(uint32_t node_id,
+       std::unique_ptr<TransformPair> content_transform,
+       mojo::RectFPtr content_clip,
+       mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+       Combinator combinator,
+       const std::vector<uint32_t>& child_node_ids);
 
   uint32_t node_id() const { return node_id_; }
   const TransformPair* content_transform() const {
@@ -89,13 +89,13 @@ class NodeDef : public base::RefCounted<NodeDef> {
                mojo::Array<mojo::gfx::composition::HitPtr>* hits) const;
 
  protected:
-  friend class base::RefCounted<NodeDef>;
-  virtual ~NodeDef();
+  friend class base::RefCounted<Node>;
+  virtual ~Node();
 
   // Applies a unary function to the children selected by the node's
   // combinator rule during a snapshot.
   // Stops when |Func| returns false.
-  // |Func| should have the signature |bool func(const NodeDef*)|.
+  // |Func| should have the signature |bool func(const Node*)|.
   template <typename Func>
   void TraverseSnapshottedChildren(const SceneContent* content,
                                    const Snapshot* snapshot,
@@ -126,28 +126,28 @@ class NodeDef : public base::RefCounted<NodeDef> {
   Combinator const combinator_;
   std::vector<uint32_t> const child_node_ids_;
 
-  DISALLOW_COPY_AND_ASSIGN(NodeDef);
+  DISALLOW_COPY_AND_ASSIGN(Node);
 };
 
 // Represents a rectangle node.
 //
 // Draws a solid color filled rectangle node underneath its children.
-class RectNodeDef : public NodeDef {
+class RectNode : public Node {
  public:
-  RectNodeDef(uint32_t node_id,
-              std::unique_ptr<TransformPair> content_transform,
-              mojo::RectFPtr content_clip,
-              mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-              Combinator combinator,
-              const std::vector<uint32_t>& child_node_ids,
-              const mojo::RectF& content_rect,
-              const mojo::gfx::composition::Color& color);
+  RectNode(uint32_t node_id,
+           std::unique_ptr<TransformPair> content_transform,
+           mojo::RectFPtr content_clip,
+           mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+           Combinator combinator,
+           const std::vector<uint32_t>& child_node_ids,
+           const mojo::RectF& content_rect,
+           const mojo::gfx::composition::Color& color);
 
   const mojo::RectF& content_rect() const { return content_rect_; }
   const mojo::gfx::composition::Color& color() const { return color_; }
 
  protected:
-  ~RectNodeDef() override;
+  ~RectNode() override;
 
   void RecordPictureInner(const SceneContent* content,
                           const Snapshot* snapshot,
@@ -157,24 +157,24 @@ class RectNodeDef : public NodeDef {
   mojo::RectF const content_rect_;
   mojo::gfx::composition::Color const color_;
 
-  DISALLOW_COPY_AND_ASSIGN(RectNodeDef);
+  DISALLOW_COPY_AND_ASSIGN(RectNode);
 };
 
 // Represents an image node.
 //
 // Draws an image filled rectangle underneath its children.
-class ImageNodeDef : public NodeDef {
+class ImageNode : public Node {
  public:
-  ImageNodeDef(uint32_t node_id,
-               std::unique_ptr<TransformPair> content_transform,
-               mojo::RectFPtr content_clip,
-               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-               Combinator combinator,
-               const std::vector<uint32_t>& child_node_ids,
-               const mojo::RectF& content_rect,
-               mojo::RectFPtr image_rect,
-               uint32 image_resource_id,
-               mojo::gfx::composition::BlendPtr blend);
+  ImageNode(uint32_t node_id,
+            std::unique_ptr<TransformPair> content_transform,
+            mojo::RectFPtr content_clip,
+            mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+            Combinator combinator,
+            const std::vector<uint32_t>& child_node_ids,
+            const mojo::RectF& content_rect,
+            mojo::RectFPtr image_rect,
+            uint32 image_resource_id,
+            mojo::gfx::composition::BlendPtr blend);
 
   const mojo::RectF& content_rect() const { return content_rect_; }
   const mojo::RectF* image_rect() const { return image_rect_.get(); }
@@ -184,7 +184,7 @@ class ImageNodeDef : public NodeDef {
   bool RecordContent(SceneContentBuilder* builder) const override;
 
  protected:
-  ~ImageNodeDef() override;
+  ~ImageNode() override;
 
   void RecordPictureInner(const SceneContent* content,
                           const Snapshot* snapshot,
@@ -196,22 +196,22 @@ class ImageNodeDef : public NodeDef {
   uint32_t const image_resource_id_;
   mojo::gfx::composition::BlendPtr const blend_;
 
-  DISALLOW_COPY_AND_ASSIGN(ImageNodeDef);
+  DISALLOW_COPY_AND_ASSIGN(ImageNode);
 };
 
 // Represents a scene node.
 //
 // Draws an embedded scene underneath its children.
-class SceneNodeDef : public NodeDef {
+class SceneNode : public Node {
  public:
-  SceneNodeDef(uint32_t node_id,
-               std::unique_ptr<TransformPair> content_transform,
-               mojo::RectFPtr content_clip,
-               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-               Combinator combinator,
-               const std::vector<uint32_t>& child_node_ids,
-               uint32_t scene_resource_id,
-               uint32_t scene_version);
+  SceneNode(uint32_t node_id,
+            std::unique_ptr<TransformPair> content_transform,
+            mojo::RectFPtr content_clip,
+            mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+            Combinator combinator,
+            const std::vector<uint32_t>& child_node_ids,
+            uint32_t scene_resource_id,
+            uint32_t scene_version);
 
   uint32_t scene_resource_id() const { return scene_resource_id_; }
   uint32_t scene_version() const { return scene_version_; }
@@ -222,7 +222,7 @@ class SceneNodeDef : public NodeDef {
                                        SnapshotBuilder* builder) const override;
 
  protected:
-  ~SceneNodeDef() override;
+  ~SceneNode() override;
 
   void RecordPictureInner(const SceneContent* content,
                           const Snapshot* snapshot,
@@ -239,28 +239,28 @@ class SceneNodeDef : public NodeDef {
   uint32_t const scene_resource_id_;
   uint32_t const scene_version_;
 
-  DISALLOW_COPY_AND_ASSIGN(SceneNodeDef);
+  DISALLOW_COPY_AND_ASSIGN(SceneNode);
 };
 
 // Represents a layer node.
 //
 // Composites its children to a layer and applies a blending operation.
-class LayerNodeDef : public NodeDef {
+class LayerNode : public Node {
  public:
-  LayerNodeDef(uint32_t node_id,
-               std::unique_ptr<TransformPair> content_transform,
-               mojo::RectFPtr content_clip,
-               mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-               Combinator combinator,
-               const std::vector<uint32_t>& child_node_ids,
-               const mojo::RectF& layer_rect,
-               mojo::gfx::composition::BlendPtr blend);
+  LayerNode(uint32_t node_id,
+            std::unique_ptr<TransformPair> content_transform,
+            mojo::RectFPtr content_clip,
+            mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+            Combinator combinator,
+            const std::vector<uint32_t>& child_node_ids,
+            const mojo::RectF& layer_rect,
+            mojo::gfx::composition::BlendPtr blend);
 
   const mojo::RectF& layer_rect() const { return layer_rect_; }
   const mojo::gfx::composition::Blend* blend() const { return blend_.get(); }
 
  protected:
-  ~LayerNodeDef() override;
+  ~LayerNode() override;
 
   void RecordPictureInner(const SceneContent* content,
                           const Snapshot* snapshot,
@@ -270,9 +270,9 @@ class LayerNodeDef : public NodeDef {
   mojo::RectF const layer_rect_;
   mojo::gfx::composition::BlendPtr const blend_;
 
-  DISALLOW_COPY_AND_ASSIGN(LayerNodeDef);
+  DISALLOW_COPY_AND_ASSIGN(LayerNode);
 };
 
 }  // namespace compositor
 
-#endif  // SERVICES_GFX_COMPOSITOR_GRAPH_NODE_DEF_H_
+#endif  // SERVICES_GFX_COMPOSITOR_GRAPH_NODES_H_

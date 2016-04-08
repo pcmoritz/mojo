@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "services/gfx/compositor/graph/node_def.h"
+#include "services/gfx/compositor/graph/nodes.h"
 
 #include <ostream>
 
@@ -40,12 +40,12 @@ bool Contains(const SkRect& bounds, const SkPoint& point) {
 }
 }  // namespace
 
-NodeDef::NodeDef(uint32_t node_id,
-                 std::unique_ptr<TransformPair> content_transform,
-                 mojo::RectFPtr content_clip,
-                 mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-                 Combinator combinator,
-                 const std::vector<uint32_t>& child_node_ids)
+Node::Node(uint32_t node_id,
+           std::unique_ptr<TransformPair> content_transform,
+           mojo::RectFPtr content_clip,
+           mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+           Combinator combinator,
+           const std::vector<uint32_t>& child_node_ids)
     : node_id_(node_id),
       content_transform_(std::move(content_transform)),
       content_clip_(content_clip.Pass()),
@@ -53,13 +53,13 @@ NodeDef::NodeDef(uint32_t node_id,
       combinator_(combinator),
       child_node_ids_(child_node_ids) {}
 
-NodeDef::~NodeDef() {}
+Node::~Node() {}
 
-std::string NodeDef::FormattedLabel(const SceneContent* content) const {
+std::string Node::FormattedLabel(const SceneContent* content) const {
   return content->FormattedLabelForNode(node_id_);
 }
 
-bool NodeDef::RecordContent(SceneContentBuilder* builder) const {
+bool Node::RecordContent(SceneContentBuilder* builder) const {
   DCHECK(builder);
 
   for (const auto& child_node_id : child_node_ids_) {
@@ -69,8 +69,8 @@ bool NodeDef::RecordContent(SceneContentBuilder* builder) const {
   return true;
 }
 
-Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
-                                              SnapshotBuilder* builder) const {
+Snapshot::Disposition Node::RecordSnapshot(const SceneContent* content,
+                                           SnapshotBuilder* builder) const {
   DCHECK(content);
   DCHECK(builder);
 
@@ -78,7 +78,7 @@ Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
     // MERGE: All or nothing.
     case Combinator::MERGE: {
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         Snapshot::Disposition disposition =
             builder->SnapshotNode(child_node, content);
@@ -101,7 +101,7 @@ Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
     // PRUNE: Silently discard blocked children.
     case Combinator::PRUNE: {
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         Snapshot::Disposition disposition =
             builder->SnapshotNode(child_node, content);
@@ -116,7 +116,7 @@ Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
       if (child_node_ids_.empty())
         return Snapshot::Disposition::kSuccess;
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         Snapshot::Disposition disposition =
             builder->SnapshotNode(child_node, content);
@@ -143,9 +143,9 @@ Snapshot::Disposition NodeDef::RecordSnapshot(const SceneContent* content,
 }
 
 template <typename Func>
-void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
-                                          const Snapshot* snapshot,
-                                          const Func& func) const {
+void Node::TraverseSnapshottedChildren(const SceneContent* content,
+                                       const Snapshot* snapshot,
+                                       const Func& func) const {
   DCHECK(content);
   DCHECK(snapshot);
 
@@ -153,7 +153,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
     // MERGE: All or nothing.
     case Combinator::MERGE: {
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         DCHECK(!snapshot->IsNodeBlocked(child_node));
         if (!func(child_node))
@@ -165,7 +165,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
     // PRUNE: Silently discard blocked children.
     case Combinator::PRUNE: {
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         if (!snapshot->IsNodeBlocked(child_node) && !func(child_node))
           return;
@@ -178,7 +178,7 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
       if (child_node_ids_.empty())
         return;
       for (uint32_t child_node_id : child_node_ids_) {
-        const NodeDef* child_node = content->GetNode(child_node_id);
+        const Node* child_node = content->GetNode(child_node_id);
         DCHECK(child_node);
         if (!snapshot->IsNodeBlocked(child_node)) {
           func(child_node);  // don't care about the result because we
@@ -196,9 +196,9 @@ void NodeDef::TraverseSnapshottedChildren(const SceneContent* content,
   }
 }
 
-void NodeDef::RecordPicture(const SceneContent* content,
-                            const Snapshot* snapshot,
-                            SkCanvas* canvas) const {
+void Node::RecordPicture(const SceneContent* content,
+                         const Snapshot* snapshot,
+                         SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
@@ -218,26 +218,26 @@ void NodeDef::RecordPicture(const SceneContent* content,
     canvas->restore();
 }
 
-void NodeDef::RecordPictureInner(const SceneContent* content,
-                                 const Snapshot* snapshot,
-                                 SkCanvas* canvas) const {
+void Node::RecordPictureInner(const SceneContent* content,
+                              const Snapshot* snapshot,
+                              SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
 
   TraverseSnapshottedChildren(
       content, snapshot,
-      [this, content, snapshot, canvas](const NodeDef* child_node) -> bool {
+      [this, content, snapshot, canvas](const Node* child_node) -> bool {
         child_node->RecordPicture(content, snapshot, canvas);
         return true;
       });
 }
 
-bool NodeDef::HitTest(const SceneContent* content,
-                      const Snapshot* snapshot,
-                      const SkPoint& parent_point,
-                      const SkMatrix44& global_to_parent_transform,
-                      mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
+bool Node::HitTest(const SceneContent* content,
+                   const Snapshot* snapshot,
+                   const SkPoint& parent_point,
+                   const SkMatrix44& global_to_parent_transform,
+                   mojo::Array<mojo::gfx::composition::HitPtr>* hits) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(hits);
@@ -266,7 +266,7 @@ bool NodeDef::HitTest(const SceneContent* content,
          opaque_children;
 }
 
-bool NodeDef::HitTestInner(
+bool Node::HitTestInner(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
@@ -278,9 +278,9 @@ bool NodeDef::HitTestInner(
 
   // TODO(jeffbrown): Implement a more efficient way to traverse children in
   // reverse order.
-  std::vector<const NodeDef*> children;
+  std::vector<const Node*> children;
   TraverseSnapshottedChildren(
-      content, snapshot, [this, &children](const NodeDef* child_node) -> bool {
+      content, snapshot, [this, &children](const Node* child_node) -> bool {
         children.push_back(child_node);
         return true;
       });
@@ -293,7 +293,7 @@ bool NodeDef::HitTestInner(
   return false;
 }
 
-bool NodeDef::HitTestSelf(
+bool Node::HitTestSelf(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
@@ -322,29 +322,28 @@ bool NodeDef::HitTestSelf(
          mojo::gfx::composition::HitTestBehavior::Visibility::OPAQUE;
 }
 
-RectNodeDef::RectNodeDef(
-    uint32_t node_id,
-    std::unique_ptr<TransformPair> content_transform,
-    mojo::RectFPtr content_clip,
-    mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
-    Combinator combinator,
-    const std::vector<uint32_t>& child_node_ids,
-    const mojo::RectF& content_rect,
-    const mojo::gfx::composition::Color& color)
-    : NodeDef(node_id,
-              std::move(content_transform),
-              content_clip.Pass(),
-              hit_test_behavior.Pass(),
-              combinator,
-              child_node_ids),
+RectNode::RectNode(uint32_t node_id,
+                   std::unique_ptr<TransformPair> content_transform,
+                   mojo::RectFPtr content_clip,
+                   mojo::gfx::composition::HitTestBehaviorPtr hit_test_behavior,
+                   Combinator combinator,
+                   const std::vector<uint32_t>& child_node_ids,
+                   const mojo::RectF& content_rect,
+                   const mojo::gfx::composition::Color& color)
+    : Node(node_id,
+           std::move(content_transform),
+           content_clip.Pass(),
+           hit_test_behavior.Pass(),
+           combinator,
+           child_node_ids),
       content_rect_(content_rect),
       color_(color) {}
 
-RectNodeDef::~RectNodeDef() {}
+RectNode::~RectNode() {}
 
-void RectNodeDef::RecordPictureInner(const SceneContent* content,
-                                     const Snapshot* snapshot,
-                                     SkCanvas* canvas) const {
+void RectNode::RecordPictureInner(const SceneContent* content,
+                                  const Snapshot* snapshot,
+                                  SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
@@ -353,10 +352,10 @@ void RectNodeDef::RecordPictureInner(const SceneContent* content,
   paint.setColor(MakeSkColor(color_));
   canvas->drawRect(content_rect_.To<SkRect>(), paint);
 
-  NodeDef::RecordPictureInner(content, snapshot, canvas);
+  Node::RecordPictureInner(content, snapshot, canvas);
 }
 
-ImageNodeDef::ImageNodeDef(
+ImageNode::ImageNode(
     uint32_t node_id,
     std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
@@ -367,36 +366,36 @@ ImageNodeDef::ImageNodeDef(
     mojo::RectFPtr image_rect,
     uint32 image_resource_id,
     mojo::gfx::composition::BlendPtr blend)
-    : NodeDef(node_id,
-              std::move(content_transform),
-              content_clip.Pass(),
-              hit_test_behavior.Pass(),
-              combinator,
-              child_node_ids),
+    : Node(node_id,
+           std::move(content_transform),
+           content_clip.Pass(),
+           hit_test_behavior.Pass(),
+           combinator,
+           child_node_ids),
       content_rect_(content_rect),
       image_rect_(image_rect.Pass()),
       image_resource_id_(image_resource_id),
       blend_(blend.Pass()) {}
 
-ImageNodeDef::~ImageNodeDef() {}
+ImageNode::~ImageNode() {}
 
-bool ImageNodeDef::RecordContent(SceneContentBuilder* builder) const {
+bool ImageNode::RecordContent(SceneContentBuilder* builder) const {
   DCHECK(builder);
 
-  return NodeDef::RecordContent(builder) &&
-         builder->RequireResource(image_resource_id_, ResourceDef::Type::kImage,
+  return Node::RecordContent(builder) &&
+         builder->RequireResource(image_resource_id_, Resource::Type::kImage,
                                   node_id());
 }
 
-void ImageNodeDef::RecordPictureInner(const SceneContent* content,
-                                      const Snapshot* snapshot,
-                                      SkCanvas* canvas) const {
+void ImageNode::RecordPictureInner(const SceneContent* content,
+                                   const Snapshot* snapshot,
+                                   SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
 
-  auto image_resource = static_cast<const ImageResourceDef*>(
-      content->GetResource(image_resource_id_, ResourceDef::Type::kImage));
+  auto image_resource = static_cast<const ImageResource*>(
+      content->GetResource(image_resource_id_, Resource::Type::kImage));
   DCHECK(image_resource);
 
   SkPaint paint;
@@ -409,10 +408,10 @@ void ImageNodeDef::RecordPictureInner(const SceneContent* content,
                                              image_resource->image()->height()),
                         content_rect_.To<SkRect>(), &paint);
 
-  NodeDef::RecordPictureInner(content, snapshot, canvas);
+  Node::RecordPictureInner(content, snapshot, canvas);
 }
 
-SceneNodeDef::SceneNodeDef(
+SceneNode::SceneNode(
     uint32_t node_id,
     std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
@@ -421,33 +420,33 @@ SceneNodeDef::SceneNodeDef(
     const std::vector<uint32_t>& child_node_ids,
     uint32_t scene_resource_id,
     uint32_t scene_version)
-    : NodeDef(node_id,
-              std::move(content_transform),
-              content_clip.Pass(),
-              hit_test_behavior.Pass(),
-              combinator,
-              child_node_ids),
+    : Node(node_id,
+           std::move(content_transform),
+           content_clip.Pass(),
+           hit_test_behavior.Pass(),
+           combinator,
+           child_node_ids),
       scene_resource_id_(scene_resource_id),
       scene_version_(scene_version) {}
 
-SceneNodeDef::~SceneNodeDef() {}
+SceneNode::~SceneNode() {}
 
-bool SceneNodeDef::RecordContent(SceneContentBuilder* builder) const {
+bool SceneNode::RecordContent(SceneContentBuilder* builder) const {
   DCHECK(builder);
 
-  return NodeDef::RecordContent(builder) &&
-         builder->RequireResource(scene_resource_id_, ResourceDef::Type::kScene,
+  return Node::RecordContent(builder) &&
+         builder->RequireResource(scene_resource_id_, Resource::Type::kScene,
                                   node_id());
 }
 
-Snapshot::Disposition SceneNodeDef::RecordSnapshot(
+Snapshot::Disposition SceneNode::RecordSnapshot(
     const SceneContent* content,
     SnapshotBuilder* builder) const {
   DCHECK(content);
   DCHECK(builder);
 
-  auto scene_resource = static_cast<const SceneResourceDef*>(
-      content->GetResource(scene_resource_id_, ResourceDef::Type::kScene));
+  auto scene_resource = static_cast<const SceneResource*>(
+      content->GetResource(scene_resource_id_, Resource::Type::kScene));
   DCHECK(scene_resource);
 
   SceneDef* referenced_scene = scene_resource->referenced_scene().get();
@@ -464,12 +463,12 @@ Snapshot::Disposition SceneNodeDef::RecordSnapshot(
       builder->SnapshotScene(referenced_scene, scene_version_, this, content);
   if (disposition != Snapshot::Disposition::kSuccess)
     return disposition;
-  return NodeDef::RecordSnapshot(content, builder);
+  return Node::RecordSnapshot(content, builder);
 }
 
-void SceneNodeDef::RecordPictureInner(const SceneContent* content,
-                                      const Snapshot* snapshot,
-                                      SkCanvas* canvas) const {
+void SceneNode::RecordPictureInner(const SceneContent* content,
+                                   const Snapshot* snapshot,
+                                   SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
@@ -479,10 +478,10 @@ void SceneNodeDef::RecordPictureInner(const SceneContent* content,
   DCHECK(resolved_content);
   resolved_content->RecordPicture(snapshot, canvas);
 
-  NodeDef::RecordPictureInner(content, snapshot, canvas);
+  Node::RecordPictureInner(content, snapshot, canvas);
 }
 
-bool SceneNodeDef::HitTestInner(
+bool SceneNode::HitTestInner(
     const SceneContent* content,
     const Snapshot* snapshot,
     const SkPoint& local_point,
@@ -492,8 +491,8 @@ bool SceneNodeDef::HitTestInner(
   DCHECK(snapshot);
   DCHECK(hits);
 
-  if (NodeDef::HitTestInner(content, snapshot, local_point,
-                            global_to_local_transform, hits))
+  if (Node::HitTestInner(content, snapshot, local_point,
+                         global_to_local_transform, hits))
     return true;  // opaque child covering referenced scene
 
   const SceneContent* resolved_content =
@@ -511,7 +510,7 @@ bool SceneNodeDef::HitTestInner(
   return opaque;
 }
 
-LayerNodeDef::LayerNodeDef(
+LayerNode::LayerNode(
     uint32_t node_id,
     std::unique_ptr<TransformPair> content_transform,
     mojo::RectFPtr content_clip,
@@ -520,20 +519,20 @@ LayerNodeDef::LayerNodeDef(
     const std::vector<uint32_t>& child_node_ids,
     const mojo::RectF& layer_rect,
     mojo::gfx::composition::BlendPtr blend)
-    : NodeDef(node_id,
-              std::move(content_transform),
-              content_clip.Pass(),
-              hit_test_behavior.Pass(),
-              combinator,
-              child_node_ids),
+    : Node(node_id,
+           std::move(content_transform),
+           content_clip.Pass(),
+           hit_test_behavior.Pass(),
+           combinator,
+           child_node_ids),
       layer_rect_(layer_rect),
       blend_(blend.Pass()) {}
 
-LayerNodeDef::~LayerNodeDef() {}
+LayerNode::~LayerNode() {}
 
-void LayerNodeDef::RecordPictureInner(const SceneContent* content,
-                                      const Snapshot* snapshot,
-                                      SkCanvas* canvas) const {
+void LayerNode::RecordPictureInner(const SceneContent* content,
+                                   const Snapshot* snapshot,
+                                   SkCanvas* canvas) const {
   DCHECK(content);
   DCHECK(snapshot);
   DCHECK(canvas);
@@ -542,7 +541,7 @@ void LayerNodeDef::RecordPictureInner(const SceneContent* content,
   SetPaintForBlend(&paint, blend_.get());
 
   canvas->saveLayer(layer_rect_.To<SkRect>(), &paint);
-  NodeDef::RecordPictureInner(content, snapshot, canvas);
+  Node::RecordPictureInner(content, snapshot, canvas);
   canvas->restore();
 }
 

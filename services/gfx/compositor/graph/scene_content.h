@@ -13,8 +13,8 @@
 #include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/hit_tests.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
-#include "services/gfx/compositor/graph/node_def.h"
-#include "services/gfx/compositor/graph/resource_def.h"
+#include "services/gfx/compositor/graph/nodes.h"
+#include "services/gfx/compositor/graph/resources.h"
 #include "services/gfx/compositor/graph/scene_label.h"
 
 class SkCanvas;
@@ -69,14 +69,14 @@ class SceneContent : public base::RefCounted<SceneContent> {
                mojo::gfx::composition::SceneHitPtr* out_scene_hit) const;
 
   // Gets the requested resource, never null because it must be present.
-  const ResourceDef* GetResource(uint32_t resource_id,
-                                 ResourceDef::Type resource_type) const;
+  const Resource* GetResource(uint32_t resource_id,
+                              Resource::Type resource_type) const;
 
   // Gets the requested node, never null because it must be present.
-  const NodeDef* GetNode(uint32_t node_id) const;
+  const Node* GetNode(uint32_t node_id) const;
 
   // Gets the root node if it exists, otherwise returns nullptr.
-  const NodeDef* GetRootNodeIfExists() const;
+  const Node* GetRootNodeIfExists() const;
 
  private:
   friend class base::RefCounted<SceneContent>;
@@ -89,8 +89,8 @@ class SceneContent : public base::RefCounted<SceneContent> {
 
   const SceneLabel label_;
   const uint32_t version_;
-  std::unordered_map<uint32_t, scoped_refptr<const ResourceDef>> resources_;
-  std::unordered_map<uint32_t, scoped_refptr<const NodeDef>> nodes_;
+  std::unordered_map<uint32_t, scoped_refptr<const Resource>> resources_;
+  std::unordered_map<uint32_t, scoped_refptr<const Node>> nodes_;
 
   DISALLOW_COPY_AND_ASSIGN(SceneContent);
 };
@@ -111,20 +111,20 @@ class SceneContentBuilder {
 
   // Ensures the requested resource is part of the retained scene graph and
   // returns a reference to it, or nullptr if an error occurred.
-  const ResourceDef* RequireResource(uint32_t resource_id,
-                                     ResourceDef::Type resource_type,
-                                     uint32_t referrer_node_id);
+  const Resource* RequireResource(uint32_t resource_id,
+                                  Resource::Type resource_type,
+                                  uint32_t referrer_node_id);
 
   // Ensures the requested node is part of the retained scene graph and
   // returns a reference to it, or nullptr if an error occurred.
-  const NodeDef* RequireNode(uint32_t node_id, uint32_t referrer_node_id);
+  const Node* RequireNode(uint32_t node_id, uint32_t referrer_node_id);
 
   // Builds the content graph.
   // Returns nullptr if an error occurred.
   scoped_refptr<const SceneContent> Build();
 
  private:
-  bool AddNode(const NodeDef* node);
+  bool AddNode(const Node* node);
 
   scoped_refptr<SceneContent> content_;
   const SceneDef* scene_;

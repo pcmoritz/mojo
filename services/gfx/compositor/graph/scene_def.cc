@@ -107,7 +107,7 @@ bool SceneDef::ApplyUpdate(mojo::gfx::composition::SceneUpdatePtr update,
     uint32_t resource_id = it.GetKey();
     mojo::gfx::composition::ResourcePtr& resource_decl = it.GetValue();
     if (resource_decl) {
-      scoped_refptr<const ResourceDef> resource = CreateResource(
+      scoped_refptr<const Resource> resource = CreateResource(
           resource_id, resource_decl.Pass(), resolver, unavailable_sender, err);
       if (!resource)
         return false;
@@ -125,7 +125,7 @@ bool SceneDef::ApplyUpdate(mojo::gfx::composition::SceneUpdatePtr update,
     uint32_t node_id = it.GetKey();
     mojo::gfx::composition::NodePtr& node_decl = it.GetValue();
     if (node_decl) {
-      scoped_refptr<const NodeDef> node =
+      scoped_refptr<const Node> node =
           CreateNode(node_id, node_decl.Pass(), err);
       if (!node)
         return false;
@@ -144,9 +144,9 @@ bool SceneDef::UnlinkReferencedScene(
 
   bool changed = false;
   for (auto& pair : resources_) {
-    if (pair.second->type() == ResourceDef::Type::kScene) {
+    if (pair.second->type() == Resource::Type::kScene) {
       auto scene_resource =
-          static_cast<const SceneResourceDef*>(pair.second.get());
+          static_cast<const SceneResource*>(pair.second.get());
       if (scene_resource->referenced_scene().get() == scene) {
         changed = true;
         pair.second = scene_resource->Unlink();
@@ -157,7 +157,7 @@ bool SceneDef::UnlinkReferencedScene(
   return changed;
 }
 
-scoped_refptr<const ResourceDef> SceneDef::CreateResource(
+scoped_refptr<const Resource> SceneDef::CreateResource(
     uint32_t resource_id,
     mojo::gfx::composition::ResourcePtr resource_decl,
     const SceneResolver& resolver,
@@ -174,7 +174,7 @@ scoped_refptr<const ResourceDef> SceneDef::CreateResource(
     base::WeakPtr<SceneDef> referenced_scene = resolver.Run(scene_token);
     if (!referenced_scene)
       unavailable_sender.Run(resource_id);
-    return new SceneResourceDef(scene_token, referenced_scene);
+    return new SceneResource(scene_token, referenced_scene);
   }
 
   if (resource_decl->is_mailbox_texture()) {
@@ -210,14 +210,14 @@ scoped_refptr<const ResourceDef> SceneDef::CreateResource(
       err << "Could not create MailboxTexture";
       return nullptr;
     }
-    return new ImageResourceDef(image);
+    return new ImageResource(image);
   }
 
   err << "Unsupported resource type: resource_id=" << resource_id;
   return nullptr;
 }
 
-scoped_refptr<const NodeDef> SceneDef::CreateNode(
+scoped_refptr<const Node> SceneDef::CreateNode(
     uint32_t node_id,
     mojo::gfx::composition::NodePtr node_decl,
     std::ostream& err) {
@@ -237,9 +237,8 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
       node_decl->child_node_ids.storage();
 
   if (!node_decl->op) {
-    return new NodeDef(node_id, std::move(content_transform),
-                       content_clip.Pass(), hit_test_behavior.Pass(),
-                       combinator, child_node_ids);
+    return new Node(node_id, std::move(content_transform), content_clip.Pass(),
+                    hit_test_behavior.Pass(), combinator, child_node_ids);
   }
 
   if (node_decl->op->is_rect()) {
@@ -249,9 +248,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const mojo::RectF& content_rect = *rect_node_decl->content_rect;
     const mojo::gfx::composition::Color& color = *rect_node_decl->color;
-    return new RectNodeDef(node_id, std::move(content_transform),
-                           content_clip.Pass(), hit_test_behavior.Pass(),
-                           combinator, child_node_ids, content_rect, color);
+    return new RectNode(node_id, std::move(content_transform),
+                        content_clip.Pass(), hit_test_behavior.Pass(),
+                        combinator, child_node_ids, content_rect, color);
   }
 
   if (node_decl->op->is_image()) {
@@ -262,10 +261,10 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
     mojo::RectFPtr image_rect = image_node_decl->image_rect.Pass();
     const uint32 image_resource_id = image_node_decl->image_resource_id;
     mojo::gfx::composition::BlendPtr blend = image_node_decl->blend.Pass();
-    return new ImageNodeDef(node_id, std::move(content_transform),
-                            content_clip.Pass(), hit_test_behavior.Pass(),
-                            combinator, child_node_ids, content_rect,
-                            image_rect.Pass(), image_resource_id, blend.Pass());
+    return new ImageNode(node_id, std::move(content_transform),
+                         content_clip.Pass(), hit_test_behavior.Pass(),
+                         combinator, child_node_ids, content_rect,
+                         image_rect.Pass(), image_resource_id, blend.Pass());
   }
 
   if (node_decl->op->is_scene()) {
@@ -273,10 +272,10 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const uint32_t scene_resource_id = scene_node_decl->scene_resource_id;
     const uint32_t scene_version = scene_node_decl->scene_version;
-    return new SceneNodeDef(node_id, std::move(content_transform),
-                            content_clip.Pass(), hit_test_behavior.Pass(),
-                            combinator, child_node_ids, scene_resource_id,
-                            scene_version);
+    return new SceneNode(node_id, std::move(content_transform),
+                         content_clip.Pass(), hit_test_behavior.Pass(),
+                         combinator, child_node_ids, scene_resource_id,
+                         scene_version);
   }
 
   if (node_decl->op->is_layer()) {
@@ -285,10 +284,9 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
 
     const mojo::RectF& layer_rect = *layer_node_decl->layer_rect;
     mojo::gfx::composition::BlendPtr blend = layer_node_decl->blend.Pass();
-    return new LayerNodeDef(node_id, std::move(content_transform),
-                            content_clip.Pass(), hit_test_behavior.Pass(),
-                            combinator, child_node_ids, layer_rect,
-                            blend.Pass());
+    return new LayerNode(node_id, std::move(content_transform),
+                         content_clip.Pass(), hit_test_behavior.Pass(),
+                         combinator, child_node_ids, layer_rect, blend.Pass());
   }
 
   err << "Unsupported node op type: node_id=" << node_id
@@ -296,12 +294,12 @@ scoped_refptr<const NodeDef> SceneDef::CreateNode(
   return nullptr;
 }
 
-const NodeDef* SceneDef::FindNode(uint32_t node_id) const {
+const Node* SceneDef::FindNode(uint32_t node_id) const {
   auto it = nodes_.find(node_id);
   return it != nodes_.end() ? it->second.get() : nullptr;
 }
 
-const ResourceDef* SceneDef::FindResource(uint32_t resource_id) const {
+const Resource* SceneDef::FindResource(uint32_t resource_id) const {
   auto it = resources_.find(resource_id);
   return it != resources_.end() ? it->second.get() : nullptr;
 }

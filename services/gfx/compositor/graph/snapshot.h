@@ -17,10 +17,10 @@
 
 namespace compositor {
 
-class NodeDef;
+class Node;
 class SceneDef;
 class SceneContent;
-class SceneNodeDef;
+class SceneNode;
 class RenderFrame;
 
 // Describes a single frame snapshot of the scene graph, sufficient for
@@ -76,12 +76,12 @@ class Snapshot : public base::RefCounted<Snapshot> {
 
   // Returns true if the specified node was blocked from rendering.
   // Only valid if |!is_blocked()|.
-  bool IsNodeBlocked(const NodeDef* node) const;
+  bool IsNodeBlocked(const Node* node) const;
 
   // Gets the scene content which was resolved by following a scene node link.
   // Only valid if |!is_blocked()|.
   const SceneContent* GetResolvedSceneContent(
-      const SceneNodeDef* scene_node) const;
+      const SceneNode* scene_node) const;
 
  private:
   friend class base::RefCounted<Snapshot>;
@@ -103,11 +103,11 @@ class Snapshot : public base::RefCounted<Snapshot> {
   scoped_refptr<const SceneContent> root_scene_content_;
 
   // Map of scenes which were resolved from scene nodes.
-  std::unordered_map<const SceneNodeDef*, scoped_refptr<const SceneContent>>
+  std::unordered_map<const SceneNode*, scoped_refptr<const SceneContent>>
       resolved_scene_contents_;
 
   // Node states, true if snapshotted successfully, false if blocked.
-  std::unordered_map<const NodeDef*, Disposition> node_dispositions_;
+  std::unordered_map<const Node*, Disposition> node_dispositions_;
 
   DISALLOW_COPY_AND_ASSIGN(Snapshot);
 };
@@ -124,13 +124,13 @@ class SnapshotBuilder {
   std::ostream* block_log() { return block_log_; }
 
   // Snapshots the requested node.
-  Snapshot::Disposition SnapshotNode(const NodeDef* node,
+  Snapshot::Disposition SnapshotNode(const Node* node,
                                      const SceneContent* content);
 
   // Snapshots the requested scene.
   Snapshot::Disposition SnapshotScene(const SceneDef* scene,
                                       uint32_t version,
-                                      const SceneNodeDef* referrer_node,
+                                      const SceneNode* referrer_node,
                                       const SceneContent* referrer_content);
 
   // Builds a snapshot rooted at the specified scene.
@@ -146,7 +146,7 @@ class SnapshotBuilder {
   // This is just like |SnapshotNode| but performs cycle detection which
   // isn't otherwise needed.
   Snapshot::Disposition SnapshotRootAndDetectCycles(
-      const NodeDef* node,
+      const Node* node,
       const SceneContent* content);
 
   std::ostream* const block_log_;

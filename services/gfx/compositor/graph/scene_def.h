@@ -16,8 +16,8 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
-#include "services/gfx/compositor/graph/node_def.h"
-#include "services/gfx/compositor/graph/resource_def.h"
+#include "services/gfx/compositor/graph/nodes.h"
+#include "services/gfx/compositor/graph/resources.h"
 #include "services/gfx/compositor/graph/scene_label.h"
 
 namespace compositor {
@@ -34,11 +34,11 @@ using SceneResolver = base::Callback<base::WeakPtr<SceneDef>(
 using SceneUnavailableSender = base::Callback<void(uint32_t)>;
 
 // Scene definition.
-// Contains all of the resources and nodes of a published scene.
 //
-// TODO(jeffbrown): Consider renaming to |Scene| since there is now an
-// asymmetry between the stateful nature of this class compared with
-// |NodeDef| and |ResourceDef| which are immutable but similarly named.
+// Contains the client-supplied content that makes up a scene in an
+// incrementally updatable form.  As part of preparing the scene for
+// presentation, the content is gathered up into an immutable
+// |SceneContent| object.
 class SceneDef {
  public:
   // Outcome of a call to |Present|.
@@ -87,9 +87,9 @@ class SceneDef {
                              const SceneUnavailableSender& unavailable_sender);
 
   // Finds resources or nodes in the current version, returns nullptr if absent.
-  const ResourceDef* FindResource(uint32_t resource_id) const;
-  const NodeDef* FindNode(uint32_t node_id) const;
-  const NodeDef* FindRootNode() const {
+  const Resource* FindResource(uint32_t resource_id) const;
+  const Node* FindNode(uint32_t node_id) const;
+  const Node* FindRootNode() const {
     return FindNode(mojo::gfx::composition::kSceneRootNodeId);
   }
 
@@ -119,13 +119,13 @@ class SceneDef {
                    const SceneUnavailableSender& unavailable_sender,
                    std::ostream& err);
 
-  scoped_refptr<const ResourceDef> CreateResource(
+  scoped_refptr<const Resource> CreateResource(
       uint32_t resource_id,
       mojo::gfx::composition::ResourcePtr resource_decl,
       const SceneResolver& resolver,
       const SceneUnavailableSender& unavailable_sender,
       std::ostream& err);
-  scoped_refptr<const NodeDef> CreateNode(
+  scoped_refptr<const Node> CreateNode(
       uint32_t node_id,
       mojo::gfx::composition::NodePtr node_decl,
       std::ostream& err);
@@ -136,8 +136,8 @@ class SceneDef {
   std::vector<std::unique_ptr<Publication>> pending_publications_;
 
   uint32_t version_ = mojo::gfx::composition::kSceneVersionNone;
-  std::unordered_map<uint32_t, scoped_refptr<const ResourceDef>> resources_;
-  std::unordered_map<uint32_t, scoped_refptr<const NodeDef>> nodes_;
+  std::unordered_map<uint32_t, scoped_refptr<const Resource>> resources_;
+  std::unordered_map<uint32_t, scoped_refptr<const Node>> nodes_;
 
   scoped_refptr<const SceneContent> content_;
 

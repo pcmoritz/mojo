@@ -24,7 +24,7 @@ SceneContent::~SceneContent() {}
 
 void SceneContent::RecordPicture(const Snapshot* snapshot,
                                  SkCanvas* canvas) const {
-  const NodeDef* root = GetRootNodeIfExists();
+  const Node* root = GetRootNodeIfExists();
   if (root)
     root->RecordPicture(this, snapshot, canvas);
 }
@@ -37,7 +37,7 @@ bool SceneContent::HitTest(
   DCHECK(snapshot);
   DCHECK(out_scene_hit);
 
-  const NodeDef* root = GetRootNodeIfExists();
+  const Node* root = GetRootNodeIfExists();
   if (!root)
     return false;
 
@@ -55,22 +55,21 @@ bool SceneContent::HitTest(
   return opaque;
 }
 
-const ResourceDef* SceneContent::GetResource(
-    uint32_t resource_id,
-    ResourceDef::Type resource_type) const {
+const Resource* SceneContent::GetResource(uint32_t resource_id,
+                                          Resource::Type resource_type) const {
   auto it = resources_.find(resource_id);
   DCHECK(it != resources_.end());
   DCHECK(it->second->type() == resource_type);
   return it->second.get();
 }
 
-const NodeDef* SceneContent::GetNode(uint32_t node_id) const {
+const Node* SceneContent::GetNode(uint32_t node_id) const {
   auto it = nodes_.find(node_id);
   DCHECK(it != nodes_.end());
   return it->second.get();
 }
 
-const NodeDef* SceneContent::GetRootNodeIfExists() const {
+const Node* SceneContent::GetRootNodeIfExists() const {
   auto it = nodes_.find(mojo::gfx::composition::kSceneRootNodeId);
   return it != nodes_.end() ? it->second.get() : nullptr;
 }
@@ -89,9 +88,9 @@ SceneContentBuilder::SceneContentBuilder(const SceneDef* scene,
 
 SceneContentBuilder::~SceneContentBuilder() {}
 
-const ResourceDef* SceneContentBuilder::RequireResource(
+const Resource* SceneContentBuilder::RequireResource(
     uint32_t resource_id,
-    ResourceDef::Type resource_type,
+    Resource::Type resource_type,
     uint32_t referrer_node_id) {
   DCHECK(content_);
 
@@ -99,7 +98,7 @@ const ResourceDef* SceneContentBuilder::RequireResource(
   if (it != content_->resources_.end())
     return it->second.get();
 
-  const ResourceDef* resource = scene_->FindResource(resource_id);
+  const Resource* resource = scene_->FindResource(resource_id);
   if (!resource) {
     err_ << "Missing resource " << resource_id << " referenced from node "
          << content_->FormattedLabelForNode(referrer_node_id);
@@ -117,8 +116,8 @@ const ResourceDef* SceneContentBuilder::RequireResource(
   return resource;
 }
 
-const NodeDef* SceneContentBuilder::RequireNode(uint32_t node_id,
-                                                uint32_t referrer_node_id) {
+const Node* SceneContentBuilder::RequireNode(uint32_t node_id,
+                                             uint32_t referrer_node_id) {
   DCHECK(content_);
 
   auto it = content_->nodes_.find(node_id);
@@ -130,7 +129,7 @@ const NodeDef* SceneContentBuilder::RequireNode(uint32_t node_id,
     return nullptr;
   }
 
-  const NodeDef* node = scene_->FindNode(node_id);
+  const Node* node = scene_->FindNode(node_id);
   if (!node) {
     err_ << "Missing node " << node_id << " referenced from node "
          << content_->FormattedLabelForNode(referrer_node_id);
@@ -140,7 +139,7 @@ const NodeDef* SceneContentBuilder::RequireNode(uint32_t node_id,
   return AddNode(node) ? node : nullptr;
 }
 
-bool SceneContentBuilder::AddNode(const NodeDef* node) {
+bool SceneContentBuilder::AddNode(const Node* node) {
   DCHECK(content_);
   DCHECK(node);
 
@@ -168,7 +167,7 @@ bool SceneContentBuilder::AddNode(const NodeDef* node) {
 scoped_refptr<const SceneContent> SceneContentBuilder::Build() {
   DCHECK(content_);
 
-  const NodeDef* root = scene_->FindRootNode();
+  const Node* root = scene_->FindRootNode();
   return !root || AddNode(root) ? std::move(content_) : nullptr;
 }
 

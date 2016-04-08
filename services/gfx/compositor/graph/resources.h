@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCE_DEF_H_
-#define SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCE_DEF_H_
+#ifndef SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCES_H_
+#define SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCES_H_
 
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
@@ -15,33 +15,32 @@ namespace compositor {
 
 class SceneDef;
 
-// Abstract scene graph resource definition.
+// Base class for resources in a scene graph.
 //
 // Instances of this class are immutable and reference counted so they may
 // be shared by multiple versions of the same scene.
-class ResourceDef : public base::RefCounted<ResourceDef> {
+class Resource : public base::RefCounted<Resource> {
  public:
   enum class Type { kScene, kImage };
 
-  ResourceDef();
+  Resource();
 
   // Gets the resource type.
   virtual Type type() const = 0;
 
  protected:
-  friend class base::RefCounted<ResourceDef>;
-  virtual ~ResourceDef();
+  friend class base::RefCounted<Resource>;
+  virtual ~Resource();
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(ResourceDef);
+  DISALLOW_COPY_AND_ASSIGN(Resource);
 };
 
-// Reference to another scene expressed as a resource definition.
-class SceneResourceDef : public ResourceDef {
+// A resource which represents a reference to a specified scene.
+class SceneResource : public Resource {
  public:
-  explicit SceneResourceDef(
-      const mojo::gfx::composition::SceneToken& scene_token,
-      const base::WeakPtr<SceneDef>& referenced_scene);
+  SceneResource(const mojo::gfx::composition::SceneToken& scene_token,
+                const base::WeakPtr<SceneDef>& referenced_scene);
 
   Type type() const override;
 
@@ -55,22 +54,22 @@ class SceneResourceDef : public ResourceDef {
   }
 
   // Returns a copy of the resource without its referenced scene.
-  scoped_refptr<const SceneResourceDef> Unlink() const;
+  scoped_refptr<const SceneResource> Unlink() const;
 
  protected:
-  ~SceneResourceDef() override;
+  ~SceneResource() override;
 
  private:
   mojo::gfx::composition::SceneToken scene_token_;
   base::WeakPtr<SceneDef> referenced_scene_;
 
-  DISALLOW_COPY_AND_ASSIGN(SceneResourceDef);
+  DISALLOW_COPY_AND_ASSIGN(SceneResource);
 };
 
-// Reference to an image expressed as a resource definition.
-class ImageResourceDef : public ResourceDef {
+// A resource which represents a refrence to a specified image.
+class ImageResource : public Resource {
  public:
-  explicit ImageResourceDef(const scoped_refptr<RenderImage>& image);
+  explicit ImageResource(const scoped_refptr<RenderImage>& image);
 
   Type type() const override;
 
@@ -78,14 +77,14 @@ class ImageResourceDef : public ResourceDef {
   const scoped_refptr<RenderImage>& image() const { return image_; }
 
  protected:
-  ~ImageResourceDef() override;
+  ~ImageResource() override;
 
  private:
   scoped_refptr<RenderImage> image_;
 
-  DISALLOW_COPY_AND_ASSIGN(ImageResourceDef);
+  DISALLOW_COPY_AND_ASSIGN(ImageResource);
 };
 
 }  // namespace compositor
 
-#endif  // SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCE_DEF_H_
+#endif  // SERVICES_GFX_COMPOSITOR_GRAPH_RESOURCES_H_

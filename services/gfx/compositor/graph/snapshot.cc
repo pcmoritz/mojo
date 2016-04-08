@@ -48,7 +48,7 @@ void Snapshot::HitTest(const mojo::PointF& point,
                                &result->root);
 }
 
-bool Snapshot::IsNodeBlocked(const NodeDef* node) const {
+bool Snapshot::IsNodeBlocked(const Node* node) const {
   DCHECK(!is_blocked());
 
   auto it = node_dispositions_.find(node);
@@ -59,7 +59,7 @@ bool Snapshot::IsNodeBlocked(const NodeDef* node) const {
 }
 
 const SceneContent* Snapshot::GetResolvedSceneContent(
-    const SceneNodeDef* scene_node) const {
+    const SceneNode* scene_node) const {
   DCHECK(!is_blocked());
 
   auto it = resolved_scene_contents_.find(scene_node);
@@ -73,7 +73,7 @@ SnapshotBuilder::SnapshotBuilder(std::ostream* block_log)
 SnapshotBuilder::~SnapshotBuilder() {}
 
 Snapshot::Disposition SnapshotBuilder::SnapshotNode(
-    const NodeDef* node,
+    const Node* node,
     const SceneContent* content) {
   DCHECK(snapshot_);
   DCHECK(node);
@@ -90,7 +90,7 @@ Snapshot::Disposition SnapshotBuilder::SnapshotNode(
 }
 
 Snapshot::Disposition SnapshotBuilder::SnapshotRootAndDetectCycles(
-    const NodeDef* node,
+    const Node* node,
     const SceneContent* content) {
   DCHECK(snapshot_);
   DCHECK(node);
@@ -132,7 +132,7 @@ Snapshot::Disposition SnapshotBuilder::SnapshotRootAndDetectCycles(
 Snapshot::Disposition SnapshotBuilder::SnapshotScene(
     const SceneDef* scene,
     uint32_t version,
-    const SceneNodeDef* referrer_node,
+    const SceneNode* referrer_node,
     const SceneContent* referrer_content) {
   DCHECK(snapshot_);
   DCHECK(scene);
@@ -140,7 +140,7 @@ Snapshot::Disposition SnapshotBuilder::SnapshotScene(
   DCHECK(referrer_content);
 
   // This function should only ever be called once when snapshotting the
-  // referring |SceneNodeDef| at which point the result will be memoized
+  // referring |SceneNode| at which point the result will be memoized
   // by |SnapshotNode| as usual so reentrance should not occur.
   DCHECK(snapshot_->resolved_scene_contents_.find(referrer_node) ==
          snapshot_->resolved_scene_contents_.end());
@@ -160,7 +160,7 @@ Snapshot::Disposition SnapshotBuilder::SnapshotScene(
     return Snapshot::Disposition::kBlocked;
   }
 
-  const NodeDef* root = content->GetRootNodeIfExists();
+  const Node* root = content->GetRootNodeIfExists();
   if (!root) {
     if (block_log_) {
       *block_log_ << "Scene node blocked because its referenced scene has no "
@@ -190,7 +190,7 @@ Snapshot::Disposition SnapshotBuilder::SnapshotRenderer(const SceneDef* scene) {
     return Snapshot::Disposition::kBlocked;
   }
 
-  const NodeDef* root = content->GetRootNodeIfExists();
+  const Node* root = content->GetRootNodeIfExists();
   if (!root) {
     if (block_log_) {
       *block_log_ << "Rendering blocked the root scene has no root node: "
