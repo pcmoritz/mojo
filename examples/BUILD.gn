@@ -41,6 +41,7 @@ group("examples") {
     ":portable_examples",
     "//examples/moterm_example_app",
     "//examples/shadows",
+    "//examples/ui/jank",
     "//examples/ui/noodles",
     "//examples/ui/png_viewer",
     "//examples/ui/shapes",

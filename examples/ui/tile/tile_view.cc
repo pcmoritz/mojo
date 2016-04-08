@@ -221,7 +221,7 @@ void TileView::UpdateScene() {
       dim_node->op->set_layer(mojo::gfx::composition::LayerNodeOp::New());
       dim_node->op->get_layer()->layer_rect = extent.Clone();
       dim_node->op->get_layer()->blend = mojo::gfx::composition::Blend::New();
-      dim_node->op->get_layer()->blend->alpha = 200;
+      dim_node->op->get_layer()->blend->alpha = 50;
 
       if (view_data.view_info) {
         const uint32_t scene_node_id =
