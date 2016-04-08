@@ -52,12 +52,14 @@ def GetTestList(config, verbose_count=0):
     return not types_to_run.isdisjoint(this_tests_types)
 
   # Call this to add the given command to the test list.
-  def AddEntry(name, command):
+  # |env| is an optional dictionary to be used to update the environment for
+  # the test process.
+  def AddEntry(name, command, env=None):
     if config.sanitizer == Config.SANITIZER_ASAN:
       command = (["python", os.path.join("mojo", "tools",
                                          "run_command_through_symbolizer.py")] +
                  command)
-    test_list.append({"name": name, "command": command})
+    test_list.append({"name": name, "command": command, "env" : env})
 
   # Call this to add the given command to the test list. If appropriate, the
   # command will be run under xvfb.
@@ -128,7 +130,8 @@ def GetTestList(config, verbose_count=0):
       ShouldRunTest(Config.TEST_TYPE_DEFAULT, Config.TEST_TYPE_UNIT, "go")):
     # Go system tests:
     AddEntry("Go system tests",
-             [os.path.join(build_dir, "obj", "mojo", "go", "system_test")])
+             [os.path.join(build_dir, "obj", "mojo", "go", "system_test")],
+             env={'GODEBUG' : 'cgocheck=2'})
 
     # Pure Go unit tests:
     assert paths.go_tool_path is not None

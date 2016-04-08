@@ -185,7 +185,10 @@ def _run_tests(config, test_types):
       continue
 
     _logger.info('Starting: %s' % ' '.join(entry['command']))
-    exit_code = subprocess.call(entry['command'])
+    env = os.environ
+    if 'env' in entry and entry['env'] is not None:
+      env.update(entry['env'])
+    exit_code = subprocess.call(entry['command'], env=env)
     _logger.info('Completed: %s' % ' '.join(entry['command']))
     if exit_code:
       if not final_exit_code:
