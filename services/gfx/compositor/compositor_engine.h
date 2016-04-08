@@ -13,6 +13,7 @@
 #include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/compositor.mojom.h"
 #include "services/gfx/compositor/backend/scheduler.h"
+#include "services/gfx/compositor/graph/universe.h"
 #include "services/gfx/compositor/renderer_state.h"
 #include "services/gfx/compositor/scene_state.h"
 
@@ -107,14 +108,14 @@ class CompositorEngine {
   void OnPresentScene(const base::WeakPtr<SceneState>& scene_state_weak,
                       int64_t presentation_time);
 
-  base::WeakPtr<SceneDef> ResolveSceneReference(
+  bool ResolveSceneReference(
       const mojo::gfx::composition::SceneToken& scene_token);
   void SendResourceUnavailable(SceneState* scene_state, uint32_t resource_id);
 
   SceneState* FindScene(uint32_t scene_token);
 
   bool IsSceneStateRegisteredDebug(SceneState* scene_state) {
-    return scene_state && FindScene(scene_state->scene_token()->value);
+    return scene_state && FindScene(scene_state->scene_token().value);
   }
   bool IsRendererStateRegisteredDebug(RendererState* renderer_state) {
     return renderer_state &&
@@ -128,6 +129,8 @@ class CompositorEngine {
   uint32_t next_renderer_id_ = 1u;
   std::unordered_map<uint32_t, SceneState*> scenes_by_token_;
   std::vector<RendererState*> renderers_;
+
+  Universe universe_;
 
   base::WeakPtrFactory<CompositorEngine> weak_factory_;
 

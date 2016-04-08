@@ -14,6 +14,7 @@
 #include "mojo/skia/type_converters.h"
 #include "services/gfx/compositor/graph/scene_content.h"
 #include "services/gfx/compositor/graph/transform_pair.h"
+#include "services/gfx/compositor/graph/universe.h"
 #include "services/gfx/compositor/render/render_image.h"
 
 namespace compositor {
@@ -31,8 +32,7 @@ void ReleaseMailboxTexture(
 }
 }  // namespace
 
-SceneDef::SceneDef(const SceneLabel& label)
-    : label_(label), weak_factory_(this) {}
+SceneDef::SceneDef(const SceneLabel& label) : label_(label) {}
 
 SceneDef::~SceneDef() {}
 
@@ -50,6 +50,7 @@ void SceneDef::EnqueuePublish(
 
 SceneDef::Disposition SceneDef::Present(
     int64_t presentation_time,
+    Universe* universe,
     const SceneResolver& resolver,
     const SceneUnavailableSender& unavailable_sender,
     std::ostream& err) {
@@ -65,8 +66,12 @@ SceneDef::Disposition SceneDef::Present(
     end--;
   }
 
+  // TODO(jeffbrown): Should we publish every individual update to the
+  // universe or is it good enough to only capture the most recent
+  // accumulated updates at presentation time as we do here?
+
   // Apply all updates sequentially up to this point.
-  version_ = pending_publications_[end - 1]->metadata->version;
+  uint32_t version = pending_publications_[end - 1]->metadata->version;
   for (size_t index = 0; index < end; ++index) {
     for (auto& update : pending_publications_[index]->updates) {
       if (!ApplyUpdate(update.Pass(), resolver, unavailable_sender, err))
@@ -78,12 +83,15 @@ SceneDef::Disposition SceneDef::Present(
   pending_publications_.erase(pending_publications_.begin(),
                               pending_publications_.begin() + end);
 
-  // Rebuild the scene content, gathering all reachable nodes and resources
+  // Rebuild the scene content, collecting all reachable nodes and resources
   // and verifying that everything is correctly linked.
-  SceneContentBuilder builder(this, version_, err, resources_.size(),
-                              nodes_.size());
-  content_ = builder.Build();
-  return content_ ? Disposition::kSucceeded : Disposition::kFailed;
+  Collector collector(this, version, presentation_time, err);
+  scoped_refptr<const SceneContent> content = collector.Build();
+  if (!content)
+    return Disposition::kFailed;
+
+  universe->PresentScene(content);
+  return Disposition::kSucceeded;
 }
 
 bool SceneDef::ApplyUpdate(mojo::gfx::composition::SceneUpdatePtr update,
@@ -137,24 +145,17 @@ bool SceneDef::ApplyUpdate(mojo::gfx::composition::SceneUpdatePtr update,
   return true;
 }
 
-bool SceneDef::UnlinkReferencedScene(
-    SceneDef* scene,
+void SceneDef::NotifySceneUnavailable(
+    const mojo::gfx::composition::SceneToken& scene_token,
     const SceneUnavailableSender& unavailable_sender) {
-  DCHECK(scene);
-
-  bool changed = false;
   for (auto& pair : resources_) {
     if (pair.second->type() == Resource::Type::kScene) {
       auto scene_resource =
           static_cast<const SceneResource*>(pair.second.get());
-      if (scene_resource->referenced_scene().get() == scene) {
-        changed = true;
-        pair.second = scene_resource->Unlink();
+      if (scene_resource->scene_token().value == scene_token.value)
         unavailable_sender.Run(pair.first);
-      }
     }
   }
-  return changed;
 }
 
 scoped_refptr<const Resource> SceneDef::CreateResource(
@@ -171,10 +172,9 @@ scoped_refptr<const Resource> SceneDef::CreateResource(
 
     const mojo::gfx::composition::SceneToken& scene_token =
         *scene_resource_decl->scene_token;
-    base::WeakPtr<SceneDef> referenced_scene = resolver.Run(scene_token);
-    if (!referenced_scene)
+    if (!resolver.Run(scene_token))
       unavailable_sender.Run(resource_id);
-    return new SceneResource(scene_token, referenced_scene);
+    return new SceneResource(scene_token);
   }
 
   if (resource_decl->is_mailbox_texture()) {
@@ -294,27 +294,30 @@ scoped_refptr<const Node> SceneDef::CreateNode(
   return nullptr;
 }
 
-const Node* SceneDef::FindNode(uint32_t node_id) const {
-  auto it = nodes_.find(node_id);
-  return it != nodes_.end() ? it->second.get() : nullptr;
+SceneDef::Collector::Collector(const SceneDef* scene,
+                               uint32_t version,
+                               int64_t presentation_time,
+                               std::ostream& err)
+    : SceneContentBuilder(scene->label_,
+                          version,
+                          presentation_time,
+                          scene->resources_.size(),
+                          scene->nodes_.size(),
+                          err),
+      scene_(scene) {
+  DCHECK(scene_);
 }
 
-const Resource* SceneDef::FindResource(uint32_t resource_id) const {
-  auto it = resources_.find(resource_id);
-  return it != resources_.end() ? it->second.get() : nullptr;
+SceneDef::Collector::~Collector() {}
+
+const Node* SceneDef::Collector::FindNode(uint32_t node_id) const {
+  auto it = scene_->nodes_.find(node_id);
+  return it != scene_->nodes_.end() ? it->second.get() : nullptr;
 }
 
-const SceneContent* SceneDef::FindContent(uint32_t version) const {
-  if (!content_)
-    return nullptr;
-
-  // TODO(jeffbrown): Consider briefly caching older versions to allow them
-  // to be used to provide alternate content for node combinators.
-  if (version != mojo::gfx::composition::kSceneVersionNone &&
-      version != content_->version() &&
-      content_->version() != mojo::gfx::composition::kSceneVersionNone)
-    return nullptr;
-  return content_.get();
+const Resource* SceneDef::Collector::FindResource(uint32_t resource_id) const {
+  auto it = scene_->resources_.find(resource_id);
+  return it != scene_->resources_.end() ? it->second.get() : nullptr;
 }
 
 SceneDef::Publication::Publication(

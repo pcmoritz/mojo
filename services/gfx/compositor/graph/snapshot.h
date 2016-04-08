@@ -18,7 +18,6 @@
 namespace compositor {
 
 class Node;
-class SceneDef;
 class SceneContent;
 class SceneNode;
 class RenderFrame;
@@ -61,7 +60,8 @@ class Snapshot : public base::RefCounted<Snapshot> {
 
   // Returns true if the snapshot has a dependency on content from the
   // specified scene.
-  bool HasDependency(const SceneDef* scene) const;
+  bool HasDependency(
+      const mojo::gfx::composition::SceneToken& scene_token) const;
 
   // Creates a frame for rendering.
   // Only valid if |!is_blocked()|.
@@ -100,13 +100,16 @@ class Snapshot : public base::RefCounted<Snapshot> {
   // This reference together with |resolved_scenes| retains all of the
   // nodes used by the snapshot so that we can use bare pointers for nodes
   // and avoid excess reference counting overhead in other data structures.
+  // Empty when the snapshot is blocked.
   scoped_refptr<const SceneContent> root_scene_content_;
 
   // Map of scenes which were resolved from scene nodes.
+  // Empty when the snapshot is blocked.
   std::unordered_map<const SceneNode*, scoped_refptr<const SceneContent>>
       resolved_scene_contents_;
 
-  // Node states, true if snapshotted successfully, false if blocked.
+  // Node dispositions.  We only ever observe |kSuccess| or |kBlocked| here.
+  // Empty when the snapshot is blocked.
   std::unordered_map<const Node*, Disposition> node_dispositions_;
 
   DISALLOW_COPY_AND_ASSIGN(Snapshot);
@@ -117,7 +120,7 @@ class Snapshot : public base::RefCounted<Snapshot> {
 class SnapshotBuilder {
  public:
   explicit SnapshotBuilder(std::ostream* block_log);
-  ~SnapshotBuilder();
+  virtual ~SnapshotBuilder();
 
   // If not null, the snapshotter will append information to this stream
   // describing the parts of the scene graph for which composition was blocked.
@@ -127,31 +130,34 @@ class SnapshotBuilder {
   Snapshot::Disposition SnapshotNode(const Node* node,
                                      const SceneContent* content);
 
-  // Snapshots the requested scene.
-  Snapshot::Disposition SnapshotScene(const SceneDef* scene,
-                                      uint32_t version,
-                                      const SceneNode* referrer_node,
-                                      const SceneContent* referrer_content);
+  // Snapshots the referenced scene.
+  Snapshot::Disposition SnapshotReferencedScene(
+      const SceneNode* referrer_node,
+      const SceneContent* referrer_content);
 
   // Builds a snapshot rooted at the specified scene.
-  scoped_refptr<const Snapshot> Build(const SceneDef* root_scene);
+  scoped_refptr<const Snapshot> Build(
+      const mojo::gfx::composition::SceneToken& scene_token,
+      uint32_t version);
+
+ protected:
+  // Resolves and snapshots a particular version of a scene.
+  virtual Snapshot::Disposition ResolveAndSnapshotScene(
+      const mojo::gfx::composition::SceneToken& scene_token,
+      uint32_t version,
+      scoped_refptr<const SceneContent>* out_content) = 0;
+
+  // Snapshots a scene.
+  Snapshot::Disposition SnapshotSceneContent(const SceneContent* content);
 
  private:
-  // Snapshots the root scene of a renderer.
-  // This is just like |SnapshotScene| but the errors are reported a little
-  // differently since there is no referrer node.
-  Snapshot::Disposition SnapshotRenderer(const SceneDef* scene);
+  Snapshot::Disposition AddDependencyResolveAndSnapshotScene(
+      const mojo::gfx::composition::SceneToken& scene_token,
+      uint32_t version,
+      scoped_refptr<const SceneContent>* out_content);
 
-  // Snapshots the root node of a scene and detects cycles.
-  // This is just like |SnapshotNode| but performs cycle detection which
-  // isn't otherwise needed.
-  Snapshot::Disposition SnapshotRootAndDetectCycles(
-      const Node* node,
-      const SceneContent* content);
-
-  std::ostream* const block_log_;
   scoped_refptr<Snapshot> snapshot_;
-  const SceneContent* cycle_ = nullptr;  // point where a cycle was detected
+  std::ostream* const block_log_;
 
   DISALLOW_COPY_AND_ASSIGN(SnapshotBuilder);
 };

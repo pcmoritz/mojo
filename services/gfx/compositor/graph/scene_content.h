@@ -6,11 +6,11 @@
 #define SERVICES_GFX_COMPOSITOR_GRAPH_SCENE_CONTENT_H_
 
 #include <iosfwd>
+#include <string>
 #include <unordered_map>
 
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
-#include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/hit_tests.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "services/gfx/compositor/graph/nodes.h"
@@ -24,7 +24,6 @@ class SkMatrix44;
 namespace compositor {
 
 class SceneContentBuilder;
-class SceneDef;
 
 // Represents the content of a particular published version of a scene.
 //
@@ -45,14 +44,20 @@ class SceneContent : public base::RefCounted<SceneContent> {
   // Gets the scene label.
   const SceneLabel& label() const { return label_; }
   std::string FormattedLabel() const {
-    return label_.FormattedLabelForVersion(version_);
+    return label_.FormattedLabelForVersion(version_, presentation_time_);
   }
   std::string FormattedLabelForNode(uint32_t node_id) const {
-    return label_.FormattedLabelForNode(version_, node_id);
+    return label_.FormattedLabelForNode(version_, presentation_time_, node_id);
   }
 
   // Gets the version of the scene represented by this object.
   uint32_t version() const { return version_; }
+
+  // Gets the time when this scene was presented.
+  int64_t presentation_time() const { return presentation_time_; }
+
+  // Returns true if this content satisfies a request for the specified version.
+  bool MatchesVersion(uint32_t requested_version) const;
 
   // Called to record drawing commands from a snapshot.
   void RecordPicture(const Snapshot* snapshot, SkCanvas* canvas) const;
@@ -83,12 +88,14 @@ class SceneContent : public base::RefCounted<SceneContent> {
   friend class SceneContentBuilder;
   SceneContent(const SceneLabel& label,
                uint32_t version,
+               int64_t presentation_time,
                size_t max_resources,
                size_t max_nodes);
   ~SceneContent();
 
   const SceneLabel label_;
   const uint32_t version_;
+  const int64_t presentation_time_;
   std::unordered_map<uint32_t, scoped_refptr<const Resource>> resources_;
   std::unordered_map<uint32_t, scoped_refptr<const Node>> nodes_;
 
@@ -99,12 +106,13 @@ class SceneContent : public base::RefCounted<SceneContent> {
 // content of a particular version of a scene.
 class SceneContentBuilder {
  public:
-  SceneContentBuilder(const SceneDef* scene,
+  SceneContentBuilder(const SceneLabel& label,
                       uint32_t version,
-                      std::ostream& err,
+                      int64_t presentation_time,
                       size_t max_resources,
-                      size_t max_nodes);
-  ~SceneContentBuilder();
+                      size_t max_nodes,
+                      std::ostream& err);
+  virtual ~SceneContentBuilder();
 
   // Stream for reporting validation error messages.
   std::ostream& err() { return err_; }
@@ -123,12 +131,18 @@ class SceneContentBuilder {
   // Returns nullptr if an error occurred.
   scoped_refptr<const SceneContent> Build();
 
+ protected:
+  // Finds resources or nodes in the current version, returns nullptr if absent.
+  virtual const Resource* FindResource(uint32_t resource_id) const = 0;
+  virtual const Node* FindNode(uint32_t node_id) const = 0;
+
  private:
   bool AddNode(const Node* node);
 
   scoped_refptr<SceneContent> content_;
-  const SceneDef* scene_;
   std::ostream& err_;
+
+  DISALLOW_COPY_AND_ASSIGN(SceneContentBuilder);
 };
 
 }  // namespace compositor

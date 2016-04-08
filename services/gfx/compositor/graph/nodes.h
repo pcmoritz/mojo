@@ -22,7 +22,6 @@ namespace compositor {
 
 class SceneContent;
 class SceneContentBuilder;
-class SceneDef;
 class TransformPair;
 
 // Base class for nodes in a scene graph.

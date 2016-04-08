@@ -55,9 +55,10 @@ mojo::gfx::composition::SceneTokenPtr CompositorEngine::CreateScene(
   scene_impl->set_connection_error_handler(error_handler);
 
   // Add to registry.
-  scenes_by_token_.insert({scene_state->scene_token()->value, scene_state});
+  scenes_by_token_.emplace(scene_state->scene_token().value, scene_state);
+  universe_.AddScene(scene_state->scene_def()->label());
   DVLOG(1) << "CreateScene: scene=" << scene_state;
-  return scene_state->scene_token()->Clone();
+  return scene_state->scene_token().Clone();
 }
 
 void CompositorEngine::OnSceneConnectionError(SceneState* scene_state) {
@@ -71,11 +72,11 @@ void CompositorEngine::DestroyScene(SceneState* scene_state) {
   DCHECK(IsSceneStateRegisteredDebug(scene_state));
   DVLOG(1) << "DestroyScene: scene=" << scene_state;
 
-  // Unlink from other scenes.
+  // Notify other scenes which may depend on this one.
   for (auto& pair : scenes_by_token_) {
     SceneState* other_scene_state = pair.second;
-    other_scene_state->scene_def()->UnlinkReferencedScene(
-        scene_state->scene_def(),
+    other_scene_state->scene_def()->NotifySceneUnavailable(
+        scene_state->scene_token(),
         base::Bind(&CompositorEngine::SendResourceUnavailable,
                    base::Unretained(this),
                    base::Unretained(other_scene_state)));
@@ -91,11 +92,12 @@ void CompositorEngine::DestroyScene(SceneState* scene_state) {
     }
   }
 
-  // Destroy.
+  // Consider all dependent rendering to be invalidated.
+  universe_.RemoveScene(scene_state->scene_token());
   InvalidateScene(scene_state);
 
   // Remove from registry.
-  scenes_by_token_.erase(scene_state->scene_token()->value);
+  scenes_by_token_.erase(scene_state->scene_token().value);
   delete scene_state;
 }
 
@@ -287,11 +289,9 @@ void CompositorEngine::HitTest(
   callback.Run(result.Pass());
 }
 
-base::WeakPtr<SceneDef> CompositorEngine::ResolveSceneReference(
+bool CompositorEngine::ResolveSceneReference(
     const mojo::gfx::composition::SceneToken& scene_token) {
-  SceneState* scene_state = FindScene(scene_token.value);
-  return scene_state ? scene_state->scene_def()->GetWeakPtr()
-                     : base::WeakPtr<SceneDef>();
+  return FindScene(scene_token.value) != nullptr;
 }
 
 void CompositorEngine::SendResourceUnavailable(SceneState* scene_state,
@@ -317,7 +317,8 @@ void CompositorEngine::InvalidateScene(SceneState* scene_state) {
 
   for (auto& renderer : renderers_) {
     if (renderer->current_snapshot() &&
-        renderer->current_snapshot()->HasDependency(scene_state->scene_def())) {
+        renderer->current_snapshot()->HasDependency(
+            scene_state->scene_token())) {
       ScheduleFrameForRenderer(renderer, Scheduler::SchedulingMode::kSnapshot);
     }
   }
@@ -331,8 +332,9 @@ SceneDef::Disposition CompositorEngine::PresentScene(
 
   std::ostringstream errs;
   SceneDef::Disposition disposition = scene_state->scene_def()->Present(
-      presentation_time, base::Bind(&CompositorEngine::ResolveSceneReference,
-                                    base::Unretained(this)),
+      presentation_time, &universe_,
+      base::Bind(&CompositorEngine::ResolveSceneReference,
+                 base::Unretained(this)),
       base::Bind(&CompositorEngine::SendResourceUnavailable,
                  base::Unretained(this), base::Unretained(scene_state)),
       errs);
@@ -374,9 +376,11 @@ void CompositorEngine::SnapshotRenderer(
     SnapshotRendererInner(renderer_state, &block_log);
     if (!renderer_state->current_snapshot() ||
         renderer_state->current_snapshot()->is_blocked()) {
-      DVLOG(2) << "Rendering completely blocked: " << block_log.str();
+      DVLOG(2) << "Rendering completely blocked:" << std::endl
+               << block_log.str();
     } else if (!block_log.str().empty()) {
-      DVLOG(2) << "Rendering partially blocked: " << block_log.str();
+      DVLOG(2) << "Rendering partially blocked:" << std::endl
+               << block_log.str();
     } else {
       DVLOG(2) << "Rendering unblocked";
     }
@@ -404,9 +408,9 @@ void CompositorEngine::SnapshotRendererInner(RendererState* renderer_state,
     return;
   }
 
-  SnapshotBuilder builder(block_log);
   renderer_state->SetSnapshot(
-      builder.Build(renderer_state->root_scene()->scene_def()));
+      universe_.SnapshotScene(renderer_state->root_scene()->scene_token(),
+                              renderer_state->root_scene_version(), block_log));
 }
 
 void CompositorEngine::ScheduleFrameForRenderer(

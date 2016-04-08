@@ -13,15 +13,10 @@ Resource::Resource() {}
 Resource::~Resource() {}
 
 SceneResource::SceneResource(
-    const mojo::gfx::composition::SceneToken& scene_token,
-    const base::WeakPtr<SceneDef>& referenced_scene)
-    : scene_token_(scene_token), referenced_scene_(referenced_scene) {}
+    const mojo::gfx::composition::SceneToken& scene_token)
+    : scene_token_(scene_token) {}
 
 SceneResource::~SceneResource() {}
-
-scoped_refptr<const SceneResource> SceneResource::Unlink() const {
-  return new SceneResource(scene_token_, base::WeakPtr<SceneDef>());
-}
 
 Resource::Type SceneResource::type() const {
   return Type::kScene;

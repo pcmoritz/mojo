@@ -36,6 +36,8 @@ source_set("common") {
     "graph/snapshot.h",
     "graph/transform_pair.cc",
     "graph/transform_pair.h",
+    "graph/universe.cc",
+    "graph/universe.h",
     "render/render_frame.cc",
     "render/render_frame.h",
     "render/render_image.cc",

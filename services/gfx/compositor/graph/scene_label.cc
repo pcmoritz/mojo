@@ -4,6 +4,8 @@
 
 #include "services/gfx/compositor/graph/scene_label.h"
 
+#include <cinttypes>
+
 #include "base/strings/stringprintf.h"
 
 namespace compositor {
@@ -22,18 +24,25 @@ std::string SceneLabel::FormattedLabel() const {
              : base::StringPrintf("<S%d:%s>", token_, label_.c_str());
 }
 
-std::string SceneLabel::FormattedLabelForVersion(uint32_t version) const {
-  return label_.empty() ? base::StringPrintf("<S%d/%d>", token_, version)
-                        : base::StringPrintf("<S%d:%s/%d>", token_,
-                                             label_.c_str(), version);
+std::string SceneLabel::FormattedLabelForVersion(
+    uint32_t version,
+    int64_t presentation_time) const {
+  return label_.empty()
+             ? base::StringPrintf("<S%d/v%d@%" PRId64 ">", token_, version,
+                                  presentation_time)
+             : base::StringPrintf("<S%d:%s/v%d@%" PRId64 ">", token_,
+                                  label_.c_str(), version, presentation_time);
 }
 
 std::string SceneLabel::FormattedLabelForNode(uint32_t version,
+                                              int64_t presentation_time,
                                               uint32_t node_id) const {
   return label_.empty()
-             ? base::StringPrintf("<S%d/%d>[%d]", token_, version, node_id)
-             : base::StringPrintf("<S%d:%s/%d>[%d]", token_, label_.c_str(),
-                                  version, node_id);
+             ? base::StringPrintf("<S%d/v%d@%" PRId64 ">[#%d]", token_, version,
+                                  presentation_time, node_id)
+             : base::StringPrintf("<S%d:%s/v%d@%" PRId64 ">[#%d]", token_,
+                                  label_.c_str(), version, presentation_time,
+                                  node_id);
 }
 
 }  // namespace compositor

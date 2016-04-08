@@ -5,9 +5,9 @@
 #include "services/gfx/compositor/graph/snapshot.h"
 
 #include "base/logging.h"
+#include "mojo/services/gfx/composition/cpp/formatting.h"
 #include "mojo/skia/type_converters.h"
 #include "services/gfx/compositor/graph/scene_content.h"
-#include "services/gfx/compositor/graph/scene_def.h"
 #include "services/gfx/compositor/render/render_frame.h"
 #include "third_party/skia/include/core/SkPictureRecorder.h"
 #include "third_party/skia/include/core/SkRect.h"
@@ -19,8 +19,9 @@ Snapshot::Snapshot() {}
 
 Snapshot::~Snapshot() {}
 
-bool Snapshot::HasDependency(const SceneDef* scene) const {
-  return dependencies_.find(scene->label().token()) != dependencies_.end();
+bool Snapshot::HasDependency(
+    const mojo::gfx::composition::SceneToken& scene_token) const {
+  return dependencies_.find(scene_token.value) != dependencies_.end();
 }
 
 scoped_refptr<RenderFrame> Snapshot::CreateFrame(
@@ -68,7 +69,7 @@ const SceneContent* Snapshot::GetResolvedSceneContent(
 }
 
 SnapshotBuilder::SnapshotBuilder(std::ostream* block_log)
-    : block_log_(block_log), snapshot_(new Snapshot()) {}
+    : snapshot_(new Snapshot()), block_log_(block_log) {}
 
 SnapshotBuilder::~SnapshotBuilder() {}
 
@@ -78,7 +79,6 @@ Snapshot::Disposition SnapshotBuilder::SnapshotNode(
   DCHECK(snapshot_);
   DCHECK(node);
   DCHECK(content);
-  DCHECK(node != content->GetRootNodeIfExists());
 
   auto it = snapshot_->node_dispositions_.find(node);
   if (it != snapshot_->node_dispositions_.end())
@@ -89,53 +89,10 @@ Snapshot::Disposition SnapshotBuilder::SnapshotNode(
   return disposition;
 }
 
-Snapshot::Disposition SnapshotBuilder::SnapshotRootAndDetectCycles(
-    const Node* node,
-    const SceneContent* content) {
-  DCHECK(snapshot_);
-  DCHECK(node);
-  DCHECK(content);
-  DCHECK(node == content->GetRootNodeIfExists());
-
-  auto storage = snapshot_->node_dispositions_.emplace(
-      node, Snapshot::Disposition::kCycle);
-  if (!storage.second) {
-    if (storage.first->second == Snapshot::Disposition::kCycle)
-      cycle_ = content;  // start unwinding, remember where to stop
-    return storage.first->second;
-  }
-
-  Snapshot::Disposition disposition = node->RecordSnapshot(content, this);
-  if (disposition == Snapshot::Disposition::kSuccess) {
-    snapshot_->node_dispositions_[node] = disposition;
-    return disposition;
-  }
-
-  // We cannot reuse the iterator in |storage.first| because it may have
-  // been invalidated by the call to |RecordSnapshot| due to rehashing so
-  // we must look up the node again just in case.
-  snapshot_->node_dispositions_[node] = Snapshot::Disposition::kBlocked;
-
-  if (disposition == Snapshot::Disposition::kCycle) {
-    DCHECK(cycle_);
-    if (block_log_) {
-      *block_log_ << "Scene blocked because it is part of a cycle: "
-                  << content->FormattedLabel() << std::endl;
-    }
-    if (cycle_ == content) {
-      cycle_ = nullptr;  // found the ouroboros tail, stop unwinding
-      disposition = Snapshot::Disposition::kBlocked;
-    }
-  }
-  return disposition;
-}
-Snapshot::Disposition SnapshotBuilder::SnapshotScene(
-    const SceneDef* scene,
-    uint32_t version,
+Snapshot::Disposition SnapshotBuilder::SnapshotReferencedScene(
     const SceneNode* referrer_node,
     const SceneContent* referrer_content) {
   DCHECK(snapshot_);
-  DCHECK(scene);
   DCHECK(referrer_node);
   DCHECK(referrer_content);
 
@@ -145,74 +102,69 @@ Snapshot::Disposition SnapshotBuilder::SnapshotScene(
   DCHECK(snapshot_->resolved_scene_contents_.find(referrer_node) ==
          snapshot_->resolved_scene_contents_.end());
 
-  snapshot_->dependencies_.insert(scene->label().token());
+  auto scene_resource =
+      static_cast<const SceneResource*>(referrer_content->GetResource(
+          referrer_node->scene_resource_id(), Resource::Type::kScene));
+  DCHECK(scene_resource);
 
-  const SceneContent* content = scene->FindContent(version);
-  if (!content) {
+  scoped_refptr<const SceneContent> content;
+  Snapshot::Disposition disposition = AddDependencyResolveAndSnapshotScene(
+      scene_resource->scene_token(), referrer_node->scene_version(), &content);
+
+  if (disposition == Snapshot::Disposition::kSuccess) {
+    snapshot_->resolved_scene_contents_[referrer_node] = content;
+  } else if (disposition == Snapshot::Disposition::kBlocked) {
     if (block_log_) {
-      *block_log_ << "Scene node blocked because its referenced scene is not "
-                     "available with the requested version: "
+      *block_log_ << "Scene node's referenced scene is blocked: "
                   << referrer_node->FormattedLabel(referrer_content)
-                  << ", scene " << scene->label().FormattedLabel()
-                  << ", requested version " << version << ", current version "
-                  << scene->version() << std::endl;
+                  << ", referenced scene " << scene_resource->scene_token()
+                  << ", version " << referrer_node->scene_version()
+                  << std::endl;
     }
-    return Snapshot::Disposition::kBlocked;
   }
-
-  const Node* root = content->GetRootNodeIfExists();
-  if (!root) {
-    if (block_log_) {
-      *block_log_ << "Scene node blocked because its referenced scene has no "
-                     "root node: "
-                  << referrer_node->FormattedLabel(referrer_content)
-                  << ", scene " << content->FormattedLabel() << std::endl;
-    }
-    return Snapshot::Disposition::kBlocked;
-  }
-
-  snapshot_->resolved_scene_contents_[referrer_node] = content;
-  return SnapshotRootAndDetectCycles(root, content);
+  return disposition;
 }
 
-Snapshot::Disposition SnapshotBuilder::SnapshotRenderer(const SceneDef* scene) {
-  DCHECK(!snapshot_->root_scene_content_);
-
-  snapshot_->dependencies_.insert(scene->label().token());
-
-  const SceneContent* content =
-      scene->FindContent(mojo::gfx::composition::kSceneVersionNone);
-  if (!content) {
-    if (block_log_) {
-      *block_log_ << "Rendering blocked because the root scene has no content: "
-                  << scene->label().FormattedLabel() << std::endl;
-    }
-    return Snapshot::Disposition::kBlocked;
-  }
+Snapshot::Disposition SnapshotBuilder::SnapshotSceneContent(
+    const SceneContent* content) {
+  DCHECK(snapshot_);
+  DCHECK(content);
 
   const Node* root = content->GetRootNodeIfExists();
   if (!root) {
     if (block_log_) {
-      *block_log_ << "Rendering blocked the root scene has no root node: "
-                  << content->FormattedLabel() << std::endl;
+      *block_log_ << "Scene has no root node: " << content->FormattedLabel()
+                  << std::endl;
     }
     return Snapshot::Disposition::kBlocked;
   }
 
-  snapshot_->root_scene_content_ = content;
-  return SnapshotRootAndDetectCycles(root, content);
+  return SnapshotNode(root, content);
+}
+
+Snapshot::Disposition SnapshotBuilder::AddDependencyResolveAndSnapshotScene(
+    const mojo::gfx::composition::SceneToken& scene_token,
+    uint32_t version,
+    scoped_refptr<const SceneContent>* out_content) {
+  DCHECK(out_content);
+
+  snapshot_->dependencies_.insert(scene_token.value);
+  return ResolveAndSnapshotScene(scene_token, version, out_content);
 }
 
 scoped_refptr<const Snapshot> SnapshotBuilder::Build(
-    const SceneDef* root_scene) {
+    const mojo::gfx::composition::SceneToken& scene_token,
+    uint32_t version) {
   DCHECK(snapshot_);
-  DCHECK(root_scene);
+  DCHECK(!snapshot_->root_scene_content_);
 
-  snapshot_->disposition_ = SnapshotRenderer(root_scene);
-  DCHECK(!cycle_);  // must have properly unwound any cycles by now
+  scoped_refptr<const SceneContent> content;
+  snapshot_->disposition_ =
+      AddDependencyResolveAndSnapshotScene(scene_token, version, &content);
 
-  if (snapshot_->is_blocked()) {
-    snapshot_->root_scene_content_ = nullptr;
+  if (!snapshot_->is_blocked()) {
+    snapshot_->root_scene_content_ = content;
+  } else {
     snapshot_->resolved_scene_contents_.clear();
     snapshot_->node_dispositions_.clear();
   }

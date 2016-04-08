@@ -10,7 +10,6 @@
 #include "mojo/services/gfx/composition/cpp/formatting.h"
 #include "mojo/skia/type_converters.h"
 #include "services/gfx/compositor/graph/scene_content.h"
-#include "services/gfx/compositor/graph/scene_def.h"
 #include "services/gfx/compositor/graph/snapshot.h"
 #include "services/gfx/compositor/graph/transform_pair.h"
 #include "services/gfx/compositor/render/render_image.h"
@@ -445,22 +444,8 @@ Snapshot::Disposition SceneNode::RecordSnapshot(
   DCHECK(content);
   DCHECK(builder);
 
-  auto scene_resource = static_cast<const SceneResource*>(
-      content->GetResource(scene_resource_id_, Resource::Type::kScene));
-  DCHECK(scene_resource);
-
-  SceneDef* referenced_scene = scene_resource->referenced_scene().get();
-  if (!referenced_scene) {
-    if (builder->block_log()) {
-      *builder->block_log()
-          << "Scene node blocked because its referenced scene is unavailable: "
-          << FormattedLabel(content) << std::endl;
-    }
-    return Snapshot::Disposition::kBlocked;
-  }
-
   Snapshot::Disposition disposition =
-      builder->SnapshotScene(referenced_scene, scene_version_, this, content);
+      builder->SnapshotReferencedScene(this, content);
   if (disposition != Snapshot::Disposition::kSuccess)
     return disposition;
   return Node::RecordSnapshot(content, builder);

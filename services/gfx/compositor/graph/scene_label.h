@@ -24,8 +24,11 @@ class SceneLabel {
 
   // Gets a descriptive label including optional version and node information.
   std::string FormattedLabel() const;
-  std::string FormattedLabelForVersion(uint32_t version) const;
-  std::string FormattedLabelForNode(uint32_t version, uint32_t node_id) const;
+  std::string FormattedLabelForVersion(uint32_t version,
+                                       int64_t presentation_time) const;
+  std::string FormattedLabelForNode(uint32_t version,
+                                    int64_t presentation_time,
+                                    uint32_t node_id) const;
 
  private:
   uint32_t const token_;

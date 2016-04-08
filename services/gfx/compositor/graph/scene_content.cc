@@ -13,14 +13,22 @@ namespace compositor {
 
 SceneContent::SceneContent(const SceneLabel& label,
                            uint32_t version,
+                           int64_t presentation_time,
                            size_t max_resources,
                            size_t max_nodes)
     : label_(label),
       version_(version),
+      presentation_time_(presentation_time),
       resources_(max_resources),
       nodes_(max_nodes) {}
 
 SceneContent::~SceneContent() {}
+
+bool SceneContent::MatchesVersion(uint32_t requested_version) const {
+  return requested_version == mojo::gfx::composition::kSceneVersionNone ||
+         requested_version == version_ ||
+         version_ == mojo::gfx::composition::kSceneVersionNone;
+}
 
 void SceneContent::RecordPicture(const Snapshot* snapshot,
                                  SkCanvas* canvas) const {
@@ -74,17 +82,18 @@ const Node* SceneContent::GetRootNodeIfExists() const {
   return it != nodes_.end() ? it->second.get() : nullptr;
 }
 
-SceneContentBuilder::SceneContentBuilder(const SceneDef* scene,
+SceneContentBuilder::SceneContentBuilder(const SceneLabel& label,
                                          uint32_t version,
-                                         std::ostream& err,
+                                         int64_t presentation_time,
                                          size_t max_resources,
-                                         size_t max_nodes)
-    : content_(
-          new SceneContent(scene->label(), version, max_resources, max_nodes)),
-      scene_(scene),
-      err_(err) {
-  DCHECK(scene);
-}
+                                         size_t max_nodes,
+                                         std::ostream& err)
+    : content_(new SceneContent(label,
+                                version,
+                                presentation_time,
+                                max_resources,
+                                max_nodes)),
+      err_(err) {}
 
 SceneContentBuilder::~SceneContentBuilder() {}
 
@@ -98,17 +107,17 @@ const Resource* SceneContentBuilder::RequireResource(
   if (it != content_->resources_.end())
     return it->second.get();
 
-  const Resource* resource = scene_->FindResource(resource_id);
+  const Resource* resource = FindResource(resource_id);
   if (!resource) {
     err_ << "Missing resource " << resource_id << " referenced from node "
-         << content_->FormattedLabelForNode(referrer_node_id);
+         << content_->FormattedLabelForNode(referrer_node_id) << std::endl;
     return nullptr;
   }
 
   if (resource->type() != resource_type) {
     err_ << "Resource " << resource_id << " referenced from node "
          << content_->FormattedLabelForNode(referrer_node_id)
-         << " has incorrect type for its intended usage";
+         << " has incorrect type for its intended usage" << std::endl;
     return nullptr;
   }
 
@@ -125,14 +134,14 @@ const Node* SceneContentBuilder::RequireNode(uint32_t node_id,
     if (it->second)
       return it->second.get();
     err_ << "Cycle detected at node " << node_id << " referenced from node "
-         << content_->FormattedLabelForNode(referrer_node_id);
+         << content_->FormattedLabelForNode(referrer_node_id) << std::endl;
     return nullptr;
   }
 
-  const Node* node = scene_->FindNode(node_id);
+  const Node* node = FindNode(node_id);
   if (!node) {
     err_ << "Missing node " << node_id << " referenced from node "
-         << content_->FormattedLabelForNode(referrer_node_id);
+         << content_->FormattedLabelForNode(referrer_node_id) << std::endl;
     return nullptr;
   }
 
@@ -167,7 +176,7 @@ bool SceneContentBuilder::AddNode(const Node* node) {
 scoped_refptr<const SceneContent> SceneContentBuilder::Build() {
   DCHECK(content_);
 
-  const Node* root = scene_->FindRootNode();
+  const Node* root = FindNode(mojo::gfx::composition::kSceneRootNodeId);
   return !root || AddNode(root) ? std::move(content_) : nullptr;
 }
 

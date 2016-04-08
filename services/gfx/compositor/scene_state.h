@@ -34,8 +34,8 @@ class SceneState {
 
   // Gets the token used to refer to this scene globally.
   // Caller does not obtain ownership of the token.
-  const mojo::gfx::composition::SceneToken* scene_token() {
-    return scene_token_.get();
+  const mojo::gfx::composition::SceneToken& scene_token() {
+    return *scene_token_;
   }
 
   // Gets or sets the scene listener interface.

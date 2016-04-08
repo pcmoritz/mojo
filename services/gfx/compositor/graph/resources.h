@@ -7,13 +7,10 @@
 
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
-#include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/resources.mojom.h"
 #include "services/gfx/compositor/render/render_image.h"
 
 namespace compositor {
-
-class SceneDef;
 
 // Base class for resources in a scene graph.
 //
@@ -39,8 +36,7 @@ class Resource : public base::RefCounted<Resource> {
 // A resource which represents a reference to a specified scene.
 class SceneResource : public Resource {
  public:
-  SceneResource(const mojo::gfx::composition::SceneToken& scene_token,
-                const base::WeakPtr<SceneDef>& referenced_scene);
+  explicit SceneResource(const mojo::gfx::composition::SceneToken& scene_token);
 
   Type type() const override;
 
@@ -48,20 +44,11 @@ class SceneResource : public Resource {
     return scene_token_;
   }
 
-  // The referenced scene, may be null if the scene is unavailable.
-  const base::WeakPtr<SceneDef>& referenced_scene() const {
-    return referenced_scene_;
-  }
-
-  // Returns a copy of the resource without its referenced scene.
-  scoped_refptr<const SceneResource> Unlink() const;
-
  protected:
   ~SceneResource() override;
 
  private:
   mojo::gfx::composition::SceneToken scene_token_;
-  base::WeakPtr<SceneDef> referenced_scene_;
 
   DISALLOW_COPY_AND_ASSIGN(SceneResource);
 };

@@ -14,21 +14,20 @@
 #include "base/callback.h"
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
-#include "base/memory/weak_ptr.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "services/gfx/compositor/graph/nodes.h"
 #include "services/gfx/compositor/graph/resources.h"
+#include "services/gfx/compositor/graph/scene_content.h"
 #include "services/gfx/compositor/graph/scene_label.h"
 
 namespace compositor {
 
-class SceneContent;
 class SceneDef;
-class SnapshotBuilder;
+class Universe;
 
-// Resolves a scene token to a scene definition.
-using SceneResolver = base::Callback<base::WeakPtr<SceneDef>(
-    const mojo::gfx::composition::SceneToken&)>;
+// Determines whether a scene is registered.
+using SceneResolver =
+    base::Callback<bool(const mojo::gfx::composition::SceneToken&)>;
 
 // Sends a scene unavailable message with the specified resource id.
 using SceneUnavailableSender = base::Callback<void(uint32_t)>;
@@ -51,16 +50,9 @@ class SceneDef {
   SceneDef(const SceneLabel& label);
   ~SceneDef();
 
-  base::WeakPtr<SceneDef> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
-
   // Gets the scene label.
   const SceneLabel& label() const { return label_; }
-  std::string FormattedLabel() const {
-    return label_.FormattedLabelForVersion(version_);
-  }
-
-  // Gets the currently published scene graph version.
-  uint32_t version() const { return version_; }
+  std::string FormattedLabel() const { return label_.FormattedLabel(); }
 
   // Enqueues a pending update event to the scene graph.
   void EnqueueUpdate(mojo::gfx::composition::SceneUpdatePtr update);
@@ -70,35 +62,43 @@ class SceneDef {
   void EnqueuePublish(mojo::gfx::composition::SceneMetadataPtr metadata);
 
   // Applies published updates to the scene up to the point indicated by
-  // |presentation_time|.
+  // |presentation_time|, adds new scene content to the universe.
   //
-  // Returns a value which indicates whether the updates succeded.
+  // Returns a value which indicates whether the updates succeeded.
   // If the result is |kFailed|, the scene graph was left in an unusable
   // and inconsistent state and must be destroyed.
   Disposition Present(int64_t presentation_time,
+                      Universe* universe,
                       const SceneResolver& resolver,
                       const SceneUnavailableSender& unavailable_sender,
                       std::ostream& err);
 
-  // Unlinks references to another scene which has been unregistered.
-  // Causes |OnResourceUnavailable()| to be delivered to the scene for all
-  // invalidated scene resources.  Returns true if any changes were made.
-  bool UnlinkReferencedScene(SceneDef* scene,
-                             const SceneUnavailableSender& unavailable_sender);
-
-  // Finds resources or nodes in the current version, returns nullptr if absent.
-  const Resource* FindResource(uint32_t resource_id) const;
-  const Node* FindNode(uint32_t node_id) const;
-  const Node* FindRootNode() const {
-    return FindNode(mojo::gfx::composition::kSceneRootNodeId);
-  }
-
-  // Finds the most recently presented content of the specified version,
-  // returns nullptr if absent.
-  // If the version is |kSceneVersionNone| returns the current version.
-  const SceneContent* FindContent(uint32_t version) const;
+  // Reports that a scene has been unregistered.
+  // Causes |OnResourceUnavailable()| to be delivered for all matching scene
+  // references.
+  void NotifySceneUnavailable(
+      const mojo::gfx::composition::SceneToken& scene_token,
+      const SceneUnavailableSender& unavailable_sender);
 
  private:
+  class Collector : public SceneContentBuilder {
+   public:
+    Collector(const SceneDef* scene,
+              uint32_t version,
+              int64_t presentation_time,
+              std::ostream& err);
+    ~Collector() override;
+
+   protected:
+    const Resource* FindResource(uint32_t resource_id) const override;
+    const Node* FindNode(uint32_t node_id) const override;
+
+   private:
+    const SceneDef* scene_;
+
+    DISALLOW_COPY_AND_ASSIGN(Collector);
+  };
+
   struct Publication {
     Publication(mojo::gfx::composition::SceneMetadataPtr metadata);
     ~Publication();
@@ -135,13 +135,8 @@ class SceneDef {
   std::vector<mojo::gfx::composition::SceneUpdatePtr> pending_updates_;
   std::vector<std::unique_ptr<Publication>> pending_publications_;
 
-  uint32_t version_ = mojo::gfx::composition::kSceneVersionNone;
   std::unordered_map<uint32_t, scoped_refptr<const Resource>> resources_;
   std::unordered_map<uint32_t, scoped_refptr<const Node>> nodes_;
-
-  scoped_refptr<const SceneContent> content_;
-
-  base::WeakPtrFactory<SceneDef> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(SceneDef);
 };

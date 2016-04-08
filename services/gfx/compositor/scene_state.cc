@@ -10,7 +10,9 @@ SceneState::SceneState(mojo::gfx::composition::SceneTokenPtr scene_token,
                        const std::string& label)
     : scene_token_(scene_token.Pass()),
       scene_def_(SceneLabel(scene_token_->value, label)),
-      weak_factory_(this) {}
+      weak_factory_(this) {
+  DCHECK(scene_token_);
+}
 
 SceneState::~SceneState() {
   // The scene implementation and all of its bindings must be destroyed
