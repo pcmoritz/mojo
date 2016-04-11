@@ -176,9 +176,10 @@ void MediaSinkImpl::Pause() {
 
 void MediaSinkImpl::StatusUpdated() {
   ++status_version_;
-  while (!pending_status_requests_.empty()) {
-    RunStatusCallback(pending_status_requests_.front());
-    pending_status_requests_.pop_front();
+  std::deque<GetStatusCallback> pending_status_requests;
+  pending_status_requests_.swap(pending_status_requests);
+  for (const GetStatusCallback& callback : pending_status_requests) {
+    RunStatusCallback(callback);
   }
 }
 

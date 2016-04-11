@@ -20,6 +20,8 @@ mojo_native_application("media_factory") {
     "main.cc",
     "media_decoder_impl.cc",
     "media_decoder_impl.h",
+    "media_demux_impl.cc",
+    "media_demux_impl.h",
     "media_player_impl.cc",
     "media_player_impl.h",
     "media_sink_impl.cc",

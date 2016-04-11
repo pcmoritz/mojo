@@ -68,6 +68,9 @@ class MediaFactoryService : public ApplicationDelegate,
                   MediaTypePtr media_type,
                   InterfaceRequest<MediaSink> sink) override;
 
+  void CreateDemux(InterfaceHandle<SeekingReader> reader,
+                   InterfaceRequest<MediaDemux> demux) override;
+
   void CreateDecoder(MediaTypePtr input_media_type,
                      InterfaceRequest<MediaTypeConverter> decoder) override;
 

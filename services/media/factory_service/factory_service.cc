@@ -4,6 +4,7 @@
 
 #include "services/media/factory_service/factory_service.h"
 #include "services/media/factory_service/media_decoder_impl.h"
+#include "services/media/factory_service/media_demux_impl.h"
 #include "services/media/factory_service/media_player_impl.h"
 #include "services/media/factory_service/media_sink_impl.h"
 #include "services/media/factory_service/media_source_impl.h"
@@ -56,6 +57,12 @@ void MediaFactoryService::CreateSink(const String& destination_url,
                                      InterfaceRequest<MediaSink> sink) {
   products_.insert(std::static_pointer_cast<Product>(MediaSinkImpl::Create(
       destination_url, media_type.Pass(), sink.Pass(), this)));
+}
+
+void MediaFactoryService::CreateDemux(InterfaceHandle<SeekingReader> reader,
+                                      InterfaceRequest<MediaDemux> demux) {
+  products_.insert(std::static_pointer_cast<Product>(
+      MediaDemuxImpl::Create(reader.Pass(), demux.Pass(), this)));
 }
 
 void MediaFactoryService::CreateDecoder(

@@ -80,7 +80,7 @@ class MediaSourceImpl : public MediaFactoryService::Product,
 
     ~Stream();
 
-    // Gets the stream type of the stream.
+    // Gets the media type of the stream.
     MediaTypePtr media_type() const;
 
     // Gets the original stream type of the stream.
@@ -127,7 +127,6 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   Array<MediaTypeSetPtr> allowed_media_types_;
   Graph graph_;
   PartRef demux_part_;
-  std::shared_ptr<Reader> reader_;
   std::shared_ptr<Demux> demux_;
   Incident init_complete_;
   std::vector<std::unique_ptr<Stream>> streams_;

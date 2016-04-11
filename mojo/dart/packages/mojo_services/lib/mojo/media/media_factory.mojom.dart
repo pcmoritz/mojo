@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
+import 'package:mojo_services/mojo/media/media_demux.mojom.dart' as media_demux_mojom;
 import 'package:mojo_services/mojo/media/media_player.mojom.dart' as media_player_mojom;
 import 'package:mojo_services/mojo/media/media_sink.mojom.dart' as media_sink_mojom;
 import 'package:mojo_services/mojo/media/media_source.mojom.dart' as media_source_mojom;
@@ -313,6 +314,90 @@ class _MediaFactoryCreateSinkParams extends bindings.Struct {
 }
 
 
+class _MediaFactoryCreateDemuxParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(24, 0)
+  ];
+  Object reader = null;
+  Object demux = null;
+
+  _MediaFactoryCreateDemuxParams() : super(kVersions.last.size);
+
+  static _MediaFactoryCreateDemuxParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _MediaFactoryCreateDemuxParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _MediaFactoryCreateDemuxParams result = new _MediaFactoryCreateDemuxParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.reader = decoder0.decodeServiceInterface(8, false, seeking_reader_mojom.SeekingReaderProxy.newFromEndpoint);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.demux = decoder0.decodeInterfaceRequest(16, false, media_demux_mojom.MediaDemuxStub.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInterface(reader, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "reader of struct _MediaFactoryCreateDemuxParams: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeInterfaceRequest(demux, 16, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "demux of struct _MediaFactoryCreateDemuxParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_MediaFactoryCreateDemuxParams("
+           "reader: $reader" ", "
+           "demux: $demux" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
 class _MediaFactoryCreateDecoderParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
@@ -484,8 +569,9 @@ class _MediaFactoryCreateNetworkReaderParams extends bindings.Struct {
 const int _mediaFactoryMethodCreatePlayerName = 0;
 const int _mediaFactoryMethodCreateSourceName = 1;
 const int _mediaFactoryMethodCreateSinkName = 2;
-const int _mediaFactoryMethodCreateDecoderName = 3;
-const int _mediaFactoryMethodCreateNetworkReaderName = 4;
+const int _mediaFactoryMethodCreateDemuxName = 3;
+const int _mediaFactoryMethodCreateDecoderName = 4;
+const int _mediaFactoryMethodCreateNetworkReaderName = 5;
 
 class _MediaFactoryServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -503,6 +589,7 @@ abstract class MediaFactory {
   void createPlayer(Object reader, Object player);
   void createSource(Object reader, List<media_types_mojom.MediaTypeSet> allowedMediaTypes, Object source);
   void createSink(String destinationUrl, media_types_mojom.MediaType mediaType, Object sink);
+  void createDemux(Object reader, Object demux);
   void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder);
   void createNetworkReader(String url, Object reader);
 }
@@ -577,6 +664,16 @@ class _MediaFactoryProxyCalls implements MediaFactory {
       params.mediaType = mediaType;
       params.sink = sink;
       _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateSinkName);
+    }
+    void createDemux(Object reader, Object demux) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _MediaFactoryCreateDemuxParams();
+      params.reader = reader;
+      params.demux = demux;
+      _proxyImpl.sendMessage(params, _mediaFactoryMethodCreateDemuxName);
     }
     void createDecoder(media_types_mojom.MediaType inputMediaType, Object decoder) {
       if (!_proxyImpl.isBound) {
@@ -702,6 +799,11 @@ class MediaFactoryStub extends bindings.Stub {
         var params = _MediaFactoryCreateSinkParams.deserialize(
             message.payload);
         _impl.createSink(params.destinationUrl, params.mediaType, params.sink);
+        break;
+      case _mediaFactoryMethodCreateDemuxName:
+        var params = _MediaFactoryCreateDemuxParams.deserialize(
+            message.payload);
+        _impl.createDemux(params.reader, params.demux);
         break;
       case _mediaFactoryMethodCreateDecoderName:
         var params = _MediaFactoryCreateDecoderParams.deserialize(

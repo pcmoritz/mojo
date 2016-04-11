@@ -42,14 +42,14 @@ MediaSourceImpl::MediaSourceImpl(
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  reader_ = MojoReader::Create(reader.Pass());
-  if (!reader_) {
+  std::shared_ptr<Reader> reader_ptr = MojoReader::Create(reader.Pass());
+  if (!reader_ptr) {
     NOTREACHED() << "couldn't create reader";
     state_ = MediaState::FAULT;
     return;
   }
 
-  demux_ = Demux::Create(reader_);
+  demux_ = Demux::Create(reader_ptr);
   if (!demux_) {
     NOTREACHED() << "couldn't create demux";
     state_ = MediaState::FAULT;
@@ -194,9 +194,10 @@ void MediaSourceImpl::RunSeekCallback(const SeekCallback& callback) {
 
 void MediaSourceImpl::StatusUpdated() {
   ++status_version_;
-  while (!pending_status_requests_.empty()) {
-    RunStatusCallback(pending_status_requests_.front());
-    pending_status_requests_.pop_front();
+  std::deque<GetStatusCallback> pending_status_requests;
+  pending_status_requests_.swap(pending_status_requests);
+  for (const GetStatusCallback& callback : pending_status_requests) {
+    RunStatusCallback(callback);
   }
 }
 
