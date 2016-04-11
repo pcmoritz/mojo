@@ -11,8 +11,6 @@ source_set("application_manager") {
     "application_loader.h",
     "application_manager.cc",
     "application_manager.h",
-    "data_pipe_peek.cc",
-    "data_pipe_peek.h",
     "fetcher.cc",
     "fetcher.h",
     "identity.cc",
@@ -48,12 +46,12 @@ source_set("application_manager") {
   deps = [
     "//base/third_party/dynamic_annotations",
     "//crypto:crypto",
-    "//url",
     "//mojo/common",
     "//mojo/edk/system",
     "//mojo/environment:chromium",
     "//mojo/services/content_handler/interfaces",
     "//shell:native_application_support",
+    "//url",
   ]
 }
 

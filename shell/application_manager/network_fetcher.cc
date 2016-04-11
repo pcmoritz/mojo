@@ -21,7 +21,6 @@
 #include "crypto/sha2.h"
 #include "mojo/converters/url/url_type_converters.h"
 #include "mojo/data_pipe_utils/data_pipe_utils.h"
-#include "shell/application_manager/data_pipe_peek.h"
 
 namespace shell {
 
