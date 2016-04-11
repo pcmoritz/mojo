@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
-import 'package:mojo_services/mojo/media/media_clock.mojom.dart' as media_clock_mojom;
 import 'package:mojo_services/mojo/media/media_metadata.mojom.dart' as media_metadata_mojom;
 import 'package:mojo_services/mojo/media/media_state.mojom.dart' as media_state_mojom;
 import 'package:mojo_services/mojo/media/media_transport.mojom.dart' as media_transport_mojom;
@@ -350,282 +349,6 @@ class MediaSourceGetStreamsResponseParams extends bindings.Struct {
     Map map = new Map();
     map["streams"] = streams;
     return map;
-  }
-}
-
-
-class _MediaSourceGetClockDispositionParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _MediaSourceGetClockDispositionParams() : super(kVersions.last.size);
-
-  static _MediaSourceGetClockDispositionParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSourceGetClockDispositionParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSourceGetClockDispositionParams result = new _MediaSourceGetClockDispositionParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_MediaSourceGetClockDispositionParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-class MediaSourceGetClockDispositionResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  media_clock_mojom.ClockDisposition clockDisposition = null;
-
-  MediaSourceGetClockDispositionResponseParams() : super(kVersions.last.size);
-
-  static MediaSourceGetClockDispositionResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static MediaSourceGetClockDispositionResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    MediaSourceGetClockDispositionResponseParams result = new MediaSourceGetClockDispositionResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.clockDisposition = media_clock_mojom.ClockDisposition.decode(decoder0, 8);
-        if (result.clockDisposition == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable media_clock_mojom.ClockDisposition.');
-        }
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeEnum(clockDisposition, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "clockDisposition of struct MediaSourceGetClockDispositionResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "MediaSourceGetClockDispositionResponseParams("
-           "clockDisposition: $clockDisposition" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["clockDisposition"] = clockDisposition;
-    return map;
-  }
-}
-
-
-class _MediaSourceGetMasterClockParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  Object masterClock = null;
-
-  _MediaSourceGetMasterClockParams() : super(kVersions.last.size);
-
-  static _MediaSourceGetMasterClockParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSourceGetMasterClockParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSourceGetMasterClockParams result = new _MediaSourceGetMasterClockParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.masterClock = decoder0.decodeInterfaceRequest(8, false, media_clock_mojom.ClockStub.newFromEndpoint);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeInterfaceRequest(masterClock, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "masterClock of struct _MediaSourceGetMasterClockParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_MediaSourceGetMasterClockParams("
-           "masterClock: $masterClock" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class _MediaSourceSetMasterClockParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  Object masterClock = null;
-
-  _MediaSourceSetMasterClockParams() : super(kVersions.last.size);
-
-  static _MediaSourceSetMasterClockParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSourceSetMasterClockParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSourceSetMasterClockParams result = new _MediaSourceSetMasterClockParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.masterClock = decoder0.decodeServiceInterface(8, true, media_clock_mojom.ClockProxy.newFromEndpoint);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeInterface(masterClock, 8, true);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "masterClock of struct _MediaSourceSetMasterClockParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_MediaSourceSetMasterClockParams("
-           "masterClock: $masterClock" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
   }
 }
 
@@ -1435,16 +1158,13 @@ class MediaSourceSeekResponseParams extends bindings.Struct {
 }
 
 const int _mediaSourceMethodGetStreamsName = 0;
-const int _mediaSourceMethodGetClockDispositionName = 1;
-const int _mediaSourceMethodGetMasterClockName = 2;
-const int _mediaSourceMethodSetMasterClockName = 3;
-const int _mediaSourceMethodGetProducerName = 4;
-const int _mediaSourceMethodGetPullModeProducerName = 5;
-const int _mediaSourceMethodGetStatusName = 6;
-const int _mediaSourceMethodPrepareName = 7;
-const int _mediaSourceMethodPrimeName = 8;
-const int _mediaSourceMethodFlushName = 9;
-const int _mediaSourceMethodSeekName = 10;
+const int _mediaSourceMethodGetProducerName = 1;
+const int _mediaSourceMethodGetPullModeProducerName = 2;
+const int _mediaSourceMethodGetStatusName = 3;
+const int _mediaSourceMethodPrepareName = 4;
+const int _mediaSourceMethodPrimeName = 5;
+const int _mediaSourceMethodFlushName = 6;
+const int _mediaSourceMethodSeekName = 7;
 
 class _MediaSourceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -1460,9 +1180,6 @@ class _MediaSourceServiceDescription implements service_describer.ServiceDescrip
 abstract class MediaSource {
   static const String serviceName = null;
   dynamic getStreams([Function responseFactory = null]);
-  dynamic getClockDisposition([Function responseFactory = null]);
-  void getMasterClock(Object masterClock);
-  void setMasterClock(Object masterClock);
   void getProducer(int streamIndex, Object producer);
   void getPullModeProducer(int streamIndex, Object producer);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
@@ -1496,26 +1213,6 @@ class _MediaSourceProxyImpl extends bindings.Proxy {
     switch (message.header.type) {
       case _mediaSourceMethodGetStreamsName:
         var r = MediaSourceGetStreamsResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
-      case _mediaSourceMethodGetClockDispositionName:
-        var r = MediaSourceGetClockDispositionResponseParams.deserialize(
             message.payload);
         if (!message.header.hasRequestId) {
           proxyError("Expected a message with a valid request Id.");
@@ -1659,32 +1356,6 @@ class _MediaSourceProxyCalls implements MediaSource {
           _mediaSourceMethodGetStreamsName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
-    }
-    dynamic getClockDisposition([Function responseFactory = null]) {
-      var params = new _MediaSourceGetClockDispositionParams();
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _mediaSourceMethodGetClockDispositionName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
-    }
-    void getMasterClock(Object masterClock) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _MediaSourceGetMasterClockParams();
-      params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _mediaSourceMethodGetMasterClockName);
-    }
-    void setMasterClock(Object masterClock) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _MediaSourceSetMasterClockParams();
-      params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _mediaSourceMethodSetMasterClockName);
     }
     void getProducer(int streamIndex, Object producer) {
       if (!_proxyImpl.isBound) {
@@ -1834,11 +1505,6 @@ class MediaSourceStub extends bindings.Stub {
     result.streams = streams;
     return result;
   }
-  MediaSourceGetClockDispositionResponseParams _mediaSourceGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
-    var result = new MediaSourceGetClockDispositionResponseParams();
-    result.clockDisposition = clockDisposition;
-    return result;
-  }
   MediaSourceGetStatusResponseParams _mediaSourceGetStatusResponseParamsFactory(int version, MediaSourceStatus status) {
     var result = new MediaSourceGetStatusResponseParams();
     result.version = version;
@@ -1889,36 +1555,6 @@ class MediaSourceStub extends bindings.Stub {
               message.header.requestId,
               bindings.MessageHeader.kMessageIsResponse);
         }
-        break;
-      case _mediaSourceMethodGetClockDispositionName:
-        var response = _impl.getClockDisposition(_mediaSourceGetClockDispositionResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _mediaSourceMethodGetClockDispositionName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _mediaSourceMethodGetClockDispositionName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
-        break;
-      case _mediaSourceMethodGetMasterClockName:
-        var params = _MediaSourceGetMasterClockParams.deserialize(
-            message.payload);
-        _impl.getMasterClock(params.masterClock);
-        break;
-      case _mediaSourceMethodSetMasterClockName:
-        var params = _MediaSourceSetMasterClockParams.deserialize(
-            message.payload);
-        _impl.setMasterClock(params.masterClock);
         break;
       case _mediaSourceMethodGetProducerName:
         var params = _MediaSourceGetProducerParams.deserialize(

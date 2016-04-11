@@ -36,13 +36,6 @@ class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
   ~MediaSinkImpl() override;
 
   // MediaSink implementation.
-  void GetClockDisposition(
-      const GetClockDispositionCallback& callback) override;
-
-  void GetMasterClock(InterfaceRequest<Clock> master_clock) override;
-
-  void SetMasterClock(InterfaceHandle<Clock> master_clock) override;
-
   void GetConsumer(InterfaceRequest<MediaConsumer> consumer) override;
 
   void GetStatus(uint64_t version_last_seen,

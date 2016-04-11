@@ -39,13 +39,6 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   // MediaSource implementation.
   void GetStreams(const GetStreamsCallback& callback) override;
 
-  void GetClockDisposition(
-      const GetClockDispositionCallback& callback) override;
-
-  void GetMasterClock(InterfaceRequest<Clock> master_clock) override;
-
-  void SetMasterClock(InterfaceHandle<Clock> master_clock) override;
-
   void GetProducer(uint32_t stream_index,
                    InterfaceRequest<MediaProducer> producer) override;
 

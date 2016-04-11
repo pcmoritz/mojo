@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:mojo/bindings.dart' as bindings;
 import 'package:mojo/core.dart' as core;
 import 'package:mojo/mojo/bindings/types/service_describer.mojom.dart' as service_describer;
-import 'package:mojo_services/mojo/media/media_clock.mojom.dart' as media_clock_mojom;
 import 'package:mojo_services/mojo/media/media_state.mojom.dart' as media_state_mojom;
 import 'package:mojo_services/mojo/media/media_transport.mojom.dart' as media_transport_mojom;
 import 'package:mojo_services/mojo/media/rate_control.mojom.dart' as rate_control_mojom;
@@ -101,282 +100,6 @@ class MediaSinkStatus extends bindings.Struct {
     map["state"] = state;
     map["timelineTransform"] = timelineTransform;
     return map;
-  }
-}
-
-
-class _MediaSinkGetClockDispositionParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(8, 0)
-  ];
-
-  _MediaSinkGetClockDispositionParams() : super(kVersions.last.size);
-
-  static _MediaSinkGetClockDispositionParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSinkGetClockDispositionParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSinkGetClockDispositionParams result = new _MediaSinkGetClockDispositionParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    encoder.getStructEncoderAtOffset(kVersions.last);
-  }
-
-  String toString() {
-    return "_MediaSinkGetClockDispositionParams("")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    return map;
-  }
-}
-
-
-class MediaSinkGetClockDispositionResponseParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  media_clock_mojom.ClockDisposition clockDisposition = null;
-
-  MediaSinkGetClockDispositionResponseParams() : super(kVersions.last.size);
-
-  static MediaSinkGetClockDispositionResponseParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static MediaSinkGetClockDispositionResponseParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    MediaSinkGetClockDispositionResponseParams result = new MediaSinkGetClockDispositionResponseParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.clockDisposition = media_clock_mojom.ClockDisposition.decode(decoder0, 8);
-        if (result.clockDisposition == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable media_clock_mojom.ClockDisposition.');
-        }
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeEnum(clockDisposition, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "clockDisposition of struct MediaSinkGetClockDispositionResponseParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "MediaSinkGetClockDispositionResponseParams("
-           "clockDisposition: $clockDisposition" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["clockDisposition"] = clockDisposition;
-    return map;
-  }
-}
-
-
-class _MediaSinkGetMasterClockParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  Object masterClock = null;
-
-  _MediaSinkGetMasterClockParams() : super(kVersions.last.size);
-
-  static _MediaSinkGetMasterClockParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSinkGetMasterClockParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSinkGetMasterClockParams result = new _MediaSinkGetMasterClockParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.masterClock = decoder0.decodeInterfaceRequest(8, false, media_clock_mojom.ClockStub.newFromEndpoint);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeInterfaceRequest(masterClock, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "masterClock of struct _MediaSinkGetMasterClockParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_MediaSinkGetMasterClockParams("
-           "masterClock: $masterClock" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
-  }
-}
-
-
-class _MediaSinkSetMasterClockParams extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(16, 0)
-  ];
-  Object masterClock = null;
-
-  _MediaSinkSetMasterClockParams() : super(kVersions.last.size);
-
-  static _MediaSinkSetMasterClockParams deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static _MediaSinkSetMasterClockParams decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    _MediaSinkSetMasterClockParams result = new _MediaSinkSetMasterClockParams();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.masterClock = decoder0.decodeServiceInterface(8, true, media_clock_mojom.ClockProxy.newFromEndpoint);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeInterface(masterClock, 8, true);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "masterClock of struct _MediaSinkSetMasterClockParams: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "_MediaSinkSetMasterClockParams("
-           "masterClock: $masterClock" ")";
-  }
-
-  Map toJson() {
-    throw new bindings.MojoCodecError(
-        'Object containing handles cannot be encoded to JSON.');
   }
 }
 
@@ -726,13 +449,10 @@ class _MediaSinkPauseParams extends bindings.Struct {
   }
 }
 
-const int _mediaSinkMethodGetClockDispositionName = 0;
-const int _mediaSinkMethodGetMasterClockName = 1;
-const int _mediaSinkMethodSetMasterClockName = 2;
-const int _mediaSinkMethodGetConsumerName = 3;
-const int _mediaSinkMethodGetStatusName = 4;
-const int _mediaSinkMethodPlayName = 5;
-const int _mediaSinkMethodPauseName = 6;
+const int _mediaSinkMethodGetConsumerName = 0;
+const int _mediaSinkMethodGetStatusName = 1;
+const int _mediaSinkMethodPlayName = 2;
+const int _mediaSinkMethodPauseName = 3;
 
 class _MediaSinkServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]) =>
@@ -747,9 +467,6 @@ class _MediaSinkServiceDescription implements service_describer.ServiceDescripti
 
 abstract class MediaSink {
   static const String serviceName = null;
-  dynamic getClockDisposition([Function responseFactory = null]);
-  void getMasterClock(Object masterClock);
-  void setMasterClock(Object masterClock);
   void getConsumer(Object consumer);
   dynamic getStatus(int versionLastSeen,[Function responseFactory = null]);
   void play();
@@ -778,26 +495,6 @@ class _MediaSinkProxyImpl extends bindings.Proxy {
 
   void handleResponse(bindings.ServiceMessage message) {
     switch (message.header.type) {
-      case _mediaSinkMethodGetClockDispositionName:
-        var r = MediaSinkGetClockDispositionResponseParams.deserialize(
-            message.payload);
-        if (!message.header.hasRequestId) {
-          proxyError("Expected a message with a valid request Id.");
-          return;
-        }
-        Completer c = completerMap[message.header.requestId];
-        if (c == null) {
-          proxyError(
-              "Message had unknown request Id: ${message.header.requestId}");
-          return;
-        }
-        completerMap.remove(message.header.requestId);
-        if (c.isCompleted) {
-          proxyError("Response completer already completed");
-          return;
-        }
-        c.complete(r);
-        break;
       case _mediaSinkMethodGetStatusName:
         var r = MediaSinkGetStatusResponseParams.deserialize(
             message.payload);
@@ -836,32 +533,6 @@ class _MediaSinkProxyCalls implements MediaSink {
   _MediaSinkProxyImpl _proxyImpl;
 
   _MediaSinkProxyCalls(this._proxyImpl);
-    dynamic getClockDisposition([Function responseFactory = null]) {
-      var params = new _MediaSinkGetClockDispositionParams();
-      return _proxyImpl.sendMessageWithRequestId(
-          params,
-          _mediaSinkMethodGetClockDispositionName,
-          -1,
-          bindings.MessageHeader.kMessageExpectsResponse);
-    }
-    void getMasterClock(Object masterClock) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _MediaSinkGetMasterClockParams();
-      params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _mediaSinkMethodGetMasterClockName);
-    }
-    void setMasterClock(Object masterClock) {
-      if (!_proxyImpl.isBound) {
-        _proxyImpl.proxyError("The Proxy is closed.");
-        return;
-      }
-      var params = new _MediaSinkSetMasterClockParams();
-      params.masterClock = masterClock;
-      _proxyImpl.sendMessage(params, _mediaSinkMethodSetMasterClockName);
-    }
     void getConsumer(Object consumer) {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
@@ -977,11 +648,6 @@ class MediaSinkStub extends bindings.Stub {
   }
 
 
-  MediaSinkGetClockDispositionResponseParams _mediaSinkGetClockDispositionResponseParamsFactory(media_clock_mojom.ClockDisposition clockDisposition) {
-    var result = new MediaSinkGetClockDispositionResponseParams();
-    result.clockDisposition = clockDisposition;
-    return result;
-  }
   MediaSinkGetStatusResponseParams _mediaSinkGetStatusResponseParamsFactory(int version, MediaSinkStatus status) {
     var result = new MediaSinkGetStatusResponseParams();
     result.version = version;
@@ -997,36 +663,6 @@ class MediaSinkStub extends bindings.Stub {
     }
     assert(_impl != null);
     switch (message.header.type) {
-      case _mediaSinkMethodGetClockDispositionName:
-        var response = _impl.getClockDisposition(_mediaSinkGetClockDispositionResponseParamsFactory);
-        if (response is Future) {
-          return response.then((response) {
-            if (response != null) {
-              return buildResponseWithId(
-                  response,
-                  _mediaSinkMethodGetClockDispositionName,
-                  message.header.requestId,
-                  bindings.MessageHeader.kMessageIsResponse);
-            }
-          });
-        } else if (response != null) {
-          return buildResponseWithId(
-              response,
-              _mediaSinkMethodGetClockDispositionName,
-              message.header.requestId,
-              bindings.MessageHeader.kMessageIsResponse);
-        }
-        break;
-      case _mediaSinkMethodGetMasterClockName:
-        var params = _MediaSinkGetMasterClockParams.deserialize(
-            message.payload);
-        _impl.getMasterClock(params.masterClock);
-        break;
-      case _mediaSinkMethodSetMasterClockName:
-        var params = _MediaSinkSetMasterClockParams.deserialize(
-            message.payload);
-        _impl.setMasterClock(params.masterClock);
-        break;
       case _mediaSinkMethodGetConsumerName:
         var params = _MediaSinkGetConsumerParams.deserialize(
             message.payload);

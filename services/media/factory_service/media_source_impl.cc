@@ -95,20 +95,6 @@ void MediaSourceImpl::GetStreams(const GetStreamsCallback& callback) {
   });
 }
 
-void MediaSourceImpl::GetClockDisposition(
-    const GetClockDispositionCallback& callback) {
-  callback.Run(ClockDisposition::PASSIVE);
-  // TODO(dalesat): Varies by origin type.
-}
-
-void MediaSourceImpl::GetMasterClock(InterfaceRequest<Clock> master_clock) {
-  // TODO(dalesat): Produce master clock as appropriate.
-}
-
-void MediaSourceImpl::SetMasterClock(InterfaceHandle<Clock> master_clock) {
-  // TODO(dalesat): Is this needed?
-}
-
 void MediaSourceImpl::GetProducer(uint32_t stream_index,
                                   InterfaceRequest<MediaProducer> producer) {
   DCHECK(init_complete_.occurred());

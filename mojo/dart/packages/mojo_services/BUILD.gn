@@ -53,7 +53,6 @@ bindings_sources = [
   "lib/mojo/location_service.mojom.dart",
   "lib/mojo/media/audio_server.mojom.dart",
   "lib/mojo/media/audio_track.mojom.dart",
-  "lib/mojo/media/media_clock.mojom.dart",
   "lib/mojo/media/media_common.mojom.dart",
   "lib/mojo/media/media_factory.mojom.dart",
   "lib/mojo/media/media_metadata.mojom.dart",

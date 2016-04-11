@@ -137,20 +137,6 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
 
 MediaSinkImpl::~MediaSinkImpl() {}
 
-void MediaSinkImpl::GetClockDisposition(
-    const GetClockDispositionCallback& callback) {
-  callback.Run(ClockDisposition::PREFER_MASTER);
-  // TODO(dalesat): Varies by destination type.
-}
-
-void MediaSinkImpl::GetMasterClock(InterfaceRequest<Clock> master_clock) {
-  // TODO(dalesat): Produce master clock as appropriate.
-}
-
-void MediaSinkImpl::SetMasterClock(InterfaceHandle<Clock> master_clock) {
-  // TODO(dalesat): Accept master clock and arrange for synchronization.
-}
-
 void MediaSinkImpl::GetConsumer(InterfaceRequest<MediaConsumer> consumer) {
   consumer_->AddBinding(consumer.Pass());
 }
