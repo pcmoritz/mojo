@@ -25,6 +25,15 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
     : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
   DCHECK(reader);
 
+  status_publisher_.SetCallbackRunner(
+      [this](const GetStatusCallback& callback, uint64_t version) {
+        MediaPlayerStatusPtr status = MediaPlayerStatus::New();
+        status->state = reported_media_state_;
+        status->timeline_transform = transform_.Clone();
+        status->metadata = metadata_.Clone();
+        callback.Run(version, status.Pass());
+      });
+
   state_ = State::kWaiting;
 
   // Go away when the client is no longer connected.
@@ -225,17 +234,13 @@ bool MediaPlayerImpl::AllSinksAre(SinkState sink_state) {
 void MediaPlayerImpl::SetReportedMediaState(MediaState media_state) {
   if (reported_media_state_ != media_state) {
     reported_media_state_ = media_state;
-    StatusUpdated();
+    status_publisher_.SendUpdates();
   }
 }
 
 void MediaPlayerImpl::GetStatus(uint64_t version_last_seen,
                                 const GetStatusCallback& callback) {
-  if (version_last_seen < status_version_) {
-    RunStatusCallback(callback);
-  } else {
-    pending_status_requests_.push_back(callback);
-  }
+  status_publisher_.Get(version_last_seen, callback);
 }
 
 void MediaPlayerImpl::Play() {
@@ -328,29 +333,11 @@ void MediaPlayerImpl::CreateSink(const std::unique_ptr<Stream>& stream,
       });
 }
 
-void MediaPlayerImpl::StatusUpdated() {
-  ++status_version_;
-  std::deque<GetStatusCallback> pending_status_requests;
-  pending_status_requests_.swap(pending_status_requests);
-  for (const GetStatusCallback& callback : pending_status_requests) {
-    RunStatusCallback(callback);
-  }
-}
-
-void MediaPlayerImpl::RunStatusCallback(
-    const GetStatusCallback& callback) const {
-  MediaPlayerStatusPtr status = MediaPlayerStatus::New();
-  status->state = reported_media_state_;
-  status->timeline_transform = transform_.Clone();
-  status->metadata = metadata_.Clone();
-  callback.Run(status_version_, status.Pass());
-}
-
 void MediaPlayerImpl::HandleSourceStatusUpdates(uint64_t version,
                                                 MediaSourceStatusPtr status) {
   if (status) {
     metadata_ = status->metadata.Pass();
-    StatusUpdated();
+    status_publisher_.SendUpdates();
   }
 
   source_->GetStatus(version,
@@ -368,7 +355,7 @@ void MediaPlayerImpl::HandleSinkStatusUpdates(
     DCHECK(stream->state_ > MediaState::UNPREPARED);
     stream->state_ = status->state;
     transform_ = status->timeline_transform.Pass();
-    StatusUpdated();
+    status_publisher_.SendUpdates();
     Update();
   }
 

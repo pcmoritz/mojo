@@ -39,6 +39,14 @@ MediaSourceImpl::MediaSourceImpl(
   task_runner_ = base::MessageLoop::current()->task_runner();
   DCHECK(task_runner_);
 
+  status_publisher_.SetCallbackRunner(
+      [this](const GetStatusCallback& callback, uint64_t version) {
+        MediaSourceStatusPtr status = MediaSourceStatus::New();
+        status->state = state_;
+        status->metadata = demux_ ? Convert(demux_->metadata()) : nullptr;
+        callback.Run(version, status.Pass());
+      });
+
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
@@ -120,11 +128,7 @@ void MediaSourceImpl::GetPullModeProducer(
 
 void MediaSourceImpl::GetStatus(uint64_t version_last_seen,
                                 const GetStatusCallback& callback) {
-  if (version_last_seen < status_version_) {
-    RunStatusCallback(callback);
-  } else {
-    pending_status_requests_.push_back(callback);
-  }
+  status_publisher_.Get(version_last_seen, callback);
 }
 
 void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
@@ -136,7 +140,7 @@ void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
   graph_.Prepare();
   state_ = MediaState::PAUSED;
   callback.Run();
-  StatusUpdated();
+  status_publisher_.SendUpdates();
 }
 
 void MediaSourceImpl::Prime(const PrimeCallback& callback) {
@@ -176,23 +180,6 @@ void MediaSourceImpl::Seek(int64_t position, const SeekCallback& callback) {
 // static
 void MediaSourceImpl::RunSeekCallback(const SeekCallback& callback) {
   callback.Run();
-}
-
-void MediaSourceImpl::StatusUpdated() {
-  ++status_version_;
-  std::deque<GetStatusCallback> pending_status_requests;
-  pending_status_requests_.swap(pending_status_requests);
-  for (const GetStatusCallback& callback : pending_status_requests) {
-    RunStatusCallback(callback);
-  }
-}
-
-void MediaSourceImpl::RunStatusCallback(
-    const GetStatusCallback& callback) const {
-  MediaSourceStatusPtr status = MediaSourceStatus::New();
-  status->state = state_;
-  status->metadata = demux_ ? Convert(demux_->metadata()) : nullptr;
-  callback.Run(status_version_, status.Pass());
 }
 
 MediaSourceImpl::Stream::Stream(

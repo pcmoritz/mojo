@@ -12,6 +12,7 @@
 #include "mojo/services/media/control/interfaces/media_source.mojom.h"
 #include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "services/media/factory_service/factory_service.h"
+#include "services/media/factory_service/mojo_publisher.h"
 #include "services/media/framework/graph.h"
 #include "services/media/framework/incident.h"
 #include "services/media/framework/parts/decoder.h"
@@ -107,12 +108,7 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   // Handles the completion of demux initialization.
   void OnDemuxInitialized(Result result);
 
-  // Increments the status version and runs pending status request callbacks.
-  void StatusUpdated();
-
-  // Runs status request callback.
-  void RunStatusCallback(const GetStatusCallback& callback) const;
-
+  // Runs a seek callback.
   static void RunSeekCallback(const SeekCallback& callback);
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
@@ -123,9 +119,8 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   std::shared_ptr<Demux> demux_;
   Incident init_complete_;
   std::vector<std::unique_ptr<Stream>> streams_;
-  uint64_t status_version_ = 1;
   MediaState state_ = MediaState::UNPREPARED;
-  std::deque<GetStatusCallback> pending_status_requests_;
+  MojoPublisher<GetStatusCallback> status_publisher_;
 };
 
 }  // namespace media

@@ -5,7 +5,6 @@
 #ifndef MOJO_SERVICES_MEDIA_FACTORY_MEDIA_SINK_IMPL_H_
 #define MOJO_SERVICES_MEDIA_FACTORY_MEDIA_SINK_IMPL_H_
 
-#include <deque>
 #include <memory>
 
 #include "mojo/public/cpp/application/application_impl.h"
@@ -14,6 +13,7 @@
 #include "mojo/services/media/control/interfaces/media_sink.mojom.h"
 #include "services/media/factory_service/audio_track_controller.h"
 #include "services/media/factory_service/factory_service.h"
+#include "services/media/factory_service/mojo_publisher.h"
 #include "services/media/framework/graph.h"
 #include "services/media/framework/incident.h"
 #include "services/media/framework/parts/decoder.h"
@@ -51,12 +51,6 @@ class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
                 InterfaceRequest<MediaSink> request,
                 MediaFactoryService* owner);
 
-  // Increments the status version and runs pending status request callbacks.
-  void StatusUpdated();
-
-  // Runs status request callback.
-  void RunStatusCallback(const GetStatusCallback& callback) const;
-
   // Sets the rate if the producer is ready and the target rate differs from
   // the current rate.
   void MaybeSetRate();
@@ -70,13 +64,12 @@ class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
   RateControlPtr rate_control_;
   float rate_ = 0.0f;
   float target_rate_ = 0.0f;
-  uint64_t status_version_ = 1u;
   MediaState producer_state_ = MediaState::UNPREPARED;
   LinearTransform transform_ = LinearTransform(0, 0, 1, 0);
   TimelineTransformPtr status_transform_;
-  std::deque<GetStatusCallback> pending_status_requests_;
   uint32_t frames_per_second_ = 0u;
   bool flushed_ = true;
+  MojoPublisher<GetStatusCallback> status_publisher_;
 };
 
 }  // namespace media

@@ -36,8 +36,15 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  // TODO(dalesat): Support file and network urls.
-  // TODO(dalesat): Support mojo services in a reasonable way.
+  status_publisher_.SetCallbackRunner(
+      [this](const GetStatusCallback& callback, uint64_t version) {
+        MediaSinkStatusPtr status = MediaSinkStatus::New();
+        status->state = (producer_state_ == MediaState::PAUSED && rate_ != 0.0)
+                            ? MediaState::PLAYING
+                            : producer_state_;
+        status->timeline_transform = status_transform_.Clone();
+        callback.Run(version, status.Pass());
+      });
 
   PartRef consumer_ref = graph_.Add(consumer_);
   PartRef producer_ref = graph_.Add(producer_);
@@ -61,7 +68,7 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
 
   producer_->SetStatusCallback([this](MediaState state) {
     producer_state_ = state;
-    StatusUpdated();
+    status_publisher_.SendUpdates();
     if (state == MediaState::ENDED) {
       Pause();
     }
@@ -99,7 +106,7 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
     if (!result) {
       // Failed to build conversion pipeline.
       producer_state_ = MediaState::FAULT;
-      StatusUpdated();
+      status_publisher_.SendUpdates();
       return;
     }
 
@@ -116,7 +123,7 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
       default:
         // Unsupported producer stream type.
         producer_state_ = MediaState::FAULT;
-        StatusUpdated();
+        status_publisher_.SendUpdates();
         return;
     }
 
@@ -143,11 +150,7 @@ void MediaSinkImpl::GetConsumer(InterfaceRequest<MediaConsumer> consumer) {
 
 void MediaSinkImpl::GetStatus(uint64_t version_last_seen,
                               const GetStatusCallback& callback) {
-  if (version_last_seen < status_version_) {
-    RunStatusCallback(callback);
-  } else {
-    pending_status_requests_.push_back(callback);
-  }
+  status_publisher_.Get(version_last_seen, callback);
 }
 
 void MediaSinkImpl::Play() {
@@ -158,24 +161,6 @@ void MediaSinkImpl::Play() {
 void MediaSinkImpl::Pause() {
   target_rate_ = 0.0;
   MaybeSetRate();
-}
-
-void MediaSinkImpl::StatusUpdated() {
-  ++status_version_;
-  std::deque<GetStatusCallback> pending_status_requests;
-  pending_status_requests_.swap(pending_status_requests);
-  for (const GetStatusCallback& callback : pending_status_requests) {
-    RunStatusCallback(callback);
-  }
-}
-
-void MediaSinkImpl::RunStatusCallback(const GetStatusCallback& callback) const {
-  MediaSinkStatusPtr status = MediaSinkStatus::New();
-  status->state = (producer_state_ == MediaState::PAUSED && rate_ != 0.0)
-                      ? MediaState::PLAYING
-                      : producer_state_;
-  status->timeline_transform = status_transform_.Clone();
-  callback.Run(status_version_, status.Pass());
 }
 
 void MediaSinkImpl::MaybeSetRate() {
@@ -274,7 +259,7 @@ void MediaSinkImpl::MaybeSetRate() {
                                  &status_transform_->quad->target_delta);
 
   rate_ = target_rate_;
-  StatusUpdated();
+  status_publisher_.SendUpdates();
 }
 
 }  // namespace media

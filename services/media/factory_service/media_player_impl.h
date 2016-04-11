@@ -5,7 +5,6 @@
 #ifndef MOJO_SERVICES_MEDIA_FACTORY_MEDIA_PLAYER_IMPL_H_
 #define MOJO_SERVICES_MEDIA_FACTORY_MEDIA_PLAYER_IMPL_H_
 
-#include <deque>
 #include <limits>
 #include <vector>
 
@@ -15,6 +14,7 @@
 #include "mojo/services/media/control/interfaces/media_factory.mojom.h"
 #include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "services/media/factory_service/factory_service.h"
+#include "services/media/factory_service/mojo_publisher.h"
 
 namespace mojo {
 namespace media {
@@ -110,12 +110,6 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                   const String& url,
                   const std::function<void()>& callback);
 
-  // Increments the status version and runs pending status request callbacks.
-  void StatusUpdated();
-
-  // Runs a status request callback.
-  void RunStatusCallback(const GetStatusCallback& callback) const;
-
   // Handles a status update from the source. When called with the default
   // argument values, initiates source status updates.
   void HandleSourceStatusUpdates(uint64_t version = MediaSource::kInitialStatus,
@@ -132,14 +126,13 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
   MediaSourcePtr source_;
   std::vector<std::unique_ptr<Stream>> streams_;
   State state_ = State::kWaiting;
-  uint64_t status_version_ = 1u;
   bool flushed_ = true;
   MediaState reported_media_state_ = MediaState::UNPREPARED;
   MediaState target_state_ = MediaState::PAUSED;
   int64_t target_position_ = kNotSeeking;
   TimelineTransformPtr transform_;
   MediaMetadataPtr metadata_;
-  std::deque<GetStatusCallback> pending_status_requests_;
+  MojoPublisher<GetStatusCallback> status_publisher_;
 };
 
 }  // namespace media
