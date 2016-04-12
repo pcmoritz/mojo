@@ -62,11 +62,12 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
   };
 
   struct Stream {
-    Stream();
+    Stream(size_t index, MediaTypePtr media_type);
     ~Stream();
+    size_t index_;
     bool enabled_ = false;
     MediaState state_ = MediaState::UNPREPARED;
-    MediaSourceStreamDescriptorPtr descriptor_;
+    MediaTypePtr media_type_;
     MediaTypeConverterPtr decoder_;
     MediaSinkPtr sink_;
     MediaProducerPtr encoded_producer_;
@@ -76,9 +77,6 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
   MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
                   InterfaceRequest<MediaPlayer> request,
                   MediaFactoryService* owner);
-
-  // Prepares the source.
-  void PrepareSource();
 
   // Takes action based on current state.
   void Update();
@@ -110,10 +108,11 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                   const String& url,
                   const std::function<void()>& callback);
 
-  // Handles a status update from the source. When called with the default
-  // argument values, initiates source status updates.
-  void HandleSourceStatusUpdates(uint64_t version = MediaSource::kInitialStatus,
-                                 MediaSourceStatusPtr status = nullptr);
+  // Handles a metadata update from the demux. When called with the default
+  // argument values, initiates demux metadata updates.
+  void HandleDemuxMetadataUpdates(
+      uint64_t version = MediaDemux::kInitialMetadata,
+      MediaMetadataPtr metadata = nullptr);
 
   // Handles a status update from a sink. When called with the default
   // argument values, initiates sink status updates.
@@ -123,7 +122,7 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
 
   Binding<MediaPlayer> binding_;
   MediaFactoryPtr factory_;
-  MediaSourcePtr source_;
+  MediaDemuxPtr demux_;
   std::vector<std::unique_ptr<Stream>> streams_;
   State state_ = State::kWaiting;
   bool flushed_ = true;

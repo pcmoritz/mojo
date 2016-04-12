@@ -6,7 +6,6 @@
 #define MOJO_SERVICES_MEDIA_FACTORY_MEDIA_DEMUX_IMPL_H_
 
 #include <cstdint>
-#include <deque>
 #include <memory>
 #include <vector>
 
@@ -15,6 +14,7 @@
 #include "mojo/services/media/core/interfaces/media_demux.mojom.h"
 #include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "services/media/factory_service/factory_service.h"
+#include "services/media/factory_service/mojo_publisher.h"
 #include "services/media/framework/graph.h"
 #include "services/media/framework/incident.h"
 #include "services/media/framework/parts/demux.h"
@@ -83,13 +83,6 @@ class MediaDemuxImpl : public MediaFactoryService::Product, public MediaDemux {
   // Handles the completion of demux initialization.
   void OnDemuxInitialized(Result result);
 
-  // Increments the metadata version and runs pending Metadata request
-  // callbacks.
-  void MetadataUpdated();
-
-  // Runs metadata request callback.
-  void RunMetadataCallback(const GetMetadataCallback& callback) const;
-
   static void RunSeekCallback(const SeekCallback& callback);
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
@@ -99,8 +92,7 @@ class MediaDemuxImpl : public MediaFactoryService::Product, public MediaDemux {
   std::shared_ptr<Demux> demux_;
   Incident init_complete_;
   std::vector<std::unique_ptr<Stream>> streams_;
-  uint64_t metadata_version_ = 1;
-  std::deque<GetMetadataCallback> pending_metadata_requests_;
+  MojoPublisher<GetMetadataCallback> metadata_publisher_;
 };
 
 }  // namespace media

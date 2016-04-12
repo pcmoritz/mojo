@@ -31,6 +31,11 @@ MediaDemuxImpl::MediaDemuxImpl(InterfaceHandle<SeekingReader> reader,
   task_runner_ = base::MessageLoop::current()->task_runner();
   DCHECK(task_runner_);
 
+  metadata_publisher_.SetCallbackRunner(
+      [this](const GetMetadataCallback& callback, uint64_t version) {
+        callback.Run(version, demux_ ? Convert(demux_->metadata()) : nullptr);
+      });
+
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
@@ -67,7 +72,7 @@ void MediaDemuxImpl::OnDemuxInitialized(Result result) {
 
   graph_.Prepare();
 
-  MetadataUpdated();
+  metadata_publisher_.SendUpdates();
 
   init_complete_.Occur();
 }
@@ -97,11 +102,7 @@ void MediaDemuxImpl::GetProducer(uint32_t stream_index,
 
 void MediaDemuxImpl::GetMetadata(uint64_t version_last_seen,
                                  const GetMetadataCallback& callback) {
-  if (version_last_seen < metadata_version_) {
-    RunMetadataCallback(callback);
-  } else {
-    pending_metadata_requests_.push_back(callback);
-  }
+  metadata_publisher_.Get(version_last_seen, callback);
 }
 
 void MediaDemuxImpl::Prime(const PrimeCallback& callback) {
@@ -141,21 +142,6 @@ void MediaDemuxImpl::Seek(int64_t position, const SeekCallback& callback) {
 // static
 void MediaDemuxImpl::RunSeekCallback(const SeekCallback& callback) {
   callback.Run();
-}
-
-void MediaDemuxImpl::MetadataUpdated() {
-  ++metadata_version_;
-  std::deque<GetMetadataCallback> pending_metadata_requests;
-  pending_metadata_requests_.swap(pending_metadata_requests);
-  for (const GetMetadataCallback& callback : pending_metadata_requests) {
-    RunMetadataCallback(callback);
-  }
-}
-
-void MediaDemuxImpl::RunMetadataCallback(
-    const GetMetadataCallback& callback) const {
-  callback.Run(metadata_version_,
-               demux_ ? Convert(demux_->metadata()) : nullptr);
 }
 
 MediaDemuxImpl::Stream::Stream(OutputRef output,

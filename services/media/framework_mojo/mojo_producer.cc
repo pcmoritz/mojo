@@ -27,20 +27,28 @@ void MojoProducer::AddBinding(InterfaceRequest<MediaProducer> producer) {
 void MojoProducer::PrimeConnection(const FlushConnectionCallback& callback) {
   Demand demand;
 
-  {
+  if (consumer_.is_bound()) {
     base::AutoLock lock(lock_);
     max_pushes_outstanding_ = 10;  // TODO(dalesat): Made up!
     demand = current_pushes_outstanding_ < max_pushes_outstanding_
                  ? Demand::kPositive
                  : Demand::kNegative;
+  } else {
+    demand = Demand::kNeutral;
+    if (!mojo_allocator_.initialized()) {
+      mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
+    }
   }
 
   DCHECK(demand_callback_);
   demand_callback_(demand);
   SetState(MediaState::PAUSED);
 
-  DCHECK(consumer_.is_bound());
-  consumer_->Prime([this, callback]() { callback.Run(); });
+  if (consumer_.is_bound()) {
+    consumer_->Prime([this, callback]() { callback.Run(); });
+  } else {
+    callback.Run();
+  }
 }
 
 void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
@@ -83,9 +91,7 @@ Demand MojoProducer::SupplyPacket(PacketPtr packet) {
 
   // If we're no longer connected, throw the packet away.
   if (!consumer_.is_bound()) {
-    SetState(MediaState::UNPREPARED);
-    // TODO(dalesat): More shutdown?
-    return Demand::kNegative;
+    return Demand::kNeutral;
   }
 
   Demand demand;

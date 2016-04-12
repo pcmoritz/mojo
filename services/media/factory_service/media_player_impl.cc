@@ -41,22 +41,19 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
 
   app()->ConnectToService("mojo:media_factory", &factory_);
 
-  factory_->CreateSource(reader.Pass(),
-                         nullptr,  // allowed_media_types
-                         GetProxy(&source_));
+  factory_->CreateDemux(reader.Pass(), GetProxy(&demux_));
 
-  HandleSourceStatusUpdates();
+  HandleDemuxMetadataUpdates();
 
-  source_->GetStreams([this](
-      mojo::Array<MediaSourceStreamDescriptorPtr> descriptors) {
+  demux_->Describe([this](mojo::Array<MediaTypePtr> stream_types) {
     // Populate streams_ and enable the streams we want.
     std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-    for (MediaSourceStreamDescriptorPtr& descriptor : descriptors) {
-      streams_.push_back(std::unique_ptr<Stream>(new Stream()));
+    for (MediaTypePtr& stream_type : stream_types) {
+      streams_.push_back(std::unique_ptr<Stream>(
+          new Stream(streams_.size(), stream_type.Pass())));
       Stream& stream = *streams_.back();
-      stream.descriptor_ = descriptor.Pass();
-      switch (stream.descriptor_->media_type->scheme) {
+      switch (stream.media_type_->scheme) {
         case MediaTypeScheme::COMPRESSED_AUDIO:
         case MediaTypeScheme::LPCM:
           stream.enabled_ = true;
@@ -70,22 +67,16 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
     }
 
     callback_joiner->WhenJoined([this]() {
-      // The enabled streams are prepared. Prepare the source.
+      // The enabled streams are prepared.
       factory_.reset();
-      PrepareSource();
+      SetReportedMediaState(MediaState::PAUSED);
+      state_ = State::kPaused;
+      Update();
     });
   });
 }
 
 MediaPlayerImpl::~MediaPlayerImpl() {}
-
-void MediaPlayerImpl::PrepareSource() {
-  source_->Prepare([this]() {
-    SetReportedMediaState(MediaState::PAUSED);
-    state_ = State::kPaused;
-    Update();
-  });
-}
 
 void MediaPlayerImpl::Update() {
   while (true) {
@@ -105,7 +96,7 @@ void MediaPlayerImpl::Update() {
 
           flushed_ = false;
           state_ = State::kWaiting;
-          source_->Prime([this]() {
+          demux_->Prime([this]() {
             ChangeSinkStates(MediaState::PLAYING);
             state_ = State::kWaitingForSinksToPlay;
             Update();
@@ -162,7 +153,7 @@ void MediaPlayerImpl::Update() {
 void MediaPlayerImpl::WhenPausedAndSeeking() {
   if (!flushed_) {
     state_ = State::kWaiting;
-    source_->Flush([this]() {
+    demux_->Flush([this]() {
       flushed_ = true;
       WhenFlushedAndSeeking();
     });
@@ -174,7 +165,7 @@ void MediaPlayerImpl::WhenPausedAndSeeking() {
 void MediaPlayerImpl::WhenFlushedAndSeeking() {
   state_ = State::kWaiting;
   DCHECK(target_position_ != kNotSeeking);
-  source_->Seek(target_position_, [this]() {
+  demux_->Seek(target_position_, [this]() {
     target_position_ = kNotSeeking;
     state_ = State::kPaused;
     Update();
@@ -263,16 +254,14 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
                                     const std::function<void()>& callback) {
   DCHECK(factory_);
 
-  source_->GetProducer(stream->descriptor_->index,
-                       GetProxy(&stream->encoded_producer_));
+  demux_->GetProducer(stream->index_, GetProxy(&stream->encoded_producer_));
 
-  if (stream->descriptor_->media_type->scheme ==
-      MediaTypeScheme::COMPRESSED_AUDIO) {
+  if (stream->media_type_->scheme == MediaTypeScheme::COMPRESSED_AUDIO) {
     std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
     // Compressed audio. Insert a decoder in front of the sink. The sink would
     // add its own internal decoder, but we want to test the decoder.
-    factory_->CreateDecoder(stream->descriptor_->media_type.Clone(),
+    factory_->CreateDecoder(stream->media_type_.Clone(),
                             GetProxy(&stream->decoder_));
 
     MediaConsumerPtr decoder_consumer;
@@ -295,12 +284,12 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
 
     callback_joiner->WhenJoined(callback);
   } else {
-    // Uncompressed audio. Connect the source stream directly to the sink. This
+    // Uncompressed audio. Connect the demux stream directly to the sink. This
     // would work for compressed audio as well (the sink would decode), but we
     // want to test the decoder.
-    DCHECK(stream->descriptor_->media_type->scheme == MediaTypeScheme::LPCM);
+    DCHECK(stream->media_type_->scheme == MediaTypeScheme::LPCM);
     stream->decoded_producer_ = stream->encoded_producer_.Pass();
-    CreateSink(stream, stream->descriptor_->media_type, url, callback);
+    CreateSink(stream, stream->media_type_, url, callback);
   }
 }
 
@@ -333,17 +322,17 @@ void MediaPlayerImpl::CreateSink(const std::unique_ptr<Stream>& stream,
       });
 }
 
-void MediaPlayerImpl::HandleSourceStatusUpdates(uint64_t version,
-                                                MediaSourceStatusPtr status) {
-  if (status) {
-    metadata_ = status->metadata.Pass();
+void MediaPlayerImpl::HandleDemuxMetadataUpdates(uint64_t version,
+                                                 MediaMetadataPtr metadata) {
+  if (metadata) {
+    metadata_ = metadata.Pass();
     status_publisher_.SendUpdates();
   }
 
-  source_->GetStatus(version,
-                     [this](uint64_t version, MediaSourceStatusPtr status) {
-                       HandleSourceStatusUpdates(version, status.Pass());
-                     });
+  demux_->GetMetadata(version,
+                      [this](uint64_t version, MediaMetadataPtr metadata) {
+                        HandleDemuxMetadataUpdates(version, metadata.Pass());
+                      });
 }
 
 void MediaPlayerImpl::HandleSinkStatusUpdates(
@@ -365,7 +354,8 @@ void MediaPlayerImpl::HandleSinkStatusUpdates(
       });
 }
 
-MediaPlayerImpl::Stream::Stream() {}
+MediaPlayerImpl::Stream::Stream(size_t index, MediaTypePtr media_type)
+    : index_(index), media_type_(media_type.Pass()) {}
 
 MediaPlayerImpl::Stream::~Stream() {}
 
