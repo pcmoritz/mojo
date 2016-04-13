@@ -105,6 +105,8 @@ class DataPipe final : public ChannelEndpointClient {
   // corresponding names.
   void ProducerCancelAllAwakables();
   void ProducerClose();
+  MojoResult ProducerSetOptions(uint32_t write_threshold_num_bytes);
+  void ProducerGetOptions(uint32_t* write_threshold_num_bytes);
   MojoResult ProducerWriteData(UserPointer<const void> elements,
                                UserPointer<uint32_t> num_bytes,
                                bool all_or_none);
@@ -197,6 +199,14 @@ class DataPipe final : public ChannelEndpointClient {
     mutex_.AssertHeld();
     return consumer_open_;
   }
+  // Note that this returns the "real" write threshold (never zero).
+  size_t producer_write_threshold_num_bytes_no_lock() const
+      MOJO_SHARED_LOCKS_REQUIRED(mutex_) {
+    mutex_.AssertHeld();
+    return (producer_write_threshold_num_bytes_ > 0u)
+               ? producer_write_threshold_num_bytes_
+               : element_num_bytes_;
+  }
   // Note that this returns the "real" read threshold (never zero).
   size_t consumer_read_threshold_num_bytes_no_lock() const
       MOJO_SHARED_LOCKS_REQUIRED(mutex_) {
@@ -281,6 +291,8 @@ class DataPipe final : public ChannelEndpointClient {
   // *Known* state of producer or consumer.
   bool producer_open_ MOJO_GUARDED_BY(mutex_);
   bool consumer_open_ MOJO_GUARDED_BY(mutex_);
+  // This may be zero (in which case it "means" |element_num_bytes_|).
+  uint32_t producer_write_threshold_num_bytes_ MOJO_GUARDED_BY(mutex_);
   // This may be zero (in which case it "means" |element_num_bytes_|).
   uint32_t consumer_read_threshold_num_bytes_ MOJO_GUARDED_BY(mutex_);
   // Non-null only if the producer or consumer, respectively, is local.

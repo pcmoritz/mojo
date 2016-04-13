@@ -997,14 +997,18 @@ TEST_F(CoreTest, DataPipe) {
   EXPECT_EQ(
       MOJO_RESULT_FAILED_PRECONDITION,
       core()->Wait(ph, MOJO_HANDLE_SIGNAL_READABLE, 0, MakeUserPointer(&hss)));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_WRITE_THRESHOLD,
+            hss.satisfied_signals);
+  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_HANDLE_SIGNAL_WRITE_THRESHOLD,
             hss.satisfiable_signals);
   hss = kEmptyMojoHandleSignalsState;
   EXPECT_EQ(MOJO_RESULT_OK, core()->Wait(ph, MOJO_HANDLE_SIGNAL_WRITABLE, 0,
                                          MakeUserPointer(&hss)));
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
-  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED,
+  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_WRITE_THRESHOLD,
+            hss.satisfied_signals);
+  EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE | MOJO_HANDLE_SIGNAL_PEER_CLOSED |
+                MOJO_HANDLE_SIGNAL_WRITE_THRESHOLD,
             hss.satisfiable_signals);
 
   // Consumer should be never-writable, and not yet readable.
@@ -1179,6 +1183,92 @@ TEST_F(CoreTest, DataPipe) {
   EXPECT_EQ(MOJO_RESULT_OK, core()->Close(ch));
 }
 
+TEST_F(CoreTest, DataPipeSetGetProducerOptions) {
+  MojoCreateDataPipeOptions options = {
+      sizeof(MojoCreateDataPipeOptions),        // |struct_size|.
+      MOJO_CREATE_DATA_PIPE_OPTIONS_FLAG_NONE,  // |flags|.
+      8,                                        // |element_num_bytes|.
+      800                                       // |capacity_num_bytes|.
+  };
+  MojoHandle ph, ch;  // p is for producer and c is for consumer.
+
+  EXPECT_EQ(MOJO_RESULT_OK,
+            core()->CreateDataPipe(MakeUserPointer(&options),
+                                   MakeUserPointer(&ph), MakeUserPointer(&ch)));
+  // Should get two distinct, valid handles.
+  EXPECT_NE(ph, MOJO_HANDLE_INVALID);
+  EXPECT_NE(ch, MOJO_HANDLE_INVALID);
+  EXPECT_NE(ph, ch);
+
+  // Get it.
+  MojoDataPipeProducerOptions popts = {};
+  const uint32_t kPoptsSize = static_cast<uint32_t>(sizeof(popts));
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  EXPECT_EQ(0u, popts.write_threshold_num_bytes);
+
+  // Invalid write threshold.
+  popts.struct_size = kPoptsSize;
+  popts.write_threshold_num_bytes = 4;
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            core()->SetDataPipeProducerOptions(ph, MakeUserPointer(&popts)));
+  // The options shouldn't change.
+  popts = MojoDataPipeProducerOptions();
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  EXPECT_EQ(0u, popts.write_threshold_num_bytes);
+
+  // Valid write threshold.
+  popts.struct_size = kPoptsSize;
+  popts.write_threshold_num_bytes = 8;
+  EXPECT_EQ(MOJO_RESULT_OK,
+            core()->SetDataPipeProducerOptions(ph, MakeUserPointer(&popts)));
+  popts = MojoDataPipeProducerOptions();
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  EXPECT_EQ(8u, popts.write_threshold_num_bytes);
+
+  // Invalid write threshold.
+  popts.struct_size = kPoptsSize;
+  popts.write_threshold_num_bytes = 9;
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            core()->SetDataPipeProducerOptions(ph, MakeUserPointer(&popts)));
+  // The options shouldn't change.
+  popts = MojoDataPipeProducerOptions();
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  EXPECT_EQ(8u, popts.write_threshold_num_bytes);
+
+  // Valid write threshold.
+  popts.struct_size = kPoptsSize;
+  popts.write_threshold_num_bytes = 16;
+  EXPECT_EQ(MOJO_RESULT_OK,
+            core()->SetDataPipeProducerOptions(ph, MakeUserPointer(&popts)));
+  popts = MojoDataPipeProducerOptions();
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  EXPECT_EQ(16u, popts.write_threshold_num_bytes);
+
+  // Can also set to default by passing null.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            core()->SetDataPipeProducerOptions(ph, NullUserPointer()));
+  popts = MojoDataPipeProducerOptions();
+  EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeProducerOptions(
+                                ph, MakeUserPointer(&popts), kPoptsSize));
+  EXPECT_EQ(kPoptsSize, popts.struct_size);
+  // Note: Should be reported as 0 ("default"), even if it means the element
+  // struct_size.
+  EXPECT_EQ(0u, popts.write_threshold_num_bytes);
+
+  EXPECT_EQ(MOJO_RESULT_OK, core()->Close(ph));
+  EXPECT_EQ(MOJO_RESULT_OK, core()->Close(ch));
+}
+
 TEST_F(CoreTest, DataPipeSetGetConsumerOptions) {
   MojoCreateDataPipeOptions options = {
       sizeof(MojoCreateDataPipeOptions),        // |struct_size|.
@@ -1196,7 +1286,7 @@ TEST_F(CoreTest, DataPipeSetGetConsumerOptions) {
   EXPECT_NE(ch, MOJO_HANDLE_INVALID);
   EXPECT_NE(ph, ch);
 
-  // Read it.
+  // Get it.
   MojoDataPipeConsumerOptions copts = {};
   const uint32_t kCoptsSize = static_cast<uint32_t>(sizeof(copts));
   EXPECT_EQ(MOJO_RESULT_OK, core()->GetDataPipeConsumerOptions(

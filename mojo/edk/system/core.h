@@ -130,6 +130,13 @@ class Core {
       UserPointer<const MojoCreateDataPipeOptions> options,
       UserPointer<MojoHandle> data_pipe_producer_handle,
       UserPointer<MojoHandle> data_pipe_consumer_handle);
+  MojoResult SetDataPipeProducerOptions(
+      MojoHandle data_pipe_producer_handle,
+      UserPointer<const MojoDataPipeProducerOptions> options);
+  MojoResult GetDataPipeProducerOptions(
+      MojoHandle data_pipe_producer_handle,
+      UserPointer<MojoDataPipeProducerOptions> options,
+      uint32_t options_num_bytes);
   MojoResult WriteData(MojoHandle data_pipe_producer_handle,
                        UserPointer<const void> elements,
                        UserPointer<uint32_t> num_bytes,

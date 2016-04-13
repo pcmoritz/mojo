@@ -61,6 +61,10 @@ TEST(DispatcherTest, Basic) {
             d->ReadMessage(NullUserPointer(), NullUserPointer(), nullptr,
                            nullptr, MOJO_WRITE_MESSAGE_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->SetDataPipeProducerOptions(NullUserPointer()));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->GetDataPipeProducerOptions(NullUserPointer(), 0));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
             d->WriteData(NullUserPointer(), NullUserPointer(),
                          MOJO_WRITE_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
@@ -114,6 +118,10 @@ TEST(DispatcherTest, Basic) {
             d->ReadMessage(NullUserPointer(), NullUserPointer(), nullptr,
                            nullptr, MOJO_WRITE_MESSAGE_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->SetDataPipeProducerOptions(NullUserPointer()));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+            d->GetDataPipeProducerOptions(NullUserPointer(), 0));
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
             d->WriteData(NullUserPointer(), NullUserPointer(),
                          MOJO_WRITE_DATA_FLAG_NONE));
   EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
@@ -156,6 +164,8 @@ enum class DispatcherOp {
   CLOSE = 0,
   WRITE_MESSAGE,
   READ_MESSAGE,
+  SET_DATA_PIPE_PRODUCER_OPTIONS,
+  GET_DATA_PIPE_PRODUCER_OPTIONS,
   WRITE_DATA,
   BEGIN_WRITE_DATA,
   END_WRITE_DATA,
@@ -199,6 +209,14 @@ void ThreadSafetyStressHelper(ManualResetWaitableEvent* event,
           MOJO_RESULT_INVALID_ARGUMENT,
           dispatcher->ReadMessage(NullUserPointer(), NullUserPointer(), nullptr,
                                   nullptr, MOJO_WRITE_MESSAGE_FLAG_NONE));
+      break;
+    case DispatcherOp::SET_DATA_PIPE_PRODUCER_OPTIONS:
+      EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+                dispatcher->SetDataPipeProducerOptions(NullUserPointer()));
+      break;
+    case DispatcherOp::GET_DATA_PIPE_PRODUCER_OPTIONS:
+      EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,
+                dispatcher->GetDataPipeProducerOptions(NullUserPointer(), 0));
       break;
     case DispatcherOp::WRITE_DATA:
       EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT,

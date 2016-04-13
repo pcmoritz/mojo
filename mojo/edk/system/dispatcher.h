@@ -98,6 +98,11 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                          uint32_t* num_dispatchers,
                          MojoReadMessageFlags flags);
 
+  MojoResult SetDataPipeProducerOptions(
+      UserPointer<const MojoDataPipeProducerOptions> options);
+  MojoResult GetDataPipeProducerOptions(
+      UserPointer<MojoDataPipeProducerOptions> options,
+      uint32_t options_num_bytes);
   MojoResult WriteData(UserPointer<const void> elements,
                        UserPointer<uint32_t> elements_num_bytes,
                        MojoWriteDataFlags flags);
@@ -251,6 +256,12 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                                            uint32_t* num_dispatchers,
                                            MojoReadMessageFlags flags)
       MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  virtual MojoResult SetDataPipeProducerOptionsImplNoLock(
+      UserPointer<const MojoDataPipeProducerOptions> options)
+      MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  virtual MojoResult GetDataPipeProducerOptionsImplNoLock(
+      UserPointer<MojoDataPipeProducerOptions> options,
+      uint32_t options_num_bytes) MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   virtual MojoResult WriteDataImplNoLock(UserPointer<const void> elements,
                                          UserPointer<uint32_t> num_bytes,
                                          MojoWriteDataFlags flags)

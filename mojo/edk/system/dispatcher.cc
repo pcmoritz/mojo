@@ -140,6 +140,25 @@ MojoResult Dispatcher::ReadMessage(UserPointer<void> bytes,
                                flags);
 }
 
+MojoResult Dispatcher::SetDataPipeProducerOptions(
+    UserPointer<const MojoDataPipeProducerOptions> options) {
+  MutexLocker locker(&mutex_);
+  if (is_closed_)
+    return MOJO_RESULT_INVALID_ARGUMENT;
+
+  return SetDataPipeProducerOptionsImplNoLock(options);
+}
+
+MojoResult Dispatcher::GetDataPipeProducerOptions(
+    UserPointer<MojoDataPipeProducerOptions> options,
+    uint32_t options_num_bytes) {
+  MutexLocker locker(&mutex_);
+  if (is_closed_)
+    return MOJO_RESULT_INVALID_ARGUMENT;
+
+  return GetDataPipeProducerOptionsImplNoLock(options, options_num_bytes);
+}
+
 MojoResult Dispatcher::WriteData(UserPointer<const void> elements,
                                  UserPointer<uint32_t> num_bytes,
                                  MojoWriteDataFlags flags) {
@@ -323,6 +342,21 @@ MojoResult Dispatcher::ReadMessageImplNoLock(
   mutex_.AssertHeld();
   DCHECK(!is_closed_);
   // By default, not supported. Only needed for message pipe dispatchers.
+  return MOJO_RESULT_INVALID_ARGUMENT;
+}
+
+MojoResult Dispatcher::SetDataPipeProducerOptionsImplNoLock(
+    UserPointer<const MojoDataPipeProducerOptions> /*options*/) {
+  mutex_.AssertHeld();
+  DCHECK(!is_closed_);
+  return MOJO_RESULT_INVALID_ARGUMENT;
+}
+
+MojoResult Dispatcher::GetDataPipeProducerOptionsImplNoLock(
+    UserPointer<MojoDataPipeProducerOptions> /*options*/,
+    uint32_t /*options_num_bytes*/) {
+  mutex_.AssertHeld();
+  DCHECK(!is_closed_);
   return MOJO_RESULT_INVALID_ARGUMENT;
 }
 
