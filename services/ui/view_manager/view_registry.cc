@@ -245,6 +245,8 @@ void ViewRegistry::OnStubSceneTokenAvailable(
   // Store the scene token.
   DCHECK(view_stub->is_linked());
   view_stub->SetStubSceneToken(scene_token.Clone());
+  if (view_stub->state())
+    PublishStubScene(view_stub->state());
 
   // Send view info to the container including the scene token.
   auto view_info = mojo::ui::ViewInfo::New();
