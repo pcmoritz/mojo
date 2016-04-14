@@ -63,6 +63,17 @@ def MakeInterface():
   f.Param('data_pipe_producer_handle').Out('MojoHandle')
   f.Param('data_pipe_consumer_handle').Out('MojoHandle')
 
+  f = mojo.Func('MojoSetDataPipeProducerOptions', 'MojoResult')
+  f.Param('data_pipe_producer_handle').In('MojoHandle')
+  p = f.Param('options')
+  p.InExtensibleStruct('MojoDataPipeProducerOptions').Optional()
+
+  f = mojo.Func('MojoGetDataPipeProducerOptions', 'MojoResult')
+  f.Param('data_pipe_producer_handle').In('MojoHandle')
+  p = f.Param('options')
+  p.OutExtensibleStruct('MojoDataPipeProducerOptions', 'options_num_bytes')
+  f.Param('options_num_bytes').In('uint32_t')
+
   f = mojo.Func('MojoWriteData', 'MojoResult')
   f.Param('data_pipe_producer_handle').In('MojoHandle')
   f.Param('elements').InArray('void', 'num_bytes')

@@ -428,6 +428,76 @@ ssize_t MojoDescSendMsg(void* handle,
       return 0;
     }
     case 9: {
+      if (num_params != 4) {
+        return -1;
+      }
+      MojoHandle data_pipe_producer_handle_value;
+      const struct MojoDataPipeProducerOptions* options;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_producer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertExtensibleStructInput(nap, params[2], true, &options)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[3], false, &result_ptr)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplSetDataPipeProducerOptions(
+          g_mojo_system, data_pipe_producer_handle_value, options);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 10: {
+      if (num_params != 5) {
+        return -1;
+      }
+      MojoHandle data_pipe_producer_handle_value;
+      struct MojoDataPipeProducerOptions* options;
+      uint32_t options_num_bytes_value;
+      MojoResult volatile* result_ptr;
+      MojoResult result_value;
+      {
+        ScopedCopyLock copy_lock(nap);
+        if (!ConvertScalarInput(nap, params[1],
+                                &data_pipe_producer_handle_value)) {
+          return -1;
+        }
+        if (!ConvertScalarInput(nap, params[3], &options_num_bytes_value)) {
+          return -1;
+        }
+        if (!ConvertScalarOutput(nap, params[4], false, &result_ptr)) {
+          return -1;
+        }
+        if (!ConvertArray(nap, params[2], options_num_bytes_value, 1, false,
+                          &options)) {
+          return -1;
+        }
+      }
+
+      result_value = MojoSystemImplGetDataPipeProducerOptions(
+          g_mojo_system, data_pipe_producer_handle_value, options,
+          options_num_bytes_value);
+
+      {
+        ScopedCopyLock copy_lock(nap);
+        *result_ptr = result_value;
+      }
+
+      return 0;
+    }
+    case 11: {
       if (num_params != 6) {
         return -1;
       }
@@ -472,10 +542,10 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 10:
+    case 12:
       fprintf(stderr, "MojoBeginWriteData not implemented\n");
       return -1;
-    case 11: {
+    case 13: {
       if (num_params != 4) {
         return -1;
       }
@@ -508,7 +578,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 12: {
+    case 14: {
       if (num_params != 4) {
         return -1;
       }
@@ -540,7 +610,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 13: {
+    case 15: {
       if (num_params != 5) {
         return -1;
       }
@@ -578,7 +648,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 14: {
+    case 16: {
       if (num_params != 6) {
         return -1;
       }
@@ -623,10 +693,10 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 15:
+    case 17:
       fprintf(stderr, "MojoBeginReadData not implemented\n");
       return -1;
-    case 16: {
+    case 18: {
       if (num_params != 4) {
         return -1;
       }
@@ -658,7 +728,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 17: {
+    case 19: {
       if (num_params != 5) {
         return -1;
       }
@@ -697,7 +767,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 18: {
+    case 20: {
       if (num_params != 5) {
         return -1;
       }
@@ -736,7 +806,7 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 19: {
+    case 21: {
       if (num_params != 5) {
         return -1;
       }
@@ -772,10 +842,10 @@ ssize_t MojoDescSendMsg(void* handle,
 
       return 0;
     }
-    case 20:
+    case 22:
       fprintf(stderr, "MojoMapBuffer not implemented\n");
       return -1;
-    case 21:
+    case 23:
       fprintf(stderr, "MojoUnmapBuffer not implemented\n");
       return -1;
   }

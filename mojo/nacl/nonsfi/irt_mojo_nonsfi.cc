@@ -30,6 +30,8 @@ const struct nacl_irt_mojo kIrtMojo = {
     MojoWriteMessage,
     MojoReadMessage,
     MojoCreateDataPipe,
+    MojoSetDataPipeProducerOptions,
+    MojoGetDataPipeProducerOptions,
     MojoWriteData,
     MojoBeginWriteData,
     MojoEndWriteData,

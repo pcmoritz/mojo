@@ -167,6 +167,34 @@ static MojoResult irt_MojoCreateDataPipe(
   return result;
 };
 
+static MojoResult irt_MojoSetDataPipeProducerOptions(
+    MojoHandle data_pipe_producer_handle,
+    const struct MojoDataPipeProducerOptions* options) {
+  uint32_t params[4];
+  MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
+  params[0] = 9;
+  params[1] = (uint32_t)(&data_pipe_producer_handle);
+  params[2] = (uint32_t)(options);
+  params[3] = (uint32_t)(&result);
+  DoMojoCall(params, sizeof(params));
+  return result;
+};
+
+static MojoResult irt_MojoGetDataPipeProducerOptions(
+    MojoHandle data_pipe_producer_handle,
+    struct MojoDataPipeProducerOptions* options,
+    uint32_t options_num_bytes) {
+  uint32_t params[5];
+  MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
+  params[0] = 10;
+  params[1] = (uint32_t)(&data_pipe_producer_handle);
+  params[2] = (uint32_t)(options);
+  params[3] = (uint32_t)(&options_num_bytes);
+  params[4] = (uint32_t)(&result);
+  DoMojoCall(params, sizeof(params));
+  return result;
+};
+
 static MojoResult irt_MojoWriteData(
     MojoHandle data_pipe_producer_handle,
     const void* elements,
@@ -174,7 +202,7 @@ static MojoResult irt_MojoWriteData(
     MojoWriteDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 9;
+  params[0] = 11;
   params[1] = (uint32_t)(&data_pipe_producer_handle);
   params[2] = (uint32_t)(elements);
   params[3] = (uint32_t)(num_bytes);
@@ -191,7 +219,7 @@ static MojoResult irt_MojoBeginWriteData(
     MojoWriteDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 10;
+  params[0] = 12;
   params[1] = (uint32_t)(&data_pipe_producer_handle);
   params[2] = (uint32_t)(buffer);
   params[3] = (uint32_t)(buffer_num_bytes);
@@ -206,7 +234,7 @@ static MojoResult irt_MojoEndWriteData(
     uint32_t num_bytes_written) {
   uint32_t params[4];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 11;
+  params[0] = 13;
   params[1] = (uint32_t)(&data_pipe_producer_handle);
   params[2] = (uint32_t)(&num_bytes_written);
   params[3] = (uint32_t)(&result);
@@ -219,7 +247,7 @@ static MojoResult irt_MojoSetDataPipeConsumerOptions(
     const struct MojoDataPipeConsumerOptions* options) {
   uint32_t params[4];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 12;
+  params[0] = 14;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(options);
   params[3] = (uint32_t)(&result);
@@ -233,7 +261,7 @@ static MojoResult irt_MojoGetDataPipeConsumerOptions(
     uint32_t options_num_bytes) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 13;
+  params[0] = 15;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(options);
   params[3] = (uint32_t)(&options_num_bytes);
@@ -249,7 +277,7 @@ static MojoResult irt_MojoReadData(
     MojoReadDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 14;
+  params[0] = 16;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(elements);
   params[3] = (uint32_t)(num_bytes);
@@ -266,7 +294,7 @@ static MojoResult irt_MojoBeginReadData(
     MojoReadDataFlags flags) {
   uint32_t params[6];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 15;
+  params[0] = 17;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(buffer);
   params[3] = (uint32_t)(buffer_num_bytes);
@@ -281,7 +309,7 @@ static MojoResult irt_MojoEndReadData(
     uint32_t num_bytes_read) {
   uint32_t params[4];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 16;
+  params[0] = 18;
   params[1] = (uint32_t)(&data_pipe_consumer_handle);
   params[2] = (uint32_t)(&num_bytes_read);
   params[3] = (uint32_t)(&result);
@@ -295,7 +323,7 @@ static MojoResult irt_MojoCreateSharedBuffer(
     MojoHandle* shared_buffer_handle) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 17;
+  params[0] = 19;
   params[1] = (uint32_t)(options);
   params[2] = (uint32_t)(&num_bytes);
   params[3] = (uint32_t)(shared_buffer_handle);
@@ -310,7 +338,7 @@ static MojoResult irt_MojoDuplicateBufferHandle(
     MojoHandle* new_buffer_handle) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 18;
+  params[0] = 20;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(options);
   params[3] = (uint32_t)(new_buffer_handle);
@@ -325,7 +353,7 @@ static MojoResult irt_MojoGetBufferInformation(
     uint32_t info_num_bytes) {
   uint32_t params[5];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 19;
+  params[0] = 21;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(info);
   params[3] = (uint32_t)(&info_num_bytes);
@@ -342,7 +370,7 @@ static MojoResult irt_MojoMapBuffer(
     MojoMapBufferFlags flags) {
   uint32_t params[7];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 20;
+  params[0] = 22;
   params[1] = (uint32_t)(&buffer_handle);
   params[2] = (uint32_t)(&offset);
   params[3] = (uint32_t)(&num_bytes);
@@ -356,7 +384,7 @@ static MojoResult irt_MojoMapBuffer(
 static MojoResult irt_MojoUnmapBuffer(void* buffer) {
   uint32_t params[3];
   MojoResult result = MOJO_RESULT_INVALID_ARGUMENT;
-  params[0] = 21;
+  params[0] = 23;
   params[1] = (uint32_t)(&buffer);
   params[2] = (uint32_t)(&result);
   DoMojoCall(params, sizeof(params));
@@ -373,6 +401,8 @@ struct nacl_irt_mojo kIrtMojo = {
   &irt_MojoWriteMessage,
   &irt_MojoReadMessage,
   &irt_MojoCreateDataPipe,
+  &irt_MojoSetDataPipeProducerOptions,
+  &irt_MojoGetDataPipeProducerOptions,
   &irt_MojoWriteData,
   &irt_MojoBeginWriteData,
   &irt_MojoEndWriteData,
