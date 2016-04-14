@@ -33,7 +33,22 @@ class EchoServiceImpl implements EchoService {
         new Duration(milliseconds: millis), () => responseFactory(value));
   }
 
+  void swap() {
+    _swapImpls(this);
+  }
+
   void quit() {}
+
+  static void _swapImpls(EchoServiceImpl impl) {
+    final stub = impl._stub;
+    final app = impl._application;
+    // It is not allowed to do an unbind in the midst of handling an event, so
+    // it is delayed until popping back out to the event loop.
+    Timer.run(() {
+      final endpoint = stub.unbind();
+      new EchoServiceImpl(app, endpoint);
+    });
+  }
 }
 
 class EchoApplication extends Application {

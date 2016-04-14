@@ -16,6 +16,8 @@ class DummyEchoServiceImpl implements EchoService {
   dynamic delayedEchoString(String value, int millis,
       [Function responseFactory]) => null;
 
+  void swap() {}
+
   void quit() {}
 }
 

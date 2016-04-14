@@ -317,6 +317,64 @@ class EchoServiceDelayedEchoStringResponseParams extends bindings.Struct {
 }
 
 
+class _EchoServiceSwapParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  _EchoServiceSwapParams() : super(kVersions.last.size);
+
+  static _EchoServiceSwapParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _EchoServiceSwapParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _EchoServiceSwapParams result = new _EchoServiceSwapParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "_EchoServiceSwapParams("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
 class _EchoServiceQuitParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -376,7 +434,8 @@ class _EchoServiceQuitParams extends bindings.Struct {
 
 const int _echoServiceMethodEchoStringName = 0;
 const int _echoServiceMethodDelayedEchoStringName = 1;
-const int _echoServiceMethodQuitName = 2;
+const int _echoServiceMethodSwapName = 2;
+const int _echoServiceMethodQuitName = 3;
 
 class _EchoServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -396,6 +455,7 @@ abstract class EchoService {
   static const String serviceName = "test::EchoService";
   dynamic echoString(String value,[Function responseFactory = null]);
   dynamic delayedEchoString(String value,int millis,[Function responseFactory = null]);
+  void swap();
   void quit();
 }
 
@@ -496,6 +556,14 @@ class _EchoServiceProxyCalls implements EchoService {
           _echoServiceMethodDelayedEchoStringName,
           -1,
           bindings.MessageHeader.kMessageExpectsResponse);
+    }
+    void swap() {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _EchoServiceSwapParams();
+      _proxyImpl.sendMessage(params, _echoServiceMethodSwapName);
     }
     void quit() {
       if (!_proxyImpl.isBound) {
@@ -649,6 +717,9 @@ class EchoServiceStub extends bindings.Stub {
               bindings.MessageHeader.kMessageIsResponse);
         }
         break;
+      case _echoServiceMethodSwapName:
+        _impl.swap();
+        break;
       case _echoServiceMethodQuitName:
         _impl.quit();
         break;
@@ -694,7 +765,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xXS2/UMBB2NjxCFxCPIoXHoXAKB2qO1UpIe2BPSDwEEuppsVJDg/IizlbAL+EncOTn9MixP4Eb2GQsvLP24gIbUWlHmk6d1GN/37zSmHRyCexnsPj5jrEOpEawvi71stSWi3Y0mqT71XPeHGQpd/w99nsf7G3w9WL36WT6aLI7Ug63F/25/Iwd5/n6jWGf2h8a+xOwW2BfBZ19D5ag8zVPnxCf30G+ELvge29ZcJ41nl+VOpQKKB6zgnvFQ+/Db2I4A9ODeVb325D6UuoTqXS/KjhlH1mZ0aJ6W1HRpN0ve6xpKatr5VFQ9XMqV4JmZcub1yzlgnJ5zlR0B22rTcVv74/vo/nYhLgR4HFgvA+NffXpzh4N7fH9qv2H9vgSlLfEiK/tuZYrwNtPRG2TlW/seM7B3VfFL84rjfdb4I9TyY4D5w3A+gvnvYa/m8nb2fFqWRVeXFdjRz87In7imweJY/8FqSoFD1g+4474X1sxH7pGlvVnYvRDWz/613lzE3rTXN6IuioFX+eNZ94k/2He4P6q+UpOzfvz4Scw+Mei58ZDnrMPfA+32QW+Nnrusxp3FB6vXsYOvPq7ZgHvfLvtvW5i4FWfFwcno35UPtzqsX5sfBC4o02iP+AjWMLHRalnpBZZnmfCzsfdHvur2T8GxtpVR/oD72/r6A58s9jqyBg/6/njUT8PTsD8OUS4BsfgZ7CEn/NS1Uh7NstaW74Me543h8j61onr/5dNwKjwmSOm77qIPOJv9ssfAQAA//84z+e14BAAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xYvY4TMRDenwOOu4D4lZafIlCFgjOiiiIhpSAVEgIdzVWRtWeSRbvZZb05BE/AI1BSUlLyCDzKlZR0YN+OwZnYwYlOWQXdSHMT++Kf7/M3491EXm1XIH6BiPu7WtsXvg3tW8KvCq8Yr3q9QTzO91l5lMTM8n087yOI92CuVwcvBsNng4OenHBvfj7bPH3Leq7zRjBOjg+18R2IbYiFX8ePED20vuLpE+LzF9hXz2x4320Dzgta/3Xhu8IBxXOaMafzUOPwfyJYA9ODeZb72xE+Ej4UTqa8JGke05SM8nyUMjLOM0Y+lJRk+Zv8MeFlfPKJHNKyIrQo5AqcyL9D0eIkmVSsfE1jxgkT6w55vfCeHJT9Ew/en87bFnyWvAZwrh3oV9/7fq6On1t1/HbZfO4/1DmH5nP3kJ497dxN/cquAZ8nyKoymYzMuC4ChnXxjvWn8EeBO25pXQvu24D9L+6HJXs7Fbsz41e2Lvw4H/uWOvjTczNXnXQs4y8Jl1I9oumUWfRxc838qNxaVOc9ra6a6tpp6+oO1LgZXfEin3B2pqsVddXZAF3heq34G2/NzufCl6+dBzZ1Hz1lKX3PDnHZnuNvp+G6rXjohsvlV9+CXz1PzeGfLd+N51kEvP/Rh78Z+Sb1crfBfDPx48GeTba9Aj/+An7k49d54VmSpgk38/OgwXqt159Aa9vyrh2cTt7dh2cmU95p19vZ/bZCvj3ZwPvtGOEMluArWMBXC96P9t/RwqSn3Ybvs2MUXfPK9v51AzBLvPoV1nQebTvow1vwOwXWR7gEX6GDPl5OEyNPrf9UHxLvJuvjdwAAAP//FAIeTugTAAA=";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

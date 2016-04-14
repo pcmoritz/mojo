@@ -86,6 +86,37 @@ echoApptests(Application application, String url) {
           new Duration(milliseconds: 10), () => echoProxy.close());
     });
 
+    test('Swap', () async {
+      var echoProxy =
+          new EchoServiceProxy.connectToService(application, "mojo:dart_echo");
+
+      for (int i = 0; i < 10; i++) {
+        var v =
+            await echoProxy.responseOrError(echoProxy.ptr.echoString("foo"));
+        expect(v.value, equals("foo"));
+      }
+
+      echoProxy.impl.errorFuture.then((e) {
+        fail("echoProxy: $e");
+      });
+
+      // Trigger an implementation swap in the echo server.
+      echoProxy.ptr.swap();
+
+      expect(echoProxy.impl.isBound, isTrue);
+
+      for (int i = 0; i < 10; i++) {
+        var v =
+            await echoProxy.responseOrError(echoProxy.ptr.echoString("foo"));
+        expect(v.value, equals("foo"));
+      }
+
+      var q = await echoProxy.responseOrError(echoProxy.ptr.echoString("quit"));
+      expect(q.value, equals("quit"));
+
+      await echoProxy.close();
+    });
+
     test('Multiple Error Checks Success', () {
       var echoProxy =
           new EchoServiceProxy.connectToService(application, "mojo:dart_echo");
