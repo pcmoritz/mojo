@@ -97,7 +97,9 @@ func genCmd(args []string) {
 			"use --gen-arg-arg=value. To pass --arg, you would use --gen-arg-arg.\n")
 	}
 
-	if err := flagSet.Parse(args[2:]); err != nil {
+	// If err is not ErrHelp, the only way to figure out what it was is to look at
+	// the message provided for users.
+	if err := flagSet.Parse(args[2:]); err != nil && !strings.HasPrefix(err.Error(), "flag provided but not defined") {
 		if err != flag.ErrHelp {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
