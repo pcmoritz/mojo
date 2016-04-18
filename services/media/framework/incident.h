@@ -8,6 +8,8 @@
 #include <functional>
 #include <vector>
 
+#include "base/synchronization/lock.h"
+
 namespace mojo {
 namespace media {
 
@@ -79,6 +81,66 @@ class Incident {
   void Run() { Occur(); }
 
  private:
+  bool occurred_ = false;
+  std::vector<std::function<void()>> consequences_;
+};
+
+// Like Incident, but threadsafe.
+class ThreadsafeIncident {
+ public:
+  ThreadsafeIncident();
+
+  ~ThreadsafeIncident();
+
+  // Determines if this ThreadsafeIncident has occurred due to a past call to
+  // Occur. Note that the state of the this ThreadsafeIncident may change
+  // immediately after this method returns, so there's no guarantee that the
+  // result is still valid.
+  bool occurred() {
+    base::AutoLock lock(consequences_lock_);
+    return occurred_;
+  }
+
+  // Executes the consequence when this ThreadsafeIncident occurs. If this
+  // ThreadsafeIncident hasn't occurred when this method is called, a copy of
+  // the consequence is held until this ThreadsafeIncident occurs or is reset.
+  // If this ThreadsafeIncident has occurred when this method is called, the
+  // consequence is executed immediately and no copy of the consequence is held.
+  // Note that this ThreadsafeIncident's internal lock is not held when the
+  // consequence is called. It's therefore possible for this ThreadsafeIncident
+  // to be reset between the time the decision is made to run the consequence
+  // and when the consequence is actually run.
+  void When(const std::function<void()>& consequence) {
+    {
+      base::AutoLock lock(consequences_lock_);
+      if (!occurred_) {
+        consequences_.push_back(consequence);
+        return;
+      }
+    }
+
+    consequence();
+  }
+
+  // If this ThreadsafeIncident is in inital state (!occurred()), this method
+  // makes this ThreadsafeIncident occur, executing and deleting all its
+  // consequences. Otherwise, does nothing.
+  void Occur();
+
+  // Resets this ThreadsafeIncident to initial state and clears the list of
+  // consequences.
+  void Reset() {
+    base::AutoLock lock(consequences_lock_);
+    occurred_ = false;
+    consequences_.clear();
+  }
+
+  // Calls Occur. This method makes an ThreadsafeIncident convertible to
+  // mojo::Callback<void()>.
+  void Run() { Occur(); }
+
+ private:
+  mutable base::Lock consequences_lock_;
   bool occurred_ = false;
   std::vector<std::function<void()>> consequences_;
 };

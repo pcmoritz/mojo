@@ -7,6 +7,7 @@
 #include "base/message_loop/message_loop.h"
 #include "services/media/factory_service/media_demux_impl.h"
 #include "services/media/framework/callback_joiner.h"
+#include "services/media/framework/parts/reader_cache.h"
 #include "services/media/framework_mojo/mojo_reader.h"
 #include "services/media/framework_mojo/mojo_type_conversions.h"
 
@@ -45,7 +46,14 @@ MediaDemuxImpl::MediaDemuxImpl(InterfaceHandle<SeekingReader> reader,
     return;
   }
 
-  demux_ = Demux::Create(reader_ptr);
+  std::shared_ptr<ReaderCache> reader_cache_ptr =
+      ReaderCache::Create(reader_ptr);
+  if (!reader_cache_ptr) {
+    NOTREACHED() << "couldn't create reader cache";
+    return;
+  }
+
+  demux_ = Demux::Create(std::shared_ptr<Reader>(reader_cache_ptr));
   if (!demux_) {
     NOTREACHED() << "couldn't create demux";
     return;

@@ -27,5 +27,28 @@ void Incident::Occur() {
   }
 }
 
+ThreadsafeIncident::ThreadsafeIncident() {}
+
+ThreadsafeIncident::~ThreadsafeIncident() {}
+
+void ThreadsafeIncident::Occur() {
+  std::vector<std::function<void()>> consequences;
+
+  {
+    base::AutoLock lock(consequences_lock_);
+
+    if (occurred_) {
+      return;
+    }
+
+    occurred_ = true;
+    consequences_.swap(consequences);
+  }
+
+  for (const std::function<void()>& consequence : consequences) {
+    consequence();
+  }
+}
+
 }  // namespace media
 }  // namespace mojo

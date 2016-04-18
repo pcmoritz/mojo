@@ -41,6 +41,10 @@ source_set("framework") {
     "parts/null_sink.cc",
     "parts/null_sink.h",
     "parts/reader.h",
+    "parts/reader_cache.cc",
+    "parts/reader_cache.h",
+    "parts/sparse_byte_buffer.cc",
+    "parts/sparse_byte_buffer.h",
     "payload_allocator.cc",
     "payload_allocator.h",
     "refs.cc",
@@ -86,6 +90,7 @@ mojo_native_application("apptests") {
 
   sources = [
     "test/incident_test.cc",
+    "test/sparse_byte_buffer_test.cc",
     "test/test_base.h",
   ]
 

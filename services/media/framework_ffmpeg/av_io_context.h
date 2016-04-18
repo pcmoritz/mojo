@@ -66,11 +66,16 @@ class AvIoContextOpaque {
 
   void WaitForCallback() {
     std::unique_lock<std::mutex> lock(mutex_);
-    condition_variable_.wait(lock);
+    while (!callback_happened_) {
+      condition_variable_.wait(lock);
+    }
+    callback_happened_ = false;
   }
 
   void CallbackComplete() {
     std::unique_lock<std::mutex> lock(mutex_);
+    DCHECK(!callback_happened_);
+    callback_happened_ = true;
     condition_variable_.notify_all();
   }
 
@@ -81,6 +86,7 @@ class AvIoContextOpaque {
   int64_t position_ = 0;
   std::mutex mutex_;
   std::condition_variable condition_variable_;
+  bool callback_happened_ = false;
 
   friend class AvIoContext;
 };
