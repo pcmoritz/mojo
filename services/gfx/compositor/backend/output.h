@@ -27,7 +27,7 @@ class Output {
   // Gets the output's frame scheduler.
   virtual Scheduler* GetScheduler() = 0;
 
-  // Submits a frame to be rendered to the display.
+  // Submits a frame to be rendered to the display, or null if none.
   virtual void SubmitFrame(const scoped_refptr<RenderFrame>& frame) = 0;
 
  private:

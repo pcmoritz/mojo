@@ -6,7 +6,6 @@
 #define MOJO_UI_GANESH_VIEW_H_
 
 #include "mojo/gpu/gl_context.h"
-#include "mojo/gpu/gl_context_owner.h"
 #include "mojo/skia/ganesh_context.h"
 #include "mojo/ui/base_view.h"
 #include "mojo/ui/ganesh_renderer.h"
@@ -27,20 +26,20 @@ class GaneshView : public BaseView {
 
   ~GaneshView() override;
 
-  // Gets the GL context, or null if none.
-  const base::WeakPtr<mojo::GLContext>& gl_context() const {
-    return gl_context_owner_.context();
+  // Gets the GL context, never null.
+  const scoped_refptr<mojo::GLContext>& gl_context() const {
+    return ganesh_renderer_.gl_context();
   }
 
-  // Gets the Ganesh context.
-  mojo::skia::GaneshContext* ganesh_context() { return &ganesh_context_; }
+  // Gets the Ganesh context, never null.
+  const scoped_refptr<mojo::skia::GaneshContext>& ganesh_context() const {
+    return ganesh_renderer_.ganesh_context();
+  }
 
-  // Gets the Ganesh renderer.
+  // Gets the Ganesh renderer, never null.
   mojo::ui::GaneshRenderer* ganesh_renderer() { return &ganesh_renderer_; }
 
  private:
-  mojo::GLContextOwner gl_context_owner_;
-  mojo::skia::GaneshContext ganesh_context_;
   mojo::ui::GaneshRenderer ganesh_renderer_;
 
   DISALLOW_COPY_AND_ASSIGN(GaneshView);

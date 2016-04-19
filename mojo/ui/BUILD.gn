@@ -60,6 +60,7 @@ source_set("gl") {
     "//mojo/common",
     "//mojo/gpu",
     "//mojo/public/cpp/bindings",
+    "//mojo/services/geometry/interfaces",
     "//mojo/services/gfx/composition/interfaces",
     "//mojo/services/ui/views/interfaces",
   ]
@@ -81,6 +82,7 @@ source_set("ganesh") {
     "//mojo/common",
     "//mojo/gpu",
     "//mojo/public/cpp/bindings",
+    "//mojo/services/geometry/interfaces",
     "//mojo/services/gfx/composition/interfaces",
     "//mojo/services/ui/views/interfaces",
     "//mojo/skia",

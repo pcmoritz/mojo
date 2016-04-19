@@ -46,8 +46,7 @@ void ShapesView::UpdateScene() {
     // image resource in the scene.
     mojo::gfx::composition::ResourcePtr content_resource =
         ganesh_renderer()->DrawCanvas(
-            size,
-            base::Bind(&ShapesView::DrawContent, base::Unretained(this), size));
+            size, base::Bind(&ShapesView::DrawContent, base::Unretained(this)));
     DCHECK(content_resource);
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -73,7 +72,10 @@ void ShapesView::UpdateScene() {
   scene()->Publish(metadata.Pass());
 }
 
-void ShapesView::DrawContent(const mojo::Size& size, SkCanvas* canvas) {
+void ShapesView::DrawContent(
+    const mojo::skia::GaneshContext::Scope& ganesh_scope,
+    const mojo::Size& size,
+    SkCanvas* canvas) {
   canvas->clear(SK_ColorCYAN);
 
   SkPaint paint;

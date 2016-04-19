@@ -263,7 +263,10 @@ void MotermView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
   scene()->Publish(metadata.Pass());
 }
 
-void MotermView::DrawContent(SkCanvas* canvas) {
+void MotermView::DrawContent(
+    const mojo::skia::GaneshContext::Scope& ganesh_scope,
+    const mojo::Size& texture_size,
+    SkCanvas* canvas) {
   canvas->clear(SK_ColorBLACK);
 
   SkPaint bg_paint;

@@ -13,10 +13,10 @@ GLView::GLView(mojo::ApplicationImpl* app_impl,
                mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
                const std::string& label)
     : BaseView(app_impl, view_owner_request.Pass(), label),
-      gl_context_owner_(ApplicationConnectorPtr::Create(
-                            app_impl->CreateApplicationConnector())
-                            .get()),
-      gl_renderer_(gl_context_owner_.context()) {}
+      gl_renderer_(mojo::GLContext::CreateOffscreen(
+          ApplicationConnectorPtr::Create(
+              app_impl->CreateApplicationConnector())
+              .get())) {}
 
 GLView::~GLView() {}
 

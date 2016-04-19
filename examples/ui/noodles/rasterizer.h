@@ -7,11 +7,8 @@
 
 #include <memory>
 
-#include "mojo/gpu/gl_context.h"
-#include "mojo/gpu/gl_context_owner.h"
 #include "mojo/public/interfaces/application/application_connector.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
-#include "mojo/skia/ganesh_context.h"
 #include "mojo/ui/ganesh_renderer.h"
 
 namespace examples {
@@ -31,8 +28,6 @@ class Rasterizer {
   void PublishFrame(std::unique_ptr<Frame> frame);
 
  private:
-  mojo::GLContextOwner gl_context_owner_;
-  mojo::skia::GaneshContext ganesh_context_;
   mojo::ui::GaneshRenderer ganesh_renderer_;
   mojo::gfx::composition::ScenePtr scene_;
 

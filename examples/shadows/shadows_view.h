@@ -30,7 +30,7 @@ class ShadowsView : public mojo::ui::GLView,
   void OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
               const base::TimeDelta& time_delta) override;
 
-  void Render(const mojo::Size& size);
+  void Render(const mojo::GLContext::Scope& gl_scope, const mojo::Size& size);
 
   mojo::ui::Choreographer choreographer_;
 

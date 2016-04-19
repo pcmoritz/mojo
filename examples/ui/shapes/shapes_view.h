@@ -24,7 +24,9 @@ class ShapesView : public mojo::ui::GaneshView {
                            mojo::ui::ViewPropertiesPtr old_properties) override;
 
   void UpdateScene();
-  void DrawContent(const mojo::Size& size, SkCanvas* canvas);
+  void DrawContent(const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                   const mojo::Size& size,
+                   SkCanvas* canvas);
 
   DISALLOW_COPY_AND_ASSIGN(ShapesView);
 };

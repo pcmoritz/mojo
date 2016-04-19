@@ -82,7 +82,9 @@ class MotermView : public mojo::ui::GaneshView,
   // If |force| is true, it will draw everything. Otherwise it will draw only if
   // |model_state_changes_| is dirty.
   void ScheduleDraw(bool force);
-  void DrawContent(SkCanvas* canvas);
+  void DrawContent(const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                   const mojo::Size& texture_size,
+                   SkCanvas* canvas);
 
   void OnKeyPressed(mojo::EventPtr key_event);
 

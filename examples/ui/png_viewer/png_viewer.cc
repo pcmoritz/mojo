@@ -59,8 +59,7 @@ class PNGView : public mojo::ui::GaneshView {
 
       mojo::gfx::composition::ResourcePtr content_resource =
           ganesh_renderer()->DrawCanvas(
-              size,
-              base::Bind(&PNGView::DrawContent, base::Unretained(this), size));
+              size, base::Bind(&PNGView::DrawContent, base::Unretained(this)));
       DCHECK(content_resource);
       update->resources.insert(kContentImageResourceId,
                                content_resource.Pass());
@@ -83,7 +82,9 @@ class PNGView : public mojo::ui::GaneshView {
     scene()->Publish(metadata.Pass());
   }
 
-  void DrawContent(const mojo::Size& size, SkCanvas* canvas) {
+  void DrawContent(const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                   const mojo::Size& size,
+                   SkCanvas* canvas) {
     canvas->clear(SK_ColorBLACK);
 
     int32_t w, h;

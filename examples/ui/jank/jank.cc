@@ -104,8 +104,7 @@ class JankView : public mojo::ui::GaneshView,
 
       mojo::gfx::composition::ResourcePtr content_resource =
           ganesh_renderer()->DrawCanvas(
-              size,
-              base::Bind(&JankView::DrawContent, base::Unretained(this), size));
+              size, base::Bind(&JankView::DrawContent, base::Unretained(this)));
       DCHECK(content_resource);
       update->resources.insert(kContentImageResourceId,
                                content_resource.Pass());
@@ -135,7 +134,9 @@ class JankView : public mojo::ui::GaneshView,
       sleep(2);
   }
 
-  void DrawContent(const mojo::Size& size, SkCanvas* canvas) {
+  void DrawContent(const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                   const mojo::Size& size,
+                   SkCanvas* canvas) {
     SkScalar hsv[3] = {fmod(MojoGetTimeTicksNow() * 0.000001f * 60, 360.f), 1,
                        1};
     canvas->clear(SkHSVToColor(hsv));

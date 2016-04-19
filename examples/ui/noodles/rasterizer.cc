@@ -7,6 +7,8 @@
 #include "base/bind.h"
 #include "base/logging.h"
 #include "examples/ui/noodles/frame.h"
+#include "mojo/gpu/gl_context.h"
+#include "mojo/skia/ganesh_context.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkSurface.h"
@@ -18,12 +20,18 @@ constexpr uint32_t kRootNodeId = mojo::gfx::composition::kSceneRootNodeId;
 
 Rasterizer::Rasterizer(mojo::ApplicationConnectorPtr connector,
                        mojo::gfx::composition::ScenePtr scene)
-    : gl_context_owner_(connector.get()),
-      ganesh_context_(gl_context_owner_.context()),
-      ganesh_renderer_(&ganesh_context_),
+    : ganesh_renderer_(new mojo::skia::GaneshContext(
+          mojo::GLContext::CreateOffscreen(connector.get()))),
       scene_(scene.Pass()) {}
 
 Rasterizer::~Rasterizer() {}
+
+static void DrawFrame(Frame* frame,
+                      const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                      const mojo::Size& size,
+                      SkCanvas* canvas) {
+  frame->Paint(canvas);
+}
 
 void Rasterizer::PublishFrame(std::unique_ptr<Frame> frame) {
   DCHECK(frame);
@@ -38,7 +46,7 @@ void Rasterizer::PublishFrame(std::unique_ptr<Frame> frame) {
     mojo::gfx::composition::ResourcePtr content_resource =
         ganesh_renderer_.DrawCanvas(
             frame->size(),
-            base::Bind(&Frame::Paint, base::Unretained(frame.get())));
+            base::Bind(&DrawFrame, base::Unretained(frame.get())));
     DCHECK(content_resource);
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 

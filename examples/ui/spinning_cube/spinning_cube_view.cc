@@ -60,7 +60,7 @@ SpinningCubeView::SpinningCubeView(
       choreographer_(scene(), this),
       input_handler_(GetViewServiceProvider(), this),
       weak_ptr_factory_(this) {
-  gl_renderer()->gl_context()->MakeCurrent();
+  mojo::GLContext::Scope gl_scope(gl_context());
   cube_.Init();
 }
 
@@ -153,8 +153,8 @@ void SpinningCubeView::OnDraw(
     bounds.height = size.height;
 
     mojo::gfx::composition::ResourcePtr cube_resource = gl_renderer()->DrawGL(
-        size, true, base::Bind(&SpinningCubeView::DrawCubeWithGL,
-                               base::Unretained(this), size));
+        size, true,
+        base::Bind(&SpinningCubeView::DrawCubeWithGL, base::Unretained(this)));
     DCHECK(cube_resource);
     update->resources.insert(kCubeImageResourceId, cube_resource.Pass());
 
@@ -185,7 +185,8 @@ void SpinningCubeView::OnDraw(
   choreographer_.ScheduleDraw();
 }
 
-void SpinningCubeView::DrawCubeWithGL(const mojo::Size& size) {
+void SpinningCubeView::DrawCubeWithGL(const mojo::GLContext::Scope& gl_scope,
+                                      const mojo::Size& size) {
   cube_.set_size(size.width, size.height);
   cube_.Draw();
 }

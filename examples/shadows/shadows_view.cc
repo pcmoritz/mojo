@@ -23,7 +23,7 @@ ShadowsView::ShadowsView(
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request)
     : GLView(app_impl, view_owner_request.Pass(), "Shadows"),
       choreographer_(scene(), this) {
-  gl_renderer()->gl_context()->MakeCurrent();
+  mojo::GLContext::Scope gl_scope(gl_context());
   renderer_.reset(new ShadowsRenderer());
 }
 
@@ -50,9 +50,8 @@ void ShadowsView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
     bounds.height = size.height;
 
     mojo::gfx::composition::ResourcePtr content_resource =
-        gl_renderer()->DrawGL(
-            size, true,
-            base::Bind(&ShadowsView::Render, base::Unretained(this), size));
+        gl_renderer()->DrawGL(size, true, base::Bind(&ShadowsView::Render,
+                                                     base::Unretained(this)));
     DCHECK(content_resource);
     update->resources.insert(kContentImageResourceId, content_resource.Pass());
 
@@ -80,7 +79,8 @@ void ShadowsView::OnDraw(const mojo::gfx::composition::FrameInfo& frame_info,
   scene()->Publish(metadata.Pass());
 }
 
-void ShadowsView::Render(const mojo::Size& size) {
+void ShadowsView::Render(const mojo::GLContext::Scope& gl_scope,
+                         const mojo::Size& size) {
   renderer_->Render(size);
 }
 

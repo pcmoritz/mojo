@@ -36,7 +36,8 @@ class SpinningCubeView : public mojo::ui::GLView,
   // |InputListener|:
   void OnEvent(mojo::EventPtr event, const OnEventCallback& callback) override;
 
-  void DrawCubeWithGL(const mojo::Size& size);
+  void DrawCubeWithGL(const mojo::GLContext::Scope& gl_scope,
+                      const mojo::Size& size);
 
   mojo::ui::Choreographer choreographer_;
   mojo::ui::InputHandler input_handler_;

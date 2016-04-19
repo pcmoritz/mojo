@@ -16,11 +16,11 @@ GaneshView::GaneshView(
     mojo::InterfaceRequest<mojo::ui::ViewOwner> view_owner_request,
     const std::string& label)
     : BaseView(app_impl, view_owner_request.Pass(), label),
-      gl_context_owner_(mojo::ApplicationConnectorPtr::Create(
-                            app_impl->CreateApplicationConnector())
-                            .get()),
-      ganesh_context_(gl_context()),
-      ganesh_renderer_(&ganesh_context_) {}
+      ganesh_renderer_(
+          new mojo::skia::GaneshContext(mojo::GLContext::CreateOffscreen(
+              mojo::ApplicationConnectorPtr::Create(
+                  app_impl->CreateApplicationConnector())
+                  .get()))) {}
 
 GaneshView::~GaneshView() {}
 

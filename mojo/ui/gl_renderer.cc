@@ -10,49 +10,45 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2extmojo.h>
 
-#include "mojo/gpu/gl_context.h"
-#include "mojo/gpu/gl_texture.h"
-
 namespace mojo {
 namespace ui {
 
-GLRenderer::GLRenderer(base::WeakPtr<mojo::GLContext> gl_context,
+GLRenderer::GLRenderer(const scoped_refptr<mojo::GLContext>& gl_context,
                        uint32_t max_recycled_textures)
     : gl_context_(gl_context),
       max_recycled_textures_(max_recycled_textures),
-      weak_factory_(this) {}
+      weak_factory_(this) {
+  DCHECK(gl_context_);
+}
 
 GLRenderer::~GLRenderer() {}
 
 std::unique_ptr<mojo::GLTexture> GLRenderer::GetTexture(
+    const mojo::GLContext::Scope& gl_scope,
     const mojo::Size& requested_size) {
-  if (!gl_context_) {
-    recycled_textures_.clear();
-    return nullptr;
-  }
+  DCHECK(gl_scope.gl_context() == gl_context_);
 
   while (!recycled_textures_.empty()) {
     GLRecycledTextureInfo texture_info(std::move(recycled_textures_.front()));
     recycled_textures_.pop_front();
     if (texture_info.first->size().Equals(requested_size)) {
-      gl_context_->MakeCurrent();
       glWaitSyncPointCHROMIUM(texture_info.second);
       return std::move(texture_info.first);
     }
   }
 
-  return std::unique_ptr<GLTexture>(new GLTexture(gl_context_, requested_size));
+  return std::unique_ptr<GLTexture>(new GLTexture(gl_scope, requested_size));
 }
 
 mojo::gfx::composition::ResourcePtr GLRenderer::BindTextureResource(
-    std::unique_ptr<GLTexture> texture,
+    const mojo::GLContext::Scope& gl_scope,
+    std::unique_ptr<GLTexture> gl_texture,
     mojo::gfx::composition::MailboxTextureResource::Origin origin) {
-  if (!gl_context_)
-    return nullptr;
+  DCHECK(gl_scope.gl_context() == gl_context_);
+  DCHECK(gl_texture->gl_context() == gl_context_);
 
   // Produce the texture.
-  gl_context_->MakeCurrent();
-  glBindTexture(GL_TEXTURE_2D, texture->texture_id());
+  glBindTexture(GL_TEXTURE_2D, gl_texture->texture_id());
   GLbyte mailbox[GL_MAILBOX_SIZE_CHROMIUM];
   glGenMailboxCHROMIUM(mailbox);
   glProduceTextureCHROMIUM(GL_TEXTURE_2D, mailbox);
@@ -67,12 +63,12 @@ mojo::gfx::composition::ResourcePtr GLRenderer::BindTextureResource(
   memcpy(resource->get_mailbox_texture()->mailbox_name.data(), mailbox,
          sizeof(mailbox));
   resource->get_mailbox_texture()->sync_point = sync_point;
-  resource->get_mailbox_texture()->size = texture->size().Clone();
+  resource->get_mailbox_texture()->size = gl_texture->size().Clone();
   resource->get_mailbox_texture()->origin = origin;
   resource->get_mailbox_texture()->callback =
       (new GLTextureReleaser(
            weak_factory_.GetWeakPtr(),
-           GLRecycledTextureInfo(std::move(texture), sync_point)))
+           GLRecycledTextureInfo(std::move(gl_texture), sync_point)))
           ->StrongBind()
           .Pass();
 
@@ -82,10 +78,13 @@ mojo::gfx::composition::ResourcePtr GLRenderer::BindTextureResource(
 }
 
 mojo::gfx::composition::ResourcePtr GLRenderer::DrawGL(
+    const mojo::GLContext::Scope& gl_scope,
     const mojo::Size& size,
     bool with_depth,
     const DrawGLCallback& callback) {
-  std::unique_ptr<mojo::GLTexture> texture = GetTexture(size);
+  DCHECK(gl_scope.gl_context() == gl_context_);
+
+  std::unique_ptr<mojo::GLTexture> texture = GetTexture(gl_scope, size);
   DCHECK(texture);
 
   GLuint fbo = 0u;
@@ -108,13 +107,23 @@ mojo::gfx::composition::ResourcePtr GLRenderer::DrawGL(
             glCheckFramebufferStatus(GL_FRAMEBUFFER));
 
   glViewport(0, 0, size.width, size.height);
-  callback.Run();
+  callback.Run(gl_scope, size);
 
   if (with_depth)
     glDeleteRenderbuffers(1, &depth_buffer);
   glDeleteFramebuffers(1, &fbo);
 
-  return BindTextureResource(std::move(texture));
+  return BindTextureResource(gl_scope, std::move(texture));
+}
+
+mojo::gfx::composition::ResourcePtr GLRenderer::DrawGL(
+    const mojo::Size& size,
+    bool with_depth,
+    const DrawGLCallback& callback) {
+  if (gl_context_->is_lost())
+    return nullptr;
+  mojo::GLContext::Scope gl_scope(gl_context_);
+  return DrawGL(gl_scope, size, with_depth, callback);
 }
 
 void GLRenderer::ReleaseTexture(GLRecycledTextureInfo texture_info,

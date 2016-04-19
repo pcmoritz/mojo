@@ -394,8 +394,11 @@ void CompositorEngine::SnapshotRenderer(
         renderer_state->visible_snapshot()->CreateFrame(
             renderer_state->root_scene_viewport(), frame_info));
   } else {
-    renderer_state->output()->SubmitFrame(new RenderFrame(
-        renderer_state->root_scene_viewport().To<SkIRect>(), frame_info));
+    SkIRect viewport = renderer_state->root_scene_viewport().To<SkIRect>();
+    if (!viewport.isEmpty()) {
+      renderer_state->output()->SubmitFrame(
+          new RenderFrame(viewport, frame_info));
+    }
   }
 }
 

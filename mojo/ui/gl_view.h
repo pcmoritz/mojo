@@ -6,7 +6,6 @@
 #define MOJO_UI_GL_VIEW_H_
 
 #include "mojo/gpu/gl_context.h"
-#include "mojo/gpu/gl_context_owner.h"
 #include "mojo/ui/base_view.h"
 #include "mojo/ui/gl_renderer.h"
 
@@ -24,16 +23,15 @@ class GLView : public BaseView {
 
   ~GLView() override;
 
-  // Gets the GL context, or null if none.
-  const base::WeakPtr<mojo::GLContext>& gl_context() const {
-    return gl_context_owner_.context();
+  // Gets the GL context, never null.
+  const scoped_refptr<mojo::GLContext>& gl_context() const {
+    return gl_renderer_.gl_context();
   }
 
-  // Gets the GL renderer.
+  // Gets the GL renderer, never null.
   mojo::ui::GLRenderer* gl_renderer() { return &gl_renderer_; }
 
  private:
-  mojo::GLContextOwner gl_context_owner_;
   mojo::ui::GLRenderer gl_renderer_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(GLView);

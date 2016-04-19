@@ -56,9 +56,12 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
 
   void CreateContext();
   void InitContext(mojo::InterfaceHandle<mojo::CommandBuffer> command_buffer);
+  void AbandonContext();
   void DestroyContext();
+  void RecreateContextAfterLoss();
   void OnContextProviderConnectionError();
   void OnViewportParameterTimeout();
+  void ApplyViewportParameters();
 
   void Draw();
 
@@ -69,8 +72,8 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   scoped_refptr<base::TaskRunner> task_runner_;
   base::Closure error_callback_;
 
-  base::WeakPtr<mojo::GLContext> gl_context_;
-  std::unique_ptr<mojo::skia::GaneshContext> ganesh_context_;
+  scoped_refptr<mojo::GLContext> gl_context_;
+  scoped_refptr<mojo::skia::GaneshContext> ganesh_context_;
   std::unique_ptr<mojo::skia::GaneshFramebufferSurface> ganesh_surface_;
 
   scoped_refptr<RenderFrame> frame_;
@@ -78,6 +81,9 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
 
   mojo::Binding<ViewportParameterListener> viewport_parameter_listener_binding_;
   base::Timer viewport_parameter_timeout_;
+  bool have_viewport_parameters_ = false;
+  int64_t vsync_timebase_ = 0u;
+  int64_t vsync_interval_ = 0u;
 
   base::WeakPtrFactory<GpuRasterizer> weak_ptr_factory_;
 

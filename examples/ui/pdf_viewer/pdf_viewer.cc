@@ -180,7 +180,7 @@ class PDFDocumentView : public mojo::ui::GaneshView,
       mojo::gfx::composition::ResourcePtr content_resource =
           ganesh_renderer()->DrawCanvas(
               size, base::Bind(&PDFDocumentView::DrawContent,
-                               base::Unretained(this), size));
+                               base::Unretained(this)));
       DCHECK(content_resource);
       update->resources.insert(kContentImageResourceId,
                                content_resource.Pass());
@@ -205,7 +205,9 @@ class PDFDocumentView : public mojo::ui::GaneshView,
     scene()->Publish(metadata.Pass());
   }
 
-  void DrawContent(const mojo::Size& size, SkCanvas* canvas) {
+  void DrawContent(const mojo::skia::GaneshContext::Scope& ganesh_scope,
+                   const mojo::Size& size,
+                   SkCanvas* canvas) {
     if (!cached_image_) {
       cached_image_ = pdf_document_->DrawPage(page_, size);
     }

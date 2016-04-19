@@ -7,7 +7,6 @@
 #include "base/bind.h"
 #include "base/logging.h"
 #include "mojo/gpu/gl_texture.h"
-#include "mojo/skia/ganesh_context.h"
 #include "mojo/skia/ganesh_texture_surface.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkSurface.h"
@@ -15,7 +14,8 @@
 namespace mojo {
 namespace ui {
 
-GaneshRenderer::GaneshRenderer(mojo::skia::GaneshContext* ganesh_context)
+GaneshRenderer::GaneshRenderer(
+    const scoped_refptr<mojo::skia::GaneshContext>& ganesh_context)
     : ganesh_context_(ganesh_context),
       gl_renderer_(ganesh_context_->gl_context()) {
   DCHECK(ganesh_context_);
@@ -24,35 +24,57 @@ GaneshRenderer::GaneshRenderer(mojo::skia::GaneshContext* ganesh_context)
 GaneshRenderer::~GaneshRenderer() {}
 
 mojo::gfx::composition::ResourcePtr GaneshRenderer::DrawSurface(
+    const mojo::skia::GaneshContext::Scope& ganesh_scope,
     const mojo::Size& size,
     const DrawSurfaceCallback& callback) {
-  std::unique_ptr<mojo::GLTexture> texture = gl_renderer_.GetTexture(size);
+  DCHECK(ganesh_scope.ganesh_context() == ganesh_context_);
+
+  std::unique_ptr<mojo::GLTexture> texture =
+      gl_renderer_.GetTexture(ganesh_scope.gl_scope(), size);
   DCHECK(texture);
 
-  {
-    mojo::skia::GaneshContext::Scope scope(ganesh_context_);
-    mojo::skia::GaneshTextureSurface texture_surface(scope, std::move(texture));
-
-    callback.Run(texture_surface.surface());
-
-    texture = texture_surface.TakeTexture();
-  }
+  mojo::skia::GaneshTextureSurface texture_surface(ganesh_scope,
+                                                   std::move(texture));
+  callback.Run(ganesh_scope, size, texture_surface.surface());
+  texture = texture_surface.TakeTexture();
 
   return gl_renderer_.BindTextureResource(
-      std::move(texture),
+      ganesh_scope.gl_scope(), std::move(texture),
       mojo::gfx::composition::MailboxTextureResource::Origin::TOP_LEFT);
+}
+
+mojo::gfx::composition::ResourcePtr GaneshRenderer::DrawSurface(
+    const mojo::Size& size,
+    const DrawSurfaceCallback& callback) {
+  if (ganesh_context_->is_lost())
+    return nullptr;
+  mojo::skia::GaneshContext::Scope ganesh_scope(ganesh_context_);
+  return DrawSurface(ganesh_scope, size, callback);
 }
 
 static void RunCanvasCallback(
     const mojo::ui::GaneshRenderer::DrawCanvasCallback& callback,
+    const mojo::skia::GaneshContext::Scope& ganesh_scope,
+    const mojo::Size& size,
     SkSurface* surface) {
-  callback.Run(surface->getCanvas());
+  callback.Run(ganesh_scope, size, surface->getCanvas());
+}
+
+mojo::gfx::composition::ResourcePtr GaneshRenderer::DrawCanvas(
+    const mojo::skia::GaneshContext::Scope& ganesh_scope,
+    const mojo::Size& size,
+    const DrawCanvasCallback& callback) {
+  return DrawSurface(ganesh_scope, size,
+                     base::Bind(&RunCanvasCallback, callback));
 }
 
 mojo::gfx::composition::ResourcePtr GaneshRenderer::DrawCanvas(
     const mojo::Size& size,
     const DrawCanvasCallback& callback) {
-  return DrawSurface(size, base::Bind(&RunCanvasCallback, callback));
+  if (ganesh_context_->is_lost())
+    return nullptr;
+  mojo::skia::GaneshContext::Scope ganesh_scope(ganesh_context_);
+  return DrawCanvas(ganesh_scope, size, callback);
 }
 
 }  // namespace ui
