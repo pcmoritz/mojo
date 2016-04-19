@@ -78,8 +78,11 @@ def GetSymbolMapping(lines):
     result = regex.search(line)
     if result:
       url = GetBasenameFromMojoApp(result.group(1))
-      mappings[os.path.normpath(result.group(2))] = GetSymboledNameForMojoApp(
-          url)
+      path = os.path.normpath(result.group(2))
+      name = GetSymboledNameForMojoApp(url)
+      mappings[path] = name
+      if path.startswith('/data/user/0/'):
+        mappings[path.replace('/data/user/0/', '/data/data/', 1)] = name
   return mappings
 
 
