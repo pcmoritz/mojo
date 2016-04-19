@@ -12,22 +12,21 @@
 //						[--src-root-path <path_to_src_root>]
 //						[--generators <generator_list>]
 //						[--no-gen-imports]
-//						[--gen-arg-<extra_parameter>...]
+//						[--gen-arg <extra_parameter>[=<value>]]
 //						<mojom_file>...
 //
 // <include_dirs> is the comma-separated list of directory paths to search for mojom imports.
 // <path_to_out> is the root directory in which generators should place generated files.
 // <path_to_src_root> is the path to the root of the source tree. The generators
 //	use this to compute the directory layout of the generated files.
-//	<generators> is a comma-separated list of generators to run. Each generator
+// <generators> is a comma-separated list of generators to run. Each generator
 //	should be the name of an executable that obeys the generator contract.
 //	These executables must be found on the *generator path*
 //	which is described below.
-// <extra_parameter> are passed to the generators. All extra parameters must
-//	start with the prefix --gen-arg. If you include --gen-arg-arg=value as a
-//	parameter to this command, --arg=value will be passed to the generators. If
-//	you include --gen-arg-generate-type-info as a parameter to this command,
-//	--generate-type-info will be passed to the generators.
+// --gen-arg is used to pass extra arguments to the generators. For example
+//  "--gen-arg generate-type-info" will cause the flag "--generate-type-info" to
+//  be passed to each of the generators and "--gen-arg debug-level=3" will cause
+//  --debug-level=3" to be passed to each of the generators.
 // <mojom_file>... is one or more paths to .mojom files to be parsed.
 //
 // If --no-gen-imports is specified, it is passed on to the generators. It tells
@@ -61,7 +60,6 @@ import (
 )
 
 const (
-	extraArgPrefix     = "--gen-arg-"
 	mojomGeneratorsEnv = "MOJOM_GENERATORS"
 )
 
@@ -76,13 +74,18 @@ func genCmd(args []string) {
 	outputDir := flagSet.String("output-dir", ".",
 		"output directory for generated files.")
 	srcRootPath := flagSet.String("src-root-path", ".",
-		"relative path to the root of the source tree.")
+		"relative path to the root of the source tree. The generators use the "+
+			"value of this argument to compute the directory layout of the generated files.")
 	noGenImports := flagSet.Bool("no-gen-imports", false,
 		"Generate code only for the files that are specified on the command line. "+
-			"By default, code is generated for all specified files and their transitive imports.")
+			"By default, code is generated for all specified files and their imports recursively.")
 	var generatorNames CommaSeparatedList
 	flagSet.Var(&generatorNames, "generators", "Comma-separated list of generators")
 	flagSet.SetOutput(ioutil.Discard)
+	var generatorArgs RepeatedStringArg
+	flagSet.Var(&generatorArgs, "gen-arg",
+		"Argument to be passed to the generators. Use more than once to pass more "+
+			"than one argument to the generators. (e.g. --gen-arg foo=bar --gen-arg blah)")
 
 	printUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s gen [-I <include_dirs>] "+
@@ -90,16 +93,19 @@ func genCmd(args []string) {
 			"[--src-root-path <path_to_src_root>] "+
 			"[--generators <generator_list>] "+
 			"[--no-gen-imports] "+
+			"[--gen-arg <generator_argument>[=<value>]] "+
 			"<mojom_file>\n\n", filepath.Base(args[0]))
+		fmt.Fprintf(os.Stderr, "The gen command parses a list of mojom files and "+
+			"runs code generators in order to emit generated bindings for the provided files.\n\n")
+		fmt.Fprintf(os.Stderr, "The generators specified on the command line should "+
+			"be the names of executables found on the *generator path*\n"+
+			"By default, the generator path is <directory_containing_mojom_tool>/generators.\n"+
+			"If the MOJOM_GENERATORS environment variable is set, it is assumed to contain "+
+			"a semicolon-separated list of absolute paths which are used as the generator path.\n\n")
 		fmt.Fprintf(os.Stderr, UsageString(flagSet))
-		fmt.Fprintf(os.Stderr, "Arguments with the --gen-arg- prefix will be passed "+
-			"to every generator. So for instance, to pass --arg=value, you would "+
-			"use --gen-arg-arg=value. To pass --arg, you would use --gen-arg-arg.\n")
 	}
 
-	// If err is not ErrHelp, the only way to figure out what it was is to look at
-	// the message provided for users.
-	if err := flagSet.Parse(args[2:]); err != nil && !strings.HasPrefix(err.Error(), "flag provided but not defined") {
+	if err := flagSet.Parse(args[2:]); err != nil {
 		if err != flag.ErrHelp {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
@@ -108,36 +114,25 @@ func genCmd(args []string) {
 	}
 	generatorPaths := findGeneratorPaths(mojomGenPaths(), generatorNames)
 
-	var fileNames []string
-	var extraArgs []string
-	for _, arg := range flagSet.Args() {
-		// TODO(azani): Implement generator-specific arguments.
-		if strings.HasPrefix(arg, extraArgPrefix) {
-			extraArgs = append(extraArgs, "--"+arg[len(extraArgPrefix):])
-		} else if strings.HasPrefix(arg, "--") {
-			// Catch unknown arguments.
-			fmt.Fprintf(os.Stderr, "Unrecognized argument %s.\n", arg)
-			printUsage()
-			os.Exit(1)
-		} else {
-			fileNames = append(fileNames, arg)
-		}
-	}
+	fileNames := flagSet.Args()
 
 	mojomBytes := parse(fileNames, importPaths, printUsage, false, false)
 
 	for _, generatorPath := range generatorPaths {
 		// Consider running the generators in parallel.
-		runGenerator(generatorPath, mojomBytes, *noGenImports, *srcRootPath, *outputDir, extraArgs)
+		runGenerator(generatorPath, mojomBytes, *noGenImports, *srcRootPath, *outputDir, generatorArgs)
 	}
 }
 
-func runGenerator(generatorPath string, mojomBytes []byte, noGenImports bool, srcRootPath string, outputDir string, extraArgs []string) {
+func runGenerator(generatorPath string, mojomBytes []byte, noGenImports bool, srcRootPath string, outputDir string, generatorArgs []string) {
 	var args []string
 	args = append(args, "--file-graph", "-")
 	args = append(args, "--output-dir", outputDir)
 	args = append(args, "--src-root-path", srcRootPath)
-	args = append(args, extraArgs...)
+	for _, generatorArg := range generatorArgs {
+		args = append(args, "--"+generatorArg)
+
+	}
 	if noGenImports {
 		args = append(args, "--no-gen-imports")
 	}

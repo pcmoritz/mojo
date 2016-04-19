@@ -29,6 +29,19 @@ func (l *CommaSeparatedList) Set(args string) error {
 	return nil
 }
 
+// RepeatedStringArg holds the result of parsing a string command-line argument
+// that can be repeated. This type satisfies the flag.Value interface.
+type RepeatedStringArg []string
+
+func (r *RepeatedStringArg) String() string {
+	return fmt.Sprintf("%v", *r)
+}
+
+func (r *RepeatedStringArg) Set(arg string) error {
+	*r = append(*r, arg)
+	return nil
+}
+
 // DirectoryList holds the result of parsing a command-line flag
 // that accepts a comma-separated list of directory paths. This
 // type satisfies the flag.Value interface.
