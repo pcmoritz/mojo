@@ -612,6 +612,12 @@ void DartController::InitVmIfNeeded(Dart_EntropySource entropy,
   flags.push_back("--enable_mirrors=false");
   // Force await and async to be keywords even outside of an async function.
   flags.push_back("--await_is_keyword");
+  // Enable background compilation
+  flags.push_back("--background_compilation=true");
+  // Disable code write protection
+  // TODO(johnmccutchan): This might be a security issue once Mojo gets a
+  // security sandbox. Revisit when that happens.
+  flags.push_back("--write_protect_code=false");
   // Add remaining flags.
   for (int i = 0; i < vm_flags_count; ++i) {
     flags.push_back(vm_flags[i]);
