@@ -22,29 +22,29 @@ enum class AddResult {
 // is used to compare type sets to see which represents the best goal for
 // conversion. Higher scores are preferred. A score of zero indicates that
 // in_type is incompatible with out_type_set.
-int Score(const LpcmStreamType& in_type,
-          const LpcmStreamTypeSet& out_type_set) {
+int Score(const AudioStreamType& in_type,
+          const AudioStreamTypeSet& out_type_set) {
   // TODO(dalesat): Plenty of room for more subtlety here. Maybe actually
   // measure conversion costs (cpu, quality, etc) and reflect them here.
 
   int score = 1;  // We can convert anything, so 1 is the minimum score.
 
   if (in_type.sample_format() == out_type_set.sample_format() ||
-      out_type_set.sample_format() == LpcmStreamType::SampleFormat::kAny) {
+      out_type_set.sample_format() == AudioStreamType::SampleFormat::kAny) {
     // Prefer not to convert sample format.
     score += 10;
   } else {
     // Prefer higher-quality formats.
     switch (out_type_set.sample_format()) {
-      case LpcmStreamType::SampleFormat::kUnsigned8:
+      case AudioStreamType::SampleFormat::kUnsigned8:
         break;
-      case LpcmStreamType::SampleFormat::kSigned16:
+      case AudioStreamType::SampleFormat::kSigned16:
         score += 1;
         break;
-      case LpcmStreamType::SampleFormat::kSigned24In32:
+      case AudioStreamType::SampleFormat::kSigned24In32:
         score += 2;
         break;
-      case LpcmStreamType::SampleFormat::kFloat:
+      case AudioStreamType::SampleFormat::kFloat:
         score += 3;
         break;
       default:
@@ -70,31 +70,24 @@ int Score(const LpcmStreamType& in_type,
   return score;
 }
 
-// Finds the media type set that best matches in_type.
+// Finds the stream type set that best matches in_type.
 const std::unique_ptr<StreamTypeSet>* FindBestLpcm(
-    const LpcmStreamType& in_type,
+    const AudioStreamType& in_type,
     const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets) {
   const std::unique_ptr<StreamTypeSet>* best = nullptr;
   int best_score = 0;
+
   for (const std::unique_ptr<StreamTypeSet>& out_type_set : out_type_sets) {
-    switch (out_type_set->scheme()) {
-      case StreamType::Scheme::kAnyElementary:
-      case StreamType::Scheme::kAnyAudio:
-      case StreamType::Scheme::kAny:
-        // Wildcard scheme allows any type without conversion.
-        return &out_type_set;
-      case StreamType::Scheme::kLpcm: {
-        int score = Score(in_type, *out_type_set->lpcm());
-        if (best_score < score) {
-          best_score = score;
-          best = &out_type_set;
-        }
-        break;
+    if (out_type_set->medium() == StreamType::Medium::kAudio &&
+        out_type_set->IncludesEncoding(StreamType::kAudioEncodingLpcm)) {
+      int score = Score(in_type, *out_type_set->audio());
+      if (best_score < score) {
+        best_score = score;
+        best = &out_type_set;
       }
-      default:
-        break;
     }
   }
+
   return best;
 }
 
@@ -103,7 +96,7 @@ const std::unique_ptr<StreamTypeSet>* FindBestLpcm(
 // (out_type_sets). If the call succeeds, *out_type is set to the new output
 // type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForCompressedAudio(
-    const CompressedAudioStreamType& in_type,
+    const AudioStreamType& in_type,
     const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
@@ -111,27 +104,17 @@ AddResult AddTransformsForCompressedAudio(
   DCHECK(out_type);
   DCHECK(graph);
 
-  // See if we have a matching COMPRESSED_AUDIO type.
+  // See if we have a matching audio type.
   for (const std::unique_ptr<StreamTypeSet>& out_type_set : out_type_sets) {
-    switch (out_type_set->scheme()) {
-      case StreamType::Scheme::kAnyElementary:
-      case StreamType::Scheme::kAnyAudio:
-      case StreamType::Scheme::kAny:
-        // Wildcard scheme allows any type without conversion.
+    if (out_type_set->medium() == StreamType::Medium::kAudio) {
+      if (out_type_set->audio()->contains(in_type)) {
+        // No transform needed.
         *out_type = in_type.Clone();
         return AddResult::kFinished;
-      case StreamType::Scheme::kCompressedAudio: {
-        if (out_type_set->compressed_audio()->contains(in_type)) {
-          // No transform needed.
-          *out_type = in_type.Clone();
-          return AddResult::kFinished;
-        }
-        break;
       }
-      default:
-        break;
+      // TODO(dalesat): Support a different compressed output type by
+      // transcoding.
     }
-    // TODO(dalesat): Support a different compressed output type by transcoding.
   }
 
   // Find the best LPCM output type.
@@ -143,7 +126,8 @@ AddResult AddTransformsForCompressedAudio(
     return AddResult::kFailed;
   }
 
-  DCHECK_EQ((*best)->scheme(), StreamType::Scheme::kLpcm);
+  DCHECK_EQ((*best)->medium(), StreamType::Medium::kAudio);
+  DCHECK((*best)->IncludesEncoding(StreamType::kAudioEncodingLpcm));
 
   // Need to decode. Create a decoder and go from there.
   std::shared_ptr<Decoder> decoder;
@@ -161,11 +145,11 @@ AddResult AddTransformsForCompressedAudio(
 }
 
 // Attempts to add transforms to the pipeline given an input LPCM stream type
-// (in_type) and the output lpcm stream type set for the type we need to convert
-// to (out_type_set). If the call succeeds, *out_type is set to the new output
-// type. Otherwise, *out_type is set to nullptr.
-AddResult AddTransformsForLpcm(const LpcmStreamType& in_type,
-                               const LpcmStreamTypeSet& out_type_set,
+// (in_type) and the output lpcm stream type set for the type we need to
+// convert to (out_type_set). If the call succeeds, *out_type is set to the new
+// output type. Otherwise, *out_type is set to nullptr.
+AddResult AddTransformsForLpcm(const AudioStreamType& in_type,
+                               const AudioStreamTypeSet& out_type_set,
                                Graph* graph,
                                OutputRef* output,
                                std::unique_ptr<StreamType>* out_type) {
@@ -175,7 +159,7 @@ AddResult AddTransformsForLpcm(const LpcmStreamType& in_type,
   // TODO(dalesat): Room for more intelligence here wrt transform ordering and
   // transforms that handle more than one conversion.
   if (in_type.sample_format() != out_type_set.sample_format() &&
-      out_type_set.sample_format() != LpcmStreamType::SampleFormat::kAny) {
+      out_type_set.sample_format() != AudioStreamType::SampleFormat::kAny) {
     *output =
         graph
             ->ConnectOutputToPart(*output, graph->Add(LpcmReformatter::Create(
@@ -198,8 +182,9 @@ AddResult AddTransformsForLpcm(const LpcmStreamType& in_type,
   }
 
   // Build the resulting media type.
-  *out_type = LpcmStreamType::Create(
-      out_type_set.sample_format() == LpcmStreamType::SampleFormat::kAny
+  *out_type = AudioStreamType::Create(
+      StreamType::kAudioEncodingLpcm, nullptr,
+      out_type_set.sample_format() == AudioStreamType::SampleFormat::kAny
           ? in_type.sample_format()
           : out_type_set.sample_format(),
       in_type.channels(), in_type.frames_per_second());
@@ -207,12 +192,12 @@ AddResult AddTransformsForLpcm(const LpcmStreamType& in_type,
   return AddResult::kFinished;
 }
 
-// Attempts to add transforms to the pipeline given an input media type with
-// scheme LPCM (in_type) and the set of output types we need to convert to
-// (out_type_sets). If the call succeeds, *out_type is set to the new output
-// type. Otherwise, *out_type is set to nullptr.
+// Attempts to add transforms to the pipeline given an input audio stream type
+// witn lpcm encoding (in_type) and the set of output types we need to convert
+// to (out_type_sets). If the call succeeds, *out_type is set to the new
+// output type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransformsForLpcm(
-    const LpcmStreamType& in_type,
+    const AudioStreamType& in_type,
     const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
     Graph* graph,
     OutputRef* output,
@@ -229,27 +214,16 @@ AddResult AddTransformsForLpcm(
     return AddResult::kFailed;
   }
 
-  switch ((*best)->scheme()) {
-    case StreamType::Scheme::kAnyElementary:
-    case StreamType::Scheme::kAnyAudio:
-    case StreamType::Scheme::kAny:
-      // Wildcard scheme allows any type without conversion.
-      *out_type = in_type.Clone();
-      return AddResult::kFinished;
-    case StreamType::Scheme::kLpcm:
-      return AddTransformsForLpcm(in_type, *(*best)->lpcm(), graph, output,
-                                  out_type);
-    default:
-      NOTREACHED() << "FindBestLpcm produced unexpected type set scheme"
-                   << (*best)->scheme();
-      return AddResult::kFailed;
-  }
+  DCHECK_EQ((*best)->medium(), StreamType::Medium::kAudio);
+
+  return AddTransformsForLpcm(in_type, *(*best)->audio(), graph, output,
+                              out_type);
 }
 
 // Attempts to add transforms to the pipeline given an input media type of any
-// scheme (in_type) and the set of output types we need to convert to
-// (out_type_sets). If the call succeeds, *out_type is set to the new output
-// type. Otherwise, *out_type is set to nullptr.
+// medium and encoding (in_type) and the set of output types we need to
+// convert to (out_type_sets). If the call succeeds, *out_type is set to the new
+// output type. Otherwise, *out_type is set to nullptr.
 AddResult AddTransforms(
     const StreamType& in_type,
     const std::vector<std::unique_ptr<StreamTypeSet>>& out_type_sets,
@@ -259,15 +233,17 @@ AddResult AddTransforms(
   DCHECK(graph);
   DCHECK(out_type);
 
-  switch (in_type.scheme()) {
-    case StreamType::Scheme::kLpcm:
-      return AddTransformsForLpcm(*in_type.lpcm(), out_type_sets, graph, output,
-                                  out_type);
-    case StreamType::Scheme::kCompressedAudio:
-      return AddTransformsForCompressedAudio(
-          *in_type.compressed_audio(), out_type_sets, graph, output, out_type);
+  switch (in_type.medium()) {
+    case StreamType::Medium::kAudio:
+      if (in_type.encoding() == StreamType::kAudioEncodingLpcm) {
+        return AddTransformsForLpcm(*in_type.audio(), out_type_sets, graph,
+                                    output, out_type);
+      } else {
+        return AddTransformsForCompressedAudio(*in_type.audio(), out_type_sets,
+                                               graph, output, out_type);
+      }
     default:
-      NOTREACHED() << "conversion not supported for scheme" << in_type.scheme();
+      NOTREACHED() << "conversion not supported for medium" << in_type.medium();
       *out_type = nullptr;
       return AddResult::kFailed;
   }

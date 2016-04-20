@@ -271,17 +271,18 @@ void PlayWAVApp::ProcessHTTPResponse(URLResponsePtr resp) {
   cfg->audio_frame_ratio = tmp.numerator;
   cfg->media_time_ratio  = tmp.denominator;
 
-  LpcmMediaTypeDetailsPtr pcm_cfg = LpcmMediaTypeDetails::New();
+  AudioMediaTypeDetailsPtr pcm_cfg = AudioMediaTypeDetails::New();
   pcm_cfg->sample_format = (wav_info_.bits_per_sample == 8)
-                         ? LpcmSampleFormat::UNSIGNED_8
-                         : LpcmSampleFormat::SIGNED_16;
+                         ? AudioSampleFormat::UNSIGNED_8
+                         : AudioSampleFormat::SIGNED_16;
   pcm_cfg->channels = wav_info_.channel_count;
   pcm_cfg->frames_per_second = wav_info_.frame_rate;
 
   cfg->media_type = MediaType::New();
-  cfg->media_type->scheme = MediaTypeScheme::LPCM;
+  cfg->media_type->medium = MediaTypeMedium::AUDIO;
   cfg->media_type->details = MediaTypeDetails::New();
-  cfg->media_type->details->set_lpcm(pcm_cfg.Pass());
+  cfg->media_type->details->set_audio(pcm_cfg.Pass());
+  cfg->media_type->encoding = MediaType::kAudioEncodingLpcm;
 
   // Configure the track based on the WAV header information.
   MediaConsumerPtr media_pipe;

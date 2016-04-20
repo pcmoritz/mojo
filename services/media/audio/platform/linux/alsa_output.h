@@ -21,7 +21,7 @@ class AlsaOutput : public StandardOutputBase {
   static AudioOutputPtr New(AudioOutputManager* manager);
   ~AlsaOutput() override;
 
-  MediaResult Configure(LpcmMediaTypeDetailsPtr config);
+  MediaResult Configure(AudioMediaTypeDetailsPtr config);
 
  protected:
   explicit AlsaOutput(AudioOutputManager* manager);
@@ -52,7 +52,7 @@ class AlsaOutput : public StandardOutputBase {
   // we are building for.
   MediaResult AlsaOpen();
   void AlsaClose();
-  MediaResult AlsaSelectFormat(const LpcmMediaTypeDetailsPtr& config);
+  MediaResult AlsaSelectFormat(const AudioMediaTypeDetailsPtr& config);
   int AlsaWrite(const void* data, uint32_t frames);
   int AlsaGetAvailDelay(uint32_t* avail, uint32_t* delay = nullptr);
   int AlsaRecover(int err_code);
@@ -77,4 +77,3 @@ class AlsaOutput : public StandardOutputBase {
 }  // namespace mojo
 
 #endif  // SERVICES_MEDIA_AUDIO_PLATFORM_LINUX_ALSA_OUTPUT_H_
-

@@ -27,27 +27,26 @@ class LpcmUtilImpl : public LpcmUtil {
                   size_t frame_count) const override;
 
  private:
-  LpcmUtilImpl(const LpcmStreamType& stream_type);
+  LpcmUtilImpl(const AudioStreamType& stream_type);
 
-  LpcmStreamType stream_type_;
+  AudioStreamType stream_type_;
 
   friend class LpcmUtil;
 };
 
-std::unique_ptr<LpcmUtil> LpcmUtil::Create(const LpcmStreamType& stream_type) {
+std::unique_ptr<LpcmUtil> LpcmUtil::Create(const AudioStreamType& stream_type) {
   LpcmUtil* result;
   switch (stream_type.sample_format()) {
-    case LpcmStreamType::SampleFormat::kUnsigned8:
-    case LpcmStreamType::SampleFormat::kAny:
+    case AudioStreamType::SampleFormat::kUnsigned8:
       result = new LpcmUtilImpl<uint8_t>(stream_type);
       break;
-    case LpcmStreamType::SampleFormat::kSigned16:
+    case AudioStreamType::SampleFormat::kSigned16:
       result = new LpcmUtilImpl<int16_t>(stream_type);
       break;
-    case LpcmStreamType::SampleFormat::kSigned24In32:
+    case AudioStreamType::SampleFormat::kSigned24In32:
       result = new LpcmUtilImpl<int32_t>(stream_type);
       break;
-    case LpcmStreamType::SampleFormat::kFloat:
+    case AudioStreamType::SampleFormat::kFloat:
       result = new LpcmUtilImpl<float>(stream_type);
       break;
     default:
@@ -61,7 +60,7 @@ std::unique_ptr<LpcmUtil> LpcmUtil::Create(const LpcmStreamType& stream_type) {
 }
 
 template <typename T>
-LpcmUtilImpl<T>::LpcmUtilImpl(const LpcmStreamType& stream_type)
+LpcmUtilImpl<T>::LpcmUtilImpl(const AudioStreamType& stream_type)
     : stream_type_(stream_type) {}
 
 template <typename T>

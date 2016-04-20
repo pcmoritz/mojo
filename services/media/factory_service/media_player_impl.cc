@@ -53,9 +53,8 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
       streams_.push_back(std::unique_ptr<Stream>(
           new Stream(streams_.size(), stream_type.Pass())));
       Stream& stream = *streams_.back();
-      switch (stream.media_type_->scheme) {
-        case MediaTypeScheme::COMPRESSED_AUDIO:
-        case MediaTypeScheme::LPCM:
+      switch (stream.media_type_->medium) {
+        case MediaTypeMedium::AUDIO:
           stream.enabled_ = true;
           PrepareStream(streams_.back(), "mojo:audio_server",
                         callback_joiner->NewCallback());
@@ -256,7 +255,7 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
 
   demux_->GetProducer(stream->index_, GetProxy(&stream->encoded_producer_));
 
-  if (stream->media_type_->scheme == MediaTypeScheme::COMPRESSED_AUDIO) {
+  if (stream->media_type_->encoding != MediaType::kAudioEncodingLpcm) {
     std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
     // Compressed audio. Insert a decoder in front of the sink. The sink would
@@ -287,7 +286,6 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
     // Uncompressed audio. Connect the demux stream directly to the sink. This
     // would work for compressed audio as well (the sink would decode), but we
     // want to test the decoder.
-    DCHECK(stream->media_type_->scheme == MediaTypeScheme::LPCM);
     stream->decoded_producer_ = stream->encoded_producer_.Pass();
     CreateSink(stream, stream->media_type_, url, callback);
   }

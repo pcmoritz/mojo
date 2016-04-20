@@ -16,10 +16,10 @@ namespace mojo {
 namespace media {
 
 class StreamType;
-class MultiplexedStreamType;
-class LpcmStreamType;
-class CompressedAudioStreamType;
+class AudioStreamType;
 class VideoStreamType;
+class TextStreamType;
+class SubpictureStreamType;
 
 class Bytes {
  public:
@@ -56,42 +56,46 @@ class Bytes {
 // Describes the type of a stream.
 class StreamType {
  public:
-  enum class Scheme {
-    kUnknown,
-    kNone,
-    kAnyElementary,
-    kAnyAudio,
-    kAnyVideo,
-    kAnySubpicture,
-    kAnyText,
-    kAnyMultiplexed,
-    kAny,
+  enum class Medium { kAudio, kVideo, kText, kSubpicture };
 
-    kMultiplexed,
-    kLpcm,
-    kCompressedAudio,
-    kVideo
-  };
+  static const char* kAudioEncodingLpcm;
+  static const char* kAudioEncodingVorbis;
+  static const char* kVideoEncodingUncompressed;
+  static const char* kVideoEncodingTheora;
 
-  static std::unique_ptr<StreamType> Create(Scheme scheme) {
-    return std::unique_ptr<StreamType>(new StreamType(scheme));
+  static std::unique_ptr<StreamType> Create(
+      Medium medium,
+      const std::string& encoding,
+      std::unique_ptr<Bytes> encoding_parameters) {
+    return std::unique_ptr<StreamType>(
+        new StreamType(medium, encoding, std::move(encoding_parameters)));
   }
 
-  explicit StreamType(Scheme scheme);
+  explicit StreamType(Medium medium,
+                      const std::string& encoding,
+                      std::unique_ptr<Bytes> encoding_parameters);
 
   virtual ~StreamType();
 
-  Scheme scheme() const { return scheme_; }
+  Medium medium() const { return medium_; }
 
-  virtual const MultiplexedStreamType* multiplexed() const;
-  virtual const LpcmStreamType* lpcm() const;
-  virtual const CompressedAudioStreamType* compressed_audio() const;
+  const std::string& encoding() const { return encoding_; }
+
+  const std::unique_ptr<Bytes>& encoding_parameters() const {
+    return encoding_parameters_;
+  }
+
+  virtual const AudioStreamType* audio() const;
   virtual const VideoStreamType* video() const;
+  virtual const TextStreamType* text() const;
+  virtual const SubpictureStreamType* subpicture() const;
 
   virtual std::unique_ptr<StreamType> Clone() const;
 
  private:
-  Scheme scheme_;
+  Medium medium_;
+  std::string encoding_;
+  std::unique_ptr<Bytes> encoding_parameters_;
 };
 
 template <typename T>
@@ -107,113 +111,47 @@ struct Range {
 };
 
 class StreamTypeSet;
-class MultiplexedStreamTypeSet;
-class LpcmStreamTypeSet;
-class CompressedAudioStreamTypeSet;
+class AudioStreamTypeSet;
 class VideoStreamTypeSet;
+class TextStreamTypeSet;
+class SubpictureStreamTypeSet;
 
 // Describes a set of possible stream types.
 class StreamTypeSet {
  public:
-  static std::unique_ptr<StreamTypeSet> Create(StreamType::Scheme scheme) {
-    return std::unique_ptr<StreamTypeSet>(new StreamTypeSet(scheme));
+  static std::unique_ptr<StreamTypeSet> Create(
+      StreamType::Medium medium,
+      const std::vector<std::string>& encodings) {
+    return std::unique_ptr<StreamTypeSet>(new StreamTypeSet(medium, encodings));
   }
 
-  StreamTypeSet(StreamType::Scheme scheme);
+  StreamTypeSet(StreamType::Medium medium,
+                const std::vector<std::string>& encodings);
 
   virtual ~StreamTypeSet();
 
-  StreamType::Scheme scheme() const { return scheme_; }
+  StreamType::Medium medium() const { return medium_; }
 
-  virtual const MultiplexedStreamTypeSet* multiplexed() const;
-  virtual const LpcmStreamTypeSet* lpcm() const;
-  virtual const CompressedAudioStreamTypeSet* compressed_audio() const;
+  const std::vector<std::string>& encodings() const { return encodings_; }
+
+  virtual const AudioStreamTypeSet* audio() const;
   virtual const VideoStreamTypeSet* video() const;
+  virtual const TextStreamTypeSet* text() const;
+  virtual const SubpictureStreamTypeSet* subpicture() const;
 
   virtual std::unique_ptr<StreamTypeSet> Clone() const;
 
- private:
-  StreamType::Scheme scheme_;
-};
-
-// Describes the type of a multiplexed stream.
-class MultiplexedStreamType : public StreamType {
- public:
-  static std::unique_ptr<StreamType> Create(
-      std::unique_ptr<StreamType> multiplex_type,
-      std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>
-          substream_types) {
-    return std::unique_ptr<StreamType>(new MultiplexedStreamType(
-        std::move(multiplex_type), std::move(substream_types)));
-  }
-
-  MultiplexedStreamType(
-      std::unique_ptr<StreamType> multiplex_type,
-      std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>
-          substream_types);
-
-  ~MultiplexedStreamType() override;
-
-  const MultiplexedStreamType* multiplexed() const override;
-
-  const std::unique_ptr<StreamType>& multiplex_type() const {
-    return multiplex_type_;
-  }
-
-  const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>&
-  substream_types() const {
-    return substream_types_;
-  }
-
-  std::unique_ptr<StreamType> Clone() const override;
+  bool IncludesEncoding(const std::string encoding);
 
  private:
-  std::unique_ptr<StreamType> multiplex_type_;
-  std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> substream_types_;
+  StreamType::Medium medium_;
+  std::vector<std::string> encodings_;
 };
 
-// Describes the type of a multiplexed stream.
-class MultiplexedStreamTypeSet : public StreamTypeSet {
- public:
-  static std::unique_ptr<StreamTypeSet> Create(
-      std::unique_ptr<StreamTypeSet> multiplex_type_set,
-      std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
-          substream_type_sets) {
-    return std::unique_ptr<StreamTypeSet>(new MultiplexedStreamTypeSet(
-        std::move(multiplex_type_set), std::move(substream_type_sets)));
-  }
-
-  MultiplexedStreamTypeSet(
-      std::unique_ptr<StreamTypeSet> multiplex_type_set,
-      std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
-          substream_type_sets);
-
-  ~MultiplexedStreamTypeSet() override;
-
-  const MultiplexedStreamTypeSet* multiplexed() const override;
-
-  const std::unique_ptr<StreamTypeSet>& multiplex_type_set() const {
-    return multiplex_type_set_;
-  }
-
-  const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
-  substream_type_sets() const {
-    return substream_type_sets_;
-  }
-
-  std::unique_ptr<StreamTypeSet> Clone() const override;
-
- private:
-  std::unique_ptr<StreamTypeSet> multiplex_type_set_;
-  std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>
-      substream_type_sets_;
-};
-
-// Describes the type of an LPCM stream.
-class LpcmStreamType : public StreamType {
+// Describes the type of an audio stream.
+class AudioStreamType : public StreamType {
  public:
   enum class SampleFormat {
-    kUnknown,
     kAny,
     kUnsigned8,
     kSigned16,
@@ -221,20 +159,28 @@ class LpcmStreamType : public StreamType {
     kFloat
   };
 
-  static std::unique_ptr<StreamType> Create(SampleFormat sample_format,
-                                            uint32_t channels,
-                                            uint32_t frames_per_second) {
+  static std::unique_ptr<StreamType> Create(
+      const std::string& encoding,
+      std::unique_ptr<Bytes> encoding_parameters,
+      SampleFormat sample_format,
+      uint32_t channels,
+      uint32_t frames_per_second) {
     return std::unique_ptr<StreamType>(
-        new LpcmStreamType(sample_format, channels, frames_per_second));
+        new AudioStreamType(encoding, std::move(encoding_parameters),
+                            sample_format, channels, frames_per_second));
   }
 
-  LpcmStreamType(SampleFormat sample_format,
-                 uint32_t channels,
-                 uint32_t frames_per_second);
+  AudioStreamType(const std::string& encoding,
+                  std::unique_ptr<Bytes> encoding_parameters,
+                  SampleFormat sample_format,
+                  uint32_t channels,
+                  uint32_t frames_per_second);
 
-  ~LpcmStreamType() override;
+  AudioStreamType(const AudioStreamType& other);
 
-  const LpcmStreamType* lpcm() const override;
+  ~AudioStreamType() override;
+
+  const AudioStreamType* audio() const override;
 
   SampleFormat sample_format() const { return sample_format_; }
 
@@ -260,12 +206,6 @@ class LpcmStreamType : public StreamType {
 
   std::unique_ptr<StreamType> Clone() const override;
 
- protected:
-  LpcmStreamType(Scheme scheme,
-                 SampleFormat sample_format,
-                 uint32_t channels,
-                 uint32_t frames_per_second);
-
  private:
   SampleFormat sample_format_;
   uint32_t channels_;
@@ -273,130 +213,46 @@ class LpcmStreamType : public StreamType {
   uint32_t sample_size_;
 };
 
-// Describes a set of LPCM stream types.
-class LpcmStreamTypeSet : public StreamTypeSet {
+// Describes a set of audio stream types.
+class AudioStreamTypeSet : public StreamTypeSet {
  public:
   static std::unique_ptr<StreamTypeSet> Create(
-      LpcmStreamType::SampleFormat sample_format,
+      const std::vector<std::string>& encodings,
+      AudioStreamType::SampleFormat sample_format,
       Range<uint32_t> channels,
       Range<uint32_t> frames_per_second) {
-    return std::unique_ptr<StreamTypeSet>(
-        new LpcmStreamTypeSet(sample_format, channels, frames_per_second));
+    return std::unique_ptr<StreamTypeSet>(new AudioStreamTypeSet(
+        encodings, sample_format, channels, frames_per_second));
   }
 
-  LpcmStreamTypeSet(LpcmStreamType::SampleFormat sample_format,
-                    Range<uint32_t> channels,
-                    Range<uint32_t> frames_per_second);
+  AudioStreamTypeSet(const std::vector<std::string>& encodings,
+                     AudioStreamType::SampleFormat sample_format,
+                     Range<uint32_t> channels,
+                     Range<uint32_t> frames_per_second);
 
-  ~LpcmStreamTypeSet() override;
+  ~AudioStreamTypeSet() override;
 
-  const LpcmStreamTypeSet* lpcm() const override;
+  const AudioStreamTypeSet* audio() const override;
 
-  LpcmStreamType::SampleFormat sample_format() const { return sample_format_; }
+  AudioStreamType::SampleFormat sample_format() const { return sample_format_; }
 
   Range<uint32_t> channels() const { return channels_; }
 
   Range<uint32_t> frames_per_second() const { return frames_per_second_; }
 
-  bool contains(const LpcmStreamType& type) const;
+  bool contains(const AudioStreamType& type) const;
 
   std::unique_ptr<StreamTypeSet> Clone() const override;
 
- protected:
-  LpcmStreamTypeSet(StreamType::Scheme scheme,
-                    LpcmStreamType::SampleFormat sample_format,
-                    Range<uint32_t> channels,
-                    Range<uint32_t> frames_per_second);
-
  private:
-  LpcmStreamType::SampleFormat sample_format_;
+  AudioStreamType::SampleFormat sample_format_;
   Range<uint32_t> channels_;
   Range<uint32_t> frames_per_second_;
-};
-
-// Describes the type of a compressed audio stream.
-class CompressedAudioStreamType : public LpcmStreamType {
- public:
-  enum class AudioEncoding { kUnknown, kAny, kVorbis };
-
-  static std::unique_ptr<StreamType> Create(
-      AudioEncoding encoding,
-      SampleFormat sample_format,
-      uint32_t channels,
-      uint32_t frames_per_second,
-      std::unique_ptr<Bytes> encoding_details) {
-    return std::unique_ptr<StreamType>(new CompressedAudioStreamType(
-        encoding, sample_format, channels, frames_per_second,
-        std::move(encoding_details)));
-  }
-
-  CompressedAudioStreamType(AudioEncoding encoding,
-                            SampleFormat sample_format,
-                            uint32_t channels,
-                            uint32_t frames_per_second,
-                            std::unique_ptr<Bytes> encoding_details);
-
-  ~CompressedAudioStreamType() override;
-
-  const CompressedAudioStreamType* compressed_audio() const override;
-
-  AudioEncoding encoding() const { return encoding_; }
-
-  const std::unique_ptr<Bytes>& encoding_details() const {
-    return encoding_details_;
-  }
-
-  std::unique_ptr<StreamType> Clone() const override;
-
- private:
-  AudioEncoding encoding_;
-  std::unique_ptr<Bytes> encoding_details_;
-};
-
-// Describes a set of compressed audio stream types.
-class CompressedAudioStreamTypeSet : public LpcmStreamTypeSet {
- public:
-  static std::unique_ptr<StreamTypeSet> Create(
-      CompressedAudioStreamType::AudioEncoding encoding,
-      CompressedAudioStreamType::SampleFormat sample_format,
-      Range<uint32_t> channels,
-      Range<uint32_t> frames_per_second) {
-    return std::unique_ptr<StreamTypeSet>(new CompressedAudioStreamTypeSet(
-        encoding, sample_format, channels, frames_per_second));
-  }
-
-  CompressedAudioStreamTypeSet(
-      CompressedAudioStreamType::AudioEncoding encoding,
-      CompressedAudioStreamType::SampleFormat sample_format,
-      Range<uint32_t> channels,
-      Range<uint32_t> frames_per_second);
-
-  ~CompressedAudioStreamTypeSet() override;
-
-  const CompressedAudioStreamTypeSet* compressed_audio() const override;
-
-  CompressedAudioStreamType::AudioEncoding encoding() const {
-    return encoding_;
-  }
-
-  bool contains(const CompressedAudioStreamType& type) const;
-
-  std::unique_ptr<StreamTypeSet> Clone() const override;
-
- private:
-  CompressedAudioStreamType::AudioEncoding encoding_;
 };
 
 // Describes the type of a video stream.
 class VideoStreamType : public StreamType {
  public:
-  enum class VideoEncoding {
-    kUnknown,
-    kAny,
-    kTheora,
-    kVp8,
-  };
-
   enum class VideoProfile {
     kUnknown,
     kNotApplicable,
@@ -441,35 +297,33 @@ class VideoStreamType : public StreamType {
   };
 
   static std::unique_ptr<StreamType> Create(
-      VideoEncoding encoding,
+      const std::string& encoding,
+      std::unique_ptr<Bytes> encoding_parameters,
       VideoProfile profile,
       PixelFormat pixel_format,
       ColorSpace color_space,
       uint32_t width,
       uint32_t height,
       uint32_t coded_width,
-      uint32_t coded_height,
-      std::unique_ptr<Bytes> encoding_details) {
+      uint32_t coded_height) {
     return std::unique_ptr<StreamType>(new VideoStreamType(
-        encoding, profile, pixel_format, color_space, width, height,
-        coded_width, coded_height, std::move(encoding_details)));
+        encoding, std::move(encoding_parameters), profile, pixel_format,
+        color_space, width, height, coded_width, coded_height));
   }
 
-  VideoStreamType(VideoEncoding encoding,
+  VideoStreamType(const std::string& encoding,
+                  std::unique_ptr<Bytes> encoding_parameters,
                   VideoProfile profile,
                   PixelFormat pixel_format,
                   ColorSpace color_space,
                   uint32_t width,
                   uint32_t height,
                   uint32_t coded_width,
-                  uint32_t coded_height,
-                  std::unique_ptr<Bytes> encoding_details);
+                  uint32_t coded_height);
 
   ~VideoStreamType() override;
 
   const VideoStreamType* video() const override;
-
-  VideoEncoding encoding() const { return encoding_; }
 
   VideoProfile profile() const { return profile_; }
 
@@ -485,14 +339,9 @@ class VideoStreamType : public StreamType {
 
   uint32_t coded_height() const { return coded_height_; }
 
-  const std::unique_ptr<Bytes>& encoding_details() const {
-    return encoding_details_;
-  }
-
   std::unique_ptr<StreamType> Clone() const override;
 
  private:
-  VideoEncoding encoding_;
   VideoProfile profile_;
   PixelFormat pixel_format_;
   ColorSpace color_space_;
@@ -500,29 +349,26 @@ class VideoStreamType : public StreamType {
   uint32_t height_;
   uint32_t coded_width_;
   uint32_t coded_height_;
-  std::unique_ptr<Bytes> encoding_details_;
 };
 
 // Describes a set of video stream types.
 class VideoStreamTypeSet : public StreamTypeSet {
  public:
   static std::unique_ptr<StreamTypeSet> Create(
-      VideoStreamType::VideoEncoding encoding,
+      const std::vector<std::string>& encodings,
       Range<uint32_t> width,
       Range<uint32_t> height) {
     return std::unique_ptr<StreamTypeSet>(
-        new VideoStreamTypeSet(encoding, width, height));
+        new VideoStreamTypeSet(encodings, width, height));
   }
 
-  VideoStreamTypeSet(VideoStreamType::VideoEncoding encoding,
+  VideoStreamTypeSet(const std::vector<std::string>& encodings,
                      Range<uint32_t> width,
                      Range<uint32_t> height);
 
   ~VideoStreamTypeSet() override;
 
   const VideoStreamTypeSet* video() const override;
-
-  VideoStreamType::VideoEncoding encoding() const { return encoding_; }
 
   Range<uint32_t> width() const { return width_; }
 
@@ -531,9 +377,83 @@ class VideoStreamTypeSet : public StreamTypeSet {
   std::unique_ptr<StreamTypeSet> Clone() const override;
 
  private:
-  VideoStreamType::VideoEncoding encoding_;
   Range<uint32_t> width_;
   Range<uint32_t> height_;
+};
+
+// Describes the type of a text stream.
+class TextStreamType : public StreamType {
+ public:
+  static std::unique_ptr<StreamType> Create(
+      const std::string& encoding,
+      std::unique_ptr<Bytes> encoding_parameters) {
+    return std::unique_ptr<StreamType>(
+        new TextStreamType(encoding, std::move(encoding_parameters)));
+  }
+
+  TextStreamType(const std::string& encoding,
+                 std::unique_ptr<Bytes> encoding_parameters);
+
+  ~TextStreamType() override;
+
+  const TextStreamType* text() const override;
+
+  std::unique_ptr<StreamType> Clone() const override;
+};
+
+// Describes a set of text stream types.
+class TextStreamTypeSet : public StreamTypeSet {
+ public:
+  static std::unique_ptr<StreamTypeSet> Create(
+      const std::vector<std::string>& encodings) {
+    return std::unique_ptr<StreamTypeSet>(new TextStreamTypeSet(encodings));
+  }
+
+  TextStreamTypeSet(const std::vector<std::string>& encodings);
+
+  ~TextStreamTypeSet() override;
+
+  const TextStreamTypeSet* text() const override;
+
+  std::unique_ptr<StreamTypeSet> Clone() const override;
+};
+
+// Describes the type of a subpicture stream.
+class SubpictureStreamType : public StreamType {
+ public:
+  static std::unique_ptr<StreamType> Create(
+      const std::string& encoding,
+      std::unique_ptr<Bytes> encoding_parameters) {
+    return std::unique_ptr<StreamType>(
+        new SubpictureStreamType(encoding, std::move(encoding_parameters)));
+  }
+
+  SubpictureStreamType(const std::string& encoding,
+                       std::unique_ptr<Bytes> encoding_parameters);
+
+  ~SubpictureStreamType() override;
+
+  const SubpictureStreamType* subpicture() const override;
+
+  std::unique_ptr<StreamType> Clone() const override;
+};
+
+// Describes a set of subpicture stream types.
+class SubpictureStreamTypeSet : public StreamTypeSet {
+ public:
+  static std::unique_ptr<StreamTypeSet> Create(
+      const std::vector<std::string>& encodings) {
+    return std::unique_ptr<StreamTypeSet>(
+        new SubpictureStreamTypeSet(encodings));
+  }
+
+  SubpictureStreamTypeSet(const std::vector<std::string>& encodings);
+
+  ~SubpictureStreamTypeSet() override;
+
+  const SubpictureStreamTypeSet* subpicture() const override;
+
+  std::unique_ptr<StreamTypeSet> Clone() const override;
 };
 
 }  // namespace media

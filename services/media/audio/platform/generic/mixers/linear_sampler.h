@@ -15,8 +15,8 @@ namespace mixers {
 
 class LinearSampler : public Mixer {
  public:
-  static MixerPtr Select(const LpcmMediaTypeDetailsPtr& src_format,
-                         const LpcmMediaTypeDetailsPtr& dst_format);
+  static MixerPtr Select(const AudioMediaTypeDetailsPtr& src_format,
+                         const AudioMediaTypeDetailsPtr& dst_format);
 
  protected:
   LinearSampler(uint32_t pos_filter_width, uint32_t neg_filter_width)

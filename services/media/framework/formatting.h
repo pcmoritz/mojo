@@ -50,12 +50,8 @@ inline std::ostream& outdent(std::ostream& os) {
 std::ostream& operator<<(std::ostream& os, Result value);
 std::ostream& operator<<(std::ostream& os, Demand value);
 std::ostream& operator<<(std::ostream& os, const PacketPtr& value);
-std::ostream& operator<<(std::ostream& os, StreamType::Scheme value);
-std::ostream& operator<<(std::ostream& os, LpcmStreamType::SampleFormat value);
-std::ostream& operator<<(std::ostream& os,
-                         CompressedAudioStreamType::AudioEncoding value);
-std::ostream& operator<<(std::ostream& os,
-                         VideoStreamType::VideoEncoding value);
+std::ostream& operator<<(std::ostream& os, StreamType::Medium value);
+std::ostream& operator<<(std::ostream& os, AudioStreamType::SampleFormat value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::VideoProfile value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::PixelFormat value);
 std::ostream& operator<<(std::ostream& os, VideoStreamType::ColorSpace value);
@@ -80,6 +76,22 @@ std::ostream& operator<<(
 std::ostream& operator<<(
     std::ostream& os,
     const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>& value);
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& value) {
+  if (value.size() == 0) {
+    return os << "<empty>" << std::endl;
+  } else {
+    os << std::endl;
+  }
+
+  int index = 0;
+  for (const T& element : value) {
+    os << begl << "[" << index++ << "] " << element;
+  }
+
+  return os;
+}
 
 }  // namespace media
 }  // namespace mojo

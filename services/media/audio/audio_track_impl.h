@@ -50,7 +50,7 @@ class AudioTrackImpl : public AudioTrack {
   }
 
   uint32_t BytesPerFrame() const { return bytes_per_frame_; }
-  const LpcmMediaTypeDetailsPtr& Format() const { return format_; }
+  const AudioMediaTypeDetailsPtr& Format() const { return format_; }
   float DbGain() const { return db_gain_; }
 
  private:
@@ -83,7 +83,7 @@ class AudioTrackImpl : public AudioTrack {
   RateControlBase           rate_control_;
   LinearTransform::Ratio    frame_to_media_ratio_;
   uint32_t                  bytes_per_frame_ = 1;
-  LpcmMediaTypeDetailsPtr   format_;
+  AudioMediaTypeDetailsPtr  format_;
   AudioTrackToOutputLinkSet outputs_;
   float                     db_gain_ = 0.0;
 };

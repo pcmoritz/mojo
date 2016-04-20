@@ -3,10 +3,21 @@
 // found in the LICENSE file.
 
 #include "services/media/framework_mojo/mojo_type_conversions.h"
-#include "third_party/modp_b64/modp_b64.h"
 
 namespace mojo {
 namespace media {
+
+namespace {
+
+bool KnownEncodingsMatch() {
+  return StreamType::kAudioEncodingLpcm == MediaType::kAudioEncodingLpcm &&
+         StreamType::kAudioEncodingVorbis == MediaType::kAudioEncodingVorbis &&
+         StreamType::kVideoEncodingUncompressed ==
+             MediaType::kVideoEncodingUncompressed &&
+         StreamType::kVideoEncodingTheora == MediaType::kVideoEncodingTheora;
+}
+
+}  // namespace
 
 Result ConvertResult(MojoResult mojo_result) {
   switch (mojo_result) {
@@ -68,80 +79,36 @@ Result Convert(MediaResult media_result) {
   return Result::kUnknownError;
 }
 
-StreamType::Scheme Convert(MediaTypeScheme media_type_scheme) {
-  switch (media_type_scheme) {
-    case MediaTypeScheme::UNKNOWN:
-      return StreamType::Scheme::kUnknown;
-    case MediaTypeScheme::NONE:
-      return StreamType::Scheme::kNone;
-    case MediaTypeScheme::ANY_ELEMENTARY:
-      return StreamType::Scheme::kAnyElementary;
-    case MediaTypeScheme::ANY_AUDIO:
-      return StreamType::Scheme::kAnyAudio;
-    case MediaTypeScheme::ANY_VIDEO:
-      return StreamType::Scheme::kAnyVideo;
-    case MediaTypeScheme::ANY_SUBPICTURE:
-      return StreamType::Scheme::kAnySubpicture;
-    case MediaTypeScheme::ANY_TEXT:
-      return StreamType::Scheme::kAnyText;
-    case MediaTypeScheme::ANY_MULTIPLEXED:
-      return StreamType::Scheme::kAnyMultiplexed;
-    case MediaTypeScheme::ANY:
-      return StreamType::Scheme::kAny;
-    case MediaTypeScheme::MULTIPLEXED:
-      return StreamType::Scheme::kMultiplexed;
-    case MediaTypeScheme::LPCM:
-      return StreamType::Scheme::kLpcm;
-    case MediaTypeScheme::COMPRESSED_AUDIO:
-      return StreamType::Scheme::kCompressedAudio;
-    case MediaTypeScheme::VIDEO:
-      return StreamType::Scheme::kVideo;
+StreamType::Medium Convert(MediaTypeMedium media_type_medium) {
+  switch (media_type_medium) {
+    case MediaTypeMedium::AUDIO:
+      return StreamType::Medium::kAudio;
+    case MediaTypeMedium::VIDEO:
+      return StreamType::Medium::kVideo;
+    case MediaTypeMedium::TEXT:
+      return StreamType::Medium::kText;
+    case MediaTypeMedium::SUBPICTURE:
+      return StreamType::Medium::kSubpicture;
   }
-  return StreamType::Scheme::kUnknown;
+  LOG(ERROR) << "unrecognized medium";
+  abort();
 }
 
-LpcmStreamType::SampleFormat Convert(LpcmSampleFormat lpcm_sample_format) {
-  switch (lpcm_sample_format) {
-    case LpcmSampleFormat::UNKNOWN:
-      return LpcmStreamType::SampleFormat::kUnknown;
-    case LpcmSampleFormat::ANY:
-      return LpcmStreamType::SampleFormat::kAny;
-    case LpcmSampleFormat::UNSIGNED_8:
-      return LpcmStreamType::SampleFormat::kUnsigned8;
-    case LpcmSampleFormat::SIGNED_16:
-      return LpcmStreamType::SampleFormat::kSigned16;
-    case LpcmSampleFormat::SIGNED_24_IN_32:
-      return LpcmStreamType::SampleFormat::kSigned24In32;
-    case LpcmSampleFormat::FLOAT:
-      return LpcmStreamType::SampleFormat::kFloat;
+AudioStreamType::SampleFormat Convert(AudioSampleFormat audio_sample_format) {
+  switch (audio_sample_format) {
+    case AudioSampleFormat::ANY:
+      return AudioStreamType::SampleFormat::kAny;
+    case AudioSampleFormat::UNSIGNED_8:
+      return AudioStreamType::SampleFormat::kUnsigned8;
+    case AudioSampleFormat::SIGNED_16:
+      return AudioStreamType::SampleFormat::kSigned16;
+    case AudioSampleFormat::SIGNED_24_IN_32:
+      return AudioStreamType::SampleFormat::kSigned24In32;
+    case AudioSampleFormat::FLOAT:
+      return AudioStreamType::SampleFormat::kFloat;
   }
-  return LpcmStreamType::SampleFormat::kUnknown;
-}
-
-CompressedAudioStreamType::AudioEncoding Convert(AudioEncoding audio_encoding) {
-  switch (audio_encoding) {
-    case AudioEncoding::UNKNOWN:
-      return CompressedAudioStreamType::AudioEncoding::kUnknown;
-    case AudioEncoding::ANY:
-      return CompressedAudioStreamType::AudioEncoding::kAny;
-    case AudioEncoding::VORBIS:
-      return CompressedAudioStreamType::AudioEncoding::kVorbis;
-  }
-  return CompressedAudioStreamType::AudioEncoding::kUnknown;
-}
-
-VideoStreamType::VideoEncoding Convert(VideoEncoding video_encoding) {
-  switch (video_encoding) {
-    case VideoEncoding::UNKNOWN:
-      return VideoStreamType::VideoEncoding::kUnknown;
-    case VideoEncoding::ANY:
-      return VideoStreamType::VideoEncoding::kAny;
-    case VideoEncoding::THEORA:
-      return VideoStreamType::VideoEncoding::kTheora;
-    case VideoEncoding::VP8:
-      return VideoStreamType::VideoEncoding::kVp8;
-  }
-  return VideoStreamType::VideoEncoding::kUnknown;
+  LOG(ERROR) << "unrecognized sample format";
+  abort();
 }
 
 VideoStreamType::VideoProfile Convert(VideoProfile video_profile) {
@@ -173,7 +140,8 @@ VideoStreamType::VideoProfile Convert(VideoProfile video_profile) {
     case VideoProfile::H264_MULTIVIEW_HIGH:
       return VideoStreamType::VideoProfile::kH264MultiviewHigh;
   }
-  return VideoStreamType::VideoProfile::kUnknown;
+  LOG(ERROR);
+  abort();
 }
 
 VideoStreamType::PixelFormat Convert(PixelFormat pixel_format) {
@@ -231,41 +199,35 @@ VideoStreamType::ColorSpace Convert(ColorSpace color_space) {
 }
 
 std::unique_ptr<StreamType> Convert(const MediaTypePtr& media_type) {
+  DCHECK(KnownEncodingsMatch());
+
   if (!media_type) {
     return nullptr;
   }
 
-  switch (media_type->scheme) {
-    case MediaTypeScheme::MULTIPLEXED:
-      return MultiplexedStreamType::Create(
-          Convert(media_type->details->get_multiplexed()->multiplex_type),
-          Convert(media_type->details->get_multiplexed()->substream_types));
-    case MediaTypeScheme::LPCM:
-      return LpcmStreamType::Create(
-          Convert(media_type->details->get_lpcm()->sample_format),
-          media_type->details->get_lpcm()->channels,
-          media_type->details->get_lpcm()->frames_per_second);
-    case MediaTypeScheme::COMPRESSED_AUDIO:
-      return CompressedAudioStreamType::Create(
-          Convert(media_type->details->get_compressed_audio()->encoding),
-          Convert(media_type->details->get_compressed_audio()->sample_format),
-          media_type->details->get_compressed_audio()->channels,
-          media_type->details->get_compressed_audio()->frames_per_second,
-          Convert(
-              media_type->details->get_compressed_audio()->extra_data_base64));
-    case MediaTypeScheme::VIDEO:
+  switch (media_type->medium) {
+    case MediaTypeMedium::AUDIO:
+      return AudioStreamType::Create(
+          media_type->encoding, Convert(media_type->encoding_parameters),
+          Convert(media_type->details->get_audio()->sample_format),
+          media_type->details->get_audio()->channels,
+          media_type->details->get_audio()->frames_per_second);
+    case MediaTypeMedium::VIDEO:
       return VideoStreamType::Create(
-          Convert(media_type->details->get_video()->encoding),
+          media_type->encoding, Convert(media_type->encoding_parameters),
           Convert(media_type->details->get_video()->profile),
           Convert(media_type->details->get_video()->pixel_format),
           Convert(media_type->details->get_video()->color_space),
           media_type->details->get_video()->width,
           media_type->details->get_video()->height,
           media_type->details->get_video()->coded_width,
-          media_type->details->get_video()->coded_height,
-          Convert(media_type->details->get_video()->extra_data_base64));
-    default:
-      return StreamType::Create(Convert(media_type->scheme));
+          media_type->details->get_video()->coded_height);
+    case MediaTypeMedium::TEXT:
+      return TextStreamType::Create(media_type->encoding,
+                                    Convert(media_type->encoding_parameters));
+    case MediaTypeMedium::SUBPICTURE:
+      return SubpictureStreamType::Create(
+          media_type->encoding, Convert(media_type->encoding_parameters));
   }
   return nullptr;
 }
@@ -286,44 +248,35 @@ std::unique_ptr<std::vector<std::unique_ptr<StreamType>>> Convert(
 }
 
 std::unique_ptr<StreamTypeSet> Convert(const MediaTypeSetPtr& media_type_set) {
+  DCHECK(KnownEncodingsMatch());
+
   if (!media_type_set) {
     return nullptr;
   }
 
-  switch (media_type_set->scheme) {
-    case MediaTypeScheme::MULTIPLEXED:
-      return MultiplexedStreamTypeSet::Create(
-          Convert(
-              media_type_set->details->get_multiplexed()->multiplex_type_set),
-          Convert(
-              media_type_set->details->get_multiplexed()->substream_type_sets));
-    case MediaTypeScheme::LPCM:
-      return LpcmStreamTypeSet::Create(
-          Convert(media_type_set->details->get_lpcm()->sample_format),
-          Range<uint32_t>(media_type_set->details->get_lpcm()->min_channels,
-                          media_type_set->details->get_lpcm()->max_channels),
+  switch (media_type_set->medium) {
+    case MediaTypeMedium::AUDIO:
+      return AudioStreamTypeSet::Create(
+          media_type_set->encodings.To<std::vector<std::string>>(),
+          Convert(media_type_set->details->get_audio()->sample_format),
+          Range<uint32_t>(media_type_set->details->get_audio()->min_channels,
+                          media_type_set->details->get_audio()->max_channels),
           Range<uint32_t>(
-              media_type_set->details->get_lpcm()->min_frames_per_second,
-              media_type_set->details->get_lpcm()->max_frames_per_second));
-    case MediaTypeScheme::COMPRESSED_AUDIO:
-      return CompressedAudioStreamTypeSet::Create(
-          Convert(media_type_set->details->get_compressed_audio()->encoding),
-          Convert(
-              media_type_set->details->get_compressed_audio()->sample_format),
-          Range<uint32_t>(media_type_set->details->get_lpcm()->min_channels,
-                          media_type_set->details->get_lpcm()->max_channels),
-          Range<uint32_t>(
-              media_type_set->details->get_lpcm()->min_frames_per_second,
-              media_type_set->details->get_lpcm()->max_frames_per_second));
-    case MediaTypeScheme::VIDEO:
+              media_type_set->details->get_audio()->min_frames_per_second,
+              media_type_set->details->get_audio()->max_frames_per_second));
+    case MediaTypeMedium::VIDEO:
       return VideoStreamTypeSet::Create(
-          Convert(media_type_set->details->get_video()->encoding),
+          media_type_set->encodings.To<std::vector<std::string>>(),
           Range<uint32_t>(media_type_set->details->get_video()->min_width,
                           media_type_set->details->get_video()->max_width),
           Range<uint32_t>(media_type_set->details->get_video()->min_height,
                           media_type_set->details->get_video()->max_height));
-    default:
-      return StreamTypeSet::Create(Convert(media_type_set->scheme));
+    case MediaTypeMedium::TEXT:
+      return TextStreamTypeSet::Create(
+          media_type_set->encodings.To<std::vector<std::string>>());
+    case MediaTypeMedium::SUBPICTURE:
+      return SubpictureStreamTypeSet::Create(
+          media_type_set->encodings.To<std::vector<std::string>>());
   }
 
   return nullptr;
@@ -343,21 +296,13 @@ std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>> Convert(
   return std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>(result);
 }
 
-std::unique_ptr<Bytes> Convert(const String& base64) {
-  if (base64.is_null()) {
+std::unique_ptr<Bytes> Convert(const Array<uint8_t>& bytes_array) {
+  if (bytes_array.is_null()) {
     return nullptr;
   }
 
-  size_t base64_size = base64.size();
-  size_t byte_count = modp_b64_decode_len(base64_size);
-  std::unique_ptr<Bytes> bytes = Bytes::Create(byte_count);
-
-  byte_count = modp_b64_decode(reinterpret_cast<char*>(bytes->data()),
-                               base64.data(), base64_size);
-
-  if (byte_count == MODP_B64_ERROR) {
-    return nullptr;
-  }
+  std::unique_ptr<Bytes> bytes = Bytes::Create(bytes_array.size());
+  std::memcpy(bytes->data(), bytes_array.data(), bytes_array.size());
 
   return bytes;
 }
@@ -373,91 +318,40 @@ std::unique_ptr<Metadata> Convert(const MediaMetadataPtr& media_metadata) {
                           media_metadata->composer);
 }
 
-// Creates a MediaTypeScheme from a StreamType::Scheme.
-MediaTypeScheme Convert(StreamType::Scheme scheme) {
-  switch (scheme) {
-    case StreamType::Scheme::kUnknown:
-      return MediaTypeScheme::UNKNOWN;
-    case StreamType::Scheme::kNone:
-      return MediaTypeScheme::NONE;
-    case StreamType::Scheme::kAnyElementary:
-      return MediaTypeScheme::ANY_ELEMENTARY;
-    case StreamType::Scheme::kAnyAudio:
-      return MediaTypeScheme::ANY_AUDIO;
-    case StreamType::Scheme::kAnyVideo:
-      return MediaTypeScheme::ANY_VIDEO;
-    case StreamType::Scheme::kAnySubpicture:
-      return MediaTypeScheme::ANY_SUBPICTURE;
-    case StreamType::Scheme::kAnyText:
-      return MediaTypeScheme::ANY_TEXT;
-    case StreamType::Scheme::kAnyMultiplexed:
-      return MediaTypeScheme::ANY_MULTIPLEXED;
-    case StreamType::Scheme::kAny:
-      return MediaTypeScheme::ANY;
-    case StreamType::Scheme::kMultiplexed:
-      return MediaTypeScheme::MULTIPLEXED;
-    case StreamType::Scheme::kLpcm:
-      return MediaTypeScheme::LPCM;
-    case StreamType::Scheme::kCompressedAudio:
-      return MediaTypeScheme::COMPRESSED_AUDIO;
-    case StreamType::Scheme::kVideo:
-      return MediaTypeScheme::VIDEO;
+MediaTypeMedium Convert(StreamType::Medium medium) {
+  switch (medium) {
+    case StreamType::Medium::kAudio:
+      return MediaTypeMedium::AUDIO;
+    case StreamType::Medium::kVideo:
+      return MediaTypeMedium::VIDEO;
+    case StreamType::Medium::kText:
+      return MediaTypeMedium::TEXT;
+    case StreamType::Medium::kSubpicture:
+      return MediaTypeMedium::SUBPICTURE;
   }
 
-  return MediaTypeScheme::UNKNOWN;
+  LOG(ERROR) << "unrecognized medium";
+  abort();
 }
 
-// Creates an LpcmSampleFormat from an LpcmStreamType::SampleFormat.
-LpcmSampleFormat Convert(LpcmStreamType::SampleFormat sample_format) {
+AudioSampleFormat Convert(AudioStreamType::SampleFormat sample_format) {
   switch (sample_format) {
-    case LpcmStreamType::SampleFormat::kUnknown:
-      return LpcmSampleFormat::UNKNOWN;
-    case LpcmStreamType::SampleFormat::kAny:
-      return LpcmSampleFormat::ANY;
-    case LpcmStreamType::SampleFormat::kUnsigned8:
-      return LpcmSampleFormat::UNSIGNED_8;
-    case LpcmStreamType::SampleFormat::kSigned16:
-      return LpcmSampleFormat::SIGNED_16;
-    case LpcmStreamType::SampleFormat::kSigned24In32:
-      return LpcmSampleFormat::SIGNED_24_IN_32;
-    case LpcmStreamType::SampleFormat::kFloat:
-      return LpcmSampleFormat::FLOAT;
+    case AudioStreamType::SampleFormat::kAny:
+      return AudioSampleFormat::ANY;
+    case AudioStreamType::SampleFormat::kUnsigned8:
+      return AudioSampleFormat::UNSIGNED_8;
+    case AudioStreamType::SampleFormat::kSigned16:
+      return AudioSampleFormat::SIGNED_16;
+    case AudioStreamType::SampleFormat::kSigned24In32:
+      return AudioSampleFormat::SIGNED_24_IN_32;
+    case AudioStreamType::SampleFormat::kFloat:
+      return AudioSampleFormat::FLOAT;
   }
 
-  return LpcmSampleFormat::UNKNOWN;
+  LOG(ERROR) << "unrecognized sample format";
+  abort();
 }
 
-// Creates an AudioEncoding from a CompressedAudioStreamType::VideoEncoding.
-AudioEncoding Convert(CompressedAudioStreamType::AudioEncoding audio_encoding) {
-  switch (audio_encoding) {
-    case CompressedAudioStreamType::AudioEncoding::kUnknown:
-      return AudioEncoding::UNKNOWN;
-    case CompressedAudioStreamType::AudioEncoding::kAny:
-      return AudioEncoding::ANY;
-    case CompressedAudioStreamType::AudioEncoding::kVorbis:
-      return AudioEncoding::VORBIS;
-  }
-
-  return AudioEncoding::UNKNOWN;
-}
-
-// Creates a VideoEncoding from a VideoStreamType::VideoEncoding.
-VideoEncoding Convert(VideoStreamType::VideoEncoding video_encoding) {
-  switch (video_encoding) {
-    case VideoStreamType::VideoEncoding::kUnknown:
-      return VideoEncoding::UNKNOWN;
-    case VideoStreamType::VideoEncoding::kAny:
-      return VideoEncoding::ANY;
-    case VideoStreamType::VideoEncoding::kTheora:
-      return VideoEncoding::THEORA;
-    case VideoStreamType::VideoEncoding::kVp8:
-      return VideoEncoding::VP8;
-  }
-
-  return VideoEncoding::UNKNOWN;
-}
-
-// Creates a VideoProfile from a VideoStreamType::VideoProfile.
 VideoProfile Convert(VideoStreamType::VideoProfile video_profile) {
   switch (video_profile) {
     case VideoStreamType::VideoProfile::kUnknown:
@@ -488,10 +382,10 @@ VideoProfile Convert(VideoStreamType::VideoProfile video_profile) {
       return VideoProfile::H264_MULTIVIEW_HIGH;
   }
 
-  return VideoProfile::UNKNOWN;
+  LOG(ERROR) << "unrecognized video profile";
+  abort();
 }
 
-// Creates a PixelFormat from a VideoStreamType::PixelFormat.
 PixelFormat Convert(VideoStreamType::PixelFormat pixel_format) {
   switch (pixel_format) {
     case VideoStreamType::PixelFormat::kUnknown:
@@ -528,10 +422,10 @@ PixelFormat Convert(VideoStreamType::PixelFormat pixel_format) {
       return PixelFormat::MT21;
   }
 
-  return PixelFormat::UNKNOWN;
+  LOG(ERROR) << "unrecognized pixel format";
+  abort();
 }
 
-// Creates a ColorSpace from a VideoStreamType::ColorSpace.
 ColorSpace Convert(VideoStreamType::ColorSpace color_space) {
   switch (color_space) {
     case VideoStreamType::ColorSpace::kUnknown:
@@ -546,67 +440,37 @@ ColorSpace Convert(VideoStreamType::ColorSpace color_space) {
       return ColorSpace::SD_REC601;
   }
 
-  return ColorSpace::UNKNOWN;
+  LOG(ERROR) << "unrecognized color space";
+  abort();
 }
 
-// Creates a MediaType from a StreamType.
 MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type) {
+  DCHECK(KnownEncodingsMatch());
+
   if (stream_type == nullptr) {
     return nullptr;
   }
 
-  switch (stream_type->scheme()) {
-    case StreamType::Scheme::kMultiplexed: {
-      MultiplexedMediaTypeDetailsPtr multiplexed_details =
-          MultiplexedMediaTypeDetails::New();
-      multiplexed_details->multiplex_type =
-          Convert(stream_type->multiplexed()->multiplex_type());
-      multiplexed_details->substream_types =
-          Convert(stream_type->multiplexed()->substream_types());
+  switch (stream_type->medium()) {
+    case StreamType::Medium::kAudio: {
+      AudioMediaTypeDetailsPtr audio_details = AudioMediaTypeDetails::New();
+      audio_details->sample_format =
+          Convert(stream_type->audio()->sample_format());
+      audio_details->channels = stream_type->audio()->channels();
+      audio_details->frames_per_second =
+          stream_type->audio()->frames_per_second();
       MediaTypeDetailsPtr details = MediaTypeDetails::New();
-      details->set_multiplexed(multiplexed_details.Pass());
+      details->set_audio(audio_details.Pass());
       MediaTypePtr media_type = MediaType::New();
-      media_type->scheme = MediaTypeScheme::MULTIPLEXED;
+      media_type->medium = MediaTypeMedium::AUDIO;
       media_type->details = details.Pass();
+      media_type->encoding = stream_type->encoding();
+      media_type->encoding_parameters =
+          Convert(stream_type->encoding_parameters());
       return media_type;
     }
-    case StreamType::Scheme::kLpcm: {
-      LpcmMediaTypeDetailsPtr lpcm_details = LpcmMediaTypeDetails::New();
-      lpcm_details->sample_format =
-          Convert(stream_type->lpcm()->sample_format());
-      lpcm_details->channels = stream_type->lpcm()->channels();
-      lpcm_details->frames_per_second =
-          stream_type->lpcm()->frames_per_second();
-      MediaTypeDetailsPtr details = MediaTypeDetails::New();
-      details->set_lpcm(lpcm_details.Pass());
-      MediaTypePtr media_type = MediaType::New();
-      media_type->scheme = MediaTypeScheme::LPCM;
-      media_type->details = details.Pass();
-      return media_type;
-    }
-    case StreamType::Scheme::kCompressedAudio: {
-      CompressedAudioMediaTypeDetailsPtr compressed_audio_details =
-          CompressedAudioMediaTypeDetails::New();
-      compressed_audio_details->encoding =
-          Convert(stream_type->compressed_audio()->encoding());
-      compressed_audio_details->sample_format =
-          Convert(stream_type->compressed_audio()->sample_format());
-      compressed_audio_details->channels =
-          stream_type->compressed_audio()->channels();
-      compressed_audio_details->frames_per_second =
-          stream_type->compressed_audio()->frames_per_second();
-      compressed_audio_details->extra_data_base64 =
-          Convert(stream_type->compressed_audio()->encoding_details());
-      MediaTypeDetailsPtr details = MediaTypeDetails::New();
-      details->set_compressed_audio(compressed_audio_details.Pass());
-      MediaTypePtr media_type = MediaType::New();
-      media_type->scheme = MediaTypeScheme::COMPRESSED_AUDIO;
-      media_type->details = details.Pass();
-      return media_type;
-    }
-    case StreamType::Scheme::kVideo: {
+    case StreamType::Medium::kVideo: {
       VideoMediaTypeDetailsPtr video_details = VideoMediaTypeDetails::New();
-      video_details->encoding = Convert(stream_type->video()->encoding());
       video_details->profile = Convert(stream_type->video()->profile());
       video_details->pixel_format =
           Convert(stream_type->video()->pixel_format());
@@ -615,24 +479,38 @@ MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type) {
       video_details->height = stream_type->video()->height();
       video_details->coded_width = stream_type->video()->coded_width();
       video_details->coded_height = stream_type->video()->coded_height();
-      video_details->extra_data_base64 =
-          Convert(stream_type->video()->encoding_details());
       MediaTypeDetailsPtr details = MediaTypeDetails::New();
       details->set_video(video_details.Pass());
       MediaTypePtr media_type = MediaType::New();
-      media_type->scheme = MediaTypeScheme::VIDEO;
+      media_type->medium = MediaTypeMedium::VIDEO;
       media_type->details = details.Pass();
+      media_type->encoding = stream_type->encoding();
+      media_type->encoding_parameters =
+          Convert(stream_type->encoding_parameters());
       return media_type;
     }
-    default: {
+    case StreamType::Medium::kText: {
       MediaTypePtr media_type = MediaType::New();
-      media_type->scheme = Convert(stream_type->scheme());
+      media_type->medium = MediaTypeMedium::TEXT;
+      media_type->encoding = stream_type->encoding();
+      media_type->encoding_parameters =
+          Convert(stream_type->encoding_parameters());
+      return media_type;
+    }
+    case StreamType::Medium::kSubpicture: {
+      MediaTypePtr media_type = MediaType::New();
+      media_type->medium = MediaTypeMedium::SUBPICTURE;
+      media_type->encoding = stream_type->encoding();
+      media_type->encoding_parameters =
+          Convert(stream_type->encoding_parameters());
       return media_type;
     }
   }
+
+  LOG(ERROR) << "unrecognized medium";
+  abort();
 }
 
-// Creates an array of MediaTypes from std::vector<std::unique_ptr<StreamType>>.
 Array<MediaTypePtr> Convert(
     const std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>&
         stream_types) {
@@ -647,70 +525,37 @@ Array<MediaTypePtr> Convert(
   return result;
 }
 
-// Creates a MediaTypeSet from a StreamTypeSet.
 MediaTypeSetPtr Convert(const std::unique_ptr<StreamTypeSet>& stream_type_set) {
+  DCHECK(KnownEncodingsMatch());
+
   if (stream_type_set == nullptr) {
     return nullptr;
   }
 
-  switch (stream_type_set->scheme()) {
-    case StreamType::Scheme::kMultiplexed: {
-      MultiplexedMediaTypeSetDetailsPtr multiplexed_details =
-          MultiplexedMediaTypeSetDetails::New();
-      multiplexed_details->multiplex_type_set =
-          Convert(stream_type_set->multiplexed()->multiplex_type_set());
-      multiplexed_details->substream_type_sets =
-          Convert(stream_type_set->multiplexed()->substream_type_sets());
+  switch (stream_type_set->medium()) {
+    case StreamType::Medium::kAudio: {
+      AudioMediaTypeSetDetailsPtr audio_details =
+          AudioMediaTypeSetDetails::New();
+      audio_details->sample_format =
+          Convert(stream_type_set->audio()->sample_format());
+      audio_details->min_channels = stream_type_set->audio()->channels().min;
+      audio_details->max_channels = stream_type_set->audio()->channels().max;
+      audio_details->min_frames_per_second =
+          stream_type_set->audio()->frames_per_second().min;
+      audio_details->max_frames_per_second =
+          stream_type_set->audio()->frames_per_second().max;
       MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
-      details->set_multiplexed(multiplexed_details.Pass());
+      details->set_audio(audio_details.Pass());
       MediaTypeSetPtr media_type_set = MediaTypeSet::New();
-      media_type_set->scheme = MediaTypeScheme::MULTIPLEXED;
+      media_type_set->medium = MediaTypeMedium::AUDIO;
       media_type_set->details = details.Pass();
+      media_type_set->encodings =
+          Array<String>::From(stream_type_set->encodings());
       return media_type_set;
     }
-    case StreamType::Scheme::kLpcm: {
-      LpcmMediaTypeSetDetailsPtr lpcm_details = LpcmMediaTypeSetDetails::New();
-      lpcm_details->sample_format =
-          Convert(stream_type_set->lpcm()->sample_format());
-      lpcm_details->min_channels = stream_type_set->lpcm()->channels().min;
-      lpcm_details->max_channels = stream_type_set->lpcm()->channels().max;
-      lpcm_details->min_frames_per_second =
-          stream_type_set->lpcm()->frames_per_second().min;
-      lpcm_details->max_frames_per_second =
-          stream_type_set->lpcm()->frames_per_second().max;
-      MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
-      details->set_lpcm(lpcm_details.Pass());
-      MediaTypeSetPtr media_type_set = MediaTypeSet::New();
-      media_type_set->scheme = MediaTypeScheme::LPCM;
-      media_type_set->details = details.Pass();
-      return media_type_set;
-    }
-    case StreamType::Scheme::kCompressedAudio: {
-      CompressedAudioMediaTypeSetDetailsPtr compressed_audio_details =
-          CompressedAudioMediaTypeSetDetails::New();
-      compressed_audio_details->encoding =
-          Convert(stream_type_set->compressed_audio()->encoding());
-      compressed_audio_details->sample_format =
-          Convert(stream_type_set->compressed_audio()->sample_format());
-      compressed_audio_details->min_channels =
-          stream_type_set->compressed_audio()->channels().min;
-      compressed_audio_details->max_channels =
-          stream_type_set->compressed_audio()->channels().max;
-      compressed_audio_details->min_frames_per_second =
-          stream_type_set->compressed_audio()->frames_per_second().min;
-      compressed_audio_details->max_frames_per_second =
-          stream_type_set->compressed_audio()->frames_per_second().max;
-      MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
-      details->set_compressed_audio(compressed_audio_details.Pass());
-      MediaTypeSetPtr media_type_set = MediaTypeSet::New();
-      media_type_set->scheme = MediaTypeScheme::COMPRESSED_AUDIO;
-      media_type_set->details = details.Pass();
-      return media_type_set;
-    }
-    case StreamType::Scheme::kVideo: {
+    case StreamType::Medium::kVideo: {
       VideoMediaTypeSetDetailsPtr video_details =
           VideoMediaTypeSetDetails::New();
-      video_details->encoding = Convert(stream_type_set->video()->encoding());
       video_details->min_width = stream_type_set->video()->width().min;
       video_details->max_width = stream_type_set->video()->width().max;
       video_details->min_height = stream_type_set->video()->height().min;
@@ -718,20 +563,32 @@ MediaTypeSetPtr Convert(const std::unique_ptr<StreamTypeSet>& stream_type_set) {
       MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
       details->set_video(video_details.Pass());
       MediaTypeSetPtr media_type_set = MediaTypeSet::New();
-      media_type_set->scheme = MediaTypeScheme::VIDEO;
+      media_type_set->medium = MediaTypeMedium::VIDEO;
       media_type_set->details = details.Pass();
+      media_type_set->encodings =
+          Array<String>::From(stream_type_set->encodings());
       return media_type_set;
     }
-    default: {
+    case StreamType::Medium::kText: {
       MediaTypeSetPtr media_type_set = MediaTypeSet::New();
-      media_type_set->scheme = Convert(stream_type_set->scheme());
+      media_type_set->medium = MediaTypeMedium::TEXT;
+      media_type_set->encodings =
+          Array<String>::From(stream_type_set->encodings());
+      return media_type_set;
+    }
+    case StreamType::Medium::kSubpicture: {
+      MediaTypeSetPtr media_type_set = MediaTypeSet::New();
+      media_type_set->medium = MediaTypeMedium::SUBPICTURE;
+      media_type_set->encodings =
+          Array<String>::From(stream_type_set->encodings());
       return media_type_set;
     }
   }
+
+  LOG(ERROR) << "unrecognized medium";
+  abort();
 }
 
-// Creates an array of MediaTypeSets from
-// std::vector<std::unique_ptr<StreamTypeSet>>.
 Array<MediaTypeSetPtr> Convert(
     const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
         stream_type_sets) {
@@ -748,22 +605,15 @@ Array<MediaTypeSetPtr> Convert(
   return result;
 }
 
-// Creates a base64-encoded string from Bytes.
-String Convert(const std::unique_ptr<Bytes>& bytes) {
+Array<uint8_t> Convert(const std::unique_ptr<Bytes>& bytes) {
   if (bytes == nullptr) {
     return nullptr;
   }
 
-  std::string temp;
-  temp.resize(modp_b64_encode_len(bytes->size()));  // Makes room for null byte.
+  Array<uint8_t> array = Array<uint8_t>::New(bytes->size());
+  std::memcpy(array.data(), bytes->data(), bytes->size());
 
-  // modp_b64_encode_len() returns at least 1, so temp[0] is safe to use.
-  size_t output_size = modp_b64_encode(
-      &(temp[0]), reinterpret_cast<char*>(bytes->data()), bytes->size());
-
-  temp.resize(output_size);  // Strips off null byte.
-
-  return String(temp);
+  return array;
 }
 
 MediaMetadataPtr Convert(const std::unique_ptr<Metadata>& metadata) {

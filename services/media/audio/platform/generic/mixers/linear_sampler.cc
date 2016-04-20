@@ -225,15 +225,15 @@ bool LinearSamplerImpl<DChCount, SType, SChCount>::Mix(
 template <size_t   DChCount,
           typename SType,
           size_t   SChCount>
-static inline MixerPtr SelectLSM(const LpcmMediaTypeDetailsPtr& src_format,
-                                 const LpcmMediaTypeDetailsPtr& dst_format) {
+static inline MixerPtr SelectLSM(const AudioMediaTypeDetailsPtr& src_format,
+                                 const AudioMediaTypeDetailsPtr& dst_format) {
   return MixerPtr(new LinearSamplerImpl<DChCount, SType, SChCount>());
 }
 
 template <size_t   DChCount,
           typename SType>
-static inline MixerPtr SelectLSM(const LpcmMediaTypeDetailsPtr& src_format,
-                                 const LpcmMediaTypeDetailsPtr& dst_format) {
+static inline MixerPtr SelectLSM(const AudioMediaTypeDetailsPtr& src_format,
+                                 const AudioMediaTypeDetailsPtr& dst_format) {
   switch (src_format->channels) {
   case 1:
     return SelectLSM<DChCount, SType, 1>(src_format, dst_format);
@@ -245,20 +245,20 @@ static inline MixerPtr SelectLSM(const LpcmMediaTypeDetailsPtr& src_format,
 }
 
 template <size_t DChCount>
-static inline MixerPtr SelectLSM(const LpcmMediaTypeDetailsPtr& src_format,
-                                 const LpcmMediaTypeDetailsPtr& dst_format) {
+static inline MixerPtr SelectLSM(const AudioMediaTypeDetailsPtr& src_format,
+                                 const AudioMediaTypeDetailsPtr& dst_format) {
   switch (src_format->sample_format) {
-  case LpcmSampleFormat::UNSIGNED_8:
+  case AudioSampleFormat::UNSIGNED_8:
     return SelectLSM<DChCount, uint8_t>(src_format, dst_format);
-  case LpcmSampleFormat::SIGNED_16:
+  case AudioSampleFormat::SIGNED_16:
     return SelectLSM<DChCount, int16_t>(src_format, dst_format);
   default:
     return nullptr;
   }
 }
 
-MixerPtr LinearSampler::Select(const LpcmMediaTypeDetailsPtr& src_format,
-                               const LpcmMediaTypeDetailsPtr& dst_format) {
+MixerPtr LinearSampler::Select(const AudioMediaTypeDetailsPtr& src_format,
+                               const AudioMediaTypeDetailsPtr& dst_format) {
   switch (dst_format->channels) {
   case 1:
     return SelectLSM<1>(src_format, dst_format);

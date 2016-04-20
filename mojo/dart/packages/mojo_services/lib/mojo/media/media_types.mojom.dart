@@ -6,127 +6,64 @@ library media_types_mojom;
 import 'package:mojo/bindings.dart' as bindings;
 
 
-class MediaTypeScheme extends bindings.MojoEnum {
-  static const MediaTypeScheme unknown = const MediaTypeScheme._(0);
-  static const MediaTypeScheme none = const MediaTypeScheme._(1);
-  static const MediaTypeScheme anyElementary = const MediaTypeScheme._(2);
-  static const MediaTypeScheme anyAudio = const MediaTypeScheme._(3);
-  static const MediaTypeScheme anyVideo = const MediaTypeScheme._(4);
-  static const MediaTypeScheme anySubpicture = const MediaTypeScheme._(5);
-  static const MediaTypeScheme anyText = const MediaTypeScheme._(6);
-  static const MediaTypeScheme anyMultiplexed = const MediaTypeScheme._(7);
-  static const MediaTypeScheme any = const MediaTypeScheme._(8);
-  static const MediaTypeScheme multiplexed = const MediaTypeScheme._(9);
-  static const MediaTypeScheme lpcm = const MediaTypeScheme._(10);
-  static const MediaTypeScheme compressedAudio = const MediaTypeScheme._(11);
-  static const MediaTypeScheme video = const MediaTypeScheme._(12);
+class MediaTypeMedium extends bindings.MojoEnum {
+  static const MediaTypeMedium audio = const MediaTypeMedium._(0);
+  static const MediaTypeMedium video = const MediaTypeMedium._(1);
+  static const MediaTypeMedium text = const MediaTypeMedium._(2);
+  static const MediaTypeMedium subpicture = const MediaTypeMedium._(3);
 
-  const MediaTypeScheme._(int v) : super(v);
+  const MediaTypeMedium._(int v) : super(v);
 
-  static const Map<String, MediaTypeScheme> valuesMap = const {
-    "unknown": unknown,
-    "none": none,
-    "anyElementary": anyElementary,
-    "anyAudio": anyAudio,
-    "anyVideo": anyVideo,
-    "anySubpicture": anySubpicture,
-    "anyText": anyText,
-    "anyMultiplexed": anyMultiplexed,
-    "any": any,
-    "multiplexed": multiplexed,
-    "lpcm": lpcm,
-    "compressedAudio": compressedAudio,
+  static const Map<String, MediaTypeMedium> valuesMap = const {
+    "audio": audio,
     "video": video,
+    "text": text,
+    "subpicture": subpicture,
   };
-  static const List<MediaTypeScheme> values = const [
-    unknown,
-    none,
-    anyElementary,
-    anyAudio,
-    anyVideo,
-    anySubpicture,
-    anyText,
-    anyMultiplexed,
-    any,
-    multiplexed,
-    lpcm,
-    compressedAudio,
+  static const List<MediaTypeMedium> values = const [
+    audio,
     video,
+    text,
+    subpicture,
   ];
 
-  static MediaTypeScheme valueOf(String name) => valuesMap[name];
+  static MediaTypeMedium valueOf(String name) => valuesMap[name];
 
-  factory MediaTypeScheme(int v) {
+  factory MediaTypeMedium(int v) {
     switch (v) {
       case 0:
-        return MediaTypeScheme.unknown;
+        return MediaTypeMedium.audio;
       case 1:
-        return MediaTypeScheme.none;
+        return MediaTypeMedium.video;
       case 2:
-        return MediaTypeScheme.anyElementary;
+        return MediaTypeMedium.text;
       case 3:
-        return MediaTypeScheme.anyAudio;
-      case 4:
-        return MediaTypeScheme.anyVideo;
-      case 5:
-        return MediaTypeScheme.anySubpicture;
-      case 6:
-        return MediaTypeScheme.anyText;
-      case 7:
-        return MediaTypeScheme.anyMultiplexed;
-      case 8:
-        return MediaTypeScheme.any;
-      case 9:
-        return MediaTypeScheme.multiplexed;
-      case 10:
-        return MediaTypeScheme.lpcm;
-      case 11:
-        return MediaTypeScheme.compressedAudio;
-      case 12:
-        return MediaTypeScheme.video;
+        return MediaTypeMedium.subpicture;
       default:
         return null;
     }
   }
 
-  static MediaTypeScheme decode(bindings.Decoder decoder0, int offset) {
+  static MediaTypeMedium decode(bindings.Decoder decoder0, int offset) {
     int v = decoder0.decodeUint32(offset);
-    MediaTypeScheme result = new MediaTypeScheme(v);
+    MediaTypeMedium result = new MediaTypeMedium(v);
     if (result == null) {
       throw new bindings.MojoCodecError(
-          'Bad value $v for enum MediaTypeScheme.');
+          'Bad value $v for enum MediaTypeMedium.');
     }
     return result;
   }
 
   String toString() {
     switch(this) {
-      case unknown:
-        return 'MediaTypeScheme.unknown';
-      case none:
-        return 'MediaTypeScheme.none';
-      case anyElementary:
-        return 'MediaTypeScheme.anyElementary';
-      case anyAudio:
-        return 'MediaTypeScheme.anyAudio';
-      case anyVideo:
-        return 'MediaTypeScheme.anyVideo';
-      case anySubpicture:
-        return 'MediaTypeScheme.anySubpicture';
-      case anyText:
-        return 'MediaTypeScheme.anyText';
-      case anyMultiplexed:
-        return 'MediaTypeScheme.anyMultiplexed';
-      case any:
-        return 'MediaTypeScheme.any';
-      case multiplexed:
-        return 'MediaTypeScheme.multiplexed';
-      case lpcm:
-        return 'MediaTypeScheme.lpcm';
-      case compressedAudio:
-        return 'MediaTypeScheme.compressedAudio';
+      case audio:
+        return 'MediaTypeMedium.audio';
       case video:
-        return 'MediaTypeScheme.video';
+        return 'MediaTypeMedium.video';
+      case text:
+        return 'MediaTypeMedium.text';
+      case subpicture:
+        return 'MediaTypeMedium.subpicture';
       default:
         return null;
     }
@@ -135,26 +72,23 @@ class MediaTypeScheme extends bindings.MojoEnum {
   int toJson() => mojoEnumValue;
 }
 
-class LpcmSampleFormat extends bindings.MojoEnum {
-  static const LpcmSampleFormat unknown = const LpcmSampleFormat._(0);
-  static const LpcmSampleFormat any = const LpcmSampleFormat._(1);
-  static const LpcmSampleFormat unsigned8 = const LpcmSampleFormat._(2);
-  static const LpcmSampleFormat signed16 = const LpcmSampleFormat._(3);
-  static const LpcmSampleFormat signed24In32 = const LpcmSampleFormat._(4);
-  static const LpcmSampleFormat float = const LpcmSampleFormat._(5);
+class AudioSampleFormat extends bindings.MojoEnum {
+  static const AudioSampleFormat any = const AudioSampleFormat._(0);
+  static const AudioSampleFormat unsigned8 = const AudioSampleFormat._(1);
+  static const AudioSampleFormat signed16 = const AudioSampleFormat._(2);
+  static const AudioSampleFormat signed24In32 = const AudioSampleFormat._(3);
+  static const AudioSampleFormat float = const AudioSampleFormat._(4);
 
-  const LpcmSampleFormat._(int v) : super(v);
+  const AudioSampleFormat._(int v) : super(v);
 
-  static const Map<String, LpcmSampleFormat> valuesMap = const {
-    "unknown": unknown,
+  static const Map<String, AudioSampleFormat> valuesMap = const {
     "any": any,
     "unsigned8": unsigned8,
     "signed16": signed16,
     "signed24In32": signed24In32,
     "float": float,
   };
-  static const List<LpcmSampleFormat> values = const [
-    unknown,
+  static const List<AudioSampleFormat> values = const [
     any,
     unsigned8,
     signed16,
@@ -162,176 +96,47 @@ class LpcmSampleFormat extends bindings.MojoEnum {
     float,
   ];
 
-  static LpcmSampleFormat valueOf(String name) => valuesMap[name];
+  static AudioSampleFormat valueOf(String name) => valuesMap[name];
 
-  factory LpcmSampleFormat(int v) {
+  factory AudioSampleFormat(int v) {
     switch (v) {
       case 0:
-        return LpcmSampleFormat.unknown;
+        return AudioSampleFormat.any;
       case 1:
-        return LpcmSampleFormat.any;
+        return AudioSampleFormat.unsigned8;
       case 2:
-        return LpcmSampleFormat.unsigned8;
+        return AudioSampleFormat.signed16;
       case 3:
-        return LpcmSampleFormat.signed16;
+        return AudioSampleFormat.signed24In32;
       case 4:
-        return LpcmSampleFormat.signed24In32;
-      case 5:
-        return LpcmSampleFormat.float;
+        return AudioSampleFormat.float;
       default:
         return null;
     }
   }
 
-  static LpcmSampleFormat decode(bindings.Decoder decoder0, int offset) {
+  static AudioSampleFormat decode(bindings.Decoder decoder0, int offset) {
     int v = decoder0.decodeUint32(offset);
-    LpcmSampleFormat result = new LpcmSampleFormat(v);
+    AudioSampleFormat result = new AudioSampleFormat(v);
     if (result == null) {
       throw new bindings.MojoCodecError(
-          'Bad value $v for enum LpcmSampleFormat.');
+          'Bad value $v for enum AudioSampleFormat.');
     }
     return result;
   }
 
   String toString() {
     switch(this) {
-      case unknown:
-        return 'LpcmSampleFormat.unknown';
       case any:
-        return 'LpcmSampleFormat.any';
+        return 'AudioSampleFormat.any';
       case unsigned8:
-        return 'LpcmSampleFormat.unsigned8';
+        return 'AudioSampleFormat.unsigned8';
       case signed16:
-        return 'LpcmSampleFormat.signed16';
+        return 'AudioSampleFormat.signed16';
       case signed24In32:
-        return 'LpcmSampleFormat.signed24In32';
+        return 'AudioSampleFormat.signed24In32';
       case float:
-        return 'LpcmSampleFormat.float';
-      default:
-        return null;
-    }
-  }
-
-  int toJson() => mojoEnumValue;
-}
-
-class AudioEncoding extends bindings.MojoEnum {
-  static const AudioEncoding unknown = const AudioEncoding._(0);
-  static const AudioEncoding any = const AudioEncoding._(1);
-  static const AudioEncoding vorbis = const AudioEncoding._(2);
-
-  const AudioEncoding._(int v) : super(v);
-
-  static const Map<String, AudioEncoding> valuesMap = const {
-    "unknown": unknown,
-    "any": any,
-    "vorbis": vorbis,
-  };
-  static const List<AudioEncoding> values = const [
-    unknown,
-    any,
-    vorbis,
-  ];
-
-  static AudioEncoding valueOf(String name) => valuesMap[name];
-
-  factory AudioEncoding(int v) {
-    switch (v) {
-      case 0:
-        return AudioEncoding.unknown;
-      case 1:
-        return AudioEncoding.any;
-      case 2:
-        return AudioEncoding.vorbis;
-      default:
-        return null;
-    }
-  }
-
-  static AudioEncoding decode(bindings.Decoder decoder0, int offset) {
-    int v = decoder0.decodeUint32(offset);
-    AudioEncoding result = new AudioEncoding(v);
-    if (result == null) {
-      throw new bindings.MojoCodecError(
-          'Bad value $v for enum AudioEncoding.');
-    }
-    return result;
-  }
-
-  String toString() {
-    switch(this) {
-      case unknown:
-        return 'AudioEncoding.unknown';
-      case any:
-        return 'AudioEncoding.any';
-      case vorbis:
-        return 'AudioEncoding.vorbis';
-      default:
-        return null;
-    }
-  }
-
-  int toJson() => mojoEnumValue;
-}
-
-class VideoEncoding extends bindings.MojoEnum {
-  static const VideoEncoding unknown = const VideoEncoding._(0);
-  static const VideoEncoding any = const VideoEncoding._(1);
-  static const VideoEncoding theora = const VideoEncoding._(2);
-  static const VideoEncoding vp8 = const VideoEncoding._(3);
-
-  const VideoEncoding._(int v) : super(v);
-
-  static const Map<String, VideoEncoding> valuesMap = const {
-    "unknown": unknown,
-    "any": any,
-    "theora": theora,
-    "vp8": vp8,
-  };
-  static const List<VideoEncoding> values = const [
-    unknown,
-    any,
-    theora,
-    vp8,
-  ];
-
-  static VideoEncoding valueOf(String name) => valuesMap[name];
-
-  factory VideoEncoding(int v) {
-    switch (v) {
-      case 0:
-        return VideoEncoding.unknown;
-      case 1:
-        return VideoEncoding.any;
-      case 2:
-        return VideoEncoding.theora;
-      case 3:
-        return VideoEncoding.vp8;
-      default:
-        return null;
-    }
-  }
-
-  static VideoEncoding decode(bindings.Decoder decoder0, int offset) {
-    int v = decoder0.decodeUint32(offset);
-    VideoEncoding result = new VideoEncoding(v);
-    if (result == null) {
-      throw new bindings.MojoCodecError(
-          'Bad value $v for enum VideoEncoding.');
-    }
-    return result;
-  }
-
-  String toString() {
-    switch(this) {
-      case unknown:
-        return 'VideoEncoding.unknown';
-      case any:
-        return 'VideoEncoding.any';
-      case theora:
-        return 'VideoEncoding.theora';
-      case vp8:
-        return 'VideoEncoding.vp8';
+        return 'AudioSampleFormat.float';
       default:
         return null;
     }
@@ -696,10 +501,16 @@ class ColorSpace extends bindings.MojoEnum {
 
 class MediaType extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
+    const bindings.StructDataHeader(48, 0)
   ];
-  MediaTypeScheme scheme = null;
+  static const String kAudioEncodingLpcm = "lpcm";
+  static const String kAudioEncodingVorbis = "vorbis";
+  static const String kVideoEncodingUncompressed = "uncompressed_video";
+  static const String kVideoEncodingTheora = "theora";
+  MediaTypeMedium medium = null;
   MediaTypeDetails details = null;
+  String encoding = null;
+  List<int> encodingParameters = null;
 
   MediaType() : super(kVersions.last.size);
 
@@ -738,15 +549,27 @@ class MediaType extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.scheme = MediaTypeScheme.decode(decoder0, 8);
-        if (result.scheme == null) {
+        result.medium = MediaTypeMedium.decode(decoder0, 8);
+        if (result.medium == null) {
           throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable MediaTypeScheme.');
+            'Trying to decode null union for non-nullable MediaTypeMedium.');
         }
     }
     if (mainDataHeader.version >= 0) {
       
         result.details = MediaTypeDetails.decode(decoder0, 16);
+        if (result.details == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable MediaTypeDetails.');
+        }
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.encoding = decoder0.decodeString(32, false);
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.encodingParameters = decoder0.decodeUint8Array(40, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
     }
     return result;
   }
@@ -754,31 +577,49 @@ class MediaType extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeEnum(scheme, 8);
+      encoder0.encodeEnum(medium, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "scheme of struct MediaType: $e";
+          "medium of struct MediaType: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUnion(details, 16, true);
+      encoder0.encodeUnion(details, 16, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "details of struct MediaType: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeString(encoding, 32, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "encoding of struct MediaType: $e";
+      rethrow;
+    }
+    try {
+      encoder0.encodeUint8Array(encodingParameters, 40, bindings.kArrayNullable, bindings.kUnspecifiedArrayLength);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "encodingParameters of struct MediaType: $e";
       rethrow;
     }
   }
 
   String toString() {
     return "MediaType("
-           "scheme: $scheme" ", "
-           "details: $details" ")";
+           "medium: $medium" ", "
+           "details: $details" ", "
+           "encoding: $encoding" ", "
+           "encodingParameters: $encodingParameters" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["scheme"] = scheme;
+    map["medium"] = medium;
     map["details"] = details;
+    map["encoding"] = encoding;
+    map["encodingParameters"] = encodingParameters;
     return map;
   }
 }
@@ -786,10 +627,11 @@ class MediaType extends bindings.Struct {
 
 class MediaTypeSet extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
+    const bindings.StructDataHeader(40, 0)
   ];
-  MediaTypeScheme scheme = null;
+  MediaTypeMedium medium = null;
   MediaTypeSetDetails details = null;
+  List<String> encodings = null;
 
   MediaTypeSet() : super(kVersions.last.size);
 
@@ -828,15 +670,31 @@ class MediaTypeSet extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.scheme = MediaTypeScheme.decode(decoder0, 8);
-        if (result.scheme == null) {
+        result.medium = MediaTypeMedium.decode(decoder0, 8);
+        if (result.medium == null) {
           throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable MediaTypeScheme.');
+            'Trying to decode null union for non-nullable MediaTypeMedium.');
         }
     }
     if (mainDataHeader.version >= 0) {
       
         result.details = MediaTypeSetDetails.decode(decoder0, 16);
+        if (result.details == null) {
+          throw new bindings.MojoCodecError(
+            'Trying to decode null union for non-nullable MediaTypeSetDetails.');
+        }
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      var decoder1 = decoder0.decodePointer(32, false);
+      {
+        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
+        result.encodings = new List<String>(si1.numElements);
+        for (int i1 = 0; i1 < si1.numElements; ++i1) {
+          
+          result.encodings[i1] = decoder1.decodeString(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
+        }
+      }
     }
     return result;
   }
@@ -844,47 +702,63 @@ class MediaTypeSet extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeEnum(scheme, 8);
+      encoder0.encodeEnum(medium, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "scheme of struct MediaTypeSet: $e";
+          "medium of struct MediaTypeSet: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUnion(details, 16, true);
+      encoder0.encodeUnion(details, 16, false);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "details of struct MediaTypeSet: $e";
+      rethrow;
+    }
+    try {
+      if (encodings == null) {
+        encoder0.encodeNullPointer(32, false);
+      } else {
+        var encoder1 = encoder0.encodePointerArray(encodings.length, 32, bindings.kUnspecifiedArrayLength);
+        for (int i0 = 0; i0 < encodings.length; ++i0) {
+          encoder1.encodeString(encodings[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
+        }
+      }
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "encodings of struct MediaTypeSet: $e";
       rethrow;
     }
   }
 
   String toString() {
     return "MediaTypeSet("
-           "scheme: $scheme" ", "
-           "details: $details" ")";
+           "medium: $medium" ", "
+           "details: $details" ", "
+           "encodings: $encodings" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["scheme"] = scheme;
+    map["medium"] = medium;
     map["details"] = details;
+    map["encodings"] = encodings;
     return map;
   }
 }
 
 
-class LpcmMediaTypeDetails extends bindings.Struct {
+class AudioMediaTypeDetails extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(24, 0)
   ];
-  LpcmSampleFormat sampleFormat = null;
+  AudioSampleFormat sampleFormat = null;
   int channels = 0;
   int framesPerSecond = 0;
 
-  LpcmMediaTypeDetails() : super(kVersions.last.size);
+  AudioMediaTypeDetails() : super(kVersions.last.size);
 
-  static LpcmMediaTypeDetails deserialize(bindings.Message message) {
+  static AudioMediaTypeDetails deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -893,11 +767,11 @@ class LpcmMediaTypeDetails extends bindings.Struct {
     return result;
   }
 
-  static LpcmMediaTypeDetails decode(bindings.Decoder decoder0) {
+  static AudioMediaTypeDetails decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    LpcmMediaTypeDetails result = new LpcmMediaTypeDetails();
+    AudioMediaTypeDetails result = new AudioMediaTypeDetails();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -919,10 +793,10 @@ class LpcmMediaTypeDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.sampleFormat = LpcmSampleFormat.decode(decoder0, 8);
+        result.sampleFormat = AudioSampleFormat.decode(decoder0, 8);
         if (result.sampleFormat == null) {
           throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable LpcmSampleFormat.');
+            'Trying to decode null union for non-nullable AudioSampleFormat.');
         }
     }
     if (mainDataHeader.version >= 0) {
@@ -942,27 +816,27 @@ class LpcmMediaTypeDetails extends bindings.Struct {
       encoder0.encodeEnum(sampleFormat, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "sampleFormat of struct LpcmMediaTypeDetails: $e";
+          "sampleFormat of struct AudioMediaTypeDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(channels, 12);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "channels of struct LpcmMediaTypeDetails: $e";
+          "channels of struct AudioMediaTypeDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(framesPerSecond, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "framesPerSecond of struct LpcmMediaTypeDetails: $e";
+          "framesPerSecond of struct AudioMediaTypeDetails: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "LpcmMediaTypeDetails("
+    return "AudioMediaTypeDetails("
            "sampleFormat: $sampleFormat" ", "
            "channels: $channels" ", "
            "framesPerSecond: $framesPerSecond" ")";
@@ -978,19 +852,19 @@ class LpcmMediaTypeDetails extends bindings.Struct {
 }
 
 
-class LpcmMediaTypeSetDetails extends bindings.Struct {
+class AudioMediaTypeSetDetails extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(32, 0)
   ];
-  LpcmSampleFormat sampleFormat = null;
+  AudioSampleFormat sampleFormat = null;
   int minChannels = 0;
   int maxChannels = 0;
   int minFramesPerSecond = 0;
   int maxFramesPerSecond = 0;
 
-  LpcmMediaTypeSetDetails() : super(kVersions.last.size);
+  AudioMediaTypeSetDetails() : super(kVersions.last.size);
 
-  static LpcmMediaTypeSetDetails deserialize(bindings.Message message) {
+  static AudioMediaTypeSetDetails deserialize(bindings.Message message) {
     var decoder = new bindings.Decoder(message);
     var result = decode(decoder);
     if (decoder.excessHandles != null) {
@@ -999,11 +873,11 @@ class LpcmMediaTypeSetDetails extends bindings.Struct {
     return result;
   }
 
-  static LpcmMediaTypeSetDetails decode(bindings.Decoder decoder0) {
+  static AudioMediaTypeSetDetails decode(bindings.Decoder decoder0) {
     if (decoder0 == null) {
       return null;
     }
-    LpcmMediaTypeSetDetails result = new LpcmMediaTypeSetDetails();
+    AudioMediaTypeSetDetails result = new AudioMediaTypeSetDetails();
 
     var mainDataHeader = decoder0.decodeStructDataHeader();
     if (mainDataHeader.version <= kVersions.last.version) {
@@ -1025,10 +899,10 @@ class LpcmMediaTypeSetDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.sampleFormat = LpcmSampleFormat.decode(decoder0, 8);
+        result.sampleFormat = AudioSampleFormat.decode(decoder0, 8);
         if (result.sampleFormat == null) {
           throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable LpcmSampleFormat.');
+            'Trying to decode null union for non-nullable AudioSampleFormat.');
         }
     }
     if (mainDataHeader.version >= 0) {
@@ -1056,41 +930,41 @@ class LpcmMediaTypeSetDetails extends bindings.Struct {
       encoder0.encodeEnum(sampleFormat, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "sampleFormat of struct LpcmMediaTypeSetDetails: $e";
+          "sampleFormat of struct AudioMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(minChannels, 12);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "minChannels of struct LpcmMediaTypeSetDetails: $e";
+          "minChannels of struct AudioMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(maxChannels, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "maxChannels of struct LpcmMediaTypeSetDetails: $e";
+          "maxChannels of struct AudioMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(minFramesPerSecond, 20);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "minFramesPerSecond of struct LpcmMediaTypeSetDetails: $e";
+          "minFramesPerSecond of struct AudioMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
       encoder0.encodeUint32(maxFramesPerSecond, 24);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
-          "maxFramesPerSecond of struct LpcmMediaTypeSetDetails: $e";
+          "maxFramesPerSecond of struct AudioMediaTypeSetDetails: $e";
       rethrow;
     }
   }
 
   String toString() {
-    return "LpcmMediaTypeSetDetails("
+    return "AudioMediaTypeSetDetails("
            "sampleFormat: $sampleFormat" ", "
            "minChannels: $minChannels" ", "
            "maxChannels: $maxChannels" ", "
@@ -1100,498 +974,6 @@ class LpcmMediaTypeSetDetails extends bindings.Struct {
 
   Map toJson() {
     Map map = new Map();
-    map["sampleFormat"] = sampleFormat;
-    map["minChannels"] = minChannels;
-    map["maxChannels"] = maxChannels;
-    map["minFramesPerSecond"] = minFramesPerSecond;
-    map["maxFramesPerSecond"] = maxFramesPerSecond;
-    return map;
-  }
-}
-
-
-class MultiplexedMediaTypeDetails extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
-  ];
-  MediaType multiplexType = null;
-  List<MediaType> substreamTypes = null;
-
-  MultiplexedMediaTypeDetails() : super(kVersions.last.size);
-
-  static MultiplexedMediaTypeDetails deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static MultiplexedMediaTypeDetails decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    MultiplexedMediaTypeDetails result = new MultiplexedMediaTypeDetails();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.multiplexType = MediaType.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(16, false);
-      {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.substreamTypes = new List<MediaType>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-          result.substreamTypes[i1] = MediaType.decode(decoder2);
-        }
-      }
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(multiplexType, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "multiplexType of struct MultiplexedMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      if (substreamTypes == null) {
-        encoder0.encodeNullPointer(16, false);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(substreamTypes.length, 16, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < substreamTypes.length; ++i0) {
-          encoder1.encodeStruct(substreamTypes[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-        }
-      }
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "substreamTypes of struct MultiplexedMediaTypeDetails: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "MultiplexedMediaTypeDetails("
-           "multiplexType: $multiplexType" ", "
-           "substreamTypes: $substreamTypes" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["multiplexType"] = multiplexType;
-    map["substreamTypes"] = substreamTypes;
-    return map;
-  }
-}
-
-
-class MultiplexedMediaTypeSetDetails extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(24, 0)
-  ];
-  MediaTypeSet multiplexTypeSet = null;
-  List<MediaTypeSet> substreamTypeSets = null;
-
-  MultiplexedMediaTypeSetDetails() : super(kVersions.last.size);
-
-  static MultiplexedMediaTypeSetDetails deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static MultiplexedMediaTypeSetDetails decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    MultiplexedMediaTypeSetDetails result = new MultiplexedMediaTypeSetDetails();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(8, false);
-      result.multiplexTypeSet = MediaTypeSet.decode(decoder1);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      var decoder1 = decoder0.decodePointer(16, false);
-      {
-        var si1 = decoder1.decodeDataHeaderForPointerArray(bindings.kUnspecifiedArrayLength);
-        result.substreamTypeSets = new List<MediaTypeSet>(si1.numElements);
-        for (int i1 = 0; i1 < si1.numElements; ++i1) {
-          
-          var decoder2 = decoder1.decodePointer(bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i1, false);
-          result.substreamTypeSets[i1] = MediaTypeSet.decode(decoder2);
-        }
-      }
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeStruct(multiplexTypeSet, 8, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "multiplexTypeSet of struct MultiplexedMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      if (substreamTypeSets == null) {
-        encoder0.encodeNullPointer(16, false);
-      } else {
-        var encoder1 = encoder0.encodePointerArray(substreamTypeSets.length, 16, bindings.kUnspecifiedArrayLength);
-        for (int i0 = 0; i0 < substreamTypeSets.length; ++i0) {
-          encoder1.encodeStruct(substreamTypeSets[i0], bindings.ArrayDataHeader.kHeaderSize + bindings.kPointerSize * i0, false);
-        }
-      }
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "substreamTypeSets of struct MultiplexedMediaTypeSetDetails: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "MultiplexedMediaTypeSetDetails("
-           "multiplexTypeSet: $multiplexTypeSet" ", "
-           "substreamTypeSets: $substreamTypeSets" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["multiplexTypeSet"] = multiplexTypeSet;
-    map["substreamTypeSets"] = substreamTypeSets;
-    return map;
-  }
-}
-
-
-class CompressedAudioMediaTypeDetails extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
-  ];
-  AudioEncoding encoding = null;
-  LpcmSampleFormat sampleFormat = null;
-  int channels = 0;
-  int framesPerSecond = 0;
-  String extraDataBase64 = null;
-
-  CompressedAudioMediaTypeDetails() : super(kVersions.last.size);
-
-  static CompressedAudioMediaTypeDetails deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static CompressedAudioMediaTypeDetails decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    CompressedAudioMediaTypeDetails result = new CompressedAudioMediaTypeDetails();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.encoding = AudioEncoding.decode(decoder0, 8);
-        if (result.encoding == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable AudioEncoding.');
-        }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.sampleFormat = LpcmSampleFormat.decode(decoder0, 12);
-        if (result.sampleFormat == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable LpcmSampleFormat.');
-        }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.channels = decoder0.decodeUint32(16);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.framesPerSecond = decoder0.decodeUint32(20);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.extraDataBase64 = decoder0.decodeString(24, false);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeEnum(encoding, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "encoding of struct CompressedAudioMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeEnum(sampleFormat, 12);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "sampleFormat of struct CompressedAudioMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(channels, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "channels of struct CompressedAudioMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(framesPerSecond, 20);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "framesPerSecond of struct CompressedAudioMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeString(extraDataBase64, 24, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "extraDataBase64 of struct CompressedAudioMediaTypeDetails: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "CompressedAudioMediaTypeDetails("
-           "encoding: $encoding" ", "
-           "sampleFormat: $sampleFormat" ", "
-           "channels: $channels" ", "
-           "framesPerSecond: $framesPerSecond" ", "
-           "extraDataBase64: $extraDataBase64" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["encoding"] = encoding;
-    map["sampleFormat"] = sampleFormat;
-    map["channels"] = channels;
-    map["framesPerSecond"] = framesPerSecond;
-    map["extraDataBase64"] = extraDataBase64;
-    return map;
-  }
-}
-
-
-class CompressedAudioMediaTypeSetDetails extends bindings.Struct {
-  static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
-  ];
-  AudioEncoding encoding = null;
-  LpcmSampleFormat sampleFormat = null;
-  int minChannels = 0;
-  int maxChannels = 0;
-  int minFramesPerSecond = 0;
-  int maxFramesPerSecond = 0;
-
-  CompressedAudioMediaTypeSetDetails() : super(kVersions.last.size);
-
-  static CompressedAudioMediaTypeSetDetails deserialize(bindings.Message message) {
-    var decoder = new bindings.Decoder(message);
-    var result = decode(decoder);
-    if (decoder.excessHandles != null) {
-      decoder.excessHandles.forEach((h) => h.close());
-    }
-    return result;
-  }
-
-  static CompressedAudioMediaTypeSetDetails decode(bindings.Decoder decoder0) {
-    if (decoder0 == null) {
-      return null;
-    }
-    CompressedAudioMediaTypeSetDetails result = new CompressedAudioMediaTypeSetDetails();
-
-    var mainDataHeader = decoder0.decodeStructDataHeader();
-    if (mainDataHeader.version <= kVersions.last.version) {
-      // Scan in reverse order to optimize for more recent versions.
-      for (int i = kVersions.length - 1; i >= 0; --i) {
-        if (mainDataHeader.version >= kVersions[i].version) {
-          if (mainDataHeader.size == kVersions[i].size) {
-            // Found a match.
-            break;
-          }
-          throw new bindings.MojoCodecError(
-              'Header size doesn\'t correspond to known version size.');
-        }
-      }
-    } else if (mainDataHeader.size < kVersions.last.size) {
-      throw new bindings.MojoCodecError(
-        'Message newer than the last known version cannot be shorter than '
-        'required by the last known version.');
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.encoding = AudioEncoding.decode(decoder0, 8);
-        if (result.encoding == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable AudioEncoding.');
-        }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.sampleFormat = LpcmSampleFormat.decode(decoder0, 12);
-        if (result.sampleFormat == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable LpcmSampleFormat.');
-        }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.minChannels = decoder0.decodeUint32(16);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.maxChannels = decoder0.decodeUint32(20);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.minFramesPerSecond = decoder0.decodeUint32(24);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.maxFramesPerSecond = decoder0.decodeUint32(28);
-    }
-    return result;
-  }
-
-  void encode(bindings.Encoder encoder) {
-    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
-    try {
-      encoder0.encodeEnum(encoding, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "encoding of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeEnum(sampleFormat, 12);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "sampleFormat of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(minChannels, 16);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "minChannels of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(maxChannels, 20);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "maxChannels of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(minFramesPerSecond, 24);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "minFramesPerSecond of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(maxFramesPerSecond, 28);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "maxFramesPerSecond of struct CompressedAudioMediaTypeSetDetails: $e";
-      rethrow;
-    }
-  }
-
-  String toString() {
-    return "CompressedAudioMediaTypeSetDetails("
-           "encoding: $encoding" ", "
-           "sampleFormat: $sampleFormat" ", "
-           "minChannels: $minChannels" ", "
-           "maxChannels: $maxChannels" ", "
-           "minFramesPerSecond: $minFramesPerSecond" ", "
-           "maxFramesPerSecond: $maxFramesPerSecond" ")";
-  }
-
-  Map toJson() {
-    Map map = new Map();
-    map["encoding"] = encoding;
     map["sampleFormat"] = sampleFormat;
     map["minChannels"] = minChannels;
     map["maxChannels"] = maxChannels;
@@ -1604,9 +986,8 @@ class CompressedAudioMediaTypeSetDetails extends bindings.Struct {
 
 class VideoMediaTypeDetails extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(48, 0)
+    const bindings.StructDataHeader(40, 0)
   ];
-  VideoEncoding encoding = null;
   VideoProfile profile = null;
   PixelFormat pixelFormat = null;
   ColorSpace colorSpace = null;
@@ -1614,7 +995,6 @@ class VideoMediaTypeDetails extends bindings.Struct {
   int height = 0;
   int codedWidth = 0;
   int codedHeight = 0;
-  String extraDataBase64 = null;
 
   VideoMediaTypeDetails() : super(kVersions.last.size);
 
@@ -1653,15 +1033,7 @@ class VideoMediaTypeDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.encoding = VideoEncoding.decode(decoder0, 8);
-        if (result.encoding == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable VideoEncoding.');
-        }
-    }
-    if (mainDataHeader.version >= 0) {
-      
-        result.profile = VideoProfile.decode(decoder0, 12);
+        result.profile = VideoProfile.decode(decoder0, 8);
         if (result.profile == null) {
           throw new bindings.MojoCodecError(
             'Trying to decode null union for non-nullable VideoProfile.');
@@ -1669,7 +1041,7 @@ class VideoMediaTypeDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.pixelFormat = PixelFormat.decode(decoder0, 16);
+        result.pixelFormat = PixelFormat.decode(decoder0, 12);
         if (result.pixelFormat == null) {
           throw new bindings.MojoCodecError(
             'Trying to decode null union for non-nullable PixelFormat.');
@@ -1677,7 +1049,7 @@ class VideoMediaTypeDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.colorSpace = ColorSpace.decode(decoder0, 20);
+        result.colorSpace = ColorSpace.decode(decoder0, 16);
         if (result.colorSpace == null) {
           throw new bindings.MojoCodecError(
             'Trying to decode null union for non-nullable ColorSpace.');
@@ -1685,23 +1057,19 @@ class VideoMediaTypeDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.width = decoder0.decodeUint32(24);
+      result.width = decoder0.decodeUint32(20);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.height = decoder0.decodeUint32(28);
+      result.height = decoder0.decodeUint32(24);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.codedWidth = decoder0.decodeUint32(32);
+      result.codedWidth = decoder0.decodeUint32(28);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.codedHeight = decoder0.decodeUint32(36);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.extraDataBase64 = decoder0.decodeString(40, false);
+      result.codedHeight = decoder0.decodeUint32(32);
     }
     return result;
   }
@@ -1709,86 +1077,69 @@ class VideoMediaTypeDetails extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeEnum(encoding, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "encoding of struct VideoMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeEnum(profile, 12);
+      encoder0.encodeEnum(profile, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "profile of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeEnum(pixelFormat, 16);
+      encoder0.encodeEnum(pixelFormat, 12);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "pixelFormat of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeEnum(colorSpace, 20);
+      encoder0.encodeEnum(colorSpace, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "colorSpace of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(width, 24);
+      encoder0.encodeUint32(width, 20);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "width of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(height, 28);
+      encoder0.encodeUint32(height, 24);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "height of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(codedWidth, 32);
+      encoder0.encodeUint32(codedWidth, 28);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "codedWidth of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(codedHeight, 36);
+      encoder0.encodeUint32(codedHeight, 32);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "codedHeight of struct VideoMediaTypeDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeString(extraDataBase64, 40, false);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "extraDataBase64 of struct VideoMediaTypeDetails: $e";
       rethrow;
     }
   }
 
   String toString() {
     return "VideoMediaTypeDetails("
-           "encoding: $encoding" ", "
            "profile: $profile" ", "
            "pixelFormat: $pixelFormat" ", "
            "colorSpace: $colorSpace" ", "
            "width: $width" ", "
            "height: $height" ", "
            "codedWidth: $codedWidth" ", "
-           "codedHeight: $codedHeight" ", "
-           "extraDataBase64: $extraDataBase64" ")";
+           "codedHeight: $codedHeight" ")";
   }
 
   Map toJson() {
     Map map = new Map();
-    map["encoding"] = encoding;
     map["profile"] = profile;
     map["pixelFormat"] = pixelFormat;
     map["colorSpace"] = colorSpace;
@@ -1796,7 +1147,6 @@ class VideoMediaTypeDetails extends bindings.Struct {
     map["height"] = height;
     map["codedWidth"] = codedWidth;
     map["codedHeight"] = codedHeight;
-    map["extraDataBase64"] = extraDataBase64;
     return map;
   }
 }
@@ -1804,9 +1154,8 @@ class VideoMediaTypeDetails extends bindings.Struct {
 
 class VideoMediaTypeSetDetails extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(32, 0)
+    const bindings.StructDataHeader(24, 0)
   ];
-  VideoEncoding encoding = null;
   int minWidth = 0;
   int maxWidth = 0;
   int minHeight = 0;
@@ -1849,27 +1198,19 @@ class VideoMediaTypeSetDetails extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-        result.encoding = VideoEncoding.decode(decoder0, 8);
-        if (result.encoding == null) {
-          throw new bindings.MojoCodecError(
-            'Trying to decode null union for non-nullable VideoEncoding.');
-        }
+      result.minWidth = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.minWidth = decoder0.decodeUint32(12);
+      result.maxWidth = decoder0.decodeUint32(12);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.maxWidth = decoder0.decodeUint32(16);
+      result.minHeight = decoder0.decodeUint32(16);
     }
     if (mainDataHeader.version >= 0) {
       
-      result.minHeight = decoder0.decodeUint32(20);
-    }
-    if (mainDataHeader.version >= 0) {
-      
-      result.maxHeight = decoder0.decodeUint32(24);
+      result.maxHeight = decoder0.decodeUint32(20);
     }
     return result;
   }
@@ -1877,35 +1218,28 @@ class VideoMediaTypeSetDetails extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeEnum(encoding, 8);
-    } on bindings.MojoCodecError catch(e) {
-      e.message = "Error encountered while encoding field "
-          "encoding of struct VideoMediaTypeSetDetails: $e";
-      rethrow;
-    }
-    try {
-      encoder0.encodeUint32(minWidth, 12);
+      encoder0.encodeUint32(minWidth, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "minWidth of struct VideoMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(maxWidth, 16);
+      encoder0.encodeUint32(maxWidth, 12);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "maxWidth of struct VideoMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(minHeight, 20);
+      encoder0.encodeUint32(minHeight, 16);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "minHeight of struct VideoMediaTypeSetDetails: $e";
       rethrow;
     }
     try {
-      encoder0.encodeUint32(maxHeight, 24);
+      encoder0.encodeUint32(maxHeight, 20);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "maxHeight of struct VideoMediaTypeSetDetails: $e";
@@ -1915,7 +1249,6 @@ class VideoMediaTypeSetDetails extends bindings.Struct {
 
   String toString() {
     return "VideoMediaTypeSetDetails("
-           "encoding: $encoding" ", "
            "minWidth: $minWidth" ", "
            "maxWidth: $maxWidth" ", "
            "minHeight: $minHeight" ", "
@@ -1924,7 +1257,6 @@ class VideoMediaTypeSetDetails extends bindings.Struct {
 
   Map toJson() {
     Map map = new Map();
-    map["encoding"] = encoding;
     map["minWidth"] = minWidth;
     map["maxWidth"] = maxWidth;
     map["minHeight"] = minHeight;
@@ -1934,65 +1266,275 @@ class VideoMediaTypeSetDetails extends bindings.Struct {
 }
 
 
+class TextMediaTypeDetails extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  TextMediaTypeDetails() : super(kVersions.last.size);
+
+  static TextMediaTypeDetails deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static TextMediaTypeDetails decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    TextMediaTypeDetails result = new TextMediaTypeDetails();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "TextMediaTypeDetails("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class TextMediaTypeSetDetails extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  TextMediaTypeSetDetails() : super(kVersions.last.size);
+
+  static TextMediaTypeSetDetails deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static TextMediaTypeSetDetails decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    TextMediaTypeSetDetails result = new TextMediaTypeSetDetails();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "TextMediaTypeSetDetails("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class SubpictureMediaTypeDetails extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  SubpictureMediaTypeDetails() : super(kVersions.last.size);
+
+  static SubpictureMediaTypeDetails deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static SubpictureMediaTypeDetails decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    SubpictureMediaTypeDetails result = new SubpictureMediaTypeDetails();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "SubpictureMediaTypeDetails("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
+class SubpictureMediaTypeSetDetails extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(8, 0)
+  ];
+
+  SubpictureMediaTypeSetDetails() : super(kVersions.last.size);
+
+  static SubpictureMediaTypeSetDetails deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static SubpictureMediaTypeSetDetails decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    SubpictureMediaTypeSetDetails result = new SubpictureMediaTypeSetDetails();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    encoder.getStructEncoderAtOffset(kVersions.last);
+  }
+
+  String toString() {
+    return "SubpictureMediaTypeSetDetails("")";
+  }
+
+  Map toJson() {
+    Map map = new Map();
+    return map;
+  }
+}
+
+
 
 enum MediaTypeDetailsTag {
-  multiplexed,
-  lpcm,
-  compressedAudio,
+  audio,
   video,
+  text,
+  subpicture,
   unknown
 }
 
 class MediaTypeDetails extends bindings.Union {
   static final _tagToInt = const {
-    MediaTypeDetailsTag.multiplexed: 0,
-    MediaTypeDetailsTag.lpcm: 1,
-    MediaTypeDetailsTag.compressedAudio: 2,
-    MediaTypeDetailsTag.video: 3,
+    MediaTypeDetailsTag.audio: 0,
+    MediaTypeDetailsTag.video: 1,
+    MediaTypeDetailsTag.text: 2,
+    MediaTypeDetailsTag.subpicture: 3,
   };
 
   static final _intToTag = const {
-    0: MediaTypeDetailsTag.multiplexed,
-    1: MediaTypeDetailsTag.lpcm,
-    2: MediaTypeDetailsTag.compressedAudio,
-    3: MediaTypeDetailsTag.video,
+    0: MediaTypeDetailsTag.audio,
+    1: MediaTypeDetailsTag.video,
+    2: MediaTypeDetailsTag.text,
+    3: MediaTypeDetailsTag.subpicture,
   };
 
   var _data;
   MediaTypeDetailsTag _tag = MediaTypeDetailsTag.unknown;
 
   MediaTypeDetailsTag get tag => _tag;
-  MultiplexedMediaTypeDetails get multiplexed {
-    if (_tag != MediaTypeDetailsTag.multiplexed) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.multiplexed);
+  AudioMediaTypeDetails get audio {
+    if (_tag != MediaTypeDetailsTag.audio) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.audio);
     }
     return _data;
   }
 
-  set multiplexed(MultiplexedMediaTypeDetails value) {
-    _tag = MediaTypeDetailsTag.multiplexed;
-    _data = value;
-  }
-  LpcmMediaTypeDetails get lpcm {
-    if (_tag != MediaTypeDetailsTag.lpcm) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.lpcm);
-    }
-    return _data;
-  }
-
-  set lpcm(LpcmMediaTypeDetails value) {
-    _tag = MediaTypeDetailsTag.lpcm;
-    _data = value;
-  }
-  CompressedAudioMediaTypeDetails get compressedAudio {
-    if (_tag != MediaTypeDetailsTag.compressedAudio) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.compressedAudio);
-    }
-    return _data;
-  }
-
-  set compressedAudio(CompressedAudioMediaTypeDetails value) {
-    _tag = MediaTypeDetailsTag.compressedAudio;
+  set audio(AudioMediaTypeDetails value) {
+    _tag = MediaTypeDetailsTag.audio;
     _data = value;
   }
   VideoMediaTypeDetails get video {
@@ -2006,6 +1548,28 @@ class MediaTypeDetails extends bindings.Union {
     _tag = MediaTypeDetailsTag.video;
     _data = value;
   }
+  TextMediaTypeDetails get text {
+    if (_tag != MediaTypeDetailsTag.text) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.text);
+    }
+    return _data;
+  }
+
+  set text(TextMediaTypeDetails value) {
+    _tag = MediaTypeDetailsTag.text;
+    _data = value;
+  }
+  SubpictureMediaTypeDetails get subpicture {
+    if (_tag != MediaTypeDetailsTag.subpicture) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeDetailsTag.subpicture);
+    }
+    return _data;
+  }
+
+  set subpicture(SubpictureMediaTypeDetails value) {
+    _tag = MediaTypeDetailsTag.subpicture;
+    _data = value;
+  }
 
   static MediaTypeDetails decode(bindings.Decoder decoder0, int offset) {
     int size = decoder0.decodeUint32(offset);
@@ -2017,25 +1581,25 @@ class MediaTypeDetails extends bindings.Union {
     
     MediaTypeDetailsTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
-      case MediaTypeDetailsTag.multiplexed:
+      case MediaTypeDetailsTag.audio:
         
         var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.multiplexed = MultiplexedMediaTypeDetails.decode(decoder1);
-        break;
-      case MediaTypeDetailsTag.lpcm:
-        
-        var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.lpcm = LpcmMediaTypeDetails.decode(decoder1);
-        break;
-      case MediaTypeDetailsTag.compressedAudio:
-        
-        var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.compressedAudio = CompressedAudioMediaTypeDetails.decode(decoder1);
+        result.audio = AudioMediaTypeDetails.decode(decoder1);
         break;
       case MediaTypeDetailsTag.video:
         
         var decoder1 = decoder0.decodePointer(offset + 8, false);
         result.video = VideoMediaTypeDetails.decode(decoder1);
+        break;
+      case MediaTypeDetailsTag.text:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.text = TextMediaTypeDetails.decode(decoder1);
+        break;
+      case MediaTypeDetailsTag.subpicture:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.subpicture = SubpictureMediaTypeDetails.decode(decoder1);
         break;
       default:
         throw new bindings.MojoCodecError("Bad union tag: $tag");
@@ -2049,17 +1613,17 @@ class MediaTypeDetails extends bindings.Union {
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
-      case MediaTypeDetailsTag.multiplexed:
-        encoder0.encodeStruct(multiplexed, offset + 8, false);
-        break;
-      case MediaTypeDetailsTag.lpcm:
-        encoder0.encodeStruct(lpcm, offset + 8, false);
-        break;
-      case MediaTypeDetailsTag.compressedAudio:
-        encoder0.encodeStruct(compressedAudio, offset + 8, false);
+      case MediaTypeDetailsTag.audio:
+        encoder0.encodeStruct(audio, offset + 8, false);
         break;
       case MediaTypeDetailsTag.video:
         encoder0.encodeStruct(video, offset + 8, false);
+        break;
+      case MediaTypeDetailsTag.text:
+        encoder0.encodeStruct(text, offset + 8, false);
+        break;
+      case MediaTypeDetailsTag.subpicture:
+        encoder0.encodeStruct(subpicture, offset + 8, false);
         break;
       default:
         throw new bindings.MojoCodecError("Bad union tag: $_tag");
@@ -2069,17 +1633,17 @@ class MediaTypeDetails extends bindings.Union {
   String toString() {
     String result = "MediaTypeDetails(";
     switch (_tag) {
-      case MediaTypeDetailsTag.multiplexed:
-        result += "multiplexed";
-        break;
-      case MediaTypeDetailsTag.lpcm:
-        result += "lpcm";
-        break;
-      case MediaTypeDetailsTag.compressedAudio:
-        result += "compressedAudio";
+      case MediaTypeDetailsTag.audio:
+        result += "audio";
         break;
       case MediaTypeDetailsTag.video:
         result += "video";
+        break;
+      case MediaTypeDetailsTag.text:
+        result += "text";
+        break;
+      case MediaTypeDetailsTag.subpicture:
+        result += "subpicture";
         break;
       default:
         result += "unknown";
@@ -2091,63 +1655,41 @@ class MediaTypeDetails extends bindings.Union {
 
 
 enum MediaTypeSetDetailsTag {
-  multiplexed,
-  lpcm,
-  compressedAudio,
+  audio,
   video,
+  text,
+  subpicture,
   unknown
 }
 
 class MediaTypeSetDetails extends bindings.Union {
   static final _tagToInt = const {
-    MediaTypeSetDetailsTag.multiplexed: 0,
-    MediaTypeSetDetailsTag.lpcm: 1,
-    MediaTypeSetDetailsTag.compressedAudio: 2,
-    MediaTypeSetDetailsTag.video: 3,
+    MediaTypeSetDetailsTag.audio: 0,
+    MediaTypeSetDetailsTag.video: 1,
+    MediaTypeSetDetailsTag.text: 2,
+    MediaTypeSetDetailsTag.subpicture: 3,
   };
 
   static final _intToTag = const {
-    0: MediaTypeSetDetailsTag.multiplexed,
-    1: MediaTypeSetDetailsTag.lpcm,
-    2: MediaTypeSetDetailsTag.compressedAudio,
-    3: MediaTypeSetDetailsTag.video,
+    0: MediaTypeSetDetailsTag.audio,
+    1: MediaTypeSetDetailsTag.video,
+    2: MediaTypeSetDetailsTag.text,
+    3: MediaTypeSetDetailsTag.subpicture,
   };
 
   var _data;
   MediaTypeSetDetailsTag _tag = MediaTypeSetDetailsTag.unknown;
 
   MediaTypeSetDetailsTag get tag => _tag;
-  MultiplexedMediaTypeSetDetails get multiplexed {
-    if (_tag != MediaTypeSetDetailsTag.multiplexed) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.multiplexed);
+  AudioMediaTypeSetDetails get audio {
+    if (_tag != MediaTypeSetDetailsTag.audio) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.audio);
     }
     return _data;
   }
 
-  set multiplexed(MultiplexedMediaTypeSetDetails value) {
-    _tag = MediaTypeSetDetailsTag.multiplexed;
-    _data = value;
-  }
-  LpcmMediaTypeSetDetails get lpcm {
-    if (_tag != MediaTypeSetDetailsTag.lpcm) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.lpcm);
-    }
-    return _data;
-  }
-
-  set lpcm(LpcmMediaTypeSetDetails value) {
-    _tag = MediaTypeSetDetailsTag.lpcm;
-    _data = value;
-  }
-  CompressedAudioMediaTypeSetDetails get compressedAudio {
-    if (_tag != MediaTypeSetDetailsTag.compressedAudio) {
-      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.compressedAudio);
-    }
-    return _data;
-  }
-
-  set compressedAudio(CompressedAudioMediaTypeSetDetails value) {
-    _tag = MediaTypeSetDetailsTag.compressedAudio;
+  set audio(AudioMediaTypeSetDetails value) {
+    _tag = MediaTypeSetDetailsTag.audio;
     _data = value;
   }
   VideoMediaTypeSetDetails get video {
@@ -2161,6 +1703,28 @@ class MediaTypeSetDetails extends bindings.Union {
     _tag = MediaTypeSetDetailsTag.video;
     _data = value;
   }
+  TextMediaTypeSetDetails get text {
+    if (_tag != MediaTypeSetDetailsTag.text) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.text);
+    }
+    return _data;
+  }
+
+  set text(TextMediaTypeSetDetails value) {
+    _tag = MediaTypeSetDetailsTag.text;
+    _data = value;
+  }
+  SubpictureMediaTypeSetDetails get subpicture {
+    if (_tag != MediaTypeSetDetailsTag.subpicture) {
+      throw new bindings.UnsetUnionTagError(_tag, MediaTypeSetDetailsTag.subpicture);
+    }
+    return _data;
+  }
+
+  set subpicture(SubpictureMediaTypeSetDetails value) {
+    _tag = MediaTypeSetDetailsTag.subpicture;
+    _data = value;
+  }
 
   static MediaTypeSetDetails decode(bindings.Decoder decoder0, int offset) {
     int size = decoder0.decodeUint32(offset);
@@ -2172,25 +1736,25 @@ class MediaTypeSetDetails extends bindings.Union {
     
     MediaTypeSetDetailsTag tag = _intToTag[decoder0.decodeUint32(offset + 4)];
     switch (tag) {
-      case MediaTypeSetDetailsTag.multiplexed:
+      case MediaTypeSetDetailsTag.audio:
         
         var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.multiplexed = MultiplexedMediaTypeSetDetails.decode(decoder1);
-        break;
-      case MediaTypeSetDetailsTag.lpcm:
-        
-        var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.lpcm = LpcmMediaTypeSetDetails.decode(decoder1);
-        break;
-      case MediaTypeSetDetailsTag.compressedAudio:
-        
-        var decoder1 = decoder0.decodePointer(offset + 8, false);
-        result.compressedAudio = CompressedAudioMediaTypeSetDetails.decode(decoder1);
+        result.audio = AudioMediaTypeSetDetails.decode(decoder1);
         break;
       case MediaTypeSetDetailsTag.video:
         
         var decoder1 = decoder0.decodePointer(offset + 8, false);
         result.video = VideoMediaTypeSetDetails.decode(decoder1);
+        break;
+      case MediaTypeSetDetailsTag.text:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.text = TextMediaTypeSetDetails.decode(decoder1);
+        break;
+      case MediaTypeSetDetailsTag.subpicture:
+        
+        var decoder1 = decoder0.decodePointer(offset + 8, false);
+        result.subpicture = SubpictureMediaTypeSetDetails.decode(decoder1);
         break;
       default:
         throw new bindings.MojoCodecError("Bad union tag: $tag");
@@ -2204,17 +1768,17 @@ class MediaTypeSetDetails extends bindings.Union {
     encoder0.encodeUint32(16, offset);
     encoder0.encodeUint32(_tagToInt[_tag], offset + 4);
     switch (_tag) {
-      case MediaTypeSetDetailsTag.multiplexed:
-        encoder0.encodeStruct(multiplexed, offset + 8, false);
-        break;
-      case MediaTypeSetDetailsTag.lpcm:
-        encoder0.encodeStruct(lpcm, offset + 8, false);
-        break;
-      case MediaTypeSetDetailsTag.compressedAudio:
-        encoder0.encodeStruct(compressedAudio, offset + 8, false);
+      case MediaTypeSetDetailsTag.audio:
+        encoder0.encodeStruct(audio, offset + 8, false);
         break;
       case MediaTypeSetDetailsTag.video:
         encoder0.encodeStruct(video, offset + 8, false);
+        break;
+      case MediaTypeSetDetailsTag.text:
+        encoder0.encodeStruct(text, offset + 8, false);
+        break;
+      case MediaTypeSetDetailsTag.subpicture:
+        encoder0.encodeStruct(subpicture, offset + 8, false);
         break;
       default:
         throw new bindings.MojoCodecError("Bad union tag: $_tag");
@@ -2224,17 +1788,17 @@ class MediaTypeSetDetails extends bindings.Union {
   String toString() {
     String result = "MediaTypeSetDetails(";
     switch (_tag) {
-      case MediaTypeSetDetailsTag.multiplexed:
-        result += "multiplexed";
-        break;
-      case MediaTypeSetDetailsTag.lpcm:
-        result += "lpcm";
-        break;
-      case MediaTypeSetDetailsTag.compressedAudio:
-        result += "compressedAudio";
+      case MediaTypeSetDetailsTag.audio:
+        result += "audio";
         break;
       case MediaTypeSetDetailsTag.video:
         result += "video";
+        break;
+      case MediaTypeSetDetailsTag.text:
+        result += "text";
+        break;
+      case MediaTypeSetDetailsTag.subpicture:
+        result += "subpicture";
         break;
       default:
         result += "unknown";

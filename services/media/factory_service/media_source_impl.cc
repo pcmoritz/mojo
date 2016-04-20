@@ -76,8 +76,8 @@ MediaSourceImpl::~MediaSourceImpl() {}
 void MediaSourceImpl::OnDemuxInitialized(Result result) {
   demux_part_ = graph_.Add(demux_);
 
-  auto demux_streams = demux_->streams();
-  for (auto demux_stream : demux_streams) {
+  const std::vector<Demux::DemuxStream*>& demux_streams = demux_->streams();
+  for (Demux::DemuxStream* demux_stream : demux_streams) {
     streams_.push_back(std::unique_ptr<Stream>(new Stream(
         demux_part_.output(demux_stream->index()), demux_stream->stream_type(),
         Convert(allowed_media_types_), &graph_)));
@@ -90,7 +90,8 @@ void MediaSourceImpl::OnDemuxInitialized(Result result) {
 
 void MediaSourceImpl::GetStreams(const GetStreamsCallback& callback) {
   init_complete_.When([this, callback]() {
-    auto result = Array<MediaSourceStreamDescriptorPtr>::New(streams_.size());
+    Array<MediaSourceStreamDescriptorPtr> result =
+        Array<MediaSourceStreamDescriptorPtr>::New(streams_.size());
     for (size_t i = 0; i < streams_.size(); i++) {
       MediaSourceStreamDescriptorPtr descriptor =
           MediaSourceStreamDescriptor::New();
@@ -134,7 +135,7 @@ void MediaSourceImpl::GetStatus(uint64_t version_last_seen,
 void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
   DCHECK(init_complete_.occurred());
 
-  for (auto& stream : streams_) {
+  for (std::unique_ptr<Stream>& stream : streams_) {
     stream->EnsureSink();
   }
   graph_.Prepare();
@@ -148,7 +149,7 @@ void MediaSourceImpl::Prime(const PrimeCallback& callback) {
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-  for (auto& stream : streams_) {
+  for (std::unique_ptr<Stream>& stream : streams_) {
     stream->PrimeConnection(callback_joiner->NewCallback());
   }
 
@@ -162,7 +163,7 @@ void MediaSourceImpl::Flush(const FlushCallback& callback) {
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-  for (auto& stream : streams_) {
+  for (std::unique_ptr<Stream>& stream : streams_) {
     stream->FlushConnection(callback_joiner->NewCallback());
   }
 
@@ -201,7 +202,9 @@ MediaSourceImpl::Stream::Stream(
                                       *allowed_stream_types, graph, &output_,
                                       &stream_type_)) {
     // Can't convert to any allowed type.
-    stream_type_ = StreamType::Create(StreamType::Scheme::kNone);
+    // TODO(dalesat): Indicate this in some way other than blowing up.
+    LOG(ERROR) << "can't convert to any allowed type";
+    abort();
   }
 }
 

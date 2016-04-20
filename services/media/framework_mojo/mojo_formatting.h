@@ -19,10 +19,8 @@ namespace media {
 // See services/media/framework/ostream.h for details.
 
 // Mojo defines versions of operator<< for this that produce only numbers.
-const char* StringFromMediaTypeScheme(MediaTypeScheme value);
-const char* StringFromLpcmSampleFormat(LpcmSampleFormat value);
-const char* StringFromAudioEncoding(AudioEncoding value);
-const char* StringFromVideoEncoding(VideoEncoding value);
+const char* StringFromMediaTypeMedium(MediaTypeMedium value);
+const char* StringFromAudioSampleFormat(AudioSampleFormat value);
 const char* StringFromMediaState(MediaState value);
 
 // The following overloads add newlines.
@@ -35,21 +33,21 @@ std::ostream& operator<<(std::ostream& os, const MediaTypeSetPtr& value);
 std::ostream& operator<<(std::ostream& os, const MediaTypeDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os, const MediaTypeSetDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os,
-                         const MultiplexedMediaTypeDetailsPtr& value);
+                         const AudioMediaTypeDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os,
-                         const MultiplexedMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(std::ostream& os,
-                         const LpcmMediaTypeDetailsPtr& value);
-std::ostream& operator<<(std::ostream& os,
-                         const LpcmMediaTypeSetDetailsPtr& value);
-std::ostream& operator<<(std::ostream& os,
-                         const CompressedAudioMediaTypeDetailsPtr& value);
-std::ostream& operator<<(std::ostream& os,
-                         const CompressedAudioMediaTypeSetDetailsPtr& value);
+                         const AudioMediaTypeSetDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os,
                          const VideoMediaTypeDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os,
                          const VideoMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const TextMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const TextMediaTypeSetDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const SubpictureMediaTypeDetailsPtr& value);
+std::ostream& operator<<(std::ostream& os,
+                         const SubpictureMediaTypeSetDetailsPtr& value);
 std::ostream& operator<<(std::ostream& os,
                          const MediaSourceStreamDescriptorPtr& value);
 std::ostream& operator<<(std::ostream& os, const TimelineQuadPtr& value);

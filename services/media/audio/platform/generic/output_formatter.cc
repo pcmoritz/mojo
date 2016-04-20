@@ -68,7 +68,7 @@ class SilenceMaker<DType,
 template <typename DType, uint32_t DChCount>
 class OutputFormatterImpl : public OutputFormatter {
  public:
-  explicit OutputFormatterImpl(const LpcmMediaTypeDetailsPtr& format)
+  explicit OutputFormatterImpl(const AudioMediaTypeDetailsPtr& format)
     : OutputFormatter(format, sizeof(DType), DChCount) {}
 
   void ProduceOutput(const int32_t* source,
@@ -95,7 +95,7 @@ class OutputFormatterImpl : public OutputFormatter {
 };
 
 // Constructor/destructor for the common OutputFormatter base class.
-OutputFormatter::OutputFormatter(const LpcmMediaTypeDetailsPtr& format,
+OutputFormatter::OutputFormatter(const AudioMediaTypeDetailsPtr& format,
                                  uint32_t bytes_per_sample,
                                  uint32_t channels)
   : format_(format.Clone()),
@@ -109,7 +109,7 @@ OutputFormatter::~OutputFormatter() {}
 // the output formatter.
 template <typename DType>
 static inline OutputFormatterPtr SelectOF(
-    const LpcmMediaTypeDetailsPtr& format) {
+    const AudioMediaTypeDetailsPtr& format) {
   switch (format->channels) {
   case 1:
     return OutputFormatterPtr(new OutputFormatterImpl<DType, 1>(format));
@@ -123,13 +123,13 @@ static inline OutputFormatterPtr SelectOF(
 }
 
 OutputFormatterPtr OutputFormatter::Select(
-    const LpcmMediaTypeDetailsPtr& format) {
+    const AudioMediaTypeDetailsPtr& format) {
   DCHECK(format);
 
   switch (format->sample_format) {
-  case LpcmSampleFormat::UNSIGNED_8:
+  case AudioSampleFormat::UNSIGNED_8:
     return SelectOF<uint8_t>(format);
-  case LpcmSampleFormat::SIGNED_16:
+  case AudioSampleFormat::SIGNED_16:
     return SelectOF<int16_t>(format);
   default:
     LOG(ERROR) << "Unsupported output sample format "

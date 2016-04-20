@@ -15,7 +15,7 @@ namespace media {
 // Helper class that performs various LPCM processing functions.
 class LpcmUtil {
  public:
-  static std::unique_ptr<LpcmUtil> Create(const LpcmStreamType& stream_type);
+  static std::unique_ptr<LpcmUtil> Create(const AudioStreamType& stream_type);
 
   virtual ~LpcmUtil() {}
 

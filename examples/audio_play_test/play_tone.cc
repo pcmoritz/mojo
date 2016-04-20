@@ -122,15 +122,16 @@ void PlayToneApp::Initialize(ApplicationImpl* app) {
   // Configure our sink for 16-bit 48KHz mono.
   AudioTrackConfigurationPtr cfg = AudioTrackConfiguration::New();
 
-  LpcmMediaTypeDetailsPtr pcm_cfg = LpcmMediaTypeDetails::New();
-  pcm_cfg->sample_format     = LpcmSampleFormat::SIGNED_16;
+  AudioMediaTypeDetailsPtr pcm_cfg = AudioMediaTypeDetails::New();
+  pcm_cfg->sample_format     = AudioSampleFormat::SIGNED_16;
   pcm_cfg->channels          = 1;
   pcm_cfg->frames_per_second = SAMP_FREQ;
 
   cfg->media_type = MediaType::New();
-  cfg->media_type->scheme = MediaTypeScheme::LPCM;
+  cfg->media_type->medium = MediaTypeMedium::AUDIO;
   cfg->media_type->details = MediaTypeDetails::New();
-  cfg->media_type->details->set_lpcm(pcm_cfg.Pass());
+  cfg->media_type->details->set_audio(pcm_cfg.Pass());
+  cfg->media_type->encoding = MediaType::kAudioEncodingLpcm;
 
   MediaConsumerPtr pipe;
   audio_track_->Configure(cfg.Pass(), GetProxy(&pipe));

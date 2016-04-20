@@ -21,17 +21,11 @@ Result ConvertResult(MojoResult mojo_result);
 // Converts a MediaResult into a Result.
 Result Convert(MediaResult media_result);
 
-// Creates a StreamType::Scheme from a MediaTypeScheme.
-StreamType::Scheme Convert(MediaTypeScheme media_type_scheme);
+// Creates a StreamType::Medium from a MediaTypeMedium.
+StreamType::Medium Convert(MediaTypeMedium media_type_medium);
 
-// Creates an LpcmStreamType::SampleFormat from an LpcmSampleFormat.
-LpcmStreamType::SampleFormat Convert(LpcmSampleFormat lpcm_sample_format);
-
-// Creates a CompressedAudioStreamType::VideoEncoding from an AudioEncoding.
-CompressedAudioStreamType::AudioEncoding Convert(AudioEncoding audio_encoding);
-
-// Creates a VideoStreamType::VideoEncoding from a VideoEncoding.
-VideoStreamType::VideoEncoding Convert(VideoEncoding video_encoding);
+// Creates an AudioStreamType::SampleFormat from an AudioSampleFormat.
+AudioStreamType::SampleFormat Convert(AudioSampleFormat audio_sample_format);
 
 // Creates a VideoStreamType::VideoProfile from a VideoProfile.
 VideoStreamType::VideoProfile Convert(VideoProfile video_profile);
@@ -57,23 +51,17 @@ std::unique_ptr<StreamTypeSet> Convert(const MediaTypeSetPtr& media_type_set);
 std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>> Convert(
     const Array<MediaTypeSetPtr>& media_type_sets);
 
-// Creates Bytes from a base64-encoded string.
-std::unique_ptr<Bytes> Convert(const String& base64);
+// Creates Bytes from an Array of bytes.
+std::unique_ptr<Bytes> Convert(const Array<uint8_t>& bytes_array);
 
 // Creates Metadata from MediaMetadata.
 std::unique_ptr<Metadata> Convert(const MediaMetadataPtr& media_metadata);
 
-// Creates a MediaTypeScheme from a StreamType::Scheme.
-MediaTypeScheme Convert(StreamType::Scheme scheme);
+// Creates a MediaTypeMedium from a StreamType::Medium.
+MediaTypeMedium Convert(StreamType::Medium medium);
 
-// Creates an LpcmSampleFormat from an LpcmStreamType::SampleFormat.
-LpcmSampleFormat Convert(LpcmStreamType::SampleFormat sample_format);
-
-// Creates an AudioEncoding from a CompressedAudioStreamType::VideoEncoding.
-AudioEncoding Convert(CompressedAudioStreamType::AudioEncoding audio_encoding);
-
-// Creates a VideoEncoding from a VideoStreamType::VideoEncoding.
-VideoEncoding Convert(VideoStreamType::VideoEncoding video_encoding);
+// Creates an AudioSampleFormat from an AudioStreamType::SampleFormat.
+AudioSampleFormat Convert(AudioStreamType::SampleFormat sample_format);
 
 // Creates a VideoProfile from a VideoStreamType::VideoProfile.
 VideoProfile Convert(VideoStreamType::VideoProfile video_profile);
@@ -101,8 +89,8 @@ Array<MediaTypeSetPtr> Convert(
     const std::unique_ptr<std::vector<std::unique_ptr<StreamTypeSet>>>&
         stream_type_sets);
 
-// Creates a base64-encoded string from Bytes.
-String Convert(const std::unique_ptr<Bytes>& bytes);
+// Creates an Array of bytes from Bytes.
+Array<uint8_t> Convert(const std::unique_ptr<Bytes>& bytes);
 
 // Creates MediaMetadata from Metadata.
 MediaMetadataPtr Convert(const std::unique_ptr<Metadata>& metadata);

@@ -70,17 +70,17 @@ void AlsaOutput::AlsaClose() {
 }
 
 MediaResult AlsaOutput::AlsaSelectFormat(
-    const LpcmMediaTypeDetailsPtr& config) {
+    const AudioMediaTypeDetailsPtr& config) {
   switch (config->sample_format) {
-  case LpcmSampleFormat::UNSIGNED_8:
+  case AudioSampleFormat::UNSIGNED_8:
     alsa_format_ = SND_PCM_FORMAT_U8;
     break;
 
-  case LpcmSampleFormat::SIGNED_16:
+  case AudioSampleFormat::SIGNED_16:
     alsa_format_ = SND_PCM_FORMAT_S16;
     break;
 
-  case LpcmSampleFormat::SIGNED_24_IN_32:
+  case AudioSampleFormat::SIGNED_24_IN_32:
   default:
     return MediaResult::UNSUPPORTED_CONFIG;
   }

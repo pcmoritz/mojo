@@ -20,7 +20,7 @@ FfmpegAudioDecoder::FfmpegAudioDecoder(AvCodecContextPtr av_codec_context)
   if (av_sample_fmt_is_planar(context()->sample_fmt)) {
     // Prepare for interleaving.
     stream_type_ = output_stream_type();
-    lpcm_util_ = LpcmUtil::Create(*stream_type_->lpcm());
+    lpcm_util_ = LpcmUtil::Create(*stream_type_->audio());
   }
 }
 
@@ -87,8 +87,8 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(const AVFrame& av_frame,
     // later in ReleaseBufferForAvFrame. We need a new buffer for the
     // interleaved frames, which we get from the provided allocator.
     DCHECK(stream_type_);
-    DCHECK(stream_type_->lpcm());
-    payload_size = stream_type_->lpcm()->min_buffer_size(av_frame.nb_samples);
+    DCHECK(stream_type_->audio());
+    payload_size = stream_type_->audio()->min_buffer_size(av_frame.nb_samples);
     payload_buffer = allocator->AllocatePayloadBuffer(payload_size);
 
     lpcm_util_->Interleave(av_buffer_context->buffer(),

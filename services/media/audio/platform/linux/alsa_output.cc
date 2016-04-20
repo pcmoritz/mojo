@@ -51,10 +51,10 @@ AudioOutputPtr CreateDefaultAlsaOutput(AudioOutputManager* manager) {
   AlsaOutput* alsa_out = static_cast<AlsaOutput*>(audio_out.get());
   DCHECK(alsa_out);
 
-  LpcmMediaTypeDetailsPtr config(LpcmMediaTypeDetails::New());
+  AudioMediaTypeDetailsPtr config(AudioMediaTypeDetails::New());
   config->frames_per_second = 48000;
   config->channels = 2;
-  config->sample_format = LpcmSampleFormat::SIGNED_16;
+  config->sample_format = AudioSampleFormat::SIGNED_16;
 
   if (alsa_out->Configure(config.Pass()) != MediaResult::OK) {
     return nullptr;
@@ -77,7 +77,7 @@ AudioOutputPtr AlsaOutput::New(AudioOutputManager* manager) {
   return AudioOutputPtr(new AlsaOutput(manager));
 }
 
-MediaResult AlsaOutput::Configure(LpcmMediaTypeDetailsPtr config) {
+MediaResult AlsaOutput::Configure(AudioMediaTypeDetailsPtr config) {
   if (!config) { return MediaResult::INVALID_ARGUMENT; }
   if (output_formatter_) { return MediaResult::BAD_STATE; }
 

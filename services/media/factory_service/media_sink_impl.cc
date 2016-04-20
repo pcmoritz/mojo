@@ -112,19 +112,12 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
 
     graph_.ConnectOutputToPart(out, producer_ref);
 
-    switch (producer_stream_type->scheme()) {
-      case StreamType::Scheme::kLpcm:
-        frames_per_second_ = producer_stream_type->lpcm()->frames_per_second();
-        break;
-      case StreamType::Scheme::kCompressedAudio:
-        frames_per_second_ =
-            producer_stream_type->compressed_audio()->frames_per_second();
-        break;
-      default:
-        // Unsupported producer stream type.
-        producer_state_ = MediaState::FAULT;
-        status_publisher_.SendUpdates();
-        return;
+    if (producer_stream_type->medium() == StreamType::Medium::kAudio) {
+      frames_per_second_ = producer_stream_type->audio()->frames_per_second();
+    } else {
+      // Unsupported producer stream type.
+      LOG(ERROR) << "unsupported producer stream type";
+      abort();
     }
 
     controller_->Configure(

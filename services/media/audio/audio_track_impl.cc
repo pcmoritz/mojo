@@ -21,21 +21,21 @@ constexpr size_t AudioTrackImpl::PTS_FRACTIONAL_BITS;
 // TODO(johngro): If there is ever a better way to do this type of static-table
 // initialization using mojom generated structs, we should switch to it.
 static const struct {
-  LpcmSampleFormat sample_format;
+  AudioSampleFormat sample_format;
   uint32_t min_channels;
   uint32_t max_channels;
   uint32_t min_frames_per_second;
   uint32_t max_frames_per_second;
-} kSupportedLpcmTypeSets[] = {
+} kSupportedAudioTypeSets[] = {
   {
-    .sample_format = LpcmSampleFormat::UNSIGNED_8,
+    .sample_format = AudioSampleFormat::UNSIGNED_8,
     .min_channels = 1,
     .max_channels = 2,
     .min_frames_per_second = 1000,
     .max_frames_per_second = 48000,
   },
   {
-    .sample_format = LpcmSampleFormat::SIGNED_16,
+    .sample_format = AudioSampleFormat::SIGNED_16,
     .min_channels = 1,
     .max_channels = 2,
     .min_frames_per_second = 1000,
@@ -108,24 +108,27 @@ void AudioTrackImpl::Describe(const DescribeCallback& cbk) {
   AudioTrackDescriptorPtr desc(AudioTrackDescriptor::New());
 
   desc->supported_media_types =
-    Array<MediaTypeSetPtr>::New(arraysize(kSupportedLpcmTypeSets));
+    Array<MediaTypeSetPtr>::New(arraysize(kSupportedAudioTypeSets));
 
   for (size_t i = 0; i < desc->supported_media_types.size(); ++i) {
     const MediaTypeSetPtr& mts =
       (desc->supported_media_types[i] = MediaTypeSet::New());
 
-    mts->scheme  = MediaTypeScheme::LPCM;
-    mts->details = MediaTypeSetDetails::New();
+    mts->medium    = MediaTypeMedium::AUDIO;
+    mts->encodings = Array<String>::New(1);
+    mts->details   = MediaTypeSetDetails::New();
 
-    const auto& s = kSupportedLpcmTypeSets[i];
-    LpcmMediaTypeSetDetailsPtr lpcm_detail = LpcmMediaTypeSetDetails::New();
+    mts->encodings[0] = MediaType::kAudioEncodingLpcm;
 
-    lpcm_detail->sample_format = s.sample_format;
-    lpcm_detail->min_channels = s.min_channels;
-    lpcm_detail->max_channels = s.max_channels;
-    lpcm_detail->min_frames_per_second = s.min_frames_per_second;
-    lpcm_detail->max_frames_per_second = s.max_frames_per_second;
-    mts->details->set_lpcm(lpcm_detail.Pass());
+    const auto& s = kSupportedAudioTypeSets[i];
+    AudioMediaTypeSetDetailsPtr audio_detail = AudioMediaTypeSetDetails::New();
+
+    audio_detail->sample_format = s.sample_format;
+    audio_detail->min_channels = s.min_channels;
+    audio_detail->max_channels = s.max_channels;
+    audio_detail->min_frames_per_second = s.min_frames_per_second;
+    audio_detail->max_frames_per_second = s.max_frames_per_second;
+    mts->details->set_audio(audio_detail.Pass());
   }
 
   cbk.Run(desc.Pass());
@@ -141,20 +144,21 @@ void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
   }
 
   // Check the requested configuration.
-  if ((configuration->media_type->scheme != MediaTypeScheme::LPCM) ||
-      (!configuration->media_type->details->is_lpcm())) {
+  if ((configuration->media_type->medium != MediaTypeMedium::AUDIO) ||
+      (configuration->media_type->encoding != MediaType::kAudioEncodingLpcm) ||
+      (!configuration->media_type->details->is_audio())) {
     LOG(ERROR) << "Unsupported configuration requested in "
-                  "AudioTrack::Configure.  Media type must be LPCM.";
+                  "AudioTrack::Configure.  Media type must be LPCM audio.";
     Shutdown();
     return;
   }
 
   // Search our supported configuration sets to find one compatible with this
   // request.
-  auto& cfg = configuration->media_type->details->get_lpcm();
+  auto& cfg = configuration->media_type->details->get_audio();
   size_t i;
-  for (i = 0; i < arraysize(kSupportedLpcmTypeSets); ++i) {
-    const auto& cfg_set = kSupportedLpcmTypeSets[i];
+  for (i = 0; i < arraysize(kSupportedAudioTypeSets); ++i) {
+    const auto& cfg_set = kSupportedAudioTypeSets[i];
 
     if ((cfg->sample_format == cfg_set.sample_format) &&
         (cfg->channels >= cfg_set.min_channels) &&
@@ -165,7 +169,7 @@ void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
     }
   }
 
-  if (i >= arraysize(kSupportedLpcmTypeSets)) {
+  if (i >= arraysize(kSupportedAudioTypeSets)) {
     LOG(ERROR) << "Unsupported LPCM configuration requested in "
                   "AudioTrack::Configure.  "
                << "(format = " << cfg->sample_format
@@ -206,15 +210,15 @@ void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
   // Figure out how many bytes we need to hold the requested number of nSec of
   // audio.
   switch (cfg->sample_format) {
-    case LpcmSampleFormat::UNSIGNED_8:
+    case AudioSampleFormat::UNSIGNED_8:
       bytes_per_frame_ = 1;
       break;
 
-    case LpcmSampleFormat::SIGNED_16:
+    case AudioSampleFormat::SIGNED_16:
       bytes_per_frame_ = 2;
       break;
 
-    case LpcmSampleFormat::SIGNED_24_IN_32:
+    case AudioSampleFormat::SIGNED_24_IN_32:
       bytes_per_frame_ = 4;
       break;
 

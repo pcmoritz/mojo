@@ -16,8 +16,8 @@ namespace media {
 class LpcmReformatter : public Transform {
  public:
   static std::shared_ptr<LpcmReformatter> Create(
-      const LpcmStreamType& in_type,
-      const LpcmStreamTypeSet& out_type);
+      const AudioStreamType& in_type,
+      const AudioStreamTypeSet& out_type);
 };
 
 }  // namespace media

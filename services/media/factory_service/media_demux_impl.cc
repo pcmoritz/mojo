@@ -71,8 +71,8 @@ MediaDemuxImpl::~MediaDemuxImpl() {}
 void MediaDemuxImpl::OnDemuxInitialized(Result result) {
   demux_part_ = graph_.Add(demux_);
 
-  auto demux_streams = demux_->streams();
-  for (auto demux_stream : demux_streams) {
+  const std::vector<Demux::DemuxStream*>& demux_streams = demux_->streams();
+  for (Demux::DemuxStream* demux_stream : demux_streams) {
     streams_.push_back(std::unique_ptr<Stream>(
         new Stream(demux_part_.output(demux_stream->index()),
                    demux_stream->stream_type(), &graph_)));
@@ -87,12 +87,13 @@ void MediaDemuxImpl::OnDemuxInitialized(Result result) {
 
 void MediaDemuxImpl::Describe(const DescribeCallback& callback) {
   init_complete_.When([this, callback]() {
-    auto result = Array<MediaTypePtr>::New(streams_.size());
+    Array<MediaTypePtr> result = Array<MediaTypePtr>::New(streams_.size());
     for (size_t i = 0; i < streams_.size(); i++) {
       MediaSourceStreamDescriptorPtr descriptor =
           MediaSourceStreamDescriptor::New();
       result[i] = streams_[i]->media_type();
     }
+
     callback.Run(result.Pass());
   });
 }
@@ -118,7 +119,7 @@ void MediaDemuxImpl::Prime(const PrimeCallback& callback) {
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-  for (auto& stream : streams_) {
+  for (std::unique_ptr<Stream>& stream : streams_) {
     stream->PrimeConnection(callback_joiner->NewCallback());
   }
 
@@ -132,7 +133,7 @@ void MediaDemuxImpl::Flush(const FlushCallback& callback) {
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-  for (auto& stream : streams_) {
+  for (std::unique_ptr<Stream>& stream : streams_) {
     stream->FlushConnection(callback_joiner->NewCallback());
   }
 

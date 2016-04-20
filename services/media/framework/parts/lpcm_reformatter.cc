@@ -13,8 +13,8 @@ namespace media {
 template <typename TIn, typename TOut>
 class LpcmReformatterImpl : public LpcmReformatter {
  public:
-  LpcmReformatterImpl(const LpcmStreamType& in_type,
-                      const LpcmStreamTypeSet& out_type);
+  LpcmReformatterImpl(const AudioStreamType& in_type,
+                      const AudioStreamTypeSet& out_type);
 
   ~LpcmReformatterImpl() override;
 
@@ -25,29 +25,29 @@ class LpcmReformatterImpl : public LpcmReformatter {
                        PacketPtr* output) override;
 
  private:
-  LpcmStreamType in_type_;
-  LpcmStreamType out_type_;
+  AudioStreamType in_type_;
+  AudioStreamType out_type_;
 };
 
 std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
-    const LpcmStreamType& in_type,
-    const LpcmStreamTypeSet& out_type) {
+    const AudioStreamType& in_type,
+    const AudioStreamTypeSet& out_type) {
   LpcmReformatter* result = nullptr;
 
   switch (in_type.sample_format()) {
-    case LpcmStreamType::SampleFormat::kUnsigned8:
+    case AudioStreamType::SampleFormat::kUnsigned8:
       switch (out_type.sample_format()) {
-        case LpcmStreamType::SampleFormat::kUnsigned8:
-        case LpcmStreamType::SampleFormat::kAny:
+        case AudioStreamType::SampleFormat::kUnsigned8:
+        case AudioStreamType::SampleFormat::kAny:
           result = new LpcmReformatterImpl<uint8_t, uint8_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned16:
+        case AudioStreamType::SampleFormat::kSigned16:
           result = new LpcmReformatterImpl<uint8_t, int16_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned24In32:
+        case AudioStreamType::SampleFormat::kSigned24In32:
           result = new LpcmReformatterImpl<uint8_t, int32_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kFloat:
+        case AudioStreamType::SampleFormat::kFloat:
           result = new LpcmReformatterImpl<uint8_t, float>(in_type, out_type);
           break;
         default:
@@ -56,19 +56,19 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
           break;
       }
       break;
-    case LpcmStreamType::SampleFormat::kSigned16:
+    case AudioStreamType::SampleFormat::kSigned16:
       switch (out_type.sample_format()) {
-        case LpcmStreamType::SampleFormat::kUnsigned8:
+        case AudioStreamType::SampleFormat::kUnsigned8:
           result = new LpcmReformatterImpl<int16_t, uint8_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned16:
-        case LpcmStreamType::SampleFormat::kAny:
+        case AudioStreamType::SampleFormat::kSigned16:
+        case AudioStreamType::SampleFormat::kAny:
           result = new LpcmReformatterImpl<int16_t, int16_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned24In32:
+        case AudioStreamType::SampleFormat::kSigned24In32:
           result = new LpcmReformatterImpl<int16_t, int32_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kFloat:
+        case AudioStreamType::SampleFormat::kFloat:
           result = new LpcmReformatterImpl<int16_t, float>(in_type, out_type);
           break;
         default:
@@ -77,19 +77,19 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
           break;
       }
       break;
-    case LpcmStreamType::SampleFormat::kSigned24In32:
+    case AudioStreamType::SampleFormat::kSigned24In32:
       switch (out_type.sample_format()) {
-        case LpcmStreamType::SampleFormat::kUnsigned8:
+        case AudioStreamType::SampleFormat::kUnsigned8:
           result = new LpcmReformatterImpl<int32_t, uint8_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned16:
+        case AudioStreamType::SampleFormat::kSigned16:
           result = new LpcmReformatterImpl<int32_t, int16_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned24In32:
-        case LpcmStreamType::SampleFormat::kAny:
+        case AudioStreamType::SampleFormat::kSigned24In32:
+        case AudioStreamType::SampleFormat::kAny:
           result = new LpcmReformatterImpl<int32_t, int32_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kFloat:
+        case AudioStreamType::SampleFormat::kFloat:
           result = new LpcmReformatterImpl<int32_t, float>(in_type, out_type);
           break;
         default:
@@ -98,19 +98,19 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
           break;
       }
       break;
-    case LpcmStreamType::SampleFormat::kFloat:
+    case AudioStreamType::SampleFormat::kFloat:
       switch (out_type.sample_format()) {
-        case LpcmStreamType::SampleFormat::kUnsigned8:
+        case AudioStreamType::SampleFormat::kUnsigned8:
           result = new LpcmReformatterImpl<float, uint8_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned16:
+        case AudioStreamType::SampleFormat::kSigned16:
           result = new LpcmReformatterImpl<float, int16_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kSigned24In32:
+        case AudioStreamType::SampleFormat::kSigned24In32:
           result = new LpcmReformatterImpl<float, int32_t>(in_type, out_type);
           break;
-        case LpcmStreamType::SampleFormat::kFloat:
-        case LpcmStreamType::SampleFormat::kAny:
+        case AudioStreamType::SampleFormat::kFloat:
+        case AudioStreamType::SampleFormat::kAny:
           result = new LpcmReformatterImpl<float, float>(in_type, out_type);
           break;
         default:
@@ -130,14 +130,20 @@ std::shared_ptr<LpcmReformatter> LpcmReformatter::Create(
 
 template <typename TIn, typename TOut>
 LpcmReformatterImpl<TIn, TOut>::LpcmReformatterImpl(
-    const LpcmStreamType& in_type,
-    const LpcmStreamTypeSet& out_type)
+    const AudioStreamType& in_type,
+    const AudioStreamTypeSet& out_type)
     : in_type_(in_type),
-      out_type_(out_type.sample_format() == LpcmStreamType::SampleFormat::kAny
-                    ? in_type.sample_format()
-                    : out_type.sample_format(),
-                in_type.channels(),
-                in_type.frames_per_second()) {}
+      out_type_(
+          in_type.encoding(),
+          nullptr,
+          out_type.sample_format() == AudioStreamType::SampleFormat::kAny
+              ? in_type.sample_format()
+              : out_type.sample_format(),
+          in_type.channels(),
+          in_type.frames_per_second()) {
+  DCHECK(in_type.encoding() == StreamType::kAudioEncodingLpcm);
+  DCHECK(in_type.encoding_parameters() == nullptr);
+}
 
 template <typename TIn, typename TOut>
 LpcmReformatterImpl<TIn, TOut>::~LpcmReformatterImpl() {}

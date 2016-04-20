@@ -73,41 +73,21 @@ std::ostream& operator<<(std::ostream& os,
   }
 
   os << indent;
-  os << begl << "Scheme scheme(): " << value->scheme() << std::endl;
-  switch (value->scheme()) {
-    case StreamType::Scheme::kMultiplexed:
-      os << begl << "std::unique_ptr<StreamType> multiplex_type: "
-         << value->multiplexed()->multiplex_type();
-      os << begl << "std::unique_ptr<std::vector<std::unique_ptr<StreamType>>>"
-         << " substream_types: " << value->multiplexed()->substream_types();
-      break;
-    case StreamType::Scheme::kLpcm:
+  os << begl << "Medium medium(): " << value->medium() << std::endl;
+  os << begl << "std::string encoding: " << value->encoding() << std::endl;
+  os << begl << "Bytes encoding_parameters: " << value->encoding_parameters()
+     << std::endl;
+  switch (value->medium()) {
+    case StreamType::Medium::kAudio:
       os << begl
-         << "SampleFormat sample_format: " << value->lpcm()->sample_format()
+         << "SampleFormat sample_format: " << value->audio()->sample_format()
          << std::endl;
-      os << begl << "uint32_t channels: " << value->lpcm()->channels()
-         << std::endl;
-      os << begl
-         << "uint32_t frames_per_second: " << value->lpcm()->frames_per_second()
-         << std::endl;
-      break;
-    case StreamType::Scheme::kCompressedAudio:
-      os << begl
-         << "AudioEncoding encoding: " << value->compressed_audio()->encoding()
-         << std::endl;
-      os << begl << "SampleFormat sample_format: "
-         << value->compressed_audio()->sample_format() << std::endl;
-      os << begl
-         << "uint32_t channels: " << value->compressed_audio()->channels()
+      os << begl << "uint32_t channels: " << value->audio()->channels()
          << std::endl;
       os << begl << "uint32_t frames_per_second: "
-         << value->compressed_audio()->frames_per_second() << std::endl;
-      os << begl << "std::unique_ptr<Bytes> encoding_details: "
-         << value->compressed_audio()->encoding_details() << std::endl;
+         << value->audio()->frames_per_second() << std::endl;
       break;
-    case StreamType::Scheme::kVideo:
-      os << begl << "VideoEncoding encoding: " << value->video()->encoding()
-         << std::endl;
+    case StreamType::Medium::kVideo:
       os << begl << "VideoProfile profile: " << value->video()->profile()
          << std::endl;
       os << begl
@@ -122,8 +102,6 @@ std::ostream& operator<<(std::ostream& os,
          << std::endl;
       os << begl << "uint32_t coded_height: " << value->video()->coded_height()
          << std::endl;
-      os << begl << "std::unique_ptr<Bytes> encoding_details: "
-         << value->video()->encoding_details() << std::endl;
       break;
     default:
       break;
@@ -141,38 +119,20 @@ std::ostream& operator<<(std::ostream& os,
   }
 
   os << indent;
-  os << begl << "Scheme scheme(): " << value->scheme() << std::endl;
-  switch (value->scheme()) {
-    case StreamType::Scheme::kMultiplexed:
-      os << begl << "std::unique_ptr<StreamTypeSet> multiplex_type_set: "
-         << value->multiplexed()->multiplex_type_set();
-      os << begl << "std::unique_ptr<std::vector<std::unique_ptr<"
-         << "StreamTypeSet>>> substream_type_sets: "
-         << value->multiplexed()->substream_type_sets();
-      break;
-    case StreamType::Scheme::kLpcm:
+  os << begl << "Medium medium(): " << value->medium() << std::endl;
+  os << begl << "std::vector<std::string>&: " << value->encodings()
+     << std::endl;
+  switch (value->medium()) {
+    case StreamType::Medium::kAudio:
       os << begl
-         << "SampleFormat sample_format: " << value->lpcm()->sample_format()
+         << "SampleFormat sample_format: " << value->audio()->sample_format()
          << std::endl;
-      os << begl << "Range<uint32_t> channels: " << value->lpcm()->channels()
+      os << begl << "Range<uint32_t> channels: " << value->audio()->channels()
          << std::endl;
       os << begl << "Range<uint32_t> frames_per_second: "
-         << value->lpcm()->frames_per_second() << std::endl;
+         << value->audio()->frames_per_second() << std::endl;
       break;
-    case StreamType::Scheme::kCompressedAudio:
-      os << begl
-         << "AudioEncoding encoding: " << value->compressed_audio()->encoding()
-         << std::endl;
-      os << begl << "SampleFormat sample_format: "
-         << value->compressed_audio()->sample_format() << std::endl;
-      os << begl << "Range<uint32_t> channels: "
-         << value->compressed_audio()->channels() << std::endl;
-      os << begl << "Range<uint32_t> frames_per_second: "
-         << value->compressed_audio()->frames_per_second() << std::endl;
-      break;
-    case StreamType::Scheme::kVideo:
-      os << begl << "VideoEncoding encoding: " << value->video()->encoding()
-         << std::endl;
+    case StreamType::Medium::kVideo:
       os << begl << "Range<uint32_t> width: " << value->video()->width()
          << std::endl;
       os << begl << "Range<uint32_t> height: " << value->video()->height()
@@ -223,80 +183,33 @@ std::ostream& operator<<(
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, StreamType::Scheme value) {
+std::ostream& operator<<(std::ostream& os, StreamType::Medium value) {
   switch (value) {
-    case StreamType::Scheme::kUnknown:
-      return os << "kUnknown";
-    case StreamType::Scheme::kNone:
-      return os << "kNone";
-    case StreamType::Scheme::kAnyElementary:
-      return os << "kAnyElementary";
-    case StreamType::Scheme::kAnyAudio:
-      return os << "kAnyAudio";
-    case StreamType::Scheme::kAnyVideo:
-      return os << "kAnyVideo";
-    case StreamType::Scheme::kAnySubpicture:
-      return os << "kAnySubpicture";
-    case StreamType::Scheme::kAnyText:
-      return os << "kAnyText";
-    case StreamType::Scheme::kAnyMultiplexed:
-      return os << "kAnyMultiplexed";
-    case StreamType::Scheme::kAny:
-      return os << "kAny";
-    case StreamType::Scheme::kMultiplexed:
-      return os << "kMultiplexed";
-    case StreamType::Scheme::kLpcm:
-      return os << "kLpcm";
-    case StreamType::Scheme::kCompressedAudio:
-      return os << "kCompressedAudio";
-    case StreamType::Scheme::kVideo:
+    case StreamType::Medium::kAudio:
+      return os << "kAudio";
+    case StreamType::Medium::kVideo:
       return os << "kVideo";
+    case StreamType::Medium::kText:
+      return os << "kText";
+    case StreamType::Medium::kSubpicture:
+      return os << "kSubpicture";
   }
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, LpcmStreamType::SampleFormat value) {
+std::ostream& operator<<(std::ostream& os,
+                         AudioStreamType::SampleFormat value) {
   switch (value) {
-    case LpcmStreamType::SampleFormat::kUnknown:
-      return os << "kUnknown";
-    case LpcmStreamType::SampleFormat::kAny:
+    case AudioStreamType::SampleFormat::kAny:
       return os << "kAny";
-    case LpcmStreamType::SampleFormat::kUnsigned8:
+    case AudioStreamType::SampleFormat::kUnsigned8:
       return os << "kUnsigned8";
-    case LpcmStreamType::SampleFormat::kSigned16:
+    case AudioStreamType::SampleFormat::kSigned16:
       return os << "kSigned16";
-    case LpcmStreamType::SampleFormat::kSigned24In32:
+    case AudioStreamType::SampleFormat::kSigned24In32:
       return os << "kSigned24In32";
-    case LpcmStreamType::SampleFormat::kFloat:
+    case AudioStreamType::SampleFormat::kFloat:
       return os << "kFloat";
-  }
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os,
-                         CompressedAudioStreamType::AudioEncoding value) {
-  switch (value) {
-    case CompressedAudioStreamType::AudioEncoding::kUnknown:
-      return os << "kUnknown";
-    case CompressedAudioStreamType::AudioEncoding::kAny:
-      return os << "kAny";
-    case CompressedAudioStreamType::AudioEncoding::kVorbis:
-      return os << "kVorbis";
-  }
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os,
-                         VideoStreamType::VideoEncoding value) {
-  switch (value) {
-    case VideoStreamType::VideoEncoding::kUnknown:
-      return os << "kUnknown";
-    case VideoStreamType::VideoEncoding::kAny:
-      return os << "kAny";
-    case VideoStreamType::VideoEncoding::kTheora:
-      return os << "kTheora";
-    case VideoStreamType::VideoEncoding::kVp8:
-      return os << "kVp8";
   }
   return os;
 }
