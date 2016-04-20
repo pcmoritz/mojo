@@ -28,7 +28,6 @@ namespace mojo {
 namespace system {
 namespace {
 
-// Trivial subclass that makes the constructor public.
 class TrivialDispatcher final : public Dispatcher {
  public:
   // Note: Use |MakeRefCounted<TrivialDispatcher>()|.
