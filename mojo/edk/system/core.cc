@@ -85,8 +85,8 @@ namespace system {
 //      held.
 
 Core::Core(embedder::PlatformSupport* platform_support)
-    : platform_support_(platform_support) {
-}
+    : platform_support_(platform_support),
+      handle_table_(GetConfiguration().max_handle_table_size) {}
 
 Core::~Core() {
 }

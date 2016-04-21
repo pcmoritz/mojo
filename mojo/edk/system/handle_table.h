@@ -5,6 +5,8 @@
 #ifndef MOJO_EDK_SYSTEM_HANDLE_TABLE_H_
 #define MOJO_EDK_SYSTEM_HANDLE_TABLE_H_
 
+#include <stddef.h>
+
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -39,7 +41,7 @@ bool ShutdownCheckNoLeaks(Core*);
 // case the extra locking/unlocking would be unnecessary overhead).
 class HandleTable {
  public:
-  HandleTable();
+  explicit HandleTable(size_t max_handle_table_size);
   ~HandleTable();
 
   // TODO(vtl): Replace the dispatcher-only methods with ones that either take a
@@ -134,6 +136,7 @@ class HandleTable {
   // Adds the given handle to the handle table, not doing any size checks.
   MojoHandle AddHandleNoSizeCheck(Handle&& handle);
 
+  const size_t max_handle_table_size_;
   HandleToEntryMap handle_to_entry_map_;
   MojoHandle next_handle_value_;  // Invariant: never |MOJO_HANDLE_INVALID|.
 

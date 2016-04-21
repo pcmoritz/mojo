@@ -26,7 +26,9 @@ HandleTable::Entry::~Entry() {
   DCHECK(!busy);
 }
 
-HandleTable::HandleTable() : next_handle_value_(MOJO_HANDLE_INVALID + 1) {}
+HandleTable::HandleTable(size_t max_handle_table_size)
+    : max_handle_table_size_(max_handle_table_size),
+      next_handle_value_(MOJO_HANDLE_INVALID + 1) {}
 
 HandleTable::~HandleTable() {
   // This should usually not be reached (the only instance should be owned by
@@ -65,7 +67,7 @@ MojoResult HandleTable::GetAndRemoveDispatcher(MojoHandle handle_value,
 }
 
 MojoHandle HandleTable::AddDispatcher(Dispatcher* dispatcher) {
-  if (handle_to_entry_map_.size() >= GetConfiguration().max_handle_table_size)
+  if (handle_to_entry_map_.size() >= max_handle_table_size_)
     return MOJO_HANDLE_INVALID;
   return AddHandleNoSizeCheck(
       Handle(RefPtr<Dispatcher>(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER));
@@ -74,8 +76,7 @@ MojoHandle HandleTable::AddDispatcher(Dispatcher* dispatcher) {
 std::pair<MojoHandle, MojoHandle> HandleTable::AddDispatcherPair(
     Dispatcher* dispatcher0,
     Dispatcher* dispatcher1) {
-  if (handle_to_entry_map_.size() + 1 >=
-      GetConfiguration().max_handle_table_size)
+  if (handle_to_entry_map_.size() + 1u >= max_handle_table_size_)
     return std::make_pair(MOJO_HANDLE_INVALID, MOJO_HANDLE_INVALID);
   return std::make_pair(
       AddHandleNoSizeCheck(
@@ -87,16 +88,15 @@ std::pair<MojoHandle, MojoHandle> HandleTable::AddDispatcherPair(
 bool HandleTable::AddDispatcherVector(const DispatcherVector& dispatchers,
                                       MojoHandle* handles) {
   size_t max_message_num_handles = GetConfiguration().max_message_num_handles;
-  size_t max_handle_table_size = GetConfiguration().max_handle_table_size;
 
   DCHECK_LE(dispatchers.size(), max_message_num_handles);
   DCHECK(handles);
   DCHECK_LT(
-      static_cast<uint64_t>(max_handle_table_size) + max_message_num_handles,
+      static_cast<uint64_t>(max_handle_table_size_) + max_message_num_handles,
       std::numeric_limits<size_t>::max())
       << "Addition may overflow";
 
-  if (handle_to_entry_map_.size() + dispatchers.size() > max_handle_table_size)
+  if (handle_to_entry_map_.size() + dispatchers.size() > max_handle_table_size_)
     return false;
 
   for (size_t i = 0; i < dispatchers.size(); i++) {
@@ -199,8 +199,7 @@ MojoResult HandleTable::MarkBusyAndStartTransport(
 
 MojoHandle HandleTable::AddHandleNoSizeCheck(Handle&& handle) {
   DCHECK(handle);
-  DCHECK_LT(handle_to_entry_map_.size(),
-            GetConfiguration().max_handle_table_size);
+  DCHECK_LT(handle_to_entry_map_.size(), max_handle_table_size_);
   DCHECK_NE(next_handle_value_, MOJO_HANDLE_INVALID);
 
   // TODO(vtl): Maybe we want to do something different/smarter. (Or maybe try
