@@ -45,26 +45,35 @@ TEST(HandleTest, Basic) {
   // "Null" |Handle|.
   {
     Handle h1;
+    EXPECT_FALSE(h1);
     EXPECT_FALSE(h1.dispatcher);
 
     // Copy construction.
     Handle h2(h1);
+    EXPECT_FALSE(h1);
     EXPECT_FALSE(h1.dispatcher);
+    EXPECT_FALSE(h2);
     EXPECT_FALSE(h2.dispatcher);
 
     // Move construction.
     Handle h3(std::move(h2));
+    EXPECT_FALSE(h2);
     EXPECT_FALSE(h2.dispatcher);
+    EXPECT_FALSE(h3);
     EXPECT_FALSE(h3.dispatcher);
 
     // Copy assignment.
     h1 = h3;
+    EXPECT_FALSE(h1);
     EXPECT_FALSE(h1.dispatcher);
+    EXPECT_FALSE(h3);
     EXPECT_FALSE(h3.dispatcher);
 
     // Move assignment.
     h2 = std::move(h1);
+    EXPECT_FALSE(h1);
     EXPECT_FALSE(h1.dispatcher);
+    EXPECT_FALSE(h2);
     EXPECT_FALSE(h2.dispatcher);
   }
 
@@ -73,43 +82,54 @@ TEST(HandleTest, Basic) {
     auto d = MakeRefCounted<TrivialDispatcher>();
 
     Handle h1(d.Clone(), MOJO_HANDLE_RIGHT_READ);
+    EXPECT_TRUE(h1);
     EXPECT_EQ(d, h1.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h1.rights);
 
     // Copy construction.
     Handle h2(h1);
+    EXPECT_TRUE(h1);
     EXPECT_EQ(d, h1.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h1.rights);
+    EXPECT_TRUE(h2);
     EXPECT_EQ(d, h2.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h2.rights);
 
     // Move construction.
     Handle h3(std::move(h2));
+    EXPECT_FALSE(h2);
     EXPECT_FALSE(h2.dispatcher);
+    EXPECT_TRUE(h3);
     EXPECT_EQ(d, h3.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h3.rights);
 
     // Copy assignment.
     h1 = h3;
+    EXPECT_TRUE(h1);
     EXPECT_EQ(d, h1.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h1.rights);
+    EXPECT_TRUE(h3);
     EXPECT_EQ(d, h3.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h3.rights);
 
     // Move assignment.
     h2 = std::move(h1);
+    EXPECT_FALSE(h1);
     EXPECT_FALSE(h1.dispatcher);
+    EXPECT_TRUE(h2);
     EXPECT_EQ(d, h2.dispatcher);
     EXPECT_EQ(MOJO_HANDLE_RIGHT_READ, h2.rights);
 
     // Copy assignment from "null".
     Handle h4;
     h3 = h4;
+    EXPECT_FALSE(h3);
     EXPECT_FALSE(h3.dispatcher);
 
     // Move assignment from "null".
     Handle h5;
     h2 = std::move(h5);
+    EXPECT_FALSE(h2);
     EXPECT_FALSE(h2.dispatcher);
 
     EXPECT_EQ(MOJO_RESULT_OK, d->Close());

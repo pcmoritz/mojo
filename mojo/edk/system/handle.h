@@ -30,6 +30,9 @@ struct Handle {
   Handle& operator=(const Handle&);
   Handle& operator=(Handle&&);
 
+  // A |Handle| tests as true if it actually has a dispatcher.
+  explicit operator bool() const { return !!dispatcher; }
+
   // Note: |dispatcher| is guaranteed to be null if default-constructed or
   // moved-from, but we make no guarantees about the value of |rights| in either
   // case.
