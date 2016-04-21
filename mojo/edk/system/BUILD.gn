@@ -144,6 +144,7 @@ mojo_edk_unittests("mojo_edk_system_unittests") {
     "data_pipe_unittest.cc",
     "dispatcher_unittest.cc",
     "endpoint_relayer_unittest.cc",
+    "handle_table_unittest.cc",
     "handle_unittest.cc",
     "ipc_support_unittest.cc",
     "memory_unittest.cc",

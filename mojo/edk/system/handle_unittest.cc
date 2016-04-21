@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include "mojo/edk/system/dispatcher.h"
 #include "mojo/edk/system/mock_simple_dispatcher.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
