@@ -287,6 +287,12 @@ void GLES2Implementation::RunIfContextNotLost(const base::Closure& callback) {
     callback.Run();
 }
 
+void GLES2Implementation::Echo(const base::Closure& callback) {
+  ShallowFlushCHROMIUM();
+  gpu_control_->Echo(base::Bind(&GLES2Implementation::RunIfContextNotLost,
+                                weak_ptr_factory_.GetWeakPtr(), callback));
+}
+
 void GLES2Implementation::SignalSyncPoint(uint32 sync_point,
                                           const base::Closure& callback) {
   gpu_control_->SignalSyncPoint(

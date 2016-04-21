@@ -9,13 +9,14 @@
 #include "gpu/command_buffer/client/transfer_buffer.h"
 
 namespace gles2 {
-
 namespace {
+
 const size_t kDefaultCommandBufferSize = 1024 * 1024;
 const size_t kDefaultStartTransferBufferSize = 1 * 1024 * 1024;
 const size_t kDefaultMinTransferBufferSize = 1 * 256 * 1024;
 const size_t kDefaultMaxTransferBufferSize = 16 * 1024 * 1024;
-}
+
+}  // namespace
 
 GLES2Context::GLES2Context(const MojoAsyncWaiter* async_waiter,
                            mojo::ScopedMessagePipeHandle command_buffer_handle,
@@ -57,18 +58,14 @@ bool GLES2Context::Initialize() {
                                      gpu::gles2::GLES2Implementation::kNoLimit);
 }
 
-namespace {
-void RunSignalSyncCallback(MGLSignalSyncPointCallback callback,
-                           void* closure) {
-  callback(closure);
-}
+void GLES2Context::Echo(MGLEchoCallback callback, void* closure) {
+  implementation_->Echo(base::Bind(callback, closure));
 }
 
 void GLES2Context::SignalSyncPoint(uint32_t sync_point,
                                    MGLSignalSyncPointCallback callback,
                                    void* closure) {
-  implementation_->SignalSyncPoint(
-      sync_point, base::Bind(&RunSignalSyncCallback, callback, closure));
+  implementation_->SignalSyncPoint(sync_point, base::Bind(callback, closure));
 }
 
 void GLES2Context::ContextLost() { lost_callback_(closure_); }

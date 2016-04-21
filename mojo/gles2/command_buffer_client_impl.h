@@ -62,6 +62,7 @@ class CommandBufferClientImpl : public mojo::CommandBufferLostContextObserver,
                                      size_t height,
                                      unsigned internalformat,
                                      unsigned usage) override;
+  void Echo(const base::Closure& callback) override;
   uint32 InsertSyncPoint() override;
   uint32 InsertFutureSyncPoint() override;
   void RetireSyncPoint(uint32 sync_point) override;

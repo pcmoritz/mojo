@@ -21,6 +21,7 @@
 #include "mojo/public/platform/native/gles2_impl_khr_blend_equation_advanced_thunks.h"
 #include "mojo/public/platform/native/gles2_impl_oes_vertex_array_object_thunks.h"
 #include "mojo/public/platform/native/gles2_impl_thunks.h"
+#include "mojo/public/platform/native/mgl_echo_thunks.h"
 #include "mojo/public/platform/native/mgl_onscreen_thunks.h"
 #include "mojo/public/platform/native/mgl_signal_sync_point_thunks.h"
 #include "mojo/public/platform/native/mgl_thunks.h"
@@ -121,6 +122,8 @@ bool RunNativeApplication(
             "MojoSetGLES2ImplCHROMIUMTextureMailboxThunks", app_library);
 
   if (SetThunks(MojoMakeMGLThunks, "MojoSetMGLThunks", app_library)) {
+    SetThunks(MojoMakeMGLEchoThunks, "MojoSetMGLEchoThunks", app_library);
+
     // TODO(jamesr): We should only need to expose the onscreen thunks to apps
     // that need to draw to the screen like the system compositor.
     SetThunks(MojoMakeMGLOnscreenThunks, "MojoSetMGLOnscreenThunks",

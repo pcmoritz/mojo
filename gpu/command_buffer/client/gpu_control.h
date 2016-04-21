@@ -52,6 +52,8 @@ class GPU_EXPORT GpuControl {
                                              unsigned internalformat,
                                              unsigned usage) = 0;
 
+  virtual void Echo(const base::Closure& callback) = 0;
+
   // Inserts a sync point, returning its ID. Sync point IDs are global and can
   // be used for cross-context synchronization.
   virtual uint32_t InsertSyncPoint() = 0;

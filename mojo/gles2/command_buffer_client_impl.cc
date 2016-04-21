@@ -267,6 +267,10 @@ int32_t CommandBufferClientImpl::CreateGpuMemoryBufferImage(
   return -1;
 }
 
+void CommandBufferClientImpl::Echo(const base::Closure& callback) {
+  command_buffer_->Echo(callback);
+}
+
 uint32_t CommandBufferClientImpl::InsertSyncPoint() {
   command_buffer_->InsertSyncPoint(true);
   return sync_point_client_impl_->WaitForInsertSyncPoint();

@@ -10,6 +10,7 @@
 #include "gpu/GLES2/gl2extchromium.h"
 #include "mojo/gles2/gles2_context.h"
 #include "mojo/public/c/gpu/MGL/mgl.h"
+#include "mojo/public/c/gpu/MGL/mgl_echo.h"
 #include "mojo/public/c/gpu/MGL/mgl_signal_sync_point.h"
 
 namespace gpu {
@@ -47,6 +48,8 @@ class ControlThunksImpl {
   MGLMustCastToProperFunctionPointerType GetProcAddress(const char* procname);
 
   void* GetGLES2Interface(MGLContext context);
+
+  void Echo(MGLEchoCallback callback, void* closure);
 
   void SignalSyncPoint(uint32_t sync_point,
                        MGLSignalSyncPointCallback callback,

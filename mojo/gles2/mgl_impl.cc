@@ -34,6 +34,10 @@ MGLContext MGLGetCurrentContext() {
   return gles2::ControlThunksImpl::Get()->GetCurrentContext();
 }
 
+void MGLEcho(MGLEchoCallback callback, void* closure) {
+  gles2::ControlThunksImpl::Get()->Echo(callback, closure);
+}
+
 void MGLSignalSyncPoint(uint32_t sync_point,
                         MGLSignalSyncPointCallback callback,
                         void* closure) {

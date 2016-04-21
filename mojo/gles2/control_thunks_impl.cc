@@ -79,6 +79,10 @@ void* ControlThunksImpl::GetGLES2Interface(MGLContext context) {
   return client->interface();
 }
 
+void ControlThunksImpl::Echo(MGLEchoCallback callback, void* closure) {
+  current_context_tls_.Get()->Echo(callback, closure);
+}
+
 void ControlThunksImpl::SignalSyncPoint(
     uint32_t sync_point,
     MGLSignalSyncPointCallback callback,

@@ -247,6 +247,9 @@ class GLES2_IMPL_EXPORT GLES2Implementation
   void FreeUnusedSharedMemory();
   void FreeEverything();
 
+  // TODO(abarth): This should probably be part of ContextSupport.
+  void Echo(const base::Closure& callback);
+
   // ContextSupport implementation.
   void SignalSyncPoint(uint32 sync_point,
                        const base::Closure& callback) override;
