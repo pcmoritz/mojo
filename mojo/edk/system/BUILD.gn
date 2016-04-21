@@ -154,6 +154,8 @@ mojo_edk_unittests("mojo_edk_system_unittests") {
     "message_pipe_test_utils.cc",
     "message_pipe_test_utils.h",
     "message_pipe_unittest.cc",
+    "mock_simple_dispatcher.cc",
+    "mock_simple_dispatcher.h",
     "multiprocess_message_pipe_unittest.cc",
     "options_validation_unittest.cc",
     "platform_handle_dispatcher_unittest.cc",

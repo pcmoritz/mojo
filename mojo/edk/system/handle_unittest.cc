@@ -6,36 +6,15 @@
 
 #include <utility>
 
-#include "base/logging.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/mock_simple_dispatcher.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 using mojo::util::MakeRefCounted;
-using mojo::util::RefPtr;
 
 namespace mojo {
 namespace system {
 namespace {
-
-class TrivialDispatcher final : public Dispatcher {
- public:
-  // Note: Use |MakeRefCounted<TrivialDispatcher>()|.
-
-  Type GetType() const override { return Type::UNKNOWN; }
-
- private:
-  FRIEND_MAKE_REF_COUNTED(TrivialDispatcher);
-
-  TrivialDispatcher() {}
-  ~TrivialDispatcher() override {}
-
-  RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock() override {
-    NOTREACHED();
-    return nullptr;
-  }
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(TrivialDispatcher);
-};
 
 TEST(HandleTest, Basic) {
   // Not much to do, except to test constructors/assignment. Half of the point
@@ -79,7 +58,7 @@ TEST(HandleTest, Basic) {
 
   // "Non-null" |Handle|.
   {
-    auto d = MakeRefCounted<TrivialDispatcher>();
+    auto d = MakeRefCounted<test::MockSimpleDispatcher>();
 
     Handle h1(d.Clone(), MOJO_HANDLE_RIGHT_READ);
     EXPECT_TRUE(h1);

@@ -11,8 +11,8 @@
 #include "base/logging.h"
 #include "mojo/edk/platform/platform_shared_buffer.h"
 #include "mojo/edk/system/memory.h"
+#include "mojo/edk/system/mock_simple_dispatcher.h"
 #include "mojo/edk/system/waiter.h"
-#include "mojo/edk/util/make_unique.h"
 #include "mojo/edk/util/ref_ptr.h"
 #include "mojo/edk/util/waitable_event.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -20,7 +20,6 @@
 
 using mojo::platform::PlatformSharedBufferMapping;
 using mojo::util::MakeRefCounted;
-using mojo::util::MakeUnique;
 using mojo::util::ManualResetWaitableEvent;
 using mojo::util::RefPtr;
 
@@ -28,28 +27,9 @@ namespace mojo {
 namespace system {
 namespace {
 
-class TrivialDispatcher final : public Dispatcher {
- public:
-  // Note: Use |MakeRefCounted<TrivialDispatcher>()|.
-
-  Type GetType() const override { return Type::UNKNOWN; }
-
- private:
-  FRIEND_MAKE_REF_COUNTED(TrivialDispatcher);
-
-  TrivialDispatcher() {}
-  ~TrivialDispatcher() override {}
-
-  RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock() override {
-    mutex().AssertHeld();
-    return AdoptRef(new TrivialDispatcher());
-  }
-
-  MOJO_DISALLOW_COPY_AND_ASSIGN(TrivialDispatcher);
-};
-
 TEST(DispatcherTest, Basic) {
-  auto d = MakeRefCounted<TrivialDispatcher>();
+  auto d = MakeRefCounted<test::MockSimpleDispatcher>(MOJO_HANDLE_SIGNAL_NONE,
+                                                      MOJO_HANDLE_SIGNAL_NONE);
 
   EXPECT_EQ(Dispatcher::Type::UNKNOWN, d->GetType());
 
@@ -307,7 +287,8 @@ TEST(DispatcherTest, ThreadSafetyStress) {
   for (size_t i = 0; i < kRepeatCount; i++) {
     // Manual reset, not initially signaled.
     ManualResetWaitableEvent event;
-    auto d = MakeRefCounted<TrivialDispatcher>();
+    auto d = MakeRefCounted<test::MockSimpleDispatcher>(
+        MOJO_HANDLE_SIGNAL_NONE, MOJO_HANDLE_SIGNAL_NONE);
 
     std::vector<std::thread> threads;
     for (size_t j = 0; j < kNumThreads; j++) {
@@ -337,7 +318,8 @@ TEST(DispatcherTest, ThreadSafetyStressNoClose) {
   for (size_t i = 0; i < kRepeatCount; i++) {
     // Manual reset, not initially signaled.
     ManualResetWaitableEvent event;
-    auto d = MakeRefCounted<TrivialDispatcher>();
+    auto d = MakeRefCounted<test::MockSimpleDispatcher>(
+        MOJO_HANDLE_SIGNAL_NONE, MOJO_HANDLE_SIGNAL_NONE);
 
     std::vector<std::thread> threads;
     for (size_t j = 0; j < kNumThreads; j++) {
