@@ -19,6 +19,8 @@ public class VSyncProvider implements FrameCallback {
     private static final long MAX_DRIFT_PERCENT = 5;
     // A refresh period of more than 1s is considered bogus.
     private static final long MAX_VSYNC_REFRESH_NANO = 1000000000L;
+    // A refresh period bigger than 1000Hz is considered bogus.
+    private static final long MIN_VSYNC_REFRESH_NANO = 1000000L;
     private final Choreographer mChoreographer;
     private boolean mMonitoring;
     private long mNativeAndroidVSyncProvider;
@@ -53,7 +55,7 @@ public class VSyncProvider implements FrameCallback {
     }
 
     @Override
-    public void doFrame(long timeNano) {
+    public void doFrame(final long timeNano) {
         if (mNativeAndroidVSyncProvider == 0) {
             mMonitoring = false;
             return;
@@ -65,25 +67,25 @@ public class VSyncProvider implements FrameCallback {
         }
 
         mChoreographer.postFrameCallback(this);
-        long currentTimeNano = timeNano;
         if (mLastTimeNano != 0) {
-            long currentRefreshNano = currentTimeNano - mLastTimeNano;
-            if (currentRefreshNano < MAX_VSYNC_REFRESH_NANO) {
+            long currentRefreshNano = timeNano - mLastTimeNano;
+            if (currentRefreshNano > MIN_VSYNC_REFRESH_NANO
+                    && currentRefreshNano < MAX_VSYNC_REFRESH_NANO) {
                 mVSyncRefreshNanoComputer.add(currentRefreshNano);
                 if (mLastSentTimeSynchronizationNano == 0
-                        || computeSynchronizationDriftPercent(currentTimeNano,
+                        || computeSynchronizationDriftPercent(timeNano,
                                    mLastSentTimeSynchronizationNano, mLastSentVSyncRefreshNano)
                                 > MAX_DRIFT_PERCENT
                         || computeRefreshDriftPercent(currentRefreshNano, mLastSentVSyncRefreshNano)
                                 > MAX_DRIFT_PERCENT) {
-                    mLastSentTimeSynchronizationNano = currentTimeNano;
+                    mLastSentTimeSynchronizationNano = timeNano;
                     mLastSentVSyncRefreshNano = mVSyncRefreshNanoComputer.getMedian();
-                    nativeOnSyncChanged(mNativeAndroidVSyncProvider, currentTimeNano / 1000,
+                    nativeOnSyncChanged(mNativeAndroidVSyncProvider, timeNano / 1000,
                             mLastSentVSyncRefreshNano / 1000);
                 }
             }
         }
-        mLastTimeNano = currentTimeNano;
+        mLastTimeNano = timeNano;
     }
 
     @CalledByNative
