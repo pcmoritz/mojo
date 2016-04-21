@@ -91,9 +91,15 @@ Core::Core(embedder::PlatformSupport* platform_support)
 Core::~Core() {
 }
 
-MojoHandle Core::AddDispatcher(Dispatcher* dispatcher) {
+MojoHandle Core::AddHandle(Handle&& handle) {
   MutexLocker locker(&handle_table_mutex_);
-  return handle_table_.AddDispatcher(dispatcher);
+  return handle_table_.AddHandle(std::move(handle));
+}
+
+// FIXME
+MojoHandle Core::AddDispatcher(Dispatcher* dispatcher) {
+  return AddHandle(
+      Handle(RefPtr<Dispatcher>(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER));
 }
 
 MojoResult Core::GetDispatcher(MojoHandle handle,
@@ -219,8 +225,13 @@ MojoResult Core::CreateMessagePipe(
   std::pair<MojoHandle, MojoHandle> handle_pair;
   {
     MutexLocker locker(&handle_table_mutex_);
-    handle_pair =
-        handle_table_.AddDispatcherPair(dispatcher0.get(), dispatcher1.get());
+    handle_pair = handle_table_.AddHandlePair(
+        Handle(dispatcher0.Clone(), MOJO_HANDLE_RIGHT_TRANSFER |
+                                        MOJO_HANDLE_RIGHT_READ |
+                                        MOJO_HANDLE_RIGHT_WRITE),
+        Handle(dispatcher1.Clone(), MOJO_HANDLE_RIGHT_TRANSFER |
+                                        MOJO_HANDLE_RIGHT_READ |
+                                        MOJO_HANDLE_RIGHT_WRITE));
   }
   if (handle_pair.first == MOJO_HANDLE_INVALID) {
     DCHECK_EQ(handle_pair.second, MOJO_HANDLE_INVALID);
@@ -384,8 +395,11 @@ MojoResult Core::CreateDataPipe(
   std::pair<MojoHandle, MojoHandle> handle_pair;
   {
     MutexLocker locker(&handle_table_mutex_);
-    handle_pair = handle_table_.AddDispatcherPair(producer_dispatcher.get(),
-                                                  consumer_dispatcher.get());
+    handle_pair = handle_table_.AddHandlePair(
+        Handle(producer_dispatcher.Clone(),
+               MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_WRITE),
+        Handle(consumer_dispatcher.Clone(),
+               MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ));
   }
   if (handle_pair.first == MOJO_HANDLE_INVALID) {
     DCHECK_EQ(handle_pair.second, MOJO_HANDLE_INVALID);
@@ -536,7 +550,12 @@ MojoResult Core::CreateSharedBuffer(
     return result;
   }
 
-  MojoHandle h = AddDispatcher(dispatcher.get());
+  // Note that shared buffer handles are duplicatable (by default).
+  MojoHandle h = AddHandle(Handle(
+      dispatcher.Clone(), MOJO_HANDLE_RIGHT_DUPLICATE |
+                              MOJO_HANDLE_RIGHT_TRANSFER |
+                              MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE |
+                              MOJO_HANDLE_RIGHT_EXECUTE));
   if (h == MOJO_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     dispatcher->Close();

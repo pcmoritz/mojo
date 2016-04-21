@@ -9,6 +9,7 @@
 
 #include <functional>
 
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_table.h"
 #include "mojo/edk/system/mapping_table.h"
 #include "mojo/edk/system/memory.h"
@@ -46,8 +47,15 @@ class Core {
   explicit Core(embedder::PlatformSupport* platform_support);
   virtual ~Core();
 
-  // Adds |dispatcher| to the handle table, returning the handle for it. Returns
-  // |MOJO_HANDLE_INVALID| on failure, namely if the handle table is full.
+  // Adds |handle| (which must have a dispatcher) to the handle table, returning
+  // the handle value for it. Returns |MOJO_HANDLE_INVALID| on failure, namely
+  // if the handle table is full.
+  MojoHandle AddHandle(Handle&& handle);
+
+  // DEPRECATED. TODO(vtl): Remove this.
+  // Adds |dispatcher| to the handle table, returning the handle value for it.
+  // Returns |MOJO_HANDLE_INVALID| on failure, namely if the handle table is
+  // full.
   MojoHandle AddDispatcher(Dispatcher* dispatcher);
 
   // Looks up the dispatcher for the given handle. On success, gets the

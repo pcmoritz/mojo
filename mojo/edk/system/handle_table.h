@@ -62,16 +62,17 @@ class HandleTable {
   MojoResult GetAndRemoveDispatcher(MojoHandle handle_value,
                                     util::RefPtr<Dispatcher>* dispatcher);
 
-  // Adds a dispatcher (which must be valid), returning the handle value for it.
-  // Returns |MOJO_HANDLE_INVALID| on failure (if the handle table is full).
-  MojoHandle AddDispatcher(Dispatcher* dispatcher);
+  // Adds a handle (which must have a dispatcher), returning the handle value
+  // for it. Returns |MOJO_HANDLE_INVALID| on failure (if the handle table is
+  // full).
+  MojoHandle AddHandle(Handle&& handle);
 
-  // Adds a pair of dispatchers (which must be valid), return a pair of handle
-  // values for them. On failure (if the handle table is full), the (first and
-  // second) handle values will be |MOJO_HANDLE_INVALID|, and neither dispatcher
-  // will be added.
-  std::pair<MojoHandle, MojoHandle> AddDispatcherPair(Dispatcher* dispatcher0,
-                                                      Dispatcher* dispatcher1);
+  // Adds a pair of handles (both of which must be valid), returning a pair of
+  // handle values for them. On failure (if the handle table is full), the
+  // (first and second) handle values will be |MOJO_HANDLE_INVALID|, and neither
+  // dispatcher will be added.
+  std::pair<MojoHandle, MojoHandle> AddHandlePair(Handle&& handle0,
+                                                  Handle&& handle1);
 
   // Adds the given vector of dispatchers (of size at most
   // |kMaxMessageNumHandles|). |handle_values| must point to an array of size at

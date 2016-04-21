@@ -66,23 +66,21 @@ MojoResult HandleTable::GetAndRemoveDispatcher(MojoHandle handle_value,
   return MOJO_RESULT_OK;
 }
 
-MojoHandle HandleTable::AddDispatcher(Dispatcher* dispatcher) {
-  if (handle_to_entry_map_.size() >= max_handle_table_size_)
-    return MOJO_HANDLE_INVALID;
-  return AddHandleNoSizeCheck(
-      Handle(RefPtr<Dispatcher>(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER));
+MojoHandle HandleTable::AddHandle(Handle&& handle) {
+  DCHECK(handle);
+  return (handle_to_entry_map_.size() < max_handle_table_size_)
+             ? AddHandleNoSizeCheck(std::move(handle))
+             : MOJO_HANDLE_INVALID;
 }
 
-std::pair<MojoHandle, MojoHandle> HandleTable::AddDispatcherPair(
-    Dispatcher* dispatcher0,
-    Dispatcher* dispatcher1) {
-  if (handle_to_entry_map_.size() + 1u >= max_handle_table_size_)
-    return std::make_pair(MOJO_HANDLE_INVALID, MOJO_HANDLE_INVALID);
-  return std::make_pair(
-      AddHandleNoSizeCheck(
-          Handle(RefPtr<Dispatcher>(dispatcher0), MOJO_HANDLE_RIGHT_TRANSFER)),
-      AddHandleNoSizeCheck(
-          Handle(RefPtr<Dispatcher>(dispatcher1), MOJO_HANDLE_RIGHT_TRANSFER)));
+std::pair<MojoHandle, MojoHandle> HandleTable::AddHandlePair(Handle&& handle0,
+                                                             Handle&& handle1) {
+  DCHECK(handle0);
+  DCHECK(handle1);
+  return (handle_to_entry_map_.size() + 1u < max_handle_table_size_)
+             ? std::make_pair(AddHandleNoSizeCheck(std::move(handle0)),
+                              AddHandleNoSizeCheck(std::move(handle1)))
+             : std::make_pair(MOJO_HANDLE_INVALID, MOJO_HANDLE_INVALID);
 }
 
 bool HandleTable::AddDispatcherVector(const DispatcherVector& dispatchers,
