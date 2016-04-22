@@ -9,12 +9,14 @@
 #include "files/c/mojio_sys_types.h"
 #include "files/interfaces/file.mojom.h"
 #include "mojo/public/c/system/macros.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
 
 namespace mojio {
 
 class FileFDImpl : public FDImpl {
  public:
-  FileFDImpl(ErrnoImpl* errno_impl, mojo::files::FilePtr file);
+  FileFDImpl(ErrnoImpl* errno_impl,
+             mojo::InterfaceHandle<mojo::files::File> file);
   ~FileFDImpl() override;
 
   // |FDImpl| implementation:
@@ -27,6 +29,8 @@ class FileFDImpl : public FDImpl {
   bool Fstat(struct mojio_stat* buf) override;
 
  private:
+  // TODO(vtl): Convert this to a SynchronousInterfacePtr<File> (instead of a
+  // FilePtr).
   mojo::files::FilePtr file_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(FileFDImpl);

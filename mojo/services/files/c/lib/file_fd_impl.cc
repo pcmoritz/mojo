@@ -17,10 +17,13 @@
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/environment/logging.h"
 
+using mojo::InterfaceHandle;
+
 namespace mojio {
 
-FileFDImpl::FileFDImpl(ErrnoImpl* errno_impl, mojo::files::FilePtr file)
-    : FDImpl(errno_impl), file_(file.Pass()) {
+FileFDImpl::FileFDImpl(ErrnoImpl* errno_impl,
+                       InterfaceHandle<mojo::files::File> file)
+    : FDImpl(errno_impl), file_(mojo::files::FilePtr::Create(file.Pass())) {
   MOJO_DCHECK(file_);
 }
 

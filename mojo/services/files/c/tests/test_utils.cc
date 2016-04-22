@@ -4,11 +4,13 @@
 
 #include "files/c/tests/test_utils.h"
 
-#include "files/c/lib/template_util.h"
+#include "files/interfaces/file.mojom-sync.h"
 #include "files/interfaces/file.mojom.h"
 #include "files/interfaces/types.mojom.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/public/cpp/environment/logging.h"
 
+using mojo::InterfaceHandle;
 using mojo::SynchronousInterfacePtr;
 
 namespace mojio {
@@ -28,7 +30,7 @@ void MakeDirAt(SynchronousInterfacePtr<mojo::files::Directory>* root,
   MOJO_CHECK(error == mojo::files::Error::OK);
 }
 
-mojo::files::FilePtr OpenFileAt(
+InterfaceHandle<mojo::files::File> OpenFileAt(
     SynchronousInterfacePtr<mojo::files::Directory>* root,
     const char* path,
     uint32_t open_flags) {
@@ -36,7 +38,7 @@ mojo::files::FilePtr OpenFileAt(
   MOJO_CHECK(path);
   auto& dir = *root;
 
-  mojo::files::FilePtr file;
+  InterfaceHandle<mojo::files::File> file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   MOJO_CHECK(dir->OpenFile(path, mojo::GetProxy(&file), open_flags, &error));
   if (error != mojo::files::Error::OK)
@@ -48,9 +50,9 @@ mojo::files::FilePtr OpenFileAt(
 void CreateTestFileAt(SynchronousInterfacePtr<mojo::files::Directory>* root,
                       const char* path,
                       size_t size) {
-  mojo::files::FilePtr file = OpenFileAt(
+  auto file = SynchronousInterfacePtr<mojo::files::File>::Create(OpenFileAt(
       root, path, mojo::files::kOpenFlagWrite | mojo::files::kOpenFlagCreate |
-                      mojo::files::kOpenFlagExclusive);
+                      mojo::files::kOpenFlagExclusive));
   MOJO_CHECK(file);
 
   if (!size)
@@ -61,26 +63,24 @@ void CreateTestFileAt(SynchronousInterfacePtr<mojo::files::Directory>* root,
     bytes_to_write[i] = static_cast<uint8_t>(i);
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   uint32_t num_bytes_written = 0;
-  file->Write(mojo::Array<uint8_t>::From(bytes_to_write), 0,
-              mojo::files::Whence::FROM_CURRENT,
-              Capture(&error, &num_bytes_written));
-  MOJO_CHECK(file.WaitForIncomingResponse());
+  MOJO_CHECK(file->Write(mojo::Array<uint8_t>::From(bytes_to_write), 0,
+                         mojo::files::Whence::FROM_CURRENT, &error,
+                         &num_bytes_written));
   MOJO_CHECK(error == mojo::files::Error::OK);
   MOJO_CHECK(num_bytes_written == bytes_to_write.size());
 }
 
 int64_t GetFileSize(SynchronousInterfacePtr<mojo::files::Directory>* root,
                     const char* path) {
-  mojo::files::FilePtr file =
-      OpenFileAt(root, path, mojo::files::kOpenFlagRead);
+  auto file = SynchronousInterfacePtr<mojo::files::File>::Create(
+      OpenFileAt(root, path, mojo::files::kOpenFlagRead));
   if (!file)
     return -1;
 
   // Seek to the end to get the file size (we could also stat).
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   int64_t position = -1;
-  file->Seek(0, mojo::files::Whence::FROM_END, Capture(&error, &position));
-  MOJO_CHECK(file.WaitForIncomingResponse());
+  MOJO_CHECK(file->Seek(0, mojo::files::Whence::FROM_END, &error, &position));
   MOJO_CHECK(error == mojo::files::Error::OK);
   MOJO_CHECK(position >= 0);
   return position;
@@ -89,15 +89,14 @@ int64_t GetFileSize(SynchronousInterfacePtr<mojo::files::Directory>* root,
 std::string GetFileContents(
     SynchronousInterfacePtr<mojo::files::Directory>* root,
     const char* path) {
-  mojo::files::FilePtr file =
-      OpenFileAt(root, path, mojo::files::kOpenFlagRead);
+  auto file = SynchronousInterfacePtr<mojo::files::File>::Create(
+      OpenFileAt(root, path, mojo::files::kOpenFlagRead));
   MOJO_CHECK(file);
 
   mojo::Array<uint8_t> bytes_read;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  file->Read(1024 * 1024, 0, mojo::files::Whence::FROM_START,
-             Capture(&error, &bytes_read));
-  MOJO_CHECK(file.WaitForIncomingResponse());
+  MOJO_CHECK(file->Read(1024 * 1024, 0, mojo::files::Whence::FROM_START, &error,
+                        &bytes_read));
   if (!bytes_read.size())
     return std::string();
   return std::string(reinterpret_cast<const char*>(&bytes_read[0]),

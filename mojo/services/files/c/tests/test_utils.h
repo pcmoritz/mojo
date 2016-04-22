@@ -13,6 +13,7 @@
 #include "files/interfaces/directory.mojom-sync.h"
 #include "files/interfaces/directory.mojom.h"
 #include "files/interfaces/file.mojom.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
 #include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 
 namespace mojio {
@@ -24,10 +25,10 @@ void MakeDirAt(mojo::SynchronousInterfacePtr<mojo::files::Directory>* root,
                const char* path);
 
 // Opens a file at the given path under the given root directory using the given
-// flags (|mojo::files::kOpenFlag...|). Returns a null |FilePtr| on failure
-// (e.g., if the file doesn't exist and |open_flags| doesn't indicate that it
-// should be created).
-mojo::files::FilePtr OpenFileAt(
+// flags (|mojo::files::kOpenFlag...|). Returns a "null" interface handle on
+// failure (e.g., if the file doesn't exist and |open_flags| doesn't indicate
+// that it should be created).
+mojo::InterfaceHandle<mojo::files::File> OpenFileAt(
     mojo::SynchronousInterfacePtr<mojo::files::Directory>* root,
     const char* path,
     uint32_t open_flags);
