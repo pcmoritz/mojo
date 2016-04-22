@@ -10,6 +10,7 @@
 #include "base/location.h"
 #include "base/logging.h"
 #include "base/message_loop/message_loop.h"
+#include "base/trace_event/trace_event.h"
 #include "services/gfx/compositor/backend/gpu_rasterizer.h"
 #include "services/gfx/compositor/render/render_frame.h"
 
@@ -92,7 +93,7 @@ void GpuOutput::RasterizerDelegate::PostFrame(
     was_empty = frames_.empty();
     if (frames_.size() == kMaxPipelineDepth) {
       // TODO(jeffbrown): Adjust scheduler behavior to compensate.
-      DVLOG(3) << "Renderer pipeline stalled, dropping a frame to catch up.";
+      LOG(ERROR) << "Renderer pipeline stalled, dropping a frame to catch up.";
       dropped_frame = frames_.front();  // drop an old frame outside the lock
       frames_.pop();
     }
@@ -104,6 +105,7 @@ void GpuOutput::RasterizerDelegate::PostFrame(
 }
 
 void GpuOutput::RasterizerDelegate::PostSubmit() {
+  TRACE_EVENT0("gfx", "GpuOutput::RasterizerDelegate::PostSubmit");
   task_runner_->PostTask(FROM_HERE, base::Bind(&RasterizerDelegate::SubmitTask,
                                                base::Unretained(this)));
 }
@@ -119,6 +121,7 @@ void GpuOutput::RasterizerDelegate::InitializeTask(
 }
 
 void GpuOutput::RasterizerDelegate::SubmitTask() {
+  TRACE_EVENT0("gfx", "GpuOutput::RasterizerDelegate::SubmitTask");
   bool have_more;
   scoped_refptr<RenderFrame> frame;
   {
@@ -143,6 +146,7 @@ void GpuOutput::RasterizerDelegate::OnFrameSubmitted(int64_t frame_time,
                                                      int64_t presentation_time,
                                                      int64_t submit_time,
                                                      bool presented) {
+  TRACE_EVENT0("gfx", "GpuOutput::RasterizerDelegate::OnFrameSubmitted");
   // TODO(jeffbrown): Adjust scheduler behavior based on observed timing.
   // Note: These measurements don't account for systematic downstream delay
   // in the display pipeline (how long it takes pixels to actually light up).

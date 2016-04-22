@@ -63,6 +63,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   void OnViewportParameterTimeout();
   void ApplyViewportParameters();
 
+  void DidEchoCallback(FrameCallback frame_callback);
   void Draw();
 
   void PostErrorCallback();
@@ -84,6 +85,7 @@ class GpuRasterizer : public mojo::ViewportParameterListener,
   bool have_viewport_parameters_ = false;
   int64_t vsync_timebase_ = 0u;
   int64_t vsync_interval_ = 0u;
+  uint32_t frames_pending_ = 0u;
 
   base::WeakPtrFactory<GpuRasterizer> weak_ptr_factory_;
 

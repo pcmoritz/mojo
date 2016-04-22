@@ -11,6 +11,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2extmojo.h>
 #include <MGL/mgl.h>
+#include <MGL/mgl_echo.h>
 #include <MGL/mgl_onscreen.h>
 #include <MGL/mgl_signal_sync_point.h>
 
@@ -19,6 +20,7 @@
 #include "base/logging.h"
 #include "base/message_loop/message_loop.h"
 #include "base/time/time.h"
+#include "base/trace_event/trace_event.h"
 #include "services/gfx/compositor/backend/vsync_scheduler.h"
 #include "services/gfx/compositor/render/render_frame.h"
 
@@ -186,8 +188,11 @@ void GpuRasterizer::ApplyViewportParameters() {
   }
 }
 
+constexpr uint32_t kMaxFramesPending = 2;
+
 void GpuRasterizer::SubmitFrame(const scoped_refptr<RenderFrame>& frame,
                                 const FrameCallback& frame_callback) {
+  TRACE_EVENT0("gfx", "GpuRasterizer::SubmitFrame");
   DCHECK(frame);
 
   if (frame_ && !frame_callback_.is_null())
@@ -196,11 +201,28 @@ void GpuRasterizer::SubmitFrame(const scoped_refptr<RenderFrame>& frame,
   frame_ = frame;
   frame_callback_ = frame_callback;
 
-  if (gl_context_ && !gl_context_->is_lost())
+  if (gl_context_ && !gl_context_->is_lost()) {
+    if (frames_pending_ == kMaxFramesPending) {
+      TRACE_EVENT_INSTANT0("gfx", "GpuRasterizer dropping",
+                           TRACE_EVENT_SCOPE_THREAD);
+      LOG(ERROR) << "too many frames pending, dropping";
+      frame_callback_.Run(false);
+      return;
+    }
     Draw();
+  } else
+    frame_callback_.Run(false);
+}
+
+static void DidEcho(void* context) {
+  TRACE_EVENT_ASYNC_END0("gfx", "SwapBuffers Echo", context);
+  auto cb = static_cast<base::Closure*>(context);
+  cb->Run();
+  delete cb;
 }
 
 void GpuRasterizer::Draw() {
+  TRACE_EVENT0("gfx", "GpuRasterizer::Draw");
   DCHECK(gl_context_);
   DCHECK(ganesh_context_);
   DCHECK(frame_);
@@ -232,12 +254,28 @@ void GpuRasterizer::Draw() {
 
   // Swap buffers and listen for completion.
   // TODO: Investigate using |MGLSignalSyncPoint| to wait for completion.
-  MGLSwapBuffers();
+  {
+    TRACE_EVENT0("gfx", "MGLSwapBuffers");
+    MGLSwapBuffers();
+  }
+  base::Closure* echo_callback = new base::Closure(
+      base::Bind(&GpuRasterizer::DidEchoCallback,
+                 weak_ptr_factory_.GetWeakPtr(), frame_callback_));
+  frame_callback_.Reset();
+  TRACE_EVENT_ASYNC_BEGIN0("gfx", "SwapBuffers Echo", echo_callback);
+  MGLEcho(DidEcho, echo_callback);
+  frames_pending_++;
+  TRACE_COUNTER1("gfx", "GpuRasterizer::frames_pending_", frames_pending_);
+}
 
+void GpuRasterizer::DidEchoCallback(FrameCallback frame_callback) {
+  frames_pending_--;
+  TRACE_COUNTER1("gfx", "GpuRasterizer::frames_pending_", frames_pending_);
+  TRACE_EVENT0("gfx", "GpuRasterizer::DidEchoCallback");
   // Signal pending callback for backpressure.
-  if (!frame_callback_.is_null()) {
-    frame_callback_.Run(true);
-    frame_callback_.Reset();
+  if (!frame_callback.is_null()) {
+    frame_callback.Run(true);
+    frame_callback.Reset();
   }
 }
 

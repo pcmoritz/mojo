@@ -10,6 +10,7 @@
 #include "base/location.h"
 #include "base/logging.h"
 #include "base/time/time.h"
+#include "base/trace_event/trace_event.h"
 
 namespace compositor {
 
@@ -51,14 +52,15 @@ bool VsyncScheduler::State::Start(int64_t vsync_timebase,
   // Ensure vsync timing is anchored on actual observations from the past.
   MojoTimeTicks now = GetTimeTicksNow();
   if (vsync_timebase > now) {
-    DVLOG(1) << "Vsync timebase is in the future: vsync_timebase="
-             << vsync_timebase << ", now=" << now;
+    LOG(WARNING) << "Vsync timebase is in the future: vsync_timebase="
+                 << vsync_timebase << ", now=" << now;
     return false;
   }
   if (vsync_interval < kMinVsyncInterval ||
       vsync_interval > kMaxVsyncInterval) {
-    DVLOG(1) << "Vsync interval is invalid: vsync_interval=" << vsync_interval
-             << ", min=" << kMinVsyncInterval << ", max=" << kMaxVsyncInterval;
+    LOG(WARNING) << "Vsync interval is invalid: vsync_interval="
+                 << vsync_interval << ", min=" << kMinVsyncInterval
+                 << ", max=" << kMaxVsyncInterval;
     return false;
   }
   if (snapshot_phase < update_phase ||
@@ -67,9 +69,9 @@ bool VsyncScheduler::State::Start(int64_t vsync_timebase,
     // Updating and snapshotting must happen within the same frame interval
     // to avoid having multiple updates in progress simultanteously (which
     // doesn't make much sense if we're already compute bound).
-    DVLOG(1) << "Vsync scheduling phases are invalid: update_phase="
-             << update_phase << ", snapshot_phase=" << snapshot_phase
-             << ", presentation_phase=" << presentation_phase;
+    LOG(WARNING) << "Vsync scheduling phases are invalid: update_phase="
+                 << update_phase << ", snapshot_phase=" << snapshot_phase
+                 << ", presentation_phase=" << presentation_phase;
     return false;
   }
 
@@ -119,12 +121,12 @@ void VsyncScheduler::State::ScheduleFrame(SchedulingMode scheduling_mode) {
 }
 
 void VsyncScheduler::State::ScheduleLocked(MojoTimeTicks now) {
+  TRACE_EVENT2("gfx", "VsyncScheduler::ScheduleLocked", "pending_dispatch",
+               pending_dispatch_, "need_update", need_update_);
+
   DCHECK(running_);
   DCHECK(now >= vsync_timebase_);
-  DVLOG(2) << "schedule: now=" << now << ", need_update=" << need_update_
-           << ", last_delivered_update_time=" << last_delivered_update_time_
-           << ", last_delivered_presentation_time="
-           << last_delivered_presentation_time_;
+
   if (pending_dispatch_)
     return;
 
@@ -170,9 +172,8 @@ void VsyncScheduler::State::PostDispatchLocked(int64_t now,
                                                int64_t delivery_time,
                                                Action action,
                                                int64_t update_time) {
-  DVLOG(2) << "post: now=" << now << ", delivery_time=" << delivery_time
-           << ", action=" << static_cast<int>(action)
-           << ", update_time=" << update_time;
+  TRACE_EVENT2("gfx", "VsyncScheduler::PostDispatchLocked", "delivery_time",
+               delivery_time, "update_time", update_time);
 
   task_runner_->PostDelayedTask(
       FROM_HERE,
@@ -195,6 +196,9 @@ void VsyncScheduler::State::DispatchThunk(
 void VsyncScheduler::State::Dispatch(int32_t generation,
                                      Action action,
                                      int64_t update_time) {
+  TRACE_EVENT2("gfx", "VsyncScheduler::Dispatch", "action",
+               static_cast<int>(action), "update_time", update_time);
+
   MojoTimeTicks now = GetTimeTicksNow();
   DCHECK(update_time <= now);
 
@@ -214,15 +218,15 @@ void VsyncScheduler::State::Dispatch(int32_t generation,
     if (action == Action::kUpdate) {
       int64_t update_deadline = update_time - update_phase_ + snapshot_phase_;
       if (now > update_deadline) {
-        LOG(WARNING) << "Compositor missed update deadline by "
-                     << (now - update_deadline) << " us";
+        DLOG(WARNING) << "Compositor missed update deadline by "
+                      << (now - update_deadline) << " us";
         missed_deadline = true;
       }
     } else {
       int64_t snapshot_deadline = update_time + vsync_interval_;
       if (now > snapshot_deadline) {
-        LOG(WARNING) << "Compositor missed snapshot deadline by "
-                     << (now - snapshot_deadline) << " us";
+        DLOG(WARNING) << "Compositor missed snapshot deadline by "
+                      << (now - snapshot_deadline) << " us";
         missed_deadline = true;
       }
     }
@@ -231,10 +235,6 @@ void VsyncScheduler::State::Dispatch(int32_t generation,
       update_time = now - offset;
       DCHECK(update_time > now - vsync_interval_ && update_time <= now);
     }
-
-    DVLOG(2) << "dispatch: now=" << now
-             << ", action=" << static_cast<int>(action)
-             << ", update_time=" << update_time;
 
     // Schedule the corresponding snapshot for the update.
     if (action == Action::kUpdate) {
@@ -250,7 +250,9 @@ void VsyncScheduler::State::Dispatch(int32_t generation,
       // If we missed the deadline on an early snapshot, then just skip it
       // and wait for the following update instead.
       if (action == Action::kEarlySnapshot && missed_deadline) {
-        DVLOG(2) << "skip early snapshot";
+        TRACE_EVENT_INSTANT0(
+            "gfx", "VsyncScheduler::StateDispatch Skipped early snapshot",
+            TRACE_EVENT_SCOPE_THREAD);
         return;
       }
     } else {
