@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "services/media/framework/types/audio_stream_type.h"
+#include "services/media/framework/types/subpicture_stream_type.h"
+#include "services/media/framework/types/text_stream_type.h"
+#include "services/media/framework/types/video_stream_type.h"
 #include "services/media/framework_mojo/mojo_type_conversions.h"
 
 namespace mojo {

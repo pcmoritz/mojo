@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
-#define SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
+#ifndef SERVICES_MEDIA_FRAMEWORK_UTIL_CONVERSION_PIPELINE_BUILDER_H_
+#define SERVICES_MEDIA_FRAMEWORK_UTIL_CONVERSION_PIPELINE_BUILDER_H_
 
 #include "services/media/framework/graph.h"
 #include "services/media/framework/packet.h"
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/stream_type.h"
 
 namespace mojo {
 namespace media {
@@ -26,4 +26,4 @@ bool BuildConversionPipeline(
 }  // namespace media
 }  // namespace mojo
 
-#endif  // SERVICES_MEDIA_FRAMEWORK_CONVERSION_PIPELINE_BUILDER_H_
+#endif  // SERVICES_MEDIA_FRAMEWORK_UTIL_CONVERSION_PIPELINE_BUILDER_H_

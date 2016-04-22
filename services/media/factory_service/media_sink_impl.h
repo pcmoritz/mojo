@@ -15,8 +15,8 @@
 #include "services/media/factory_service/factory_service.h"
 #include "services/media/factory_service/mojo_publisher.h"
 #include "services/media/framework/graph.h"
-#include "services/media/framework/incident.h"
 #include "services/media/framework/parts/decoder.h"
+#include "services/media/framework/util/incident.h"
 #include "services/media/framework_mojo/mojo_consumer.h"
 #include "services/media/framework_mojo/mojo_producer.h"
 

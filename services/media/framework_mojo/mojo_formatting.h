@@ -11,7 +11,7 @@
 #include "mojo/services/media/common/interfaces/rate_control.mojom.h"
 #include "mojo/services/media/control/interfaces/media_source.mojom.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
-#include "services/media/framework/formatting.h"
+#include "services/media/framework/util/formatting.h"
 
 namespace mojo {
 namespace media {

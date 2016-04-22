@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "services/media/framework/incident.h"
+#include "services/media/framework/util/incident.h"
 
 namespace mojo {
 namespace media {

@@ -7,7 +7,7 @@
 
 #include <ostream>
 
-#include "services/media/framework/formatting.h"
+#include "services/media/framework/util/formatting.h"
 extern "C" {
 #include "third_party/ffmpeg/libavformat/avformat.h"
 }

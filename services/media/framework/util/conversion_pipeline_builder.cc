@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "services/media/framework/conversion_pipeline_builder.h"
-#include "services/media/framework/formatting.h"
 #include "services/media/framework/parts/decoder.h"
 #include "services/media/framework/parts/lpcm_reformatter.h"
+#include "services/media/framework/util/conversion_pipeline_builder.h"
+#include "services/media/framework/util/formatting.h"
 
 namespace mojo {
 namespace media {

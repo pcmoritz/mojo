@@ -3,6 +3,10 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
+#include "services/media/framework/types/audio_stream_type.h"
+#include "services/media/framework/types/subpicture_stream_type.h"
+#include "services/media/framework/types/text_stream_type.h"
+#include "services/media/framework/types/video_stream_type.h"
 #include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/ffmpeg_init.h"
 extern "C" {

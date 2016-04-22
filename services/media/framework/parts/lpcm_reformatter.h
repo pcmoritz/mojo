@@ -6,7 +6,7 @@
 #define SERVICES_MEDIA_FRAMEWORK_PARTS_LPCM_REFORMATTER_H_
 
 #include "services/media/framework/models/transform.h"
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/audio_stream_type.h"
 
 namespace mojo {
 namespace media {

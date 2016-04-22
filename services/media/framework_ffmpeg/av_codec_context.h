@@ -5,7 +5,8 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_CODEC_CONTEXT_H_
 #define SERVICES_MEDIA_FRAMEWORK_FFMPEG_AV_CODEC_CONTEXT_H_
 
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/stream_type.h"
+#include "services/media/framework/types/video_stream_type.h"
 extern "C" {
 #include "third_party/ffmpeg/libavformat/avformat.h"
 }

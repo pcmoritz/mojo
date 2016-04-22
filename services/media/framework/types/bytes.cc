@@ -2,14 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "services/media/framework/callback_joiner.h"
+#include "services/media/framework/types/bytes.h"
 
 namespace mojo {
 namespace media {
 
-CallbackJoiner::CallbackJoiner() {}
+Bytes::Bytes(size_t size) : storage_(size) {}
 
-CallbackJoiner::~CallbackJoiner() {}
+Bytes::~Bytes() {}
+
+std::unique_ptr<Bytes> Bytes::Clone() const {
+  return std::unique_ptr<Bytes>(new Bytes(*this));
+}
 
 }  // namespace media
 }  // namespace mojo

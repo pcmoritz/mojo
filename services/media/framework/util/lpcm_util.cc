@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
-#include "services/media/framework/formatting.h"
-#include "services/media/framework/lpcm_util.h"
+#include "services/media/framework/util/formatting.h"
+#include "services/media/framework/util/lpcm_util.h"
 
 namespace mojo {
 namespace media {

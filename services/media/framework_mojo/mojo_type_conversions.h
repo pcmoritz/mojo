@@ -10,7 +10,9 @@
 #include "mojo/services/media/common/interfaces/media_types.mojom.h"
 #include "services/media/framework/metadata.h"
 #include "services/media/framework/result.h"
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/audio_stream_type.h"
+#include "services/media/framework/types/stream_type.h"
+#include "services/media/framework/types/video_stream_type.h"
 
 namespace mojo {
 namespace media {

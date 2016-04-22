@@ -6,7 +6,7 @@
 #include "mojo/services/media/common/cpp/linear_transform.h"
 #include "mojo/services/media/common/cpp/local_time.h"
 #include "services/media/factory_service/media_sink_impl.h"
-#include "services/media/framework/conversion_pipeline_builder.h"
+#include "services/media/framework/util/conversion_pipeline_builder.h"
 #include "services/media/framework_mojo/mojo_type_conversions.h"
 
 namespace mojo {

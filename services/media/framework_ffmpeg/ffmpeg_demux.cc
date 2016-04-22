@@ -8,8 +8,8 @@
 #include <thread>
 
 #include "base/logging.h"
-#include "services/media/framework/incident.h"
-#include "services/media/framework/safe_clone.h"
+#include "services/media/framework/util/incident.h"
+#include "services/media/framework/util/safe_clone.h"
 #include "services/media/framework_ffmpeg/av_codec_context.h"
 #include "services/media/framework_ffmpeg/av_format_context.h"
 #include "services/media/framework_ffmpeg/av_io_context.h"

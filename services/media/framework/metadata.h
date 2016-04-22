@@ -9,7 +9,7 @@
 #include <string>
 
 #include "base/macros.h"
-#include "services/media/framework/safe_clone.h"
+#include "services/media/framework/util/safe_clone.h"
 
 namespace mojo {
 namespace media {

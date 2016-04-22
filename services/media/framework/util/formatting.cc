@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "services/media/framework/formatting.h"
+#include "services/media/framework/util/formatting.h"
 
 namespace mojo {
 namespace media {

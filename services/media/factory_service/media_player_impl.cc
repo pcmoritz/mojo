@@ -4,8 +4,8 @@
 
 #include "base/logging.h"
 #include "services/media/factory_service/media_player_impl.h"
-#include "services/media/framework/callback_joiner.h"
 #include "services/media/framework/parts/reader.h"
+#include "services/media/framework/util/callback_joiner.h"
 
 namespace mojo {
 namespace media {

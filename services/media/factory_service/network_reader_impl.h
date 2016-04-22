@@ -11,7 +11,7 @@
 #include "mojo/services/media/core/interfaces/seeking_reader.mojom.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
 #include "services/media/factory_service/factory_service.h"
-#include "services/media/framework/incident.h"
+#include "services/media/framework/util/incident.h"
 
 namespace mojo {
 namespace media {

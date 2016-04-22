@@ -8,7 +8,7 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/services/media/audio/interfaces/audio_track.mojom.h"
 #include "mojo/services/media/common/interfaces/media_transport.mojom.h"
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/stream_type.h"
 
 namespace mojo {
 namespace media {

@@ -5,7 +5,7 @@
 #ifndef SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_AUDIO_DECODER_H_
 #define SERVICES_MEDIA_FRAMEWORK_FFMPEG_FFMPEG_AUDIO_DECODER_H_
 
-#include "services/media/framework/lpcm_util.h"
+#include "services/media/framework/util/lpcm_util.h"
 #include "services/media/framework_ffmpeg/ffmpeg_decoder_base.h"
 
 namespace mojo {

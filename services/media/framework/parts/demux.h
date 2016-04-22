@@ -13,7 +13,7 @@
 #include "services/media/framework/packet.h"
 #include "services/media/framework/parts/reader.h"
 #include "services/media/framework/result.h"
-#include "services/media/framework/stream_type.h"
+#include "services/media/framework/types/stream_type.h"
 
 namespace mojo {
 namespace media {
