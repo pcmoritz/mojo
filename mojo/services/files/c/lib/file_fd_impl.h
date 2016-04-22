@@ -7,9 +7,10 @@
 
 #include "files/c/lib/fd_impl.h"
 #include "files/c/mojio_sys_types.h"
-#include "files/interfaces/file.mojom.h"
+#include "files/interfaces/file.mojom-sync.h"
 #include "mojo/public/c/system/macros.h"
 #include "mojo/public/cpp/bindings/interface_handle.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 
 namespace mojio {
 
@@ -29,9 +30,7 @@ class FileFDImpl : public FDImpl {
   bool Fstat(struct mojio_stat* buf) override;
 
  private:
-  // TODO(vtl): Convert this to a SynchronousInterfacePtr<File> (instead of a
-  // FilePtr).
-  mojo::files::FilePtr file_;
+  mojo::SynchronousInterfacePtr<mojo::files::File> file_;
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(FileFDImpl);
 };

@@ -13,17 +13,20 @@
 #include "files/c/lib/template_util.h"
 #include "files/c/lib/util.h"
 #include "files/c/mojio_unistd.h"
+#include "files/interfaces/file.mojom.h"
 #include "files/interfaces/types.mojom.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/environment/logging.h"
 
 using mojo::InterfaceHandle;
+using mojo::SynchronousInterfacePtr;
 
 namespace mojio {
 
 FileFDImpl::FileFDImpl(ErrnoImpl* errno_impl,
                        InterfaceHandle<mojo::files::File> file)
-    : FDImpl(errno_impl), file_(mojo::files::FilePtr::Create(file.Pass())) {
+    : FDImpl(errno_impl),
+      file_(SynchronousInterfacePtr<mojo::files::File>::Create(file.Pass())) {
   MOJO_DCHECK(file_);
 }
 
@@ -35,8 +38,7 @@ bool FileFDImpl::Close() {
   MOJO_DCHECK(file_);
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  file_->Close(Capture(&error));
-  if (!file_.WaitForIncomingResponse())
+  if (!file_->Close(&error))
     return errno_setter.Set(ESTALE);
   return errno_setter.Set(ErrorToErrno(error));
 }
@@ -47,8 +49,7 @@ std::unique_ptr<FDImpl> FileFDImpl::Dup() {
 
   mojo::files::FilePtr new_file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  file_->Dup(mojo::GetProxy(&new_file), Capture(&error));
-  if (!file_.WaitForIncomingResponse()) {
+  if (!file_->Dup(mojo::GetProxy(&new_file), &error)) {
     errno_setter.Set(ESTALE);
     return nullptr;
   }
@@ -66,8 +67,7 @@ bool FileFDImpl::Ftruncate(mojio_off_t length) {
     return errno_setter.Set(EINVAL);
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  file_->Truncate(static_cast<int64_t>(length), Capture(&error));
-  if (!file_.WaitForIncomingResponse())
+  if (!file_->Truncate(static_cast<int64_t>(length), &error))
     return errno_setter.Set(ESTALE);
   return errno_setter.Set(ErrorToErrno(error));
 }
@@ -94,9 +94,8 @@ mojio_off_t FileFDImpl::Lseek(mojio_off_t offset, int whence) {
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   int64_t position = -1;
-  file_->Seek(static_cast<int64_t>(offset), mojo_whence,
-              Capture(&error, &position));
-  if (!file_.WaitForIncomingResponse()) {
+  if (!file_->Seek(static_cast<int64_t>(offset), mojo_whence, &error,
+                   &position)) {
     errno_setter.Set(ESTALE);
     return -1;
   }
@@ -142,10 +141,8 @@ mojio_ssize_t FileFDImpl::Read(void* buf, size_t count) {
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   mojo::Array<uint8_t> bytes_read;
-  file_->Read(static_cast<uint32_t>(count), 0,
-              mojo::files::Whence::FROM_CURRENT,
-              Capture(&error, &bytes_read));
-  if (!file_.WaitForIncomingResponse()) {
+  if (!file_->Read(static_cast<uint32_t>(count), 0,
+                   mojo::files::Whence::FROM_CURRENT, &error, &bytes_read)) {
     errno_setter.Set(ESTALE);
     return -1;
   }
@@ -190,9 +187,8 @@ mojio_ssize_t FileFDImpl::Write(const void* buf, size_t count) {
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   uint32_t num_bytes_written = 0;
-  file_->Write(bytes_to_write.Pass(), 0, mojo::files::Whence::FROM_CURRENT,
-               Capture(&error, &num_bytes_written));
-  if (!file_.WaitForIncomingResponse()) {
+  if (!file_->Write(bytes_to_write.Pass(), 0, mojo::files::Whence::FROM_CURRENT,
+                    &error, &num_bytes_written)) {
     errno_setter.Set(ESTALE);
     return -1;
   }
@@ -221,8 +217,7 @@ bool FileFDImpl::Fstat(struct mojio_stat* buf) {
 
   mojo::files::FileInformationPtr file_info;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  file_->Stat(Capture(&error, &file_info));
-  if (!file_.WaitForIncomingResponse()) {
+  if (!file_->Stat(&error, &file_info)) {
     errno_setter.Set(ESTALE);
     return false;
   }
