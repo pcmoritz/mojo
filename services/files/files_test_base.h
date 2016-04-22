@@ -10,8 +10,8 @@
 #include "base/macros.h"
 #include "mojo/public/cpp/application/application_test_base.h"
 #include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+#include "mojo/services/files/interfaces/directory.mojom-sync.h"
 #include "mojo/services/files/interfaces/files.mojom-sync.h"
-#include "mojo/services/files/interfaces/files.mojom.h"
 
 namespace mojo {
 namespace files {
@@ -67,10 +67,11 @@ class FilesTestBase : public test::ApplicationTestBase {
   void SetUp() override;
 
  protected:
-  // Note: This have out parameters rather than returning |DirectoryPtr|, since
-  // |ASSERT_...()| doesn't work with return values.
-  void GetTemporaryRoot(DirectoryPtr* directory);
-  void GetAppPersistentCacheRoot(DirectoryPtr* directory);
+  // Note: These have out parameters rather than returning
+  // |SynchronousInterfacePtr<Directory>|, since |ASSERT_...()| doesn't work
+  // with return values.
+  void GetTemporaryRoot(SynchronousInterfacePtr<Directory>* directory);
+  void GetAppPersistentCacheRoot(SynchronousInterfacePtr<Directory>* directory);
 
  private:
   SynchronousInterfacePtr<Files> files_;

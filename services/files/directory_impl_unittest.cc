@@ -14,7 +14,7 @@ namespace {
 using DirectoryImplTest = FilesTestBase;
 
 TEST_F(DirectoryImplTest, Read) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -29,23 +29,20 @@ TEST_F(DirectoryImplTest, Read) {
       {"my_file4", kOpenFlagWrite | kOpenFlagCreate | kOpenFlagTruncate}};
   for (size_t i = 0; i < arraysize(files_to_create); i++) {
     error = Error::INTERNAL;
-    directory->OpenFile(files_to_create[i].name, nullptr,
-                        files_to_create[i].open_flags, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile(files_to_create[i].name, nullptr,
+                                    files_to_create[i].open_flags, &error));
     EXPECT_EQ(Error::OK, error);
   }
   // Make a directory.
   error = Error::INTERNAL;
-  directory->OpenDirectory("my_dir", nullptr,
-                           kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate,
-                           Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenDirectory(
+      "my_dir", nullptr, kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate,
+      &error));
   EXPECT_EQ(Error::OK, error);
 
   error = Error::INTERNAL;
   Array<DirectoryEntryPtr> directory_contents;
-  directory->Read(Capture(&error, &directory_contents));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Read(&error, &directory_contents));
   EXPECT_EQ(Error::OK, error);
 
   // Expected contents of the directory.
@@ -74,15 +71,14 @@ TEST_F(DirectoryImplTest, Read) {
 // TODO(vtl): Maybe share this with |FileImplTest.StatTouch| ... but then it'd
 // be harder to split this file.
 TEST_F(DirectoryImplTest, StatTouch) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Stat it.
   error = Error::INTERNAL;
   FileInformationPtr file_info;
-  directory->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   EXPECT_EQ(FileType::DIRECTORY, file_info->type);
@@ -100,15 +96,13 @@ TEST_F(DirectoryImplTest, StatTouch) {
   t->timespec = Timespec::New();
   const int64_t kPartyTime1 = 1234567890;  // Party like it's 2009-02-13.
   t->timespec->seconds = kPartyTime1;
-  directory->Touch(t.Pass(), nullptr, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Touch(t.Pass(), nullptr, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat again.
   error = Error::INTERNAL;
   file_info.reset();
-  directory->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   ASSERT_FALSE(file_info->atime.is_null());
@@ -122,15 +116,13 @@ TEST_F(DirectoryImplTest, StatTouch) {
   t->timespec = Timespec::New();
   const int64_t kPartyTime2 = 1425059525;  // No time like the present.
   t->timespec->seconds = kPartyTime2;
-  directory->Touch(nullptr, t.Pass(), Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Touch(nullptr, t.Pass(), &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat again.
   error = Error::INTERNAL;
   file_info.reset();
-  directory->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   ASSERT_FALSE(file_info->atime.is_null());
@@ -145,51 +137,46 @@ TEST_F(DirectoryImplTest, StatTouch) {
 // TODO(vtl): Properly test OpenFile() and OpenDirectory() (including flags).
 
 TEST_F(DirectoryImplTest, BasicRenameDelete) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", nullptr, kOpenFlagWrite | kOpenFlagCreate,
-                      Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", nullptr,
+                                  kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Opening my_file should succeed.
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", nullptr, kOpenFlagRead, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", nullptr, kOpenFlagRead, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Rename my_file to my_new_file.
   error = Error::INTERNAL;
-  directory->Rename("my_file", "my_new_file", Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Rename("my_file", "my_new_file", &error));
   EXPECT_EQ(Error::OK, error);
 
   // Opening my_file should fail.
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", nullptr, kOpenFlagRead, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", nullptr, kOpenFlagRead, &error));
   EXPECT_EQ(Error::UNKNOWN, error);
 
   // Opening my_new_file should succeed.
   error = Error::INTERNAL;
-  directory->OpenFile("my_new_file", nullptr, kOpenFlagRead, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(
+      directory->OpenFile("my_new_file", nullptr, kOpenFlagRead, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Delete my_new_file (no flags).
   error = Error::INTERNAL;
-  directory->Delete("my_new_file", 0u, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Delete("my_new_file", 0u, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Opening my_new_file should fail.
   error = Error::INTERNAL;
-  directory->OpenFile("my_new_file", nullptr, kOpenFlagRead, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(
+      directory->OpenFile("my_new_file", nullptr, kOpenFlagRead, &error));
   EXPECT_EQ(Error::UNKNOWN, error);
 }
 
@@ -201,26 +188,24 @@ TEST_F(DirectoryImplTest, BasicRenameDelete) {
 // |Directory| to do anything, so it lives here.
 TEST_F(DirectoryImplTest, AppPersistentCache) {
   {
-    DirectoryPtr directory;
+    SynchronousInterfacePtr<Directory> directory;
     GetAppPersistentCacheRoot(&directory);
 
     // Create my_file.
     Error error = Error::INTERNAL;
-    directory->OpenFile("my_file", nullptr, kOpenFlagCreate | kOpenFlagWrite,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", nullptr,
+                                    kOpenFlagCreate | kOpenFlagWrite, &error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
-    DirectoryPtr directory;
+    SynchronousInterfacePtr<Directory> directory;
     GetAppPersistentCacheRoot(&directory);
 
     // We should be in the same directory and my_file should still exist, so we
     // should be able to delete it.
     Error error = Error::INTERNAL;
-    directory->Delete("my_file", kDeleteFlagFileOnly, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->Delete("my_file", kDeleteFlagFileOnly, &error));
     EXPECT_EQ(Error::OK, error);
   }
 }

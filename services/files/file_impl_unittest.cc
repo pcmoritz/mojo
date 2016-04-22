@@ -6,6 +6,7 @@
 
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/bindings/type_converter.h"
+#include "mojo/services/files/interfaces/files.mojom.h"
 #include "services/files/files_test_base.h"
 
 namespace mojo {
@@ -15,7 +16,7 @@ namespace {
 using FileImplTest = FilesTestBase;
 
 TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -23,9 +24,8 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
     // Create my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -52,17 +52,15 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
 
   // Rename it.
   error = Error::INTERNAL;
-  directory->Rename("my_file", "your_file", Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->Rename("my_file", "your_file", &error));
   EXPECT_EQ(Error::OK, error);
 
   {
     // Open your_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("your_file", GetProxy(&file), kOpenFlagRead,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("your_file", GetProxy(&file), kOpenFlagRead,
+                                    &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
@@ -81,7 +79,7 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
 }
 
 TEST_F(FileImplTest, CantWriteInReadMode) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -96,9 +94,8 @@ TEST_F(FileImplTest, CantWriteInReadMode) {
     // Create my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -121,9 +118,8 @@ TEST_F(FileImplTest, CantWriteInReadMode) {
     // Open my_file again, this time with read only mode.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(
+        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Try to write in read mode; it should fail.
@@ -144,7 +140,7 @@ TEST_F(FileImplTest, CantWriteInReadMode) {
 }
 
 TEST_F(FileImplTest, OpenExclusive) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -152,10 +148,9 @@ TEST_F(FileImplTest, OpenExclusive) {
     // Create my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("temp_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate |kOpenFlagExclusive,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile(
+        "temp_file", GetProxy(&file),
+        kOpenFlagWrite | kOpenFlagCreate | kOpenFlagExclusive, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Close it.
@@ -169,16 +164,15 @@ TEST_F(FileImplTest, OpenExclusive) {
     // Try to open my_file again in exclusive mode; it should fail.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("temp_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate | kOpenFlagExclusive,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile(
+        "temp_file", GetProxy(&file),
+        kOpenFlagWrite | kOpenFlagCreate | kOpenFlagExclusive, &error));
     EXPECT_EQ(Error::UNKNOWN, error);
   }
 }
 
 TEST_F(FileImplTest, OpenInAppendMode) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -186,9 +180,8 @@ TEST_F(FileImplTest, OpenInAppendMode) {
     // Create my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -217,9 +210,8 @@ TEST_F(FileImplTest, OpenInAppendMode) {
     // Append to my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagAppend, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagAppend, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -250,9 +242,8 @@ TEST_F(FileImplTest, OpenInAppendMode) {
     // Open my_file again.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(
+        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
@@ -270,7 +261,7 @@ TEST_F(FileImplTest, OpenInAppendMode) {
 }
 
 TEST_F(FileImplTest, OpenInTruncateMode) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
@@ -278,9 +269,8 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
     // Create my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -309,9 +299,9 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
     // Append to my_file.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file),
-                        kOpenFlagWrite | kOpenFlagTruncate, Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                    kOpenFlagWrite | kOpenFlagTruncate,
+                                    &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
@@ -342,9 +332,8 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
     // Open my_file again.
     FilePtr file;
     error = Error::INTERNAL;
-    directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead,
-                        Capture(&error));
-    ASSERT_TRUE(directory.WaitForIncomingResponse());
+    ASSERT_TRUE(
+        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
@@ -364,16 +353,15 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
 // Note: Ignore nanoseconds, since it may not always be supported. We expect at
 // least second-resolution support though.
 TEST_F(FileImplTest, StatTouch) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   FilePtr file;
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", GetProxy(&file),
-                      kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                  kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat it.
@@ -442,16 +430,15 @@ TEST_F(FileImplTest, StatTouch) {
 }
 
 TEST_F(FileImplTest, TellSeek) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   FilePtr file;
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", GetProxy(&file),
-                      kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                  kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Write to it.
@@ -527,17 +514,16 @@ TEST_F(FileImplTest, TellSeek) {
 }
 
 TEST_F(FileImplTest, Dup) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   FilePtr file1;
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", GetProxy(&file1),
-                      kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate,
-                      Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile(
+      "my_file", GetProxy(&file1),
+      kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Write to it.
@@ -619,16 +605,15 @@ TEST_F(FileImplTest, Truncate) {
   const uint32_t kInitialSize = 1000;
   const uint32_t kTruncatedSize = 654;
 
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   FilePtr file;
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", GetProxy(&file),
-                      kOpenFlagWrite | kOpenFlagCreate, Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+                                  kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Write to it.
@@ -667,17 +652,16 @@ TEST_F(FileImplTest, Truncate) {
 }
 
 TEST_F(FileImplTest, Ioctl) {
-  DirectoryPtr directory;
+  SynchronousInterfacePtr<Directory> directory;
   GetTemporaryRoot(&directory);
   Error error;
 
   // Create my_file.
   FilePtr file;
   error = Error::INTERNAL;
-  directory->OpenFile("my_file", GetProxy(&file),
-                      kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate,
-                      Capture(&error));
-  ASSERT_TRUE(directory.WaitForIncomingResponse());
+  ASSERT_TRUE(directory->OpenFile(
+      "my_file", GetProxy(&file),
+      kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Normal files don't support any ioctls.

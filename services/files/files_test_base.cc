@@ -5,7 +5,7 @@
 #include "services/files/files_test_base.h"
 
 #include "mojo/public/cpp/application/application_impl.h"
-#include "mojo/services/files/interfaces/directory.mojom.h"
+#include "mojo/services/files/interfaces/files.mojom.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
 
 namespace mojo {
@@ -24,16 +24,19 @@ void FilesTestBase::SetUp() {
       SynchronousInterfacePtr<Files>::Create(files_async.PassInterfaceHandle());
 }
 
-void FilesTestBase::GetTemporaryRoot(DirectoryPtr* directory) {
+void FilesTestBase::GetTemporaryRoot(
+    SynchronousInterfacePtr<Directory>* directory) {
   Error error = Error::INTERNAL;
-  ASSERT_TRUE(files_->OpenFileSystem(nullptr, GetProxy(directory), &error));
+  ASSERT_TRUE(
+      files_->OpenFileSystem(nullptr, GetSynchronousProxy(directory), &error));
   ASSERT_EQ(Error::OK, error);
 }
 
-void FilesTestBase::GetAppPersistentCacheRoot(DirectoryPtr* directory) {
+void FilesTestBase::GetAppPersistentCacheRoot(
+    SynchronousInterfacePtr<Directory>* directory) {
   Error error = Error::INTERNAL;
   ASSERT_TRUE(files_->OpenFileSystem("app_persistent_cache",
-                                     GetProxy(directory), &error));
+                                     GetSynchronousProxy(directory), &error));
   ASSERT_EQ(Error::OK, error);
 }
 
