@@ -6,7 +6,7 @@
 
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/bindings/type_converter.h"
-#include "mojo/services/files/interfaces/files.mojom.h"
+#include "mojo/services/files/interfaces/file.mojom-sync.h"
 #include "services/files/files_test_base.h"
 
 namespace mojo {
@@ -22,9 +22,9 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
 
   {
     // Create my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
@@ -37,16 +37,14 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
     bytes_to_write.push_back(static_cast<uint8_t>('o'));
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
@@ -57,17 +55,16 @@ TEST_F(FileImplTest, CreateWriteCloseRenameOpenRead) {
 
   {
     // Open your_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("your_file", GetProxy(&file), kOpenFlagRead,
-                                    &error));
+    ASSERT_TRUE(directory->OpenFile("your_file", GetSynchronousProxy(&file),
+                                    kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
     Array<uint8_t> bytes_read;
     error = Error::INTERNAL;
-    file->Read(3, 1, Whence::FROM_START, Capture(&error, &bytes_read));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Read(3, 1, Whence::FROM_START, &error, &bytes_read));
     EXPECT_EQ(Error::OK, error);
     ASSERT_EQ(3u, bytes_read.size());
     EXPECT_EQ(static_cast<uint8_t>('e'), bytes_read[0]);
@@ -92,49 +89,45 @@ TEST_F(FileImplTest, CantWriteInReadMode) {
 
   {
     // Create my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Write to it.
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Open my_file again, this time with read only mode.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(
-        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
+                                    kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Try to write in read mode; it should fail.
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::UNKNOWN, error);
     EXPECT_EQ(0u, num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 }
@@ -146,26 +139,25 @@ TEST_F(FileImplTest, OpenExclusive) {
 
   {
     // Create my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
     ASSERT_TRUE(directory->OpenFile(
-        "temp_file", GetProxy(&file),
+        "temp_file", GetSynchronousProxy(&file),
         kOpenFlagWrite | kOpenFlagCreate | kOpenFlagExclusive, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Try to open my_file again in exclusive mode; it should fail.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
     ASSERT_TRUE(directory->OpenFile(
-        "temp_file", GetProxy(&file),
+        "temp_file", GetSynchronousProxy(&file),
         kOpenFlagWrite | kOpenFlagCreate | kOpenFlagExclusive, &error));
     EXPECT_EQ(Error::UNKNOWN, error);
   }
@@ -178,9 +170,9 @@ TEST_F(FileImplTest, OpenInAppendMode) {
 
   {
     // Create my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
@@ -193,24 +185,22 @@ TEST_F(FileImplTest, OpenInAppendMode) {
     bytes_to_write.push_back(static_cast<uint8_t>('o'));
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Append to my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagAppend, &error));
     EXPECT_EQ(Error::OK, error);
 
@@ -225,32 +215,29 @@ TEST_F(FileImplTest, OpenInAppendMode) {
     bytes_to_write.push_back(static_cast<uint8_t>('e'));
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Open my_file again.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(
-        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
+                                    kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
     Array<uint8_t> bytes_read;
     error = Error::INTERNAL;
-    file->Read(12, 0, Whence::FROM_START, Capture(&error, &bytes_read));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Read(12, 0, Whence::FROM_START, &error, &bytes_read));
     EXPECT_EQ(Error::OK, error);
     ASSERT_EQ(12u, bytes_read.size());
     EXPECT_EQ(static_cast<uint8_t>('l'), bytes_read[3]);
@@ -267,9 +254,9 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
 
   {
     // Create my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagCreate, &error));
     EXPECT_EQ(Error::OK, error);
 
@@ -282,24 +269,22 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
     bytes_to_write.push_back(static_cast<uint8_t>('o'));
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Append to my_file.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                     kOpenFlagWrite | kOpenFlagTruncate,
                                     &error));
     EXPECT_EQ(Error::OK, error);
@@ -315,32 +300,29 @@ TEST_F(FileImplTest, OpenInTruncateMode) {
     bytes_to_write.push_back(static_cast<uint8_t>('e'));
     error = Error::INTERNAL;
     uint32_t num_bytes_written = 0;
-    file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-                Capture(&error, &num_bytes_written));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                            Whence::FROM_CURRENT, &error, &num_bytes_written));
     EXPECT_EQ(Error::OK, error);
     EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
 
     // Close it.
     error = Error::INTERNAL;
-    file->Close(Capture(&error));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Close(&error));
     EXPECT_EQ(Error::OK, error);
   }
 
   {
     // Open my_file again.
-    FilePtr file;
+    SynchronousInterfacePtr<File> file;
     error = Error::INTERNAL;
-    ASSERT_TRUE(
-        directory->OpenFile("my_file", GetProxy(&file), kOpenFlagRead, &error));
+    ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
+                                    kOpenFlagRead, &error));
     EXPECT_EQ(Error::OK, error);
 
     // Read from it.
     Array<uint8_t> bytes_read;
     error = Error::INTERNAL;
-    file->Read(7, 0, Whence::FROM_START, Capture(&error, &bytes_read));
-    ASSERT_TRUE(file.WaitForIncomingResponse());
+    ASSERT_TRUE(file->Read(7, 0, Whence::FROM_START, &error, &bytes_read));
     EXPECT_EQ(Error::OK, error);
     ASSERT_EQ(7u, bytes_read.size());
     EXPECT_EQ(static_cast<uint8_t>('g'), bytes_read[0]);
@@ -358,17 +340,16 @@ TEST_F(FileImplTest, StatTouch) {
   Error error;
 
   // Create my_file.
-  FilePtr file;
+  SynchronousInterfacePtr<File> file;
   error = Error::INTERNAL;
-  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+  ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                   kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat it.
   error = Error::INTERNAL;
   FileInformationPtr file_info;
-  file->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   EXPECT_EQ(FileType::REGULAR_FILE, file_info->type);
@@ -386,15 +367,13 @@ TEST_F(FileImplTest, StatTouch) {
   t->timespec = Timespec::New();
   const int64_t kPartyTime1 = 1234567890;  // Party like it's 2009-02-13.
   t->timespec->seconds = kPartyTime1;
-  file->Touch(t.Pass(), nullptr, Capture(&error));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Touch(t.Pass(), nullptr, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat again.
   error = Error::INTERNAL;
   file_info.reset();
-  file->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   ASSERT_FALSE(file_info->atime.is_null());
@@ -408,15 +387,13 @@ TEST_F(FileImplTest, StatTouch) {
   t->timespec = Timespec::New();
   const int64_t kPartyTime2 = 1425059525;  // No time like the present.
   t->timespec->seconds = kPartyTime2;
-  file->Touch(nullptr, t.Pass(), Capture(&error));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Touch(nullptr, t.Pass(), &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat again.
   error = Error::INTERNAL;
   file_info.reset();
-  file->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   ASSERT_FALSE(file_info->atime.is_null());
@@ -435,9 +412,9 @@ TEST_F(FileImplTest, TellSeek) {
   Error error;
 
   // Create my_file.
-  FilePtr file;
+  SynchronousInterfacePtr<File> file;
   error = Error::INTERNAL;
-  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+  ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                   kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
@@ -445,9 +422,8 @@ TEST_F(FileImplTest, TellSeek) {
   std::vector<uint8_t> bytes_to_write(1000, '!');
   error = Error::INTERNAL;
   uint32_t num_bytes_written = 0;
-  file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-              Capture(&error, &num_bytes_written));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                          Whence::FROM_CURRENT, &error, &num_bytes_written));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
   const int size = static_cast<int>(num_bytes_written);
@@ -455,8 +431,7 @@ TEST_F(FileImplTest, TellSeek) {
   // Tell.
   error = Error::INTERNAL;
   int64_t position = -1;
-  file->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Tell(&error, &position));
   // Should be at the end.
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(size, position);
@@ -464,48 +439,42 @@ TEST_F(FileImplTest, TellSeek) {
   // Seek back 100.
   error = Error::INTERNAL;
   position = -1;
-  file->Seek(-100, Whence::FROM_CURRENT, Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Seek(-100, Whence::FROM_CURRENT, &error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(size - 100, position);
 
   // Tell.
   error = Error::INTERNAL;
   position = -1;
-  file->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Tell(&error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(size - 100, position);
 
   // Seek to 123 from start.
   error = Error::INTERNAL;
   position = -1;
-  file->Seek(123, Whence::FROM_START, Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Seek(123, Whence::FROM_START, &error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(123, position);
 
   // Tell.
   error = Error::INTERNAL;
   position = -1;
-  file->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Tell(&error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(123, position);
 
   // Seek to 123 back from end.
   error = Error::INTERNAL;
   position = -1;
-  file->Seek(-123, Whence::FROM_END, Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Seek(-123, Whence::FROM_END, &error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(size - 123, position);
 
   // Tell.
   error = Error::INTERNAL;
   position = -1;
-  file->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Tell(&error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(size - 123, position);
 
@@ -519,10 +488,10 @@ TEST_F(FileImplTest, Dup) {
   Error error;
 
   // Create my_file.
-  FilePtr file1;
+  SynchronousInterfacePtr<File> file1;
   error = Error::INTERNAL;
   ASSERT_TRUE(directory->OpenFile(
-      "my_file", GetProxy(&file1),
+      "my_file", GetSynchronousProxy(&file1),
       kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
@@ -535,25 +504,22 @@ TEST_F(FileImplTest, Dup) {
   bytes_to_write.push_back(static_cast<uint8_t>('o'));
   error = Error::INTERNAL;
   uint32_t num_bytes_written = 0;
-  file1->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-               Capture(&error, &num_bytes_written));
-  ASSERT_TRUE(file1.WaitForIncomingResponse());
+  ASSERT_TRUE(file1->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                           Whence::FROM_CURRENT, &error, &num_bytes_written));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(bytes_to_write.size(), num_bytes_written);
   const int end_hello_pos = static_cast<int>(num_bytes_written);
 
   // Dup it.
-  FilePtr file2;
+  SynchronousInterfacePtr<File> file2;
   error = Error::INTERNAL;
-  file1->Dup(GetProxy(&file2), Capture(&error));
-  ASSERT_TRUE(file1.WaitForIncomingResponse());
+  ASSERT_TRUE(file1->Dup(GetSynchronousProxy(&file2), &error));
   EXPECT_EQ(Error::OK, error);
 
   // |file2| should have the same position.
   error = Error::INTERNAL;
   int64_t position = -1;
-  file2->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file2.WaitForIncomingResponse());
+  ASSERT_TRUE(file2->Tell(&error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(end_hello_pos, position);
 
@@ -566,9 +532,8 @@ TEST_F(FileImplTest, Dup) {
   more_bytes_to_write.push_back(static_cast<uint8_t>('d'));
   error = Error::INTERNAL;
   num_bytes_written = 0;
-  file2->Write(Array<uint8_t>::From(more_bytes_to_write), 0,
-               Whence::FROM_CURRENT, Capture(&error, &num_bytes_written));
-  ASSERT_TRUE(file2.WaitForIncomingResponse());
+  ASSERT_TRUE(file2->Write(Array<uint8_t>::From(more_bytes_to_write), 0,
+                           Whence::FROM_CURRENT, &error, &num_bytes_written));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(more_bytes_to_write.size(), num_bytes_written);
   const int end_world_pos = end_hello_pos + static_cast<int>(num_bytes_written);
@@ -576,22 +541,19 @@ TEST_F(FileImplTest, Dup) {
   // |file1| should have the same position.
   error = Error::INTERNAL;
   position = -1;
-  file1->Tell(Capture(&error, &position));
-  ASSERT_TRUE(file1.WaitForIncomingResponse());
+  ASSERT_TRUE(file1->Tell(&error, &position));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(end_world_pos, position);
 
   // Close |file1|.
   error = Error::INTERNAL;
-  file1->Close(Capture(&error));
-  ASSERT_TRUE(file1.WaitForIncomingResponse());
+  ASSERT_TRUE(file1->Close(&error));
   EXPECT_EQ(Error::OK, error);
 
   // Read everything using |file2|.
   Array<uint8_t> bytes_read;
   error = Error::INTERNAL;
-  file2->Read(1000, 0, Whence::FROM_START, Capture(&error, &bytes_read));
-  ASSERT_TRUE(file2.WaitForIncomingResponse());
+  ASSERT_TRUE(file2->Read(1000, 0, Whence::FROM_START, &error, &bytes_read));
   EXPECT_EQ(Error::OK, error);
   ASSERT_EQ(static_cast<size_t>(end_world_pos), bytes_read.size());
   // Just check the first and last bytes.
@@ -610,9 +572,9 @@ TEST_F(FileImplTest, Truncate) {
   Error error;
 
   // Create my_file.
-  FilePtr file;
+  SynchronousInterfacePtr<File> file;
   error = Error::INTERNAL;
-  ASSERT_TRUE(directory->OpenFile("my_file", GetProxy(&file),
+  ASSERT_TRUE(directory->OpenFile("my_file", GetSynchronousProxy(&file),
                                   kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
@@ -620,32 +582,28 @@ TEST_F(FileImplTest, Truncate) {
   std::vector<uint8_t> bytes_to_write(kInitialSize, '!');
   error = Error::INTERNAL;
   uint32_t num_bytes_written = 0;
-  file->Write(Array<uint8_t>::From(bytes_to_write), 0, Whence::FROM_CURRENT,
-              Capture(&error, &num_bytes_written));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Write(Array<uint8_t>::From(bytes_to_write), 0,
+                          Whence::FROM_CURRENT, &error, &num_bytes_written));
   EXPECT_EQ(Error::OK, error);
   EXPECT_EQ(kInitialSize, num_bytes_written);
 
   // Stat it.
   error = Error::INTERNAL;
   FileInformationPtr file_info;
-  file->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   EXPECT_EQ(kInitialSize, file_info->size);
 
   // Truncate it.
   error = Error::INTERNAL;
-  file->Truncate(kTruncatedSize, Capture(&error));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Truncate(kTruncatedSize, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Stat again.
   error = Error::INTERNAL;
   file_info.reset();
-  file->Stat(Capture(&error, &file_info));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Stat(&error, &file_info));
   EXPECT_EQ(Error::OK, error);
   ASSERT_FALSE(file_info.is_null());
   EXPECT_EQ(kTruncatedSize, file_info->size);
@@ -657,17 +615,16 @@ TEST_F(FileImplTest, Ioctl) {
   Error error;
 
   // Create my_file.
-  FilePtr file;
+  SynchronousInterfacePtr<File> file;
   error = Error::INTERNAL;
   ASSERT_TRUE(directory->OpenFile(
-      "my_file", GetProxy(&file),
+      "my_file", GetSynchronousProxy(&file),
       kOpenFlagRead | kOpenFlagWrite | kOpenFlagCreate, &error));
   EXPECT_EQ(Error::OK, error);
 
   // Normal files don't support any ioctls.
   Array<uint32_t> out_values;
-  file->Ioctl(0, nullptr, Capture(&error, &out_values));
-  ASSERT_TRUE(file.WaitForIncomingResponse());
+  ASSERT_TRUE(file->Ioctl(0, nullptr, &error, &out_values));
   EXPECT_EQ(Error::UNAVAILABLE, error);
   EXPECT_TRUE(out_values.is_null());
 }
