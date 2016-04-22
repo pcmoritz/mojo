@@ -5,6 +5,7 @@
 """Logic that drives runs of the benchmarking mojo app and parses its output."""
 
 import os.path
+import pipes
 import re
 
 _BENCHMARK_APP = 'https://core.mojoapps.io/benchmark.mojo'
@@ -15,11 +16,11 @@ _BENCHMARK_APP = 'https://core.mojoapps.io/benchmark.mojo'
 _EXTRA_TIMEOUT = 20
 
 _MEASUREMENT_RESULT_FORMAT = r"""
-^              # Beginning of the line.
-measurement:   # Hard-coded tag.
-\s+(\S+)       # Match measurement spec.
-\s+(\S+)       # Match measurement result.
-$              # End of the line.
+^                      # Beginning of the line.
+measurement:           # Hard-coded tag.
+\s+(.+)                # Match measurement spec.
+\s+([0-9]+(.[0-9]+)?)  # Match measurement result.
+$                      # End of the line.
 """
 
 _MEASUREMENT_REGEX = re.compile(_MEASUREMENT_RESULT_FORMAT, re.VERBOSE)
@@ -85,7 +86,7 @@ def run(shell, shell_args, app, duration_seconds, measurements, verbose,
   shell_args.append(_BENCHMARK_APP)
   shell_args.append('--force-offline-by-default')
   shell_args.append('--args-for=%s %s' % (_BENCHMARK_APP,
-                                          ' '.join(benchmark_args)))
+      ' '.join(map(pipes.quote, benchmark_args))))
 
   if verbose:
     print 'shell arguments: ' + str(shell_args)

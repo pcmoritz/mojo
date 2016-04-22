@@ -10,6 +10,7 @@
 #include "base/logging.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
+#include "base/strings/string_util.h"
 
 namespace benchmark {
 namespace {
@@ -115,7 +116,9 @@ bool GetRunArgs(const std::vector<std::string>& input_args, RunArgs* result) {
   // measurements.
   for (const std::string& measurement_spec : command_line.GetArgs()) {
     Measurement measurement;
-    if (!GetMeasurement(measurement_spec, &measurement)) {
+    std::string unquoted_measurement_spec;
+    base::TrimString(measurement_spec, "'\"", &unquoted_measurement_spec);
+    if (!GetMeasurement(unquoted_measurement_spec, &measurement)) {
       return false;
     }
     result->measurements.push_back(measurement);
