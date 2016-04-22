@@ -131,6 +131,7 @@ void GpuRasterizer::OnContextLost() {
   LOG(WARNING) << "GL context lost!";
 
   AbandonContext();
+  frames_pending_ = 0u;
 
   base::MessageLoop::current()->PostTask(
       FROM_HERE, base::Bind(&GpuRasterizer::RecreateContextAfterLoss,
