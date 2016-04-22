@@ -430,4 +430,30 @@ hooks = [
                 '-s', 'src/mojo/public/tools/bindings/mojom_tool/bin/mac64/mojom.sha1',
     ],
   },
+
+  # Pull the mojom generator binaries using checked-in hashes.
+  {
+    'name': 'mojom_generators',
+    'pattern': '',
+    'action': [ 'src/tools/download_from_google_storage.py',
+                '--no_resume',
+                '--quiet',
+                '--platform=linux*',
+                '--no_auth',
+                '--bucket', 'mojo/mojom_parser/linux64/generators',
+                '-d', 'src/mojo/public/tools/bindings/mojom_tool/bin/linux64/generators',
+    ],
+  },
+  {
+    'name': 'mojom_generators',
+    'pattern': '',
+    'action': [ 'src/tools/download_from_google_storage.py',
+                '--no_resume',
+                '--quiet',
+                '--platform=linux*',
+                '--no_auth',
+                '--bucket', 'mojo/mojom_parser/linux64/generators',
+                '-d', 'src/mojo/public/tools/bindings/mojom_tool/bin/linux64/generators',
+    ],
+  },
 ]
