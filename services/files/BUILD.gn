@@ -50,7 +50,10 @@ mojo_native_application("apptests") {
     "//mojo/application:test_support",
     "//mojo/public/cpp/bindings",
     "//mojo/services/files/interfaces",
+    "//mojo/services/files/interfaces:interfaces_sync",
   ]
 
-  data_deps = [ ":files($default_toolchain)" ]
+  data_deps = [
+    ":files($default_toolchain)",
+  ]
 }

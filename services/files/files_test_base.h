@@ -9,6 +9,8 @@
 
 #include "base/macros.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+#include "mojo/services/files/interfaces/files.mojom-sync.h"
 #include "mojo/services/files/interfaces/files.mojom.h"
 
 namespace mojo {
@@ -70,10 +72,8 @@ class FilesTestBase : public test::ApplicationTestBase {
   void GetTemporaryRoot(DirectoryPtr* directory);
   void GetAppPersistentCacheRoot(DirectoryPtr* directory);
 
-  FilesPtr& files() { return files_; }
-
  private:
-  FilesPtr files_;
+  SynchronousInterfacePtr<Files> files_;
 
   DISALLOW_COPY_AND_ASSIGN(FilesTestBase);
 };

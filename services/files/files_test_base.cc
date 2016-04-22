@@ -11,29 +11,29 @@
 namespace mojo {
 namespace files {
 
-FilesTestBase::FilesTestBase() {
-}
+FilesTestBase::FilesTestBase() {}
 
-FilesTestBase::~FilesTestBase() {
-}
+FilesTestBase::~FilesTestBase() {}
 
 void FilesTestBase::SetUp() {
   test::ApplicationTestBase::SetUp();
-  application_impl()->ConnectToService("mojo:files", &files_);
+  // TODO(vtl): Fix |ConnectToService()|.
+  FilesPtr files_async;
+  application_impl()->ConnectToService("mojo:files", &files_async);
+  files_ =
+      SynchronousInterfacePtr<Files>::Create(files_async.PassInterfaceHandle());
 }
 
 void FilesTestBase::GetTemporaryRoot(DirectoryPtr* directory) {
   Error error = Error::INTERNAL;
-  files()->OpenFileSystem(nullptr, GetProxy(directory), Capture(&error));
-  ASSERT_TRUE(files().WaitForIncomingResponse());
+  ASSERT_TRUE(files_->OpenFileSystem(nullptr, GetProxy(directory), &error));
   ASSERT_EQ(Error::OK, error);
 }
 
 void FilesTestBase::GetAppPersistentCacheRoot(DirectoryPtr* directory) {
   Error error = Error::INTERNAL;
-  files()->OpenFileSystem("app_persistent_cache", GetProxy(directory),
-                          Capture(&error));
-  ASSERT_TRUE(files().WaitForIncomingResponse());
+  ASSERT_TRUE(files_->OpenFileSystem("app_persistent_cache",
+                                     GetProxy(directory), &error));
   ASSERT_EQ(Error::OK, error);
 }
 
