@@ -5,10 +5,12 @@
 #include "shell/command_line_util.h"
 
 #include <functional>
+#include <string>
+#include <vector>
 
 #include "base/command_line.h"
 #include "base/logging.h"
-#include "base/strings/string_split.h"
+#include "base/strings/string_tokenizer.h"
 #include "base/strings/utf_string_conversions.h"
 #include "shell/context.h"
 #include "shell/switches.h"
@@ -46,7 +48,12 @@ GURL GetAppURLAndArgs(Context* context,
                       const std::string& app_url_and_args,
                       std::vector<std::string>* args) {
   // SplitString() returns empty strings for extra delimeter characters (' ').
-  base::SplitString(app_url_and_args, ' ', args);
+  base::StringTokenizer tokenizer =
+      base::StringTokenizer(app_url_and_args, " ");
+  tokenizer.set_quote_chars("'\"");
+  while (tokenizer.GetNext()) {
+    args->push_back(tokenizer.token());
+  }
   args->erase(std::remove_if(args->begin(), args->end(),
                              [](const std::string& a) { return a.empty(); }),
               args->end());

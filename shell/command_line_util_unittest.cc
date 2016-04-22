@@ -39,6 +39,7 @@ TEST(CommandLineUtil, GetAppURLAndArgs) {
   const char* NO_ARGUMENTS[] = {nullptr};
   const char* ONE_ARGUMENTS[] = {"1", nullptr};
   const char* TWO_ARGUMENTS[] = {"1", "two", nullptr};
+  const char* QUOTED_ARGUMENTS[] = {"'1 two'", nullptr};
   static const struct Expectation {
     const char* args;
     const char* url;
@@ -54,9 +55,9 @@ TEST(CommandLineUtil, GetAppURLAndArgs) {
       {"http://example.com 1 ", "http://example.com", ONE_ARGUMENTS},
       {"http://example.com  1 ", "http://example.com", ONE_ARGUMENTS},
       {"http://example.com 1 two", "http://example.com", TWO_ARGUMENTS},
-      {"   http://example.com  1  two   ",
-       "http://example.com",
-       TWO_ARGUMENTS}};
+      {"   http://example.com  1  two   ", "http://example.com", TWO_ARGUMENTS},
+      {"http://example.com '1 two' ", "http://example.com", QUOTED_ARGUMENTS},
+  };
   Context context;
   context.SetCommandLineCWD(base::FilePath("/root"));
   for (auto& expectation : EXPECTATIONS) {
