@@ -9,41 +9,43 @@
 #include "files/interfaces/types.mojom.h"
 #include "mojo/public/cpp/environment/logging.h"
 
+using mojo::SynchronousInterfacePtr;
+
 namespace mojio {
 namespace test {
 
-void MakeDirAt(mojo::files::DirectoryPtr* root, const char* path) {
+void MakeDirAt(SynchronousInterfacePtr<mojo::files::Directory>* root,
+               const char* path) {
   MOJO_CHECK(root);
   MOJO_CHECK(path);
-  mojo::files::DirectoryPtr& dir = *root;
+  auto& dir = *root;
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  dir->OpenDirectory(path, nullptr,
-                     mojo::files::kOpenFlagRead | mojo::files::kOpenFlagWrite |
-                         mojo::files::kOpenFlagCreate,
-                     Capture(&error));
-  MOJO_CHECK(dir.WaitForIncomingResponse());
+  MOJO_CHECK(dir->OpenDirectory(path, nullptr, mojo::files::kOpenFlagRead |
+                                                   mojo::files::kOpenFlagWrite |
+                                                   mojo::files::kOpenFlagCreate,
+                                &error));
   MOJO_CHECK(error == mojo::files::Error::OK);
 }
 
-mojo::files::FilePtr OpenFileAt(mojo::files::DirectoryPtr* root,
-                                const char* path,
-                                uint32_t open_flags) {
+mojo::files::FilePtr OpenFileAt(
+    SynchronousInterfacePtr<mojo::files::Directory>* root,
+    const char* path,
+    uint32_t open_flags) {
   MOJO_CHECK(root);
   MOJO_CHECK(path);
-  mojo::files::DirectoryPtr& dir = *root;
+  auto& dir = *root;
 
   mojo::files::FilePtr file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  dir->OpenFile(path, mojo::GetProxy(&file), open_flags, Capture(&error));
-  MOJO_CHECK(dir.WaitForIncomingResponse());
+  MOJO_CHECK(dir->OpenFile(path, mojo::GetProxy(&file), open_flags, &error));
   if (error != mojo::files::Error::OK)
     return nullptr;
 
   return file;
 }
 
-void CreateTestFileAt(mojo::files::DirectoryPtr* root,
+void CreateTestFileAt(SynchronousInterfacePtr<mojo::files::Directory>* root,
                       const char* path,
                       size_t size) {
   mojo::files::FilePtr file = OpenFileAt(
@@ -67,7 +69,8 @@ void CreateTestFileAt(mojo::files::DirectoryPtr* root,
   MOJO_CHECK(num_bytes_written == bytes_to_write.size());
 }
 
-int64_t GetFileSize(mojo::files::DirectoryPtr* root, const char* path) {
+int64_t GetFileSize(SynchronousInterfacePtr<mojo::files::Directory>* root,
+                    const char* path) {
   mojo::files::FilePtr file =
       OpenFileAt(root, path, mojo::files::kOpenFlagRead);
   if (!file)
@@ -83,7 +86,9 @@ int64_t GetFileSize(mojo::files::DirectoryPtr* root, const char* path) {
   return position;
 }
 
-std::string GetFileContents(mojo::files::DirectoryPtr* root, const char* path) {
+std::string GetFileContents(
+    SynchronousInterfacePtr<mojo::files::Directory>* root,
+    const char* path) {
   mojo::files::FilePtr file =
       OpenFileAt(root, path, mojo::files::kOpenFlagRead);
   MOJO_CHECK(file);

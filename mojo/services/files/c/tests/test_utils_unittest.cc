@@ -10,6 +10,8 @@
 #include "files/c/tests/mojio_impl_test_base.h"
 #include "files/c/tests/test_utils.h"
 
+using mojo::SynchronousInterfacePtr;
+
 namespace mojio {
 namespace test {
 namespace {
@@ -17,7 +19,8 @@ namespace {
 using TestUtilsTest = mojio::test::MojioImplTestBase;
 
 TEST_F(TestUtilsTest, MakeDirAt) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   EXPECT_EQ(-1, GetFileSize(&dir, "my_file"));
   EXPECT_EQ(-1, GetFileSize(&dir, "my_dir/my_file"));
@@ -34,7 +37,8 @@ TEST_F(TestUtilsTest, MakeDirAt) {
 }
 
 TEST_F(TestUtilsTest, OpenFileAt) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   EXPECT_FALSE(OpenFileAt(&dir, "nonexistent", mojo::files::kOpenFlagWrite));
   EXPECT_TRUE(OpenFileAt(&dir, "created", mojo::files::kOpenFlagWrite |
@@ -43,7 +47,8 @@ TEST_F(TestUtilsTest, OpenFileAt) {
 }
 
 TEST_F(TestUtilsTest, CreateTestFileAtGetFileSizeGetFileContents) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   CreateTestFileAt(&dir, "file_0", 0);
   CreateTestFileAt(&dir, "file_123", 123);

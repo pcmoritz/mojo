@@ -15,6 +15,8 @@
 #include "files/c/tests/mojio_impl_test_base.h"
 #include "files/c/tests/test_utils.h"
 
+using mojo::SynchronousInterfacePtr;
+
 namespace mojio {
 namespace {
 
@@ -113,12 +115,13 @@ TEST_F(DirectoryWrapperTest, OpenTruncate) {
 }
 
 TEST_F(DirectoryWrapperTest, OpenExisting) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 123);
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
-  DirectoryWrapper dw(&errno_impl, dir.Pass());
+  DirectoryWrapper dw(&errno_impl, dir.PassInterfaceHandle());
 
   // Test various flags:
   EXPECT_TRUE(dw.Open("my_file", MOJIO_O_RDONLY, MOJIO_S_IRWXU));
@@ -150,12 +153,13 @@ TEST_F(DirectoryWrapperTest, OpenExisting) {
 
 // Note: This necessarily also involves the returned |FDImpl|'s |Write()|.
 TEST_F(DirectoryWrapperTest, OpenAppend) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 123);
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
-  DirectoryWrapper dw(&errno_impl, dir.Pass());
+  DirectoryWrapper dw(&errno_impl, dir.PassInterfaceHandle());
 
   std::unique_ptr<FDImpl> fdi =
       dw.Open("my_file", MOJIO_O_WRONLY | MOJIO_O_APPEND, MOJIO_S_IRWXU);

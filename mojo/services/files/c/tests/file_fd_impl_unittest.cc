@@ -13,8 +13,12 @@
 #include "files/c/tests/mock_errno_impl.h"
 #include "files/c/tests/mojio_impl_test_base.h"
 #include "files/c/tests/test_utils.h"
+#include "files/interfaces/files.mojom-sync.h"
 #include "files/interfaces/files.mojom.h"
 #include "files/interfaces/types.mojom.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+
+using mojo::SynchronousInterfacePtr;
 
 namespace mojio {
 namespace {
@@ -24,7 +28,8 @@ using FileFDImplTest = mojio::test::MojioImplTestBase;
 const int kLastErrorSentinel = -12345;
 
 TEST_F(FileFDImplTest, ConstructClose) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
   FileFDImpl ffdi(
@@ -39,7 +44,8 @@ TEST_F(FileFDImplTest, ConstructClose) {
 }
 
 TEST_F(FileFDImplTest, Dup) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 1000);
 
@@ -71,7 +77,8 @@ TEST_F(FileFDImplTest, Dup) {
 }
 
 TEST_F(FileFDImplTest, Ftruncate) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 1000);
 
@@ -101,7 +108,8 @@ TEST_F(FileFDImplTest, Ftruncate) {
 }
 
 TEST_F(FileFDImplTest, Lseek) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 123);
 
@@ -158,7 +166,8 @@ TEST_F(FileFDImplTest, Lseek) {
 }
 
 TEST_F(FileFDImplTest, Read) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file", 123);
 
@@ -189,7 +198,8 @@ TEST_F(FileFDImplTest, Read) {
 }
 
 TEST_F(FileFDImplTest, Write) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
   FileFDImpl ffdi(
@@ -219,7 +229,8 @@ TEST_F(FileFDImplTest, Write) {
 }
 
 TEST_F(FileFDImplTest, Fstat) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::CreateTestFileAt(&dir, "my_file_0", 0);
   test::CreateTestFileAt(&dir, "my_file_1", 512);
@@ -269,7 +280,8 @@ TEST_F(FileFDImplTest, Fstat) {
 }
 
 TEST_F(FileFDImplTest, Efault) {
-  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+  auto dir = SynchronousInterfacePtr<mojo::files::Directory>::Create(
+      directory().Pass());
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
   FileFDImpl ffdi(
