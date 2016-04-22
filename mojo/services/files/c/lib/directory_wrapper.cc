@@ -16,16 +16,19 @@
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/environment/logging.h"
 
+using mojo::InterfaceHandle;
+
 namespace mojio {
 
-DirectoryWrapper::DirectoryWrapper(ErrnoImpl* errno_impl,
-                                   mojo::files::DirectoryPtr directory)
-    : errno_impl_(errno_impl), directory_(directory.Pass()) {
+DirectoryWrapper::DirectoryWrapper(
+    ErrnoImpl* errno_impl,
+    InterfaceHandle<mojo::files::Directory> directory)
+    : errno_impl_(errno_impl),
+      directory_(mojo::files::DirectoryPtr::Create(directory.Pass())) {
   MOJO_DCHECK(directory_);
 }
 
-DirectoryWrapper::~DirectoryWrapper() {
-}
+DirectoryWrapper::~DirectoryWrapper() {}
 
 // TODO(vtl): This doesn't currently support opening non-files (in particular,
 // directories), but it should.

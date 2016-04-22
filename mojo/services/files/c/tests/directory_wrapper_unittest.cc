@@ -113,10 +113,12 @@ TEST_F(DirectoryWrapperTest, OpenTruncate) {
 }
 
 TEST_F(DirectoryWrapperTest, OpenExisting) {
-  test::CreateTestFileAt(&directory(), "my_file", 123);
+  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+
+  test::CreateTestFileAt(&dir, "my_file", 123);
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
-  DirectoryWrapper dw(&errno_impl, directory().Pass());
+  DirectoryWrapper dw(&errno_impl, dir.Pass());
 
   // Test various flags:
   EXPECT_TRUE(dw.Open("my_file", MOJIO_O_RDONLY, MOJIO_S_IRWXU));
@@ -148,10 +150,12 @@ TEST_F(DirectoryWrapperTest, OpenExisting) {
 
 // Note: This necessarily also involves the returned |FDImpl|'s |Write()|.
 TEST_F(DirectoryWrapperTest, OpenAppend) {
-  test::CreateTestFileAt(&directory(), "my_file", 123);
+  auto dir = mojo::files::DirectoryPtr::Create(directory().Pass());
+
+  test::CreateTestFileAt(&dir, "my_file", 123);
 
   test::MockErrnoImpl errno_impl(kLastErrorSentinel);
-  DirectoryWrapper dw(&errno_impl, directory().Pass());
+  DirectoryWrapper dw(&errno_impl, dir.Pass());
 
   std::unique_ptr<FDImpl> fdi =
       dw.Open("my_file", MOJIO_O_WRONLY | MOJIO_O_APPEND, MOJIO_S_IRWXU);
