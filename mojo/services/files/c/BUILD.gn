@@ -29,7 +29,6 @@ mojo_sdk_source_set("mojio") {
     "lib/real_errno_impl.h",
     "lib/singletons.cc",
     "lib/singletons.h",
-    "lib/template_util.h",
     "lib/util.cc",
     "lib/util.h",
     "mojio_config.h",

@@ -10,7 +10,6 @@
 #include "files/c/lib/file_fd_impl.h"
 #include "files/c/lib/util.h"
 #include "files/c/mojio_fcntl.h"
-#include "files/interfaces/file.mojom.h"
 #include "files/interfaces/types.mojom.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/environment/logging.h"
@@ -74,7 +73,7 @@ std::unique_ptr<FDImpl> DirectoryWrapper::Open(const char* path,
   // TODO(vtl): We currently totally ignore |mode|; maybe we should do something
   // with it?
 
-  mojo::files::FilePtr file;
+  InterfaceHandle<mojo::files::File> file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   if (!directory_->OpenFile(path, mojo::GetProxy(&file), mojo_open_flags,
                             &error)) {

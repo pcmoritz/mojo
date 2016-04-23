@@ -10,10 +10,8 @@
 #include <limits>
 
 #include "files/c/lib/errno_impl.h"
-#include "files/c/lib/template_util.h"
 #include "files/c/lib/util.h"
 #include "files/c/mojio_unistd.h"
-#include "files/interfaces/file.mojom.h"
 #include "files/interfaces/types.mojom.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/environment/logging.h"
@@ -47,7 +45,7 @@ std::unique_ptr<FDImpl> FileFDImpl::Dup() {
   ErrnoImpl::Setter errno_setter(errno_impl());
   MOJO_DCHECK(file_);
 
-  mojo::files::FilePtr new_file;
+  InterfaceHandle<mojo::files::File> new_file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   if (!file_->Dup(mojo::GetProxy(&new_file), &error)) {
     errno_setter.Set(ESTALE);
