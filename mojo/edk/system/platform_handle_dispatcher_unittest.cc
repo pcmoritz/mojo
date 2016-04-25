@@ -60,6 +60,34 @@ TEST(PlatformHandleDispatcherTest, Basic) {
   EXPECT_EQ(MOJO_RESULT_OK, dispatcher->Close());
 }
 
+TEST(PlatformHandleDispatcher, SupportsEntrypointClass) {
+  test::ScopedTestDir test_dir;
+
+  util::ScopedFILE fp(test_dir.CreateFile());
+  ASSERT_TRUE(fp);
+
+  ScopedPlatformHandle h(PlatformHandleFromFILE(std::move(fp)));
+  EXPECT_FALSE(fp);
+  ASSERT_TRUE(h.is_valid());
+
+  auto d = PlatformHandleDispatcher::Create(h.Pass());
+  ASSERT_TRUE(d);
+  EXPECT_FALSE(h.is_valid());
+
+  EXPECT_FALSE(
+      d->SupportsEntrypointClass(Dispatcher::EntrypointClass::MESSAGE_PIPE));
+  EXPECT_FALSE(d->SupportsEntrypointClass(
+      Dispatcher::EntrypointClass::DATA_PIPE_PRODUCER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(
+      Dispatcher::EntrypointClass::DATA_PIPE_CONSUMER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(Dispatcher::EntrypointClass::BUFFER));
+
+  // TODO(vtl): Check that it actually returns |MOJO_RESULT_INVALID_ARGUMENT|
+  // for methods in unsupported entrypoint classes.
+
+  EXPECT_EQ(MOJO_RESULT_OK, d->Close());
+}
+
 TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
   test::ScopedTestDir test_dir;
 

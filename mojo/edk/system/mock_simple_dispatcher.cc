@@ -50,6 +50,11 @@ Dispatcher::Type MockSimpleDispatcher::GetType() const {
   return Type::UNKNOWN;
 }
 
+bool MockSimpleDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return false;
+}
+
 MockSimpleDispatcher::MockSimpleDispatcher(
     MojoHandleSignals satisfied_signals,
     MojoHandleSignals satisfiable_signals)

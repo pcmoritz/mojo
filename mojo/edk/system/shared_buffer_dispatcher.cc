@@ -97,6 +97,11 @@ Dispatcher::Type SharedBufferDispatcher::GetType() const {
   return Type::SHARED_BUFFER;
 }
 
+bool SharedBufferDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return (entrypoint_class == EntrypointClass::BUFFER);
+}
+
 // static
 RefPtr<SharedBufferDispatcher> SharedBufferDispatcher::Deserialize(
     Channel* channel,

@@ -71,6 +71,11 @@ Dispatcher::Type MessagePipeDispatcher::GetType() const {
   return Type::MESSAGE_PIPE;
 }
 
+bool MessagePipeDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return (entrypoint_class == EntrypointClass::MESSAGE_PIPE);
+}
+
 // static
 RefPtr<MessagePipeDispatcher> MessagePipeDispatcher::CreateRemoteMessagePipe(
     RefPtr<ChannelEndpoint>* channel_endpoint) {

@@ -60,6 +60,9 @@ DispatcherTransport DispatcherTryStartTransport(Dispatcher* dispatcher);
 // |mutex()| method).
 class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
  public:
+  // Types of dispatchers. Note that these are not necessarily a one-to-one with
+  // implementations of |Dispatcher|: multiple implementations may share the
+  // same type.
   enum class Type {
     UNKNOWN = 0,
     MESSAGE_PIPE,
@@ -70,7 +73,40 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
     // "Private" types (not exposed via the public interface):
     PLATFORM_HANDLE = -1
   };
+
+  // Classes of "entrypoints"/"syscalls": Each dispatcher should support entire
+  // classes of methods (and if they don't support a given class, they should
+  // return |MOJO_RESULT_INVALID_ARGUMENT| for all the methods in that class).
+  // Warning: A method may be called even if |SupportsEntrypointClass()|
+  // indicates that the method's class is not supported (see below).
+  enum class EntrypointClass {
+    // |ReadMessage()|, |WriteMessage()|:
+    MESSAGE_PIPE,
+
+    // |SetDataPipeProducerOptions()|, |GetDataPipeProducerOptions()|,
+    // |WriteData()|, |BeginWriteData()|, |EndWriteData()|:
+    DATA_PIPE_PRODUCER,
+
+    // |SetDataPipeConsumerOptions()|, |GetDataPipeConsumerOptions()|,
+    // |ReadData()|, |BeginReadData()|, |EndReadData()|:
+    DATA_PIPE_CONSUMER,
+
+    // |DuplicateBufferHandle()|, |GetBufferInformation()|, |MapBuffer()|:
+    BUFFER,
+  };
+
+  // Gets the type of the dispatcher; see |Type| above.
   virtual Type GetType() const = 0;
+
+  // Gets whether the given entrypoint class is supported; see |EntrypointClass|
+  // above. This is ONLY called when a rights check has failed, to determine
+  // whether |MOJO_RESULT_PERMISSION_DENIED| (if the entrypoint class is
+  // supported) or |MOJO_RESULT_INVALID_ARGUMENT| (if not) should be returned.
+  // In the case that the rights check passes, |Core| will proceed immediately
+  // to call the method (so if the method is not supported, it must still return
+  // |MOJO_RESULT_INVALID_ARGUMENT|).
+  virtual bool SupportsEntrypointClass(
+      EntrypointClass entrypoint_class) const = 0;
 
   // These methods implement the various primitives named |Mojo...()|. These
   // take |mutex_| and handle races with |Close()|. Then they call out to
@@ -81,6 +117,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // possible. If this becomes an issue, we can rethink this.
   MojoResult Close();
 
+  // |EntrypointClass::MESSAGE_PIPE|:
   // |transports| may be non-null if and only if there are handles to be
   // written; not that |this| must not be in |transports|. On success, all the
   // dispatchers in |transports| must have been moved to a closed state; on
@@ -98,6 +135,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                          uint32_t* num_dispatchers,
                          MojoReadMessageFlags flags);
 
+  // |EntrypointClass::DATA_PIPE_PRODUCER|:
   MojoResult SetDataPipeProducerOptions(
       UserPointer<const MojoDataPipeProducerOptions> options);
   MojoResult GetDataPipeProducerOptions(
@@ -110,6 +148,8 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                             UserPointer<uint32_t> buffer_num_bytes,
                             MojoWriteDataFlags flags);
   MojoResult EndWriteData(uint32_t num_bytes_written);
+
+  // |EntrypointClass::DATA_PIPE_CONSUMER|:
   MojoResult SetDataPipeConsumerOptions(
       UserPointer<const MojoDataPipeConsumerOptions> options);
   MojoResult GetDataPipeConsumerOptions(
@@ -123,6 +163,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                            MojoReadDataFlags flags);
   MojoResult EndReadData(uint32_t num_bytes_read);
 
+  // |EntrypointClass::BUFFER|:
   // |options| may be null. |new_dispatcher| must not be null, but
   // |*new_dispatcher| should be null (and will contain the dispatcher for the
   // new handle on success).

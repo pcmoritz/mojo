@@ -35,6 +35,11 @@ Dispatcher::Type PlatformHandleDispatcher::GetType() const {
   return Type::PLATFORM_HANDLE;
 }
 
+bool PlatformHandleDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return false;
+}
+
 // static
 RefPtr<PlatformHandleDispatcher> PlatformHandleDispatcher::Deserialize(
     Channel* channel,
@@ -73,8 +78,7 @@ PlatformHandleDispatcher::PlatformHandleDispatcher(
     ScopedPlatformHandle platform_handle)
     : platform_handle_(platform_handle.Pass()) {}
 
-PlatformHandleDispatcher::~PlatformHandleDispatcher() {
-}
+PlatformHandleDispatcher::~PlatformHandleDispatcher() {}
 
 void PlatformHandleDispatcher::CloseImplNoLock() {
   mutex().AssertHeld();

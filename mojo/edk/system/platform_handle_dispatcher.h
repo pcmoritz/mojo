@@ -29,6 +29,7 @@ class PlatformHandleDispatcher final : public SimpleDispatcher {
 
   // |Dispatcher| public methods:
   Type GetType() const override;
+  bool SupportsEntrypointClass(EntrypointClass entrypoint_class) const override;
 
   // The "opposite" of |SerializeAndClose()|. (Typically this is called by
   // |Dispatcher::Deserialize()|.)

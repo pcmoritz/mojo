@@ -27,6 +27,11 @@ Dispatcher::Type DataPipeConsumerDispatcher::GetType() const {
   return Type::DATA_PIPE_CONSUMER;
 }
 
+bool DataPipeConsumerDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return (entrypoint_class == EntrypointClass::DATA_PIPE_CONSUMER);
+}
+
 // static
 RefPtr<DataPipeConsumerDispatcher> DataPipeConsumerDispatcher::Deserialize(
     Channel* channel,

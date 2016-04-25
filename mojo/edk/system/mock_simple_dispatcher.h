@@ -22,6 +22,7 @@ class MockSimpleDispatcher final : public SimpleDispatcher {
   // Note: Use |MakeRefCounted<MockSimpleDispatcher>()|.
 
   Type GetType() const override;
+  bool SupportsEntrypointClass(EntrypointClass entrypoint_class) const override;
 
   void SetSatisfiedSignals(MojoHandleSignals new_satisfied_signals);
   void SetSatisfiableSignals(MojoHandleSignals new_satisfiable_signals);

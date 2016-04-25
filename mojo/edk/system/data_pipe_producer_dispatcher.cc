@@ -27,6 +27,11 @@ Dispatcher::Type DataPipeProducerDispatcher::GetType() const {
   return Type::DATA_PIPE_PRODUCER;
 }
 
+bool DataPipeProducerDispatcher::SupportsEntrypointClass(
+    EntrypointClass entrypoint_class) const {
+  return (entrypoint_class == EntrypointClass::DATA_PIPE_PRODUCER);
+}
+
 // static
 RefPtr<DataPipeProducerDispatcher> DataPipeProducerDispatcher::Deserialize(
     Channel* channel,

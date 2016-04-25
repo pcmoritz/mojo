@@ -32,8 +32,13 @@ class MockDispatcher : public Dispatcher {
     return AdoptRef(new MockDispatcher(info));
   }
 
-  // |Dispatcher| private methods:
+  // |Dispatcher| public methods:
   Type GetType() const override { return Type::UNKNOWN; }
+
+  bool SupportsEntrypointClass(
+      EntrypointClass entrypoint_class) const override {
+    return true;
+  }
 
  private:
   explicit MockDispatcher(CoreTestBase::MockHandleInfo* info) : info_(info) {

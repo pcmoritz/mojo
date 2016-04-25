@@ -47,6 +47,7 @@ class MessagePipeDispatcher final : public Dispatcher {
 
   // |Dispatcher| public methods:
   Type GetType() const override;
+  bool SupportsEntrypointClass(EntrypointClass entrypoint_class) const override;
 
   // Creates a |MessagePipe| with a local endpoint (at port 0) and a proxy
   // endpoint, and creates/initializes a |MessagePipeDispatcher| (attached to
