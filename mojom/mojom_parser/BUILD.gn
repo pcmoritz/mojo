@@ -30,6 +30,7 @@ action("mojom_tool") {
     "parser/parsing.go",
     "serialization/serialization.go",
     "utils/sort_utils.go",
+    "utils/wellfounded_graphs.go",
   ]
 
   outputs = [
