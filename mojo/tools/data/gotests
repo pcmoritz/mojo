@@ -6,10 +6,10 @@
 # of directories containing a Go package. Use forward slash ("/") as the
 # path separator.
 test_dirs = [
-   'mojom/mojom_parser/integration_tests',
-   'mojom/mojom_parser/lexer',
-   'mojom/mojom_parser/mojom',
-   'mojom/mojom_parser/parser',
-   'mojom/mojom_parser/serialization',
-   'mojom/mojom_parser/utils',
+   'mojom/mojom_tool/integration_tests',
+   'mojom/mojom_tool/lexer',
+   'mojom/mojom_tool/mojom',
+   'mojom/mojom_tool/parser',
+   'mojom/mojom_tool/serialization',
+   'mojom/mojom_tool/utils',
 ]
