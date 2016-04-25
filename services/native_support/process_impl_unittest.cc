@@ -14,7 +14,11 @@
 #include "mojo/services/files/cpp/output_stream_file.h"
 #include "mojo/services/files/interfaces/file.mojom.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
+// FIXME
+#include "mojo/services/native_support/interfaces/process.mojom.h"
 #include "services/native_support/process_test_base.h"
+
+using mojo::SynchronousInterfacePtr;
 
 namespace native_support {
 namespace {
@@ -33,35 +37,31 @@ TEST_F(ProcessImplTest, Spawn) {
   mojo::files::Error error;
 
   {
-    ProcessControllerPtr process_controller;
+    SynchronousInterfacePtr<ProcessController> process_controller;
     error = mojo::files::Error::INTERNAL;
-    process()->Spawn(ToByteArray("/bin/true"), nullptr, nullptr, nullptr,
-                     nullptr, nullptr, GetProxy(&process_controller),
-                     Capture(&error));
-    ASSERT_TRUE(process().WaitForIncomingResponse());
+    ASSERT_TRUE(process()->Spawn(
+        ToByteArray("/bin/true"), nullptr, nullptr, nullptr, nullptr, nullptr,
+        GetSynchronousProxy(&process_controller), &error));
     EXPECT_EQ(mojo::files::Error::OK, error);
 
     error = mojo::files::Error::INTERNAL;
     int32_t exit_status = 42;
-    process_controller->Wait(Capture(&error, &exit_status));
-    ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+    ASSERT_TRUE(process_controller->Wait(&error, &exit_status));
     EXPECT_EQ(mojo::files::Error::OK, error);
     EXPECT_EQ(0, exit_status);
   }
 
   {
-    ProcessControllerPtr process_controller;
+    SynchronousInterfacePtr<ProcessController> process_controller;
     error = mojo::files::Error::INTERNAL;
-    process()->Spawn(ToByteArray("/bin/false"), nullptr, nullptr, nullptr,
-                     nullptr, nullptr, GetProxy(&process_controller),
-                     Capture(&error));
-    ASSERT_TRUE(process().WaitForIncomingResponse());
+    ASSERT_TRUE(process()->Spawn(
+        ToByteArray("/bin/false"), nullptr, nullptr, nullptr, nullptr, nullptr,
+        GetSynchronousProxy(&process_controller), &error));
     EXPECT_EQ(mojo::files::Error::OK, error);
 
     error = mojo::files::Error::INTERNAL;
     int32_t exit_status = 0;
-    process_controller->Wait(Capture(&error, &exit_status));
-    ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+    ASSERT_TRUE(process_controller->Wait(&error, &exit_status));
     EXPECT_EQ(mojo::files::Error::OK, error);
     EXPECT_NE(exit_status, 0);
   }
@@ -113,12 +113,11 @@ TEST_F(ProcessImplTest, SpawnRedirectStdout) {
   mojo::Array<mojo::Array<uint8_t>> argv;
   argv.push_back(ToByteArray("/bin/echo"));
   argv.push_back(ToByteArray(kOutput));
-  ProcessControllerPtr process_controller;
+  SynchronousInterfacePtr<ProcessController> process_controller;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
-  process()->Spawn(ToByteArray("/bin/echo"), argv.Pass(), nullptr, nullptr,
-                   file.Pass(), nullptr, GetProxy(&process_controller),
-                   Capture(&error));
-  ASSERT_TRUE(process().WaitForIncomingResponse());
+  ASSERT_TRUE(process()->Spawn(
+      ToByteArray("/bin/echo"), argv.Pass(), nullptr, nullptr, file.Pass(),
+      nullptr, GetSynchronousProxy(&process_controller), &error));
   EXPECT_EQ(mojo::files::Error::OK, error);
 
   // Since |file|'s impl is on our thread, we have to spin our message loop.
@@ -128,8 +127,7 @@ TEST_F(ProcessImplTest, SpawnRedirectStdout) {
 
   error = mojo::files::Error::INTERNAL;
   int32_t exit_status = 0;
-  process_controller->Wait(Capture(&error, &exit_status));
-  ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+  ASSERT_TRUE(process_controller->Wait(&error, &exit_status));
   EXPECT_EQ(mojo::files::Error::OK, error);
   EXPECT_EQ(0, exit_status);
 

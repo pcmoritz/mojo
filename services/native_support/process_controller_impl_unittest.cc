@@ -10,10 +10,13 @@
 
 #include "base/message_loop/message_loop.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/services/files/cpp/input_stream_file.h"
 #include "mojo/services/files/cpp/output_stream_file.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
 #include "services/native_support/process_test_base.h"
+
+using mojo::SynchronousInterfacePtr;
 
 namespace native_support {
 namespace {
@@ -40,23 +43,21 @@ TEST_F(ProcessControllerImplTest, Wait) {
   mojo::files::Error error;
 
   {
-    ProcessControllerPtr process_controller;
+    SynchronousInterfacePtr<ProcessController> process_controller;
     error = mojo::files::Error::INTERNAL;
     const char kPath[] = "/bin/sh";
     mojo::Array<mojo::Array<uint8_t>> argv;
     argv.push_back(ToByteArray(kPath));
     argv.push_back(ToByteArray("-c"));
     argv.push_back(ToByteArray("exit 42"));
-    process()->Spawn(ToByteArray(kPath), argv.Pass(), nullptr, nullptr,
-                     nullptr, nullptr, GetProxy(&process_controller),
-                     Capture(&error));
-    ASSERT_TRUE(process().WaitForIncomingResponse());
+    ASSERT_TRUE(process()->Spawn(
+        ToByteArray(kPath), argv.Pass(), nullptr, nullptr, nullptr, nullptr,
+        GetSynchronousProxy(&process_controller), &error));
     EXPECT_EQ(mojo::files::Error::OK, error);
 
     error = mojo::files::Error::INTERNAL;
     int32_t exit_status = 0;
-    process_controller->Wait(Capture(&error, &exit_status));
-    ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+    ASSERT_TRUE(process_controller->Wait(&error, &exit_status));
     EXPECT_EQ(mojo::files::Error::OK, error);
     EXPECT_EQ(42, exit_status);
   }
@@ -132,7 +133,7 @@ TEST_F(ProcessControllerImplTest, Kill) {
   mojo::files::FilePtr ofile;
   QuitOnReadyFile ofile_impl(GetProxy(&ofile));
 
-  ProcessControllerPtr process_controller;
+  SynchronousInterfacePtr<ProcessController> process_controller;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   const char kPath[] = "/bin/bash";
   mojo::Array<mojo::Array<uint8_t>> argv;
@@ -140,10 +141,9 @@ TEST_F(ProcessControllerImplTest, Kill) {
   argv.push_back(ToByteArray("-c"));
   argv.push_back(
       ToByteArray("trap 'exit 42' INT; echo ready; read -t30; exit 1"));
-  process()->Spawn(ToByteArray(kPath), argv.Pass(), nullptr, ifile.Pass(),
-                   ofile.Pass(), nullptr, GetProxy(&process_controller),
-                   Capture(&error));
-  ASSERT_TRUE(process().WaitForIncomingResponse());
+  ASSERT_TRUE(process()->Spawn(
+      ToByteArray(kPath), argv.Pass(), nullptr, ifile.Pass(), ofile.Pass(),
+      nullptr, GetSynchronousProxy(&process_controller), &error));
   EXPECT_EQ(mojo::files::Error::OK, error);
 
   // |ofile_impl| will quit the message loop once it sees "ready".
@@ -152,14 +152,12 @@ TEST_F(ProcessControllerImplTest, Kill) {
 
   // Send SIGINT.
   error = mojo::files::Error::INTERNAL;
-  process_controller->Kill(static_cast<int32_t>(SIGINT), Capture(&error));
-  ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+  ASSERT_TRUE(process_controller->Kill(static_cast<int32_t>(SIGINT), &error));
   EXPECT_EQ(mojo::files::Error::OK, error);
 
   error = mojo::files::Error::INTERNAL;
   int32_t exit_status = 0;
-  process_controller->Wait(Capture(&error, &exit_status));
-  ASSERT_TRUE(process_controller.WaitForIncomingResponse());
+  ASSERT_TRUE(process_controller->Wait(&error, &exit_status));
   EXPECT_EQ(mojo::files::Error::OK, error);
   EXPECT_EQ(42, exit_status);
 }
@@ -173,17 +171,16 @@ TEST_F(ProcessControllerImplTest, DestroyingControllerKills) {
     mojo::files::FilePtr ofile;
     QuitOnReadyFile ofile_impl(GetProxy(&ofile));
 
-    ProcessControllerPtr process_controller;
+    SynchronousInterfacePtr<ProcessController> process_controller;
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     const char kPath[] = "/bin/bash";
     mojo::Array<mojo::Array<uint8_t>> argv;
     argv.push_back(ToByteArray(kPath));
     argv.push_back(ToByteArray("-c"));
     argv.push_back(ToByteArray("echo ready; read -t30"));
-    process()->Spawn(ToByteArray(kPath), argv.Pass(), nullptr, ifile.Pass(),
-                     ofile.Pass(), nullptr, GetProxy(&process_controller),
-                     Capture(&error));
-    ASSERT_TRUE(process().WaitForIncomingResponse());
+    ASSERT_TRUE(process()->Spawn(
+        ToByteArray(kPath), argv.Pass(), nullptr, ifile.Pass(), ofile.Pass(),
+        nullptr, GetSynchronousProxy(&process_controller), &error));
     EXPECT_EQ(mojo::files::Error::OK, error);
 
     // |ofile_impl| will quit the message loop once it sees "ready".

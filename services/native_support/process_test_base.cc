@@ -5,6 +5,9 @@
 #include "services/native_support/process_test_base.h"
 
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/services/native_support/interfaces/process.mojom.h"
+
+using mojo::SynchronousInterfacePtr;
 
 namespace native_support {
 
@@ -14,7 +17,11 @@ ProcessTestBase::~ProcessTestBase() {}
 
 void ProcessTestBase::SetUp() {
   mojo::test::ApplicationTestBase::SetUp();
-  application_impl()->ConnectToService("mojo:native_support", &process_);
+  ProcessPtr process_async;
+  // TODO(vtl): Fix |ConnectToService()|.
+  application_impl()->ConnectToService("mojo:native_support", &process_async);
+  process_ = SynchronousInterfacePtr<Process>::Create(
+      process_async.PassInterfaceHandle());
 }
 
 }  // namespace native_support

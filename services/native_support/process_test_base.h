@@ -9,52 +9,10 @@
 
 #include "base/macros.h"
 #include "mojo/public/cpp/application/application_test_base.h"
-#include "mojo/services/native_support/interfaces/process.mojom.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+#include "mojo/services/native_support/interfaces/process.mojom-sync.h"
 
 namespace native_support {
-
-// TODO(vtl): Stuff copied from mojo/public/cpp/bindings/lib/template_util.h.
-typedef char YesType;
-
-struct NoType {
-  YesType dummy[2];
-};
-
-template <typename T>
-struct IsMoveOnlyType {
-  template <typename U>
-  static YesType Test(const typename U::MoveOnlyTypeForCPP03*);
-
-  template <typename U>
-  static NoType Test(...);
-
-  static const bool value =
-      sizeof(Test<T>(0)) == sizeof(YesType) && !std::is_const<T>::value;
-};
-
-template <typename T>
-typename std::enable_if<!IsMoveOnlyType<T>::value, T>::type& Forward(T& t) {
-  return t;
-}
-
-template <typename T>
-typename std::enable_if<IsMoveOnlyType<T>::value, T>::type Forward(T& t) {
-  return t.Pass();
-}
-// TODO(vtl): (End of stuff copied from template_util.h.)
-
-template <typename T1>
-mojo::Callback<void(T1)> Capture(T1* t1) {
-  return [t1](T1 got_t1) { *t1 = Forward(got_t1); };
-}
-
-template <typename T1, typename T2>
-mojo::Callback<void(T1, T2)> Capture(T1* t1, T2* t2) {
-  return [t1, t2](T1 got_t1, T2 got_t2) {
-    *t1 = Forward(got_t1);
-    *t2 = Forward(got_t2);
-  };
-}
 
 class ProcessTestBase : public mojo::test::ApplicationTestBase {
  public:
@@ -64,10 +22,10 @@ class ProcessTestBase : public mojo::test::ApplicationTestBase {
   void SetUp() override;
 
  protected:
-  ProcessPtr& process() { return process_; }
+  mojo::SynchronousInterfacePtr<Process>& process() { return process_; }
 
  private:
-  ProcessPtr process_;
+  mojo::SynchronousInterfacePtr<Process> process_;
 
   DISALLOW_COPY_AND_ASSIGN(ProcessTestBase);
 };
