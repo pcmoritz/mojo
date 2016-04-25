@@ -8,8 +8,8 @@ import("//mojo/public/mojo_application.gni")
 # files service.
 source_set("file_utils") {
   sources = [
+    "file_util.cc",
     "file_util.h",
-    "lib/file_util.cc",
   ]
 
   public_deps = [
@@ -23,9 +23,7 @@ mojo_native_application("file_utils_apptests") {
   testonly = true
 
   sources = [
-    "tests/file_util_test_base.cc",
-    "tests/file_util_test_base.h",
-    "tests/file_util_unittest.cc",
+    "file_util_unittest.cc",
   ]
 
   deps = [

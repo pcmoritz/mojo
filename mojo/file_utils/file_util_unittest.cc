@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "mojo/file_utils/file_util.h"
-#include "mojo/file_utils/tests/file_util_test_base.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
 #include "mojo/public/cpp/utility/run_loop.h"
@@ -18,7 +17,7 @@ namespace file_utils {
 namespace test {
 namespace {
 
-using FileUtilTest = file_utils::test::FileUtilTestBase;
+using FileUtilTest = mojo::test::ApplicationTestBase;
 
 // TODO(smklein): Stuff copied from mojo/services/files/c/lib/template_util.h
 typedef char YesType;
@@ -135,11 +134,14 @@ void CloseFileHelper(mojo::files::FilePtr* file) {
 }
 
 TEST_F(FileUtilTest, BasicCreateTemporaryFile) {
+  mojo::files::FilesPtr files;
+  application_impl()->ConnectToService("mojo:files", &files);
+
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   mojo::files::DirectoryPtr directory;
-  files()->OpenFileSystem(nullptr, mojo::GetProxy(&directory), Capture(&error));
+  files->OpenFileSystem(nullptr, mojo::GetProxy(&directory), Capture(&error));
 
-  ASSERT_TRUE(files().WaitForIncomingResponse());
+  ASSERT_TRUE(files.WaitForIncomingResponse());
   EXPECT_EQ(mojo::files::Error::OK, error);
 
   std::string filename1, filename2, filename3;
