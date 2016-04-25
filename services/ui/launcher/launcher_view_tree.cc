@@ -47,7 +47,7 @@ LauncherViewTree::LauncherViewTree(
   mojo::ServiceProviderPtr view_tree_service_provider;
   view_tree_->GetServiceProvider(mojo::GetProxy(&view_tree_service_provider));
   mojo::ConnectToService<mojo::ui::InputDispatcher>(
-      view_tree_service_provider.get(), &input_dispatcher_);
+      view_tree_service_provider.get(), mojo::GetProxy(&input_dispatcher_));
   input_dispatcher_.set_connection_error_handler(
       base::Bind(&LauncherViewTree::OnInputDispatcherConnectionError,
                  base::Unretained(this)));

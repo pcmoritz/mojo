@@ -10,16 +10,16 @@
 namespace mojo {
 namespace ui {
 
-InputHandler::InputHandler(mojo::ServiceProvider* service_provider,
-                           mojo::ui::InputListener* listener)
+InputHandler::InputHandler(ServiceProvider* service_provider,
+                           InputListener* listener)
     : listener_binding_(listener) {
   DCHECK(service_provider);
   DCHECK(listener);
 
-  mojo::ConnectToService(service_provider, &connection_);
+  ConnectToService(service_provider, GetProxy(&connection_));
 
-  mojo::ui::InputListenerPtr listener_ptr;
-  listener_binding_.Bind(mojo::GetProxy(&listener_ptr));
+  InputListenerPtr listener_ptr;
+  listener_binding_.Bind(GetProxy(&listener_ptr));
   connection_->SetListener(listener_ptr.Pass());
 }
 

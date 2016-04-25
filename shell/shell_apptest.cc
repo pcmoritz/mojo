@@ -204,7 +204,7 @@ TEST_F(ShellAppTest, MojoURLQueryHandling) {
 
 void TestApplicationConnector(mojo::ApplicationConnector* app_connector) {
   PingablePtr pingable;
-  ConnectToService(app_connector, "mojo:pingable_app", &pingable);
+  ConnectToService(app_connector, "mojo:pingable_app", GetProxy(&pingable));
   auto callback = [](const String& app_url, const String& connection_url,
                      const String& message) {
     EXPECT_TRUE(base::EndsWith(app_url.To<base::StringPiece>(),
