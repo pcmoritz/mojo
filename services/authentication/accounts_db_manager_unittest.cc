@@ -24,7 +24,7 @@ class AccountsDBTest : public mojo::test::ApplicationTestBase {
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
     mojo::files::FilesPtr files;
-    application_impl()->ConnectToService("mojo:files", &files);
+    application_impl()->ConnectToServiceDeprecated("mojo:files", &files);
 
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     mojo::files::DirectoryPtr directory;

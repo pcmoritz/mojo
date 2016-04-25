@@ -17,9 +17,9 @@ FilesTestBase::~FilesTestBase() {}
 
 void FilesTestBase::SetUp() {
   test::ApplicationTestBase::SetUp();
-  // TODO(vtl): Fix |ConnectToService()|.
+  // TODO(vtl): Fix this.
   FilesPtr files_async;
-  application_impl()->ConnectToService("mojo:files", &files_async);
+  application_impl()->ConnectToServiceDeprecated("mojo:files", &files_async);
   files_ =
       SynchronousInterfacePtr<Files>::Create(files_async.PassInterfaceHandle());
 }

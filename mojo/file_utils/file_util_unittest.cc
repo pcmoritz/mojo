@@ -135,7 +135,7 @@ void CloseFileHelper(mojo::files::FilePtr* file) {
 
 TEST_F(FileUtilTest, BasicCreateTemporaryFile) {
   mojo::files::FilesPtr files;
-  application_impl()->ConnectToService("mojo:files", &files);
+  application_impl()->ConnectToServiceDeprecated("mojo:files", &files);
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   mojo::files::DirectoryPtr directory;

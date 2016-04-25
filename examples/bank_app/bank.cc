@@ -51,7 +51,7 @@ class BankApp : public mojo::ApplicationDelegate,
   BankApp() {
   }
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:principal_service", &login_service_);
+    app->ConnectToServiceDeprecated("mojo:principal_service", &login_service_);
   }
 
   // From ApplicationDelegate

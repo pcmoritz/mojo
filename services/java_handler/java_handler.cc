@@ -91,8 +91,8 @@ void JavaHandler::RunApplication(
 void JavaHandler::Initialize(mojo::ApplicationImpl* app) {
   tracing_.Initialize(app);
   handler_task_runner_ = base::MessageLoop::current()->task_runner();
-  app->ConnectToService("mojo:url_response_disk_cache",
-                        &url_response_disk_cache_);
+  app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
+                                  &url_response_disk_cache_);
 }
 
 void JavaHandler::GetApplication(base::FilePath* archive_path,

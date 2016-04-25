@@ -97,8 +97,8 @@ class MojoUrlRedirectorApplicationTest :
     binding_.Bind(GetProxy(&location_files_handler));
 
     http_server::HttpServerFactoryPtr http_server_factory;
-    application_impl()->ConnectToService("mojo:http_server",
-                                         &http_server_factory);
+    application_impl()->ConnectToServiceDeprecated("mojo:http_server",
+                                                   &http_server_factory);
 
     mojo::NetAddressPtr location_files_server_addr(mojo::NetAddress::New());
     location_files_server_addr->family = mojo::NetAddressFamily::IPV4;
@@ -122,9 +122,10 @@ class MojoUrlRedirectorApplicationTest :
 
     // Connect to the redirector and wait until it registers itself as a
     // handler with the server on |redirector_port_|.
-    application_impl()->ConnectToApplication("mojo:mojo_url_redirector");
-    application_impl()->ConnectToService("mojo:network_service",
-                                         &network_service_);
+    application_impl()->ConnectToApplicationDeprecated(
+        "mojo:mojo_url_redirector");
+    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
+                                                   &network_service_);
     WaitForRedirectorRegistration();
   }
 

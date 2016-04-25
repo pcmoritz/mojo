@@ -70,7 +70,7 @@ void PlayToneApp::Quit() {
 }
 
 void PlayToneApp::Initialize(ApplicationImpl* app) {
-  app->ConnectToService("mojo:audio_server", &audio_server_);
+  app->ConnectToServiceDeprecated("mojo:audio_server", &audio_server_);
   audio_server_.set_connection_error_handler([this]() {
     OnConnectionError("audio_server");
   });

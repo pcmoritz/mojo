@@ -26,7 +26,7 @@ class NfcApplicationTest : public test::ApplicationTestBase {
   // ApplicationTestBase:
   void SetUp() override {
     ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:nfc", &nfc_);
+    application_impl()->ConnectToServiceDeprecated("mojo:nfc", &nfc_);
   }
 
   nfc::NfcPtr nfc_;

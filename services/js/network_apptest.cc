@@ -19,7 +19,7 @@ class JSNetworkTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("network_test.js");
-    application_impl()->ConnectToService(url, &network_test_service_);
+    application_impl()->ConnectToServiceDeprecated(url, &network_test_service_);
   }
 
   NetworkTestServicePtr network_test_service_;

@@ -27,7 +27,8 @@ class NotificationGeneratorDelegate : public mojo::ApplicationDelegate,
 
   // mojo::ApplicationDelegate implementation.
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:notifications", &notification_service_);
+    app->ConnectToServiceDeprecated("mojo:notifications",
+                                    &notification_service_);
     PostFirstNotification();
   }
 

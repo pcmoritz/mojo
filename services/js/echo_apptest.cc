@@ -20,7 +20,7 @@ class JSEchoTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("echo.js");
-    application_impl()->ConnectToService(url, &echo_service_);
+    application_impl()->ConnectToServiceDeprecated(url, &echo_service_);
   }
 
   mojo::EchoServicePtr echo_service_;

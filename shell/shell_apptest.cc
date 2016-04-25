@@ -80,8 +80,8 @@ class ShellHTTPAppTest : public ShellAppTest {
   void SetUp() override {
     ShellAppTest::SetUp();
 
-    application_impl()->ConnectToService("mojo:http_server",
-                                         &http_server_factory_);
+    application_impl()->ConnectToServiceDeprecated("mojo:http_server",
+                                                   &http_server_factory_);
 
     mojo::NetAddressPtr local_address(mojo::NetAddress::New());
     local_address->family = mojo::NetAddressFamily::IPV4;
@@ -119,7 +119,7 @@ class ShellHTTPAppTest : public ShellAppTest {
 // Test that we can load apps over http.
 TEST_F(ShellHTTPAppTest, Http) {
   PingablePtr pingable;
-  application_impl()->ConnectToService(GetURL("app"), &pingable);
+  application_impl()->ConnectToServiceDeprecated(GetURL("app"), &pingable);
   pingable->Ping("hello",
                  [this](const String& app_url, const String& connection_url,
                         const String& message) {
@@ -135,7 +135,7 @@ TEST_F(ShellHTTPAppTest, Http) {
 // TODO(aa): Test that apps receive the correct URL parameters.
 TEST_F(ShellHTTPAppTest, Redirect) {
   PingablePtr pingable;
-  application_impl()->ConnectToService(GetURL("redirect"), &pingable);
+  application_impl()->ConnectToServiceDeprecated(GetURL("redirect"), &pingable);
   pingable->Ping("hello",
                  [this](const String& app_url, const String& connection_url,
                         const String& message) {
@@ -157,8 +157,8 @@ TEST_F(ShellHTTPAppTest, Redirect) {
 TEST_F(ShellHTTPAppTest, MAYBE_QueryHandling) {
   PingablePtr pingable1;
   PingablePtr pingable2;
-  application_impl()->ConnectToService(GetURL("app?foo"), &pingable1);
-  application_impl()->ConnectToService(GetURL("app?bar"), &pingable2);
+  application_impl()->ConnectToServiceDeprecated(GetURL("app?foo"), &pingable1);
+  application_impl()->ConnectToServiceDeprecated(GetURL("app?bar"), &pingable2);
 
   int num_responses = 0;
   auto callbacks_builder = [this, &num_responses](int query_index) {
@@ -187,7 +187,8 @@ TEST_F(ShellHTTPAppTest, MAYBE_QueryHandling) {
 // mojo: URLs can have querystrings too
 TEST_F(ShellAppTest, MojoURLQueryHandling) {
   PingablePtr pingable;
-  application_impl()->ConnectToService("mojo:pingable_app?foo", &pingable);
+  application_impl()->ConnectToServiceDeprecated("mojo:pingable_app?foo",
+                                                 &pingable);
   auto callback = [](const String& app_url, const String& connection_url,
                      const String& message) {
     EXPECT_TRUE(base::EndsWith(app_url.To<base::StringPiece>(),

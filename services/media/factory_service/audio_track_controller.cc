@@ -20,7 +20,7 @@ AudioTrackController::AudioTrackController(const String& url,
   DCHECK(app);
 
   AudioServerPtr audio_server;
-  app->ConnectToService(url, &audio_server);
+  app->ConnectToServiceDeprecated(url, &audio_server);
   audio_server->CreateTrack(GetProxy(&audio_track_));
 }
 

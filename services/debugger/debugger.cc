@@ -47,7 +47,7 @@ class Debugger : public mojo::ApplicationDelegate,
     }
     base::StringToUint(app->args()[1], &command_port_);
     http_server::HttpServerFactoryPtr http_server_factory;
-    app->ConnectToService("mojo:http_server", &http_server_factory);
+    app->ConnectToServiceDeprecated("mojo:http_server", &http_server_factory);
 
     mojo::NetAddressPtr local_address(mojo::NetAddress::New());
     local_address->family = mojo::NetAddressFamily::IPV4;
@@ -121,7 +121,7 @@ class Debugger : public mojo::ApplicationDelegate,
     }
 
     if (!tracing_)
-      app_->ConnectToService("mojo:tracing", &tracing_);
+      app_->ConnectToServiceDeprecated("mojo:tracing", &tracing_);
     is_tracing_ = true;
     mojo::DataPipe pipe;
     tracing_->Start(pipe.producer_handle.Pass(), mojo::String("*"));

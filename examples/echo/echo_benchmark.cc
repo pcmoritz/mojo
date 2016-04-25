@@ -57,9 +57,9 @@ class EchoClientDelegate : public ApplicationDelegate {
     for (int i = 0; i < num_clients_; i++) {
       EchoPtr echo;
       if (use_dart_server_) {
-        app->ConnectToService("mojo:dart_echo_server", &echo);
+        app->ConnectToServiceDeprecated("mojo:dart_echo_server", &echo);
       } else {
-        app->ConnectToService("mojo:echo_server", &echo);
+        app->ConnectToServiceDeprecated("mojo:echo_server", &echo);
       }
       echoClients_.push_back(echo.Pass());
     }

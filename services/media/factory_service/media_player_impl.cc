@@ -39,7 +39,7 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  app()->ConnectToService("mojo:media_factory", &factory_);
+  app()->ConnectToServiceDeprecated("mojo:media_factory", &factory_);
 
   factory_->CreateDemux(reader.Pass(), GetProxy(&demux_));
 

@@ -125,8 +125,8 @@ void AndroidHandler::RunApplication(
 
 void AndroidHandler::Initialize(mojo::ApplicationImpl* app) {
   handler_task_runner_ = base::MessageLoop::current()->task_runner();
-  app->ConnectToService("mojo:url_response_disk_cache",
-                        &url_response_disk_cache_);
+  app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
+                                  &url_response_disk_cache_);
 }
 
 bool AndroidHandler::ConfigureIncomingConnection(

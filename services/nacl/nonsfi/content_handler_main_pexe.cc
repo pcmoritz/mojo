@@ -78,9 +78,9 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
  private:
   // Overridden from ApplicationDelegate:
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:pnacl_compile", &compiler_init_);
-    app->ConnectToService("mojo:pnacl_link", &linker_init_);
-    app->ConnectToService("mojo:files", &files_);
+    app->ConnectToServiceDeprecated("mojo:pnacl_compile", &compiler_init_);
+    app->ConnectToServiceDeprecated("mojo:pnacl_link", &linker_init_);
+    app->ConnectToServiceDeprecated("mojo:files", &files_);
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     files_->OpenFileSystem("app_persistent_cache",
                            GetProxy(&nexe_cache_directory),

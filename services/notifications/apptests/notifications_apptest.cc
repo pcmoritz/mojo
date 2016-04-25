@@ -30,8 +30,8 @@ class NotificationsApplicationTest : public test::ApplicationTestBase,
   // ApplicationTestBase:
   void SetUp() override {
     ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:notifications",
-                                         &notification_service_);
+    application_impl()->ConnectToServiceDeprecated("mojo:notifications",
+                                                   &notification_service_);
   }
 
   notifications::NotificationServicePtr notification_service_;

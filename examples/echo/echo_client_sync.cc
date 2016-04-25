@@ -26,7 +26,7 @@ class EchoClientDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
     EchoPtr echo;
-    app->ConnectToService("mojo:echo_server", &echo);
+    app->ConnectToServiceDeprecated("mojo:echo_server", &echo);
 
     mojo::String out = "yo!";
     auto echo_proxy =

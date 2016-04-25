@@ -25,7 +25,7 @@ class LoginHandler {
 class BankCustomer : public mojo::ApplicationDelegate {
  public:
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:principal_service", &login_service_);
+    app->ConnectToServiceDeprecated("mojo:principal_service", &login_service_);
 
     // Login to the principal service to get a user identity.
     login_service_->Login(LoginHandler());
@@ -35,7 +35,7 @@ class BankCustomer : public mojo::ApplicationDelegate {
     }
 
     BankPtr bank;
-    app->ConnectToService("mojo:bank", &bank);
+    app->ConnectToServiceDeprecated("mojo:bank", &bank);
     bank->Deposit(500/*usd*/);
     bank->Withdraw(100/*usd*/);
     auto gb_callback = [](const int32_t& balance) {

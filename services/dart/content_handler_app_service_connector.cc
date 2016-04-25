@@ -18,7 +18,7 @@ void ContentHandlerAppServiceConnector::Connect(
     std::string application_name,
     mojo::InterfaceRequest<Interface> interface_request) {
   mojo::ApplicationConnection* application_connection =
-      content_handler_app_->ConnectToApplication(application_name);
+      content_handler_app_->ConnectToApplicationDeprecated(application_name);
   if (!application_connection)
     return;
   mojo::ServiceProvider* sp = application_connection->GetServiceProvider();

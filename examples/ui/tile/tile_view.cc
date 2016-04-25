@@ -40,7 +40,7 @@ void TileView::ConnectViews() {
   for (const auto& url : params_.view_urls) {
     // Start connecting to the view provider.
     mojo::ui::ViewProviderPtr provider;
-    app_impl()->ConnectToService(url, &provider);
+    app_impl()->ConnectToServiceDeprecated(url, &provider);
 
     LOG(INFO) << "Connecting to view: child_key=" << child_key
               << ", url=" << url;

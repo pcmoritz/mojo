@@ -77,7 +77,7 @@ class ResponsePrinter {
 class WGetApp : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
-    app->ConnectToService("mojo:network_service", &network_service_);
+    app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
     Start(app->args());
   }
 

@@ -22,7 +22,7 @@ MediaTest::MediaTest(mojo::ApplicationImpl* app,
                      const std::string& input_file_name)
     : state_(MediaState::UNPREPARED) {
   MediaFactoryPtr factory;
-  app->ConnectToService("mojo:media_factory", &factory);
+  app->ConnectToServiceDeprecated("mojo:media_factory", &factory);
 
   SeekingReaderPtr reader;
   factory->CreateNetworkReader(input_file_name, GetProxy(&reader));

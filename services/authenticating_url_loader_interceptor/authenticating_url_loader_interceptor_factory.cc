@@ -26,7 +26,7 @@ AuthenticatingURLLoaderInterceptorFactory::
           std::move(authentication_service))),
       app_(app),
       cached_tokens_(cached_tokens) {
-  app_->ConnectToService("mojo:network_service", &network_service_);
+  app_->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
   authentication_service_.set_connection_error_handler(
       [this]() { ClearAuthenticationService(); });
 }

@@ -24,8 +24,8 @@ class URLResponseDiskCacheAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:url_response_disk_cache",
-                                         &url_response_disk_cache_);
+    application_impl()->ConnectToServiceDeprecated(
+        "mojo:url_response_disk_cache", &url_response_disk_cache_);
   }
 
  protected:

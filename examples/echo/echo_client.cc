@@ -26,7 +26,7 @@ class ResponsePrinter {
 class EchoClientDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
-    app->ConnectToService("mojo:echo_server", &echo_);
+    app->ConnectToServiceDeprecated("mojo:echo_server", &echo_);
 
     echo_->EchoString("hello world", ResponsePrinter());
   }

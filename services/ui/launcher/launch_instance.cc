@@ -30,18 +30,20 @@ void LaunchInstance::Launch() {
   DVLOG(1) << "Launching " << app_url_;
   TRACE_EVENT0("launcher", __func__);
 
-  app_impl_->ConnectToService("mojo:compositor_service", &compositor_);
+  app_impl_->ConnectToServiceDeprecated("mojo:compositor_service",
+                                        &compositor_);
   compositor_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnCompositorConnectionError, base::Unretained(this)));
 
-  app_impl_->ConnectToService("mojo:view_manager_service", &view_manager_);
+  app_impl_->ConnectToServiceDeprecated("mojo:view_manager_service",
+                                        &view_manager_);
   view_manager_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnViewManagerConnectionError, base::Unretained(this)));
 
   InitViewport();
 
   mojo::ui::ViewProviderPtr client_view_provider;
-  app_impl_->ConnectToService(app_url_, &client_view_provider);
+  app_impl_->ConnectToServiceDeprecated(app_url_, &client_view_provider);
 
   client_view_provider->CreateView(mojo::GetProxy(&client_view_owner_), nullptr,
                                    nullptr);
@@ -58,7 +60,8 @@ void LaunchInstance::OnViewManagerConnectionError() {
 }
 
 void LaunchInstance::InitViewport() {
-  app_impl_->ConnectToService("mojo:native_viewport_service", &viewport_);
+  app_impl_->ConnectToServiceDeprecated("mojo:native_viewport_service",
+                                        &viewport_);
   viewport_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnViewportConnectionError, base::Unretained(this)));
 

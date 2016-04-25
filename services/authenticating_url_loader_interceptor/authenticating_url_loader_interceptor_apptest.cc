@@ -290,7 +290,7 @@ class AuthenticatingURLLoaderInterceptorAppTest
     ApplicationTestBase::SetUp();
 
     InitializeNetworkService();
-    application_impl()->ConnectToService(
+    application_impl()->ConnectToServiceDeprecated(
         "mojo:authenticating_url_loader_interceptor",
         &interceptor_meta_factory_);
   }
@@ -341,8 +341,8 @@ class AuthenticatingURLLoaderInterceptorAppTest
 
   void InitializeNetworkService() {
     network_service_.reset();
-    application_impl()->ConnectToService("mojo:network_service",
-                                         &network_service_);
+    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
+                                                   &network_service_);
   }
 
   void CloseAuthenticationService() { authentication_service_impl_.reset(); }

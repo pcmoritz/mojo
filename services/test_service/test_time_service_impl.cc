@@ -23,7 +23,8 @@ TestTimeServiceImpl::~TestTimeServiceImpl() {
 void TestTimeServiceImpl::StartTrackingRequests(
     const mojo::Callback<void()>& callback) {
   TestRequestTrackerPtr tracker;
-  app_impl_->ConnectToService("mojo:test_request_tracker_app", &tracker);
+  app_impl_->ConnectToServiceDeprecated("mojo:test_request_tracker_app",
+                                        &tracker);
   tracking_.reset(new TrackedService(tracker.Pass(), Name_, callback));
 }
 

@@ -36,7 +36,7 @@ void ViewManagerApp::Initialize(mojo::ApplicationImpl* app_impl) {
 
   // Connect to compositor.
   mojo::gfx::composition::CompositorPtr compositor;
-  app_impl_->ConnectToService("mojo:compositor_service", &compositor);
+  app_impl_->ConnectToServiceDeprecated("mojo:compositor_service", &compositor);
   compositor.set_connection_error_handler(base::Bind(
       &ViewManagerApp::OnCompositorConnectionError, base::Unretained(this)));
 

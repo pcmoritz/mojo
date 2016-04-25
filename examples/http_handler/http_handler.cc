@@ -33,7 +33,7 @@ class HttpHandler : public ApplicationDelegate,
     binding_.Bind(GetProxy(&http_handler_ptr));
 
     http_server::HttpServerFactoryPtr http_server_factory;
-    app->ConnectToService("mojo:http_server", &http_server_factory);
+    app->ConnectToServiceDeprecated("mojo:http_server", &http_server_factory);
 
     mojo::NetAddressPtr local_address(mojo::NetAddress::New());
     local_address->family = mojo::NetAddressFamily::IPV4;

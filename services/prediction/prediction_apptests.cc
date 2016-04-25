@@ -26,8 +26,8 @@ class PredictionApptest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:prediction_service",
-                                         &prediction_);
+    application_impl()->ConnectToServiceDeprecated("mojo:prediction_service",
+                                                   &prediction_);
   }
 
   std::vector<std::string> GetPredictionListClient(

@@ -17,7 +17,8 @@ BaseView::BaseView(
       view_listener_binding_(this),
       view_container_listener_binding_(this) {
   DCHECK(app_impl_);
-  app_impl_->ConnectToService("mojo:view_manager_service", &view_manager_);
+  app_impl_->ConnectToServiceDeprecated("mojo:view_manager_service",
+                                        &view_manager_);
 
   mojo::ui::ViewListenerPtr view_listener;
   view_listener_binding_.Bind(mojo::GetProxy(&view_listener));

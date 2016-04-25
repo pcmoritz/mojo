@@ -26,8 +26,8 @@ void MojioImplTestBase::SetUp() {
   mojo::test::ApplicationTestBase::SetUp();
 
   mojo::files::FilesPtr files_async;
-  // TODO(vtl): Fix |ConnectToService()|, etc.
-  application_impl()->ConnectToService("mojo:files", &files_async);
+  // TODO(vtl): Fix this.
+  application_impl()->ConnectToServiceDeprecated("mojo:files", &files_async);
   auto files = SynchronousInterfacePtr<mojo::files::Files>::Create(
       files_async.PassInterfaceHandle());
 

@@ -23,7 +23,7 @@ HttpServerImpl::HttpServerImpl(mojo::ApplicationImpl* app,
       requested_local_address_(requested_local_address.Pass()),
       assigned_port_(0),
       weak_ptr_factory_(this) {
-  app->ConnectToService("mojo:network_service", &network_service_);
+  app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
   Start();
 }
 

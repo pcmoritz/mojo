@@ -55,7 +55,7 @@ class BenchmarkApp : public mojo::ApplicationDelegate,
     // Connect to trace collector, which will fetch the trace events produced by
     // the app being benchmarked.
     tracing::TraceCollectorPtr trace_collector;
-    app->ConnectToService("mojo:tracing", &trace_collector);
+    app->ConnectToServiceDeprecated("mojo:tracing", &trace_collector);
     trace_collector_client_.reset(
         new TraceCollectorClient(this, trace_collector.Pass()));
     trace_collector_client_->Start(categories_str);
@@ -85,7 +85,7 @@ class BenchmarkApp : public mojo::ApplicationDelegate,
     // Record the time origin for measurements just before connecting to the app
     // being benchmarked.
     time_origin_ = base::TimeTicks::FromInternalValue(MojoGetTimeTicksNow());
-    traced_app_connection_ = app->ConnectToApplication(args_.app);
+    traced_app_connection_ = app->ConnectToApplicationDeprecated(args_.app);
 
     // Post task to stop tracing when the time is up.
     base::MessageLoop::current()->PostDelayedTask(

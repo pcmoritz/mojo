@@ -18,8 +18,9 @@ ProcessTestBase::~ProcessTestBase() {}
 void ProcessTestBase::SetUp() {
   mojo::test::ApplicationTestBase::SetUp();
   ProcessPtr process_async;
-  // TODO(vtl): Fix |ConnectToService()|.
-  application_impl()->ConnectToService("mojo:native_support", &process_async);
+  // TODO(vtl): Fix this.
+  application_impl()->ConnectToServiceDeprecated("mojo:native_support",
+                                                 &process_async);
   process_ = SynchronousInterfacePtr<Process>::Create(
       process_async.PassInterfaceHandle());
 }

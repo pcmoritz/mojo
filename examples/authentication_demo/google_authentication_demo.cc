@@ -23,7 +23,8 @@ class GoogleAuthApp : public mojo::ApplicationDelegate {
 
   void Initialize(mojo::ApplicationImpl* app) override {
     DLOG(INFO) << "Connecting to authentication service...";
-    app->ConnectToService("mojo:authentication", &authentication_service_);
+    app->ConnectToServiceDeprecated("mojo:authentication",
+                                    &authentication_service_);
 
     mojo::Array<mojo::String> scopes;
     scopes.push_back("profile");

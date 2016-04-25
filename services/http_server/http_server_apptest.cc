@@ -97,10 +97,10 @@ class HttpServerApplicationTest : public mojo::test::ApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
 
-    application_impl()->ConnectToService("mojo:http_server",
-                                         &http_server_factory_);
-    application_impl()->ConnectToService("mojo:network_service",
-                                         &network_service_);
+    application_impl()->ConnectToServiceDeprecated("mojo:http_server",
+                                                   &http_server_factory_);
+    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
+                                                   &network_service_);
   }
 
   http_server::HttpServerPtr CreateHttpServer();

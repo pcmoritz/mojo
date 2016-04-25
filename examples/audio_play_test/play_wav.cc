@@ -157,12 +157,12 @@ const std::set<uint16_t> PlayWAVApp::VALID_BITS_PER_SAMPLES({
 });
 
 void PlayWAVApp::Initialize(ApplicationImpl* app) {
-  app->ConnectToService("mojo:audio_server", &audio_server_);
+  app->ConnectToServiceDeprecated("mojo:audio_server", &audio_server_);
   audio_server_.set_connection_error_handler([this]() {
     OnConnectionError("audio_server");
   });
 
-  app->ConnectToService("mojo:network_service", &network_service_);
+  app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
   audio_server_.set_connection_error_handler([this]() {
     OnConnectionError("network_service");
   });

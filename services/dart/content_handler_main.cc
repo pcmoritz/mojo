@@ -186,8 +186,8 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
         base::MessageLoop::current()->task_runner());
     strict_content_handler_.set_handler_task_runner(
         base::MessageLoop::current()->task_runner());
-    app->ConnectToService("mojo:url_response_disk_cache",
-                          &url_response_disk_cache_);
+    app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
+                                    &url_response_disk_cache_);
     service_connector_ = new ContentHandlerAppServiceConnector(app);
 
     if (app->HasArg(kRunOnMessageLoop)) {

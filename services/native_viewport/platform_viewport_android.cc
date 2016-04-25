@@ -166,8 +166,8 @@ void PlatformViewportAndroid::Init(const gfx::Rect& bounds) {
   Java_PlatformViewportAndroid_createRequest(env,
                                              reinterpret_cast<intptr_t>(this));
 
-  application_->ConnectToService("mojo:native_viewport_support",
-                                 &support_service_);
+  application_->ConnectToServiceDeprecated("mojo:native_viewport_support",
+                                           &support_service_);
   support_service_->CreateNewNativeWindow(
       base::Bind(&PlatformViewportAndroid::Close, weak_factory_.GetWeakPtr()));
 }

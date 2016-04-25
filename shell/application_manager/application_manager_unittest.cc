@@ -360,7 +360,7 @@ class Tester : public ApplicationDelegate,
   void Create(ApplicationConnection* connection,
               InterfaceRequest<TestA> request) override {
     ApplicationConnection* b_connection =
-        app_->ConnectToApplication(kTestBURLString);
+        app_->ConnectToApplicationDeprecated(kTestBURLString);
     b_connection->AddService<TestC>(this);
     a_bindings_.push_back(
         new TestAImpl(b_connection, context_, request.Pass()));

@@ -130,7 +130,7 @@ DartTracingImpl::~DartTracingImpl() {
 }
 
 void DartTracingImpl::Initialize(mojo::ApplicationImpl* app) {
-  auto connection = app->ConnectToApplication("mojo:tracing");
+  auto connection = app->ConnectToApplicationDeprecated("mojo:tracing");
   connection->AddService(this);
 }
 

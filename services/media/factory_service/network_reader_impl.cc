@@ -34,7 +34,7 @@ NetworkReaderImpl::NetworkReaderImpl(const String& url,
 
   NetworkServicePtr network_service;
 
-  app()->ConnectToService("mojo:network_service", &network_service);
+  app()->ConnectToServiceDeprecated("mojo:network_service", &network_service);
 
   network_service->CreateURLLoader(GetProxy(&url_loader_));
 

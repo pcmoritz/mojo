@@ -94,9 +94,10 @@ class IndirectServiceDemoAppDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
     IntegerServicePtr indirect_service_delegate;
-    app->ConnectToService("mojo:indirect_integer_service",
-        &indirect_integer_service_);
-    app->ConnectToService("mojo:integer_service", &indirect_service_delegate);
+    app->ConnectToServiceDeprecated("mojo:indirect_integer_service",
+                                    &indirect_integer_service_);
+    app->ConnectToServiceDeprecated("mojo:integer_service",
+                                    &indirect_service_delegate);
     indirect_integer_service_->Set(
         indirect_service_delegate.PassInterfaceHandle());
 

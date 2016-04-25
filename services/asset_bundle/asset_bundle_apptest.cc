@@ -22,7 +22,8 @@ class AssetBundleAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:asset_bundle", &asset_unpacker_);
+    application_impl()->ConnectToServiceDeprecated("mojo:asset_bundle",
+                                                   &asset_unpacker_);
   }
 
  protected:

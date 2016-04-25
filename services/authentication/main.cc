@@ -25,8 +25,8 @@ class GoogleAccountManagerApp
   ~GoogleAccountManagerApp() override {}
 
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:network_service", &network_service_);
-    app->ConnectToService("mojo:files", &files_);
+    app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
+    app->ConnectToServiceDeprecated("mojo:files", &files_);
 
     app_url_ = app->url();
   }

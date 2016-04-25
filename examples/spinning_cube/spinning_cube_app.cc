@@ -32,7 +32,7 @@ class SpinningCubeApp : public mojo::ApplicationDelegate,
   }
 
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToService("mojo:native_viewport_service", &viewport_);
+    app->ConnectToServiceDeprecated("mojo:native_viewport_service", &viewport_);
     viewport_.set_connection_error_handler(
         [this]() { OnViewportConnectionError(); });
 

@@ -15,7 +15,8 @@ TracingImpl::TracingImpl() {}
 TracingImpl::~TracingImpl() {}
 
 void TracingImpl::Initialize(ApplicationImpl* app) {
-  ApplicationConnection* connection = app->ConnectToApplication("mojo:tracing");
+  ApplicationConnection* connection =
+      app->ConnectToApplicationDeprecated("mojo:tracing");
   connection->AddService(this);
 
 #ifdef NDEBUG

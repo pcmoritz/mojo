@@ -231,8 +231,8 @@ class NativeRunApp : public mojo::ApplicationDelegate,
   void Initialize(mojo::ApplicationImpl* application_impl) override {
     DCHECK(!application_impl_);
     application_impl_ = application_impl;
-    application_impl_->ConnectToService("mojo:native_support",
-                                        &native_support_process_);
+    application_impl_->ConnectToServiceDeprecated("mojo:native_support",
+                                                  &native_support_process_);
   }
 
   bool ConfigureIncomingConnection(

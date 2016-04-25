@@ -25,7 +25,8 @@ class HelloMojoClientApp : public mojo::ApplicationDelegate {
   ~HelloMojoClientApp() override {}
 
   void Initialize(mojo::ApplicationImpl* application) override {
-    application->ConnectToService("mojo:hello_mojo_server", &hello_mojo_);
+    application->ConnectToServiceDeprecated("mojo:hello_mojo_server",
+                                            &hello_mojo_);
 
     DoIt("hello");
     DoIt("goodbye");

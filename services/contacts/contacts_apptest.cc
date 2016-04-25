@@ -16,7 +16,8 @@ class ContactAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToService("mojo:contacts", &contacts_service_);
+    application_impl()->ConnectToServiceDeprecated("mojo:contacts",
+                                                   &contacts_service_);
   }
 
  protected:

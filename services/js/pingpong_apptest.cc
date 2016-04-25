@@ -45,7 +45,7 @@ class JSPingPongTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("pingpong.js");
-    application_impl()->ConnectToService(url, &pingpong_service_);
+    application_impl()->ConnectToServiceDeprecated(url, &pingpong_service_);
     PingPongClientPtr client_ptr;
     pingpong_client_.Bind(GetProxy(&client_ptr));
     pingpong_service_->SetClient(client_ptr.Pass());
@@ -92,7 +92,8 @@ TEST_F(JSPingPongTest, PingTargetURL) {
 // pingpong-target.js URL, we provide a connection to its PingPongService.
 TEST_F(JSPingPongTest, PingTargetService) {
   PingPongServicePtr target;
-  application_impl()->ConnectToService(JSAppURL("pingpong_target.js"), &target);
+  application_impl()->ConnectToServiceDeprecated(JSAppURL("pingpong_target.js"),
+                                                 &target);
   bool returned_value = false;
   PingTargetCallback callback(&returned_value);
   pingpong_service_->PingTargetService(target.Pass(), 9, callback);

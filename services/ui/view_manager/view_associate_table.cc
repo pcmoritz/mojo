@@ -35,7 +35,7 @@ void ViewAssociateTable::ConnectAssociates(
     associates_.emplace_back(new AssociateData(url, inspector));
     AssociateData* data = associates_.back().get();
 
-    app_impl->ConnectToService(url, &data->associate);
+    app_impl->ConnectToServiceDeprecated(url, &data->associate);
     data->associate.set_connection_error_handler(
         base::Bind(connection_error_callback, url));
 

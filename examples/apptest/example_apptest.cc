@@ -23,8 +23,8 @@ class ExampleApplicationTest : public test::ApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
 
-    application_impl()->ConnectToService("mojo:example_service",
-                                         &example_service_);
+    application_impl()->ConnectToServiceDeprecated("mojo:example_service",
+                                                   &example_service_);
   }
 
   ExampleServicePtr example_service_;
