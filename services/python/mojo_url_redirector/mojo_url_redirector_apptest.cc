@@ -11,6 +11,8 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
 #include "mojo/public/cpp/application/connect.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
+#include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
 #include "mojo/services/http_server/interfaces/http_server.mojom.h"
 #include "mojo/services/http_server/interfaces/http_server_factory.mojom.h"
@@ -123,8 +125,8 @@ class MojoUrlRedirectorApplicationTest :
 
     // Connect to the redirector and wait until it registers itself as a
     // handler with the server on |redirector_port_|.
-    application_impl()->ConnectToApplicationDeprecated(
-        "mojo:mojo_url_redirector");
+    application_impl()->shell()->ConnectToApplication(
+        "mojo:mojo_url_redirector", GetProxy(&url_redirector_sp_), nullptr);
     mojo::ConnectToService(application_impl()->shell(), "mojo:network_service",
                            GetProxy(&network_service_));
     WaitForRedirectorRegistration();
@@ -134,6 +136,7 @@ class MojoUrlRedirectorApplicationTest :
                                const std::string& app);
 
   mojo::Binding<http_server::HttpHandler> binding_;
+  mojo::InterfaceHandle<mojo::ServiceProvider> url_redirector_sp_;
   mojo::NetworkServicePtr network_service_;
   uint16_t redirector_port_;
   bool redirector_registered_;

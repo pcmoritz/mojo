@@ -5,6 +5,7 @@
 #include "services/dart/content_handler_app_service_connector.h"
 
 #include "base/location.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/services/files/interfaces/files.mojom.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
@@ -17,15 +18,8 @@ template<typename Interface>
 void ContentHandlerAppServiceConnector::Connect(
     std::string application_name,
     mojo::InterfaceRequest<Interface> interface_request) {
-  mojo::ApplicationConnection* application_connection =
-      content_handler_app_->ConnectToApplicationDeprecated(application_name);
-  if (!application_connection)
-    return;
-  mojo::ServiceProvider* sp = application_connection->GetServiceProvider();
-  if (!sp)
-    return;
-  sp->ConnectToService(Interface::Name_,
-                       interface_request.PassMessagePipe().Pass());
+  mojo::ConnectToService(content_handler_app_->shell(), application_name,
+                         interface_request.Pass());
 }
 
 ContentHandlerAppServiceConnector::ContentHandlerAppServiceConnector(

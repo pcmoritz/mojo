@@ -34,8 +34,9 @@ mojo_native_application("benchmark") {
   deps = [
     ":lib",
     "//base",
-    "//mojo/application:application",
+    "//mojo/application",
     "//mojo/public/cpp/application",
+    "//mojo/public/interfaces/application",
   ]
 }
 

@@ -21,10 +21,11 @@
 #include "base/trace_event/trace_event.h"
 #include "mojo/application/application_runner_chromium.h"
 #include "mojo/public/c/system/main.h"
-#include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/connect.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
+#include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
 namespace benchmark {
@@ -87,7 +88,8 @@ class BenchmarkApp : public mojo::ApplicationDelegate,
     // Record the time origin for measurements just before connecting to the app
     // being benchmarked.
     time_origin_ = base::TimeTicks::FromInternalValue(MojoGetTimeTicksNow());
-    traced_app_connection_ = app->ConnectToApplicationDeprecated(args_.app);
+    app->shell()->ConnectToApplication(
+        args_.app, GetProxy(&traced_app_connection_), nullptr);
 
     // Post task to stop tracing when the time is up.
     base::MessageLoop::current()->PostDelayedTask(
@@ -149,7 +151,7 @@ class BenchmarkApp : public mojo::ApplicationDelegate,
 
  private:
   RunArgs args_;
-  mojo::ApplicationConnection* traced_app_connection_;
+  mojo::InterfaceHandle<mojo::ServiceProvider> traced_app_connection_;
   scoped_ptr<TraceCollectorClient> trace_collector_client_;
   base::TimeTicks time_origin_;
 
