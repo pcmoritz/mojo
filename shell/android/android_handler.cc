@@ -20,6 +20,7 @@
 #include "mojo/data_pipe_utils/data_pipe_utils.h"
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "shell/android/run_android_application_function.h"
 #include "shell/native_application_support.h"
 
@@ -125,8 +126,8 @@ void AndroidHandler::RunApplication(
 
 void AndroidHandler::Initialize(mojo::ApplicationImpl* app) {
   handler_task_runner_ = base::MessageLoop::current()->task_runner();
-  app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
-                                  &url_response_disk_cache_);
+  mojo::ConnectToService(app->shell(), "mojo:url_response_disk_cache",
+                         GetProxy(&url_response_disk_cache_));
 }
 
 bool AndroidHandler::ConfigureIncomingConnection(

@@ -11,6 +11,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/ui/views/interfaces/view_provider.mojom.h"
 #include "services/ui/launcher/launcher_view_tree.h"
 
@@ -30,22 +31,23 @@ void LaunchInstance::Launch() {
   DVLOG(1) << "Launching " << app_url_;
   TRACE_EVENT0("launcher", __func__);
 
-  app_impl_->ConnectToServiceDeprecated("mojo:compositor_service",
-                                        &compositor_);
+  mojo::ConnectToService(app_impl_->shell(), "mojo:compositor_service",
+                         GetProxy(&compositor_));
   compositor_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnCompositorConnectionError, base::Unretained(this)));
 
-  app_impl_->ConnectToServiceDeprecated("mojo:view_manager_service",
-                                        &view_manager_);
+  mojo::ConnectToService(app_impl_->shell(), "mojo:view_manager_service",
+                         GetProxy(&view_manager_));
   view_manager_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnViewManagerConnectionError, base::Unretained(this)));
 
   InitViewport();
 
   mojo::ui::ViewProviderPtr client_view_provider;
-  app_impl_->ConnectToServiceDeprecated(app_url_, &client_view_provider);
+  mojo::ConnectToService(app_impl_->shell(), app_url_,
+                         GetProxy(&client_view_provider));
 
-  client_view_provider->CreateView(mojo::GetProxy(&client_view_owner_), nullptr,
+  client_view_provider->CreateView(GetProxy(&client_view_owner_), nullptr,
                                    nullptr);
 }
 
@@ -60,8 +62,8 @@ void LaunchInstance::OnViewManagerConnectionError() {
 }
 
 void LaunchInstance::InitViewport() {
-  app_impl_->ConnectToServiceDeprecated("mojo:native_viewport_service",
-                                        &viewport_);
+  mojo::ConnectToService(app_impl_->shell(), "mojo:native_viewport_service",
+                         GetProxy(&viewport_));
   viewport_.set_connection_error_handler(base::Bind(
       &LaunchInstance::OnViewportConnectionError, base::Unretained(this)));
 

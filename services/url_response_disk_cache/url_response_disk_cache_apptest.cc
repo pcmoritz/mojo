@@ -8,6 +8,7 @@
 #include "base/strings/stringprintf.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/data_pipe.h"
 #include "mojo/services/network/interfaces/url_loader.mojom.h"
 #include "mojo/services/url_response_disk_cache/interfaces/url_response_disk_cache.mojom.h"
@@ -23,9 +24,10 @@ class URLResponseDiskCacheAppTest : public mojo::test::ApplicationTestBase {
   ~URLResponseDiskCacheAppTest() override {}
 
   void SetUp() override {
-    mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated(
-        "mojo:url_response_disk_cache", &url_response_disk_cache_);
+    test::ApplicationTestBase::SetUp();
+    ConnectToService(application_impl()->shell(),
+                     "mojo:url_response_disk_cache",
+                     GetProxy(&url_response_disk_cache_));
   }
 
  protected:

@@ -6,6 +6,7 @@
 #include "base/message_loop/message_loop.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/callback.h"
 #include "mojo/public/cpp/environment/logging.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -26,7 +27,7 @@ class NfcApplicationTest : public test::ApplicationTestBase {
   // ApplicationTestBase:
   void SetUp() override {
     ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:nfc", &nfc_);
+    ConnectToService(application_impl()->shell(), "mojo:nfc", GetProxy(&nfc_));
   }
 
   nfc::NfcPtr nfc_;

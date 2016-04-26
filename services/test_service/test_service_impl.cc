@@ -8,6 +8,7 @@
 #include "base/i18n/time_formatting.h"
 #include "base/strings/utf_string_conversions.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/test_service/test_service_application.h"
 #include "services/test_service/test_time_service_impl.h"
 #include "services/test_service/tracked_service.h"
@@ -43,7 +44,7 @@ void SendTimeResponse(
 void TestServiceImpl::ConnectToAppAndGetTime(
     const mojo::String& app_url,
     const mojo::Callback<void(int64_t)>& callback) {
-  app_impl_->ConnectToServiceDeprecated(app_url, &time_service_);
+  ConnectToService(app_impl_->shell(), app_url, GetProxy(&time_service_));
   if (tracking_) {
     tracking_->RecordNewRequest();
     time_service_->StartTrackingRequests(mojo::Callback<void()>());
@@ -54,8 +55,8 @@ void TestServiceImpl::ConnectToAppAndGetTime(
 void TestServiceImpl::StartTrackingRequests(
     const mojo::Callback<void()>& callback) {
   TestRequestTrackerPtr tracker;
-  app_impl_->ConnectToServiceDeprecated("mojo:test_request_tracker_app",
-                                        &tracker);
+  ConnectToService(app_impl_->shell(), "mojo:test_request_tracker_app",
+                   GetProxy(&tracker));
   tracking_.reset(new TrackedService(tracker.Pass(), Name_, callback));
 }
 

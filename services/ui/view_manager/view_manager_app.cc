@@ -15,6 +15,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/ui/view_manager/view_manager_impl.h"
 
 namespace view_manager {
@@ -36,7 +37,8 @@ void ViewManagerApp::Initialize(mojo::ApplicationImpl* app_impl) {
 
   // Connect to compositor.
   mojo::gfx::composition::CompositorPtr compositor;
-  app_impl_->ConnectToServiceDeprecated("mojo:compositor_service", &compositor);
+  mojo::ConnectToService(app_impl_->shell(), "mojo:compositor_service",
+                         GetProxy(&compositor));
   compositor.set_connection_error_handler(base::Bind(
       &ViewManagerApp::OnCompositorConnectionError, base::Unretained(this)));
 

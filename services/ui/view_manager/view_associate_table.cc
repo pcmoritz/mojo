@@ -8,6 +8,7 @@
 
 #include "base/bind.h"
 #include "base/bind_helpers.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/ui/views/cpp/formatting.h"
 
 namespace view_manager {
@@ -35,12 +36,12 @@ void ViewAssociateTable::ConnectAssociates(
     associates_.emplace_back(new AssociateData(url, inspector));
     AssociateData* data = associates_.back().get();
 
-    app_impl->ConnectToServiceDeprecated(url, &data->associate);
+    mojo::ConnectToService(app_impl->shell(), url, GetProxy(&data->associate));
     data->associate.set_connection_error_handler(
         base::Bind(connection_error_callback, url));
 
     mojo::ui::ViewInspectorPtr inspector;
-    data->inspector_binding.Bind(mojo::GetProxy(&inspector));
+    data->inspector_binding.Bind(GetProxy(&inspector));
     data->associate->Connect(
         inspector.Pass(),
         base::Bind(&ViewAssociateTable::OnConnected, base::Unretained(this),
