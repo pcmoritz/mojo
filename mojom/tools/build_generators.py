@@ -15,12 +15,20 @@ import builder
 
 
 def main():
-  parser = builder.get_arg_parser("Build the mojom generators.")
+  all_generators = set(['deps'])
+  parser = builder.get_arg_parser('Build the mojom generators.')
+  parser.add_argument('--generators', dest='generators', type=str,
+      default=all_generators.join(','), action='store',
+      help='Comma-separated list of generators to be built by this build '
+      'script. These should be directories under mojom/generators. By default '
+      'every generator known to the build script will be built.')
   args = parser.parse_args()
 
-  generators = [
-      'deps',
-      ]
+  generators = args.generators.split(',')
+  for generator in generators:
+    if generator not in all_generators:
+      print "The only allowed generators are: %s" % all_generators.join(',')
+      return -1
 
   final_result = 0
   for generator in generators:
@@ -38,7 +46,7 @@ def main():
       if not args.keep_going:
         return result
 
-    return final_result
+  return final_result
 
 
 if __name__ == '__main__':
