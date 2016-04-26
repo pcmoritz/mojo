@@ -14,11 +14,26 @@ namespace media {
 namespace {
 
 bool KnownEncodingsMatch() {
-  return StreamType::kAudioEncodingLpcm == MediaType::kAudioEncodingLpcm &&
+  return StreamType::kAudioEncodingAac == MediaType::kAudioEncodingAac &&
+         StreamType::kAudioEncodingAmrNb == MediaType::kAudioEncodingAmrNb &&
+         StreamType::kAudioEncodingAmrWb == MediaType::kAudioEncodingAmrWb &&
+         StreamType::kAudioEncodingFlac == MediaType::kAudioEncodingFlac &&
+         StreamType::kAudioEncodingGsmMs == MediaType::kAudioEncodingGsmMs &&
+         StreamType::kAudioEncodingLpcm == MediaType::kAudioEncodingLpcm &&
+         StreamType::kAudioEncodingMp3 == MediaType::kAudioEncodingMp3 &&
+         StreamType::kAudioEncodingPcmALaw ==
+             MediaType::kAudioEncodingPcmALaw &&
+         StreamType::kAudioEncodingPcmMuLaw ==
+             MediaType::kAudioEncodingPcmMuLaw &&
          StreamType::kAudioEncodingVorbis == MediaType::kAudioEncodingVorbis &&
+         StreamType::kVideoEncodingH263 == MediaType::kVideoEncodingH263 &&
+         StreamType::kVideoEncodingH264 == MediaType::kVideoEncodingH264 &&
+         StreamType::kVideoEncodingMpeg4 == MediaType::kVideoEncodingMpeg4 &&
+         StreamType::kVideoEncodingTheora == MediaType::kVideoEncodingTheora &&
          StreamType::kVideoEncodingUncompressed ==
              MediaType::kVideoEncodingUncompressed &&
-         StreamType::kVideoEncodingTheora == MediaType::kVideoEncodingTheora;
+         StreamType::kVideoEncodingVp3 == MediaType::kVideoEncodingVp3 &&
+         StreamType::kVideoEncodingVp8 == MediaType::kVideoEncodingVp8;
 }
 
 }  // namespace

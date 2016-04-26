@@ -503,10 +503,23 @@ class MediaType extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(48, 0)
   ];
+  static const String kAudioEncodingAac = "aac";
+  static const String kAudioEncodingAmrNb = "amrnb";
+  static const String kAudioEncodingAmrWb = "amrwb";
+  static const String kAudioEncodingFlac = "flac";
+  static const String kAudioEncodingGsmMs = "gsmms";
   static const String kAudioEncodingLpcm = "lpcm";
+  static const String kAudioEncodingMp3 = "mp3";
+  static const String kAudioEncodingPcmALaw = "pcmalaw";
+  static const String kAudioEncodingPcmMuLaw = "pcmmulaw";
   static const String kAudioEncodingVorbis = "vorbis";
-  static const String kVideoEncodingUncompressed = "uncompressed_video";
+  static const String kVideoEncodingH263 = "h263";
+  static const String kVideoEncodingH264 = "h264";
+  static const String kVideoEncodingMpeg4 = "mpeg4";
   static const String kVideoEncodingTheora = "theora";
+  static const String kVideoEncodingUncompressed = "uncompressed_video";
+  static const String kVideoEncodingVp3 = "vp3";
+  static const String kVideoEncodingVp8 = "vp8";
   MediaTypeMedium medium = null;
   MediaTypeDetails details = null;
   String encoding = null;

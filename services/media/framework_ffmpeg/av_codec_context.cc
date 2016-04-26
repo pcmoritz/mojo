@@ -70,6 +70,30 @@ std::unique_ptr<StreamType> StreamTypeFromCompressedAudioCodecContext(
     const AVCodecContext& from) {
   const char* encoding;
   switch (from.codec_id) {
+    case CODEC_ID_AAC:
+      encoding = StreamType::kAudioEncodingAac;
+      break;
+    case CODEC_ID_AMR_NB:
+      encoding = StreamType::kAudioEncodingAmrNb;
+      break;
+    case CODEC_ID_AMR_WB:
+      encoding = StreamType::kAudioEncodingAmrWb;
+      break;
+    case CODEC_ID_FLAC:
+      encoding = StreamType::kAudioEncodingFlac;
+      break;
+    case CODEC_ID_GSM_MS:
+      encoding = StreamType::kAudioEncodingGsmMs;
+      break;
+    case CODEC_ID_MP3:
+      encoding = StreamType::kAudioEncodingMp3;
+      break;
+    case CODEC_ID_PCM_ALAW:
+      encoding = StreamType::kAudioEncodingPcmALaw;
+      break;
+    case CODEC_ID_PCM_MULAW:
+      encoding = StreamType::kAudioEncodingPcmMuLaw;
+      break;
     case CODEC_ID_VORBIS:
       encoding = StreamType::kAudioEncodingVorbis;
       break;
@@ -192,8 +216,23 @@ std::unique_ptr<StreamType> StreamTypeFromVideoCodecContext(
     const AVCodecContext& from) {
   const char* encoding;
   switch (from.codec_id) {
+    case CODEC_ID_H263:
+      encoding = StreamType::kVideoEncodingH263;
+      break;
+    case CODEC_ID_H264:
+      encoding = StreamType::kVideoEncodingH264;
+      break;
+    case CODEC_ID_MPEG4:
+      encoding = StreamType::kVideoEncodingMpeg4;
+      break;
     case AV_CODEC_ID_THEORA:
       encoding = StreamType::kVideoEncodingTheora;
+      break;
+    case CODEC_ID_VP3:
+      encoding = StreamType::kVideoEncodingVp3;
+      break;
+    case CODEC_ID_VP8:
+      encoding = StreamType::kVideoEncodingVp8;
       break;
     default:
       LOG(ERROR) << "unsupported codec_id " << from.codec_id;
@@ -232,7 +271,7 @@ AvCodecContextPtr AVCodecContextFromAudioStreamType(
   DCHECK(stream_type.medium() == StreamType::Medium::kAudio);
 
   AVCodecID codec_id;
-  AVSampleFormat sample_format;
+  AVSampleFormat sample_format = AV_SAMPLE_FMT_NONE;
 
   if (stream_type.encoding() == StreamType::kAudioEncodingLpcm) {
     switch (stream_type.sample_format()) {
@@ -256,9 +295,24 @@ AvCodecContextPtr AVCodecContextFromAudioStreamType(
         LOG(ERROR) << "unsupported sample format";
         abort();
     }
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingAac) {
+    codec_id = CODEC_ID_AAC;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingAmrNb) {
+    codec_id = CODEC_ID_AMR_NB;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingAmrWb) {
+    codec_id = CODEC_ID_AMR_WB;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingFlac) {
+    codec_id = CODEC_ID_FLAC;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingGsmMs) {
+    codec_id = CODEC_ID_GSM_MS;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingMp3) {
+    codec_id = CODEC_ID_MP3;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingPcmALaw) {
+    codec_id = CODEC_ID_PCM_ALAW;
+  } else if (stream_type.encoding() == StreamType::kAudioEncodingPcmMuLaw) {
+    codec_id = CODEC_ID_PCM_MULAW;
   } else if (stream_type.encoding() == StreamType::kAudioEncodingVorbis) {
-    codec_id = AV_CODEC_ID_VORBIS;
-    sample_format = AV_SAMPLE_FMT_S16;
+    codec_id = CODEC_ID_VORBIS;
   } else {
     LOG(ERROR) << "unsupported encoding " << stream_type.encoding();
     abort();
