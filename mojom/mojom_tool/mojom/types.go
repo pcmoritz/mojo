@@ -114,16 +114,6 @@ type TypeRef interface {
 	// Otherwise it will return the identifier.
 	TypeName() string
 
-	// ReferencedUserDefinedTypes() is invoked after the resolution and validation
-	// phases during the serialization phase. It returns the set of UserDefinedTypes
-	// referenced by this TypeRef. For SimpleType, StringType and HandleTypeRef
-	// this method returns the empty set. For UserTypeRef this method returns
-	// a singleton containing the UserDefinedType that the reference resolves to.
-	// For ArrayTypeRef this method returns the set of UserDefinedTypes of the element
-	// type and for MapTypes this method returns the union of the set of UserDefined
-	// types of the key type and the value type.
-	ReferencedUserDefinedTypes() UserDefinedTypeSet
-
 	// Returns true just in case this type reference is allowed as the type of
 	// a struct field in a non-zero version of a struct.  We disallow
 	// pointer and handle types that are not nullable. This means we allow all primitive
@@ -211,11 +201,6 @@ func (SimpleType) MarkUsedAsConstantType() bool {
 
 func (SimpleType) AllowedInNonZeroStructVersion() bool {
 	return true
-}
-
-// A SimpleType does not reference any UserDefinedTypes.
-func (SimpleType) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	return MakeUserDefinedTypeSet()
 }
 
 // From interface TypeRef:
@@ -482,11 +467,6 @@ func (s StringType) MarkTypeCompatible(assignment LiteralAssignment) (ok bool) {
 	return s.IsAssignmentCompatible(assignment.assignedValue)
 }
 
-// A StringType does not reference any user defined types.
-func (StringType) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	return MakeUserDefinedTypeSet()
-}
-
 func (s StringType) String() string {
 	nullableSpecifier := ""
 	if s.nullable {
@@ -563,11 +543,6 @@ func (HandleTypeRef) IsAssignmentCompatible(assignedValue ConcreteValue) bool {
 
 func (HandleTypeRef) MarkTypeCompatible(assignment LiteralAssignment) bool {
 	return false
-}
-
-// A HandleTypeRef does not reference any UserDefinedTypes.
-func (HandleTypeRef) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	return MakeUserDefinedTypeSet()
 }
 
 func (h HandleTypeRef) String() string {
@@ -713,14 +688,6 @@ func (ArrayTypeRef) MarkTypeCompatible(assignment LiteralAssignment) bool {
 	return false
 }
 
-// An ArrayTypeRef references the UserDefinedTypes that are referenced
-// by its element type.
-func (a ArrayTypeRef) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	setOfTypes := MakeUserDefinedTypeSet()
-	setOfTypes.AddAll(a.elementType.ReferencedUserDefinedTypes())
-	return setOfTypes
-}
-
 func (a ArrayTypeRef) ToString(debug bool) string {
 	fixedLengthSpecifier := ""
 	if a.fixedLength > 0 {
@@ -811,15 +778,6 @@ func (MapTypeRef) IsAssignmentCompatible(assignedValue ConcreteValue) bool {
 
 func (MapTypeRef) MarkTypeCompatible(assignment LiteralAssignment) bool {
 	return false
-}
-
-// An MapTypeRef references the UserDefinedTypes that are referenced
-// by its key and valuye types.
-func (m MapTypeRef) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	setOfTypes := MakeUserDefinedTypeSet()
-	setOfTypes.AddAll(m.keyType.ReferencedUserDefinedTypes())
-	setOfTypes.AddAll(m.valueType.ReferencedUserDefinedTypes())
-	return setOfTypes
 }
 
 func (m MapTypeRef) ToString(debug bool) string {
@@ -969,16 +927,6 @@ func (ref *UserTypeRef) IsAssignmentCompatible(assignedValue ConcreteValue) bool
 	default:
 		panic(fmt.Sprintf("Unexpected type %T.", assignedValue))
 	}
-}
-
-// A UserTypeRef references a single UserDefinedType.
-func (ref *UserTypeRef) ReferencedUserDefinedTypes() UserDefinedTypeSet {
-	if ref.resolvedType == nil {
-		panic("This method should only be invoked after successful resolution.")
-	}
-	singleton := MakeUserDefinedTypeSet()
-	singleton.Add(ref.resolvedType)
-	return singleton
 }
 
 func (t *UserTypeRef) MarkTypeCompatible(assignment LiteralAssignment) bool {

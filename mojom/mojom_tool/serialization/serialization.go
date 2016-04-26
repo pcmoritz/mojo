@@ -32,10 +32,6 @@ var emitComputedPackingData bool = true
 // runtime type info. This is useful in tests.
 var emitSerializedRuntimeTypeInfo bool = true
 
-// By default we do not populate the complete type set of each top-level interface
-// because doing so is expensive and we are not currently using the the data.
-var populateCompleteTypeSet bool = false
-
 // Serialize serializes the MojomDescriptor into a binary form that is passed to the
 // backend of the compiler in order to invoke the code generators.
 // To do this we use Mojo serialization.
@@ -43,18 +39,17 @@ var populateCompleteTypeSet bool = false
 // of the serialized mojom_types.FileGraph.
 // This function is not thread safe.
 func Serialize(d *mojom.MojomDescriptor, debug bool) (bytes []byte, debugString string, err error) {
-	return serialize(d, debug, true, true, true, false)
+	return serialize(d, debug, true, true, true)
 }
 
 // serialize() is a package-private version of the public method Serialize().
 // It is intended for use in tests because it allows setting of the variables
-// emitLineAndColumnNumbers, emitComputedPackingData, emitSerializedRuntimeTypeInfo
-// and populateCompleteTypeSet.
+// emitLineAndColumnNumbers, emitComputedPackingData and emitSerializedRuntimeTypeInfo.
 // This function is not thread safe because it sets and accesses these global
 // variables.
 func serialize(d *mojom.MojomDescriptor, debug,
-	emitLineAndColumnNumbersParam, emitComputedPackingDataParam, emitSerializedRuntimeTypeInfoParam,
-	populateCompleteTypeSetParam bool) (bytes []byte, debugString string, err error) {
+	emitLineAndColumnNumbersParam, emitComputedPackingDataParam,
+	emitSerializedRuntimeTypeInfoParam bool) (bytes []byte, debugString string, err error) {
 
 	// Save the global state and then set it based on the parameters.
 	saveEmitLineAndColumnNumbers := emitLineAndColumnNumbers
@@ -63,8 +58,6 @@ func serialize(d *mojom.MojomDescriptor, debug,
 	emitComputedPackingData = emitComputedPackingDataParam
 	saveEmitSerializedRuntimeTypeInfo := emitSerializedRuntimeTypeInfo
 	emitSerializedRuntimeTypeInfo = emitSerializedRuntimeTypeInfoParam
-	savePopulateCompleteTypeSet := populateCompleteTypeSet
-	populateCompleteTypeSet = populateCompleteTypeSetParam
 
 	fileGraph := translateDescriptor(d)
 	if debug {
@@ -79,7 +72,6 @@ func serialize(d *mojom.MojomDescriptor, debug,
 	emitLineAndColumnNumbers = saveEmitLineAndColumnNumbers
 	emitComputedPackingData = saveEmitComputedPackingData
 	emitSerializedRuntimeTypeInfo = saveEmitSerializedRuntimeTypeInfo
-	populateCompleteTypeSet = savePopulateCompleteTypeSet
 	return
 }
 
@@ -153,7 +145,7 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 	// the serialized bytes will form the |serialized_runtime_type_info| field
 	// of the MojomFile.
 	typeInfo := mojom_types.RuntimeTypeInfo{}
-	typeInfo.ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
+	typeInfo.Services = make(map[string]string)
 	typeInfo.TypeMap = make(map[string]mojom_types.UserDefinedType)
 
 	// We populate the declared_mojom_objects field
@@ -166,7 +158,7 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 			typeKey := intrfc.TypeKey()
 			*(file.DeclaredMojomObjects.Interfaces) = append(*(file.DeclaredMojomObjects.Interfaces), typeKey)
 
-			addServiceTypeInfo(intrfc, &typeInfo)
+			addServiceName(intrfc, &typeInfo)
 			typeInfo.TypeMap[typeKey] = fileGraph.ResolvedTypes[typeKey]
 			if intrfc.Enums != nil {
 				// Add embedded enums to typeInfo.TypeMap.
@@ -254,18 +246,13 @@ func translateMojomFile(f *mojom.MojomFile, fileGraph *mojom_files.MojomFileGrap
 	return
 }
 
-// addServiceTypeInfo will add a ServiceTypeInfo to the ServicesByName field of |typeInfo| corresponding
-// to |intrfc| if |intrfc| is a top-level interface, meaning that it has a non-nil service name. In that
+// addServiceName will add the service name of |intrfc| to the |Services| field of |typeInfo|
+// if |intrfc| is a top-level interface, meaning that it has a non-nil service name. In that
 // case this method returns true. Otherwise this method will do nothing and return fals.
-func addServiceTypeInfo(intrfc *mojom.MojomInterface, typeInfo *mojom_types.RuntimeTypeInfo) (isTopLevel bool) {
+func addServiceName(intrfc *mojom.MojomInterface, typeInfo *mojom_types.RuntimeTypeInfo) (isTopLevel bool) {
 	isTopLevel = intrfc.ServiceName != nil
 	if isTopLevel {
-		serviceTypeInfo := mojom_types.ServiceTypeInfo{}
-		serviceTypeInfo.TopLevelInterface = intrfc.TypeKey()
-		if populateCompleteTypeSet {
-			serviceTypeInfo.CompleteTypeSet = intrfc.FindReachableTypes()
-		}
-		typeInfo.ServicesByName[*intrfc.ServiceName] = serviceTypeInfo
+		typeInfo.Services[*intrfc.ServiceName] = intrfc.TypeKey()
 	}
 	return
 }

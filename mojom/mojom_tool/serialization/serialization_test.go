@@ -1159,14 +1159,14 @@ func TestSingleFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
 		// Serialize again and check for consistency.
-		bytes2, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
+		bytes2, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -2314,14 +2314,14 @@ func TestWithComputedData(t *testing.T) {
 		}
 
 		// Serialize. Notice that the fourth argument is |true|.
-		bytes, _, err := serialize(descriptor, false, false, true, false, false)
+		bytes, _, err := serialize(descriptor, false, false, true, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
 		// Serialize again and check for consistency.
-		bytes2, _, err := serialize(descriptor, false, false, true, false, false)
+		bytes2, _, err := serialize(descriptor, false, false, true, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -2414,7 +2414,7 @@ func TestMetaDataOnlyMode(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for %s: %s", c.fileName, err.Error())
 			continue
@@ -2689,7 +2689,7 @@ func TestTwoFileSerialization(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false, false)
+		bytes, _, err := serialize(descriptor, false, false, c.lineAndcolumnNumbers, false)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -2735,9 +2735,9 @@ func (t *runtimeTypeInfoTest) expectedRuntimeTypeInfoB() *mojom_types.RuntimeTyp
 
 func (test *runtimeTypeInfoTest) addTestCase(contentsA, contentsB string) {
 	test.cases = append(test.cases, runtimeTypeInfoTestCase{contentsA, contentsB, new(mojom_types.RuntimeTypeInfo), new(mojom_types.RuntimeTypeInfo)})
-	test.expectedRuntimeTypeInfoA().ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
+	test.expectedRuntimeTypeInfoA().Services = make(map[string]string)
 	test.expectedRuntimeTypeInfoA().TypeMap = make(map[string]mojom_types.UserDefinedType)
-	test.expectedRuntimeTypeInfoB().ServicesByName = make(map[string]mojom_types.ServiceTypeInfo)
+	test.expectedRuntimeTypeInfoB().Services = make(map[string]string)
 	test.expectedRuntimeTypeInfoB().TypeMap = make(map[string]mojom_types.UserDefinedType)
 }
 
@@ -2922,11 +2922,8 @@ func TestRuntimeTypeInfo(t *testing.T) {
 	`
 		test.addTestCase(contentsA, contentsB)
 
-		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
-			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
-			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
-		}
+		// Services for file A
+		test.expectedRuntimeTypeInfoA().Services["AwesomeService"] = "TYPE_KEY:a.b.c.InterfaceA"
 
 		// TypeMap for file A
 
@@ -3038,13 +3035,8 @@ func TestRuntimeTypeInfo(t *testing.T) {
 	`
 		test.addTestCase(contentsA, contentsB)
 
-		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
-			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
-			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.FooB"},
-		}
-
-		// TypeMap for file A
+		// Services for file A
+		test.expectedRuntimeTypeInfoA().Services["AwesomeService"] = "TYPE_KEY:a.b.c.InterfaceA"
 
 		// FooA
 		test.expectedRuntimeTypeInfoA().TypeMap["TYPE_KEY:a.b.c.FooA"] = &mojom_types.UserDefinedTypeStructType{mojom_types.MojomStruct{
@@ -3163,11 +3155,8 @@ func TestRuntimeTypeInfo(t *testing.T) {
 	`
 		test.addTestCase(contentsA, contentsB)
 
-		// ServicesByName for file A
-		test.expectedRuntimeTypeInfoA().ServicesByName["AwesomeService"] = mojom_types.ServiceTypeInfo{
-			TopLevelInterface: "TYPE_KEY:a.b.c.InterfaceA",
-			CompleteTypeSet:   []string{"TYPE_KEY:a.b.c.FooA", "TYPE_KEY:a.b.c.InterfaceA", "TYPE_KEY:b.c.d.Enum1", "TYPE_KEY:b.c.d.FooB"},
-		}
+		// Services for file A
+		test.expectedRuntimeTypeInfoA().Services["AwesomeService"] = "TYPE_KEY:a.b.c.InterfaceA"
 
 		// TypeMap for file A
 
@@ -3309,7 +3298,7 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		}
 
 		// Serialize
-		bytes, _, err := serialize(descriptor, false, false, false, true, true)
+		bytes, _, err := serialize(descriptor, false, false, false, true)
 		if err != nil {
 			t.Errorf("Serialization error for case %d: %s", i, err.Error())
 			continue
@@ -3334,28 +3323,6 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		// Compare B
 		if err := compareTwoGoObjects(c.expectedRuntimeTypeInfoB, &runtimeTypeInfoB); err != nil {
 			t.Errorf("case %d B:\n%s", i, err.Error())
-		}
-
-		// Test the parameter populateCompleteTypeSet. We set the final
-		// parameter to false.
-		bytes, _, err = serialize(descriptor, false, false, false, true, false)
-		if err != nil {
-			t.Errorf("Serialization error for case %d: %s", i, err.Error())
-			continue
-		}
-
-		// Deserialize
-		decoder = bindings.NewDecoder(bytes, nil)
-		fileGraph = mojom_files.MojomFileGraph{}
-		fileGraph.Decode(decoder)
-		runtimeTypeInfoA = deserializeRuntimeTypeInfo(*fileGraph.Files[fileNameA].SerializedRuntimeTypeInfo)
-
-		// Check that CompleteTypeSet has not been populated for any service.
-		for name, service := range runtimeTypeInfoA.ServicesByName {
-			length := len(service.CompleteTypeSet)
-			if length != 0 {
-				t.Errorf("len(CompleteTypeSet)=%d for service=%q", length, name)
-			}
 		}
 	}
 }

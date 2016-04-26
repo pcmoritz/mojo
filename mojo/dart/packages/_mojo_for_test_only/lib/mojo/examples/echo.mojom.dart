@@ -162,7 +162,7 @@ const int _echoMethodEchoStringName = 0;
 
 class _EchoServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
-    var interfaceTypeKey = getRuntimeTypeInfo().servicesByName["mojo::examples::Echo"].topLevelInterface;
+    var interfaceTypeKey = getRuntimeTypeInfo().services["mojo::examples::Echo"];
     var userDefinedType = getAllMojomTypeDefinitions()[interfaceTypeKey];
     return responseFactory(userDefinedType.interfaceType);
   }
@@ -406,7 +406,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/5JggAABKL0CSqOLWyDxGYGYA8qXAWIRIM7Nz8q3skqtSMwtyEkttrJyTc7Ix6Ye3VwDKK0MxNJAHBIZ4Brv7RppBTJQD2aeHsw4nOY44HAfseZKQPWB9DMj6deA0gowexghdASUZkCzHxZOM6D0Aij9Hwo2MGAH6O5WwOJPdiRxYSDmBuLg1KKyzORUv8TcVKLigweIWYAYxpcCYiGoeizBghHOnEDMBcSmQKwLxPoZ+bmp+olViXmZ+iAz9IuLkvVh5uinAs0BE3oguVwi3IduH4zPAw0fXOGFHk8HoPQGJuzxxICW/hiQ4gmbOAwIQf0Pcm9wSVFmXjr2cAKpYaIgnNDjH+afHYzE+wMELHD4AxbvCH/oFqUWlqYWl2D3DwyQ6x/0+HLAUa6cYCAOEBuPGjj08wIxKxCXJeaUpuKIP1EK/cuAlGZxlYMMSOUOAx3iXRpadqDEe3FBfl5x6mi8Q+NdYwDiHRAAAP//PLmGiogHAAA=";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/5JggAABKN0BpdHFLZD4jEDMAeXLALEIEOfmZ+VbWaVWJOYW5KQWW1m5JmfkY1OvDMTSQBwSGeAa7+0aaQXSqAfTpwfThmG/Aw77STGPEaqfGUm/BpRWgNIejBA6AUozoNkPC4cZUHoBlP4PBRsYsAN0dytgCWd2JHFhIOYG4uDUorLM5FS/xNxUosKbB4hZgBjGlwJiIah6LMGCEc6cQMwFxJZAbAjE+hn5uan6RaUp+bmZealF+iBz9IuLkvVhZumnAs0CE3oguVwi0wW6vTA+DzSccIUbenydgNFM2OMLBgzQ+KC4wiYOA0LQcAC5N7ikKDMvHXt4gdQwUSG80NMD3F+MxPsHBCxw+AeWDhD+0S1KLSxNLS7B7i8YoNRf6PHngKM8ucBAHCA2XjVw6OcFYlYgLkvMKU3FEZ+iVPI3A1JaRg8HCSQ3MSKpp3U6kIaWLSjpoLggP684dTQdoKUDjQFMB4AAAAD//1YHjLGYBwAA";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

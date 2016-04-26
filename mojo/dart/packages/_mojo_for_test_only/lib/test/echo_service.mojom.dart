@@ -439,7 +439,7 @@ const int _echoServiceMethodQuitName = 3;
 
 class _EchoServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
-    var interfaceTypeKey = getRuntimeTypeInfo().servicesByName["test::EchoService"].topLevelInterface;
+    var interfaceTypeKey = getRuntimeTypeInfo().services["test::EchoService"];
     var userDefinedType = getAllMojomTypeDefinitions()[interfaceTypeKey];
     return responseFactory(userDefinedType.interfaceType);
   }
@@ -765,7 +765,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xXzW/TMBR3mgFlHYhPKXwcBqdwYOY4VULqgZ6Q+NCQ0E7F6gwLapoQp2Pwl/AncOTP2ZHjjhy5gb08C/fVDi5aIzr1SW+v9uJn/37vw0lEKrkC9itYPL9tjAOpbRjfknpVaslF2e32h/vZDi8OkiF3PI/9PgJ7D3y92n3RHzzt73aVw61Zfy4/Pcd+vn4jWKfWh8b6GOwm2DdBZQ/BErS/5ukL4vMXyDdiF3zuTQvOC8b8dakdqYDiGUu5Vzz0OvyfCPbA9GCe1fnWpb6W+lwq3c9STtlnNk5omr3PqCiG1Y89VpSU5bnyKKj6O5AjQZNxyYu3bMgF5XKfgag22lKL0r+eH5/H5GkNfiseWxDHGOb1c4fnKvujU9njS/Y4f9f7hPY4E5S/xIizbV7LNeDvBFlZJON3dlwXAcOieMb5pfH+DPxxKtl24LwNWP/gfFjwDxN5OjteLYvCi+ur5+hrx8RPfPMgdqxXaadS8YCNJtwR/5sL5kPXSl2fJkZftPWl086bO9CjpvJG5NlY8FXeeOZN/B/mDe6vmq94bdqfDz+BwT8WfX884SP2ie/hNjvD13rDfVbjbofz1UvPgVe/38zgnW63jddNBLzq/aJgOepH5cPdBuvHxgeBM9qk/Q98BDV8XJZ6XmqajEaJsPPxoMH+avaPljF21dHJQ6dQR/fhncVWR8b1s7p/POrn8RLcP0cIV2sOflo1/GzA98bOR5bb8qXT8H1zhKxvnbi+X24ARoXPvGKarou2R/xJzXc8jn84Bz+hR/xfThIrLxtnJP4K3zLF/3cAAAD//6KdCaLoEgAA";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xYS28TMRDeR4HQBlReUngcAqdwoOZYRULKgUiVkFBRuVQcolViyKLsA3u3iBtHfgJHjhz5ST1y5B+AzY7BmdiRFzUsQRlpOvE2s/b3+ZvxbjpeZbsQP0DE1/e1sS+8BeObwq8ILygv+v3heJodUXYSj6nl+3ch5/nx4XD0ZHjcl4l7i3l4/sEZ3M+H/FDL70HsQpz6VXwP0UPzKx4+QvwM8TvYF89seN1dA84L2vVrwneEA4qnUUKd+FZ5+D8dmAPTg3mW69sW/kLOLZxMs4QSVk6yJE4pI0n2OiOcjasPk4gVJMpzeVdO5N+RGHESpwVlL6Mx5YSKuUa8mmxPJiVOOPC6dL624LPkM4D97MF19b1P56p40K7i4WXzfn9VOgjN+63sIRrLvTZdV3YVePyJrGBx+sqM6yJgWDXfWG8Kdytwxytt34L3FmD+jfcBo29KsUIzbmWrxo3rbmDpZ988N3PVRc+Sf0m4lOZJNCupRQ83/hIvqoZMPHW0NfuWOlyFjm5DD5vTEc+zlNONjmrqqPcP6wj3YcXbwdb8/Vx48rV9wKbOmcd0Fr2jE9yOF3jbbqgfK/zdsF4dDSy41XPRAu75ttxYPXWA5199xV+PupL6uNNAXZl48WCtJmv9AS/+El7k49N54Uk8m8XczMv9Bvqw3l8CbWyrr93gbOrrHjzzmOpLO64251WNunq0RufVKcIX1OApWMJTG95jjt5GuUk/Ow2dT6coutaP7f3oOmCVOPUjqal6aTnowVvyuwHWQ1iDp9BBD8/K2MhP+z/Tg8S5jnr4EQAA//+qos9XSBMAAA==";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

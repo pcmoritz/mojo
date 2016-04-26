@@ -2421,120 +2421,8 @@ func (s *ContainedDeclarations) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-type ServiceTypeInfo struct {
-	TopLevelInterface string
-	CompleteTypeSet []string
-}
-
-
-func (s *ServiceTypeInfo) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(16, 0)
-	if err := encoder.WritePointer(); err != nil {
-		return err
-	}
-	if err := encoder.WriteString(s.TopLevelInterface); err != nil {
-		return err
-	}
-	if err := encoder.WritePointer(); err != nil {
-		return err
-	}
-	encoder.StartArray(uint32(len(s.CompleteTypeSet)), 64)
-	for _, elem0 := range s.CompleteTypeSet {
-		if err := encoder.WritePointer(); err != nil {
-			return err
-		}
-		if err := encoder.WriteString(elem0); err != nil {
-			return err
-		}
-	}
-	if err := encoder.Finish(); err != nil {
-		return err
-	}
-	if err := encoder.Finish(); err != nil {
-		return err
-	}
-	return nil
-}
-
-var serviceTypeInfo_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{24, 0},
-}
-
-func (s *ServiceTypeInfo) Decode(decoder *bindings.Decoder) error {
-	header, err := decoder.StartStruct()
-	if err != nil {
-		return err
-	}
-	index := sort.Search(len(serviceTypeInfo_Versions), func(i int) bool {
-		return serviceTypeInfo_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
-	})
-	if index < len(serviceTypeInfo_Versions) {
-		if serviceTypeInfo_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
-			index--
-		}
-		expectedSize := serviceTypeInfo_Versions[index].Size
-		if expectedSize != header.Size {
-			return &bindings.ValidationError{bindings.UnexpectedStructHeader,
-				fmt.Sprintf("invalid struct header size: should be %d, but was %d", expectedSize, header.Size),
-			}
-		}
-	}
-	if header.ElementsOrVersion >= 0 {
-		pointer0, err := decoder.ReadPointer()
-		if err != nil {
-			return err
-		}
-		if pointer0 == 0 {
-			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-		} else {
-			value0, err := decoder.ReadString()
-			if err != nil {
-				return err
-			}
-			s.TopLevelInterface = value0
-		}
-	}
-	if header.ElementsOrVersion >= 0 {
-		pointer0, err := decoder.ReadPointer()
-		if err != nil {
-			return err
-		}
-		if pointer0 == 0 {
-			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-		} else {
-			len0, err := decoder.StartArray(64)
-			if err != nil {
-				return err
-			}
-			s.CompleteTypeSet = make([]string, len0)
-			for i0 := uint32(0); i0 < len0; i0++ {
-				pointer1, err := decoder.ReadPointer()
-				if err != nil {
-					return err
-				}
-				if pointer1 == 0 {
-					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-				} else {
-					value1, err := decoder.ReadString()
-					if err != nil {
-						return err
-					}
-					s.CompleteTypeSet[i0] = value1
-				}
-			}
-			if err := decoder.Finish(); err != nil {
-				return err
-			}
-		}
-	}
-	if err := decoder.Finish(); err != nil {
-		return err
-	}
-	return nil
-}
-
 type RuntimeTypeInfo struct {
-	ServicesByName map[string]ServiceTypeInfo
+	Services map[string]string
 	TypeMap map[string]UserDefinedType
 }
 
@@ -2547,18 +2435,18 @@ func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
 	encoder.StartMap()
 	{
 		var keys0 []string
-		var values0 []ServiceTypeInfo
+		var values0 []string
 		if encoder.Deterministic() {
-		  for key0, _ := range s.ServicesByName {
+		  for key0, _ := range s.Services {
 			keys0 = append(keys0, key0)
 		  }
 		  bindings.SortMapKeys(&keys0)
-		  values0 = make([]ServiceTypeInfo, len(keys0))
+		  values0 = make([]string, len(keys0))
 		  for i, key := range keys0 {
-		    values0[i] = s.ServicesByName[key]
+		    values0[i] = s.Services[key]
 		  }
 		} else {
-		  for key0, value0 := range s.ServicesByName {
+		  for key0, value0 := range s.Services {
 			keys0 = append(keys0, key0)
 			values0 = append(values0, value0)
 		  }
@@ -2586,7 +2474,7 @@ func (s *RuntimeTypeInfo) Encode(encoder *bindings.Encoder) error {
 			if err := encoder.WritePointer(); err != nil {
 				return err
 			}
-			if err := elem1.Encode(encoder); err != nil {
+			if err := encoder.WriteString(elem1); err != nil {
 				return err
 			}
 		}
@@ -2727,7 +2615,7 @@ func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
 					}
 				}
 			}
-			var values0 []ServiceTypeInfo
+			var values0 []string
 			{
 				pointer1, err := decoder.ReadPointer()
 				if err != nil {
@@ -2740,7 +2628,7 @@ func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
 					if err != nil {
 						return err
 					}
-					values0 = make([]ServiceTypeInfo, len1)
+					values0 = make([]string, len1)
 					for i1 := uint32(0); i1 < len1; i1++ {
 						pointer2, err := decoder.ReadPointer()
 						if err != nil {
@@ -2749,9 +2637,11 @@ func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
 						if pointer2 == 0 {
 							return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
 						} else {
-							if err := values0[i1].Decode(decoder); err != nil {
+							value2, err := decoder.ReadString()
+							if err != nil {
 								return err
 							}
+							values0[i1] = value2
 						}
 					}
 					if err := decoder.Finish(); err != nil {
@@ -2768,11 +2658,11 @@ func (s *RuntimeTypeInfo) Decode(decoder *bindings.Decoder) error {
 				return err
 			}
 			len0 := len(keys0)
-			map0 := make(map[string]ServiceTypeInfo)
+			map0 := make(map[string]string)
 			for i0 := 0; i0 < len0; i0++ {
 				map0[keys0[i0]] = values0[i0]
 			}
-			s.ServicesByName = map0
+			s.Services = map0
 		}
 	}
 	if header.ElementsOrVersion >= 0 {
