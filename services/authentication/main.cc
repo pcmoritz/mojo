@@ -8,6 +8,7 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -25,8 +26,9 @@ class GoogleAccountManagerApp
   ~GoogleAccountManagerApp() override {}
 
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
-    app->ConnectToServiceDeprecated("mojo:files", &files_);
+    mojo::ConnectToService(app->shell(), "mojo:network_service",
+                           GetProxy(&network_service_));
+    mojo::ConnectToService(app->shell(), "mojo:files", GetProxy(&files_));
 
     app_url_ = app->url();
   }

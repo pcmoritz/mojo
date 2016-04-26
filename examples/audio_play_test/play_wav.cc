@@ -8,6 +8,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/data_pipe.h"
 #include "mojo/public/cpp/system/wait.h"
 #include "mojo/public/cpp/utility/run_loop.h"
@@ -157,12 +158,13 @@ const std::set<uint16_t> PlayWAVApp::VALID_BITS_PER_SAMPLES({
 });
 
 void PlayWAVApp::Initialize(ApplicationImpl* app) {
-  app->ConnectToServiceDeprecated("mojo:audio_server", &audio_server_);
+  ConnectToService(app->shell(), "mojo:audio_server", GetProxy(&audio_server_));
   audio_server_.set_connection_error_handler([this]() {
     OnConnectionError("audio_server");
   });
 
-  app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
+  ConnectToService(app->shell(), "mojo:network_service",
+                   GetProxy(&network_service_));
   audio_server_.set_connection_error_handler([this]() {
     OnConnectionError("network_service");
   });

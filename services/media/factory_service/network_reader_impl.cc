@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/data_pipe.h"
 #include "services/media/factory_service/network_reader_impl.h"
 
@@ -34,7 +35,8 @@ NetworkReaderImpl::NetworkReaderImpl(const String& url,
 
   NetworkServicePtr network_service;
 
-  app()->ConnectToServiceDeprecated("mojo:network_service", &network_service);
+  ConnectToService(app()->shell(), "mojo:network_service",
+                   GetProxy(&network_service));
 
   network_service->CreateURLLoader(GetProxy(&url_loader_));
 

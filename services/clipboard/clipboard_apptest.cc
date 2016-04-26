@@ -7,6 +7,7 @@
 #include "mojo/converters/array_string/array_string_type_converters.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/clipboard/interfaces/clipboard.mojom.h"
 
 using mojo::Array;
@@ -54,8 +55,8 @@ class ClipboardAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:clipboard",
-                                                   &clipboard_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:clipboard",
+                           GetProxy(&clipboard_));
   }
 
   uint64_t GetSequenceNumber() {

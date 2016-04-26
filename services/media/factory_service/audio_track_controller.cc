@@ -6,6 +6,7 @@
 
 #include "base/bind_helpers.h"
 #include "base/logging.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/media/audio/interfaces/audio_server.mojom.h"
 #include "mojo/services/media/audio/interfaces/audio_track.mojom.h"
 #include "services/media/factory_service/audio_track_controller.h"
@@ -20,7 +21,7 @@ AudioTrackController::AudioTrackController(const String& url,
   DCHECK(app);
 
   AudioServerPtr audio_server;
-  app->ConnectToServiceDeprecated(url, &audio_server);
+  ConnectToService(app->shell(), url, GetProxy(&audio_server));
   audio_server->CreateTrack(GetProxy(&audio_track_));
 }
 

@@ -12,6 +12,7 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
 #include "mojo/public/cpp/system/data_pipe.h"
 #include "mojo/services/authenticating_url_loader_interceptor/interfaces/authenticating_url_loader_interceptor_meta_factory.mojom.h"
@@ -290,9 +291,9 @@ class AuthenticatingURLLoaderInterceptorAppTest
     ApplicationTestBase::SetUp();
 
     InitializeNetworkService();
-    application_impl()->ConnectToServiceDeprecated(
-        "mojo:authenticating_url_loader_interceptor",
-        &interceptor_meta_factory_);
+    ConnectToService(application_impl()->shell(),
+                     "mojo:authenticating_url_loader_interceptor",
+                     GetProxy(&interceptor_meta_factory_));
   }
 
   void TearDown() override {
@@ -341,8 +342,8 @@ class AuthenticatingURLLoaderInterceptorAppTest
 
   void InitializeNetworkService() {
     network_service_.reset();
-    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
-                                                   &network_service_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:network_service",
+                           GetProxy(&network_service_));
   }
 
   void CloseAuthenticationService() { authentication_service_impl_.reset(); }

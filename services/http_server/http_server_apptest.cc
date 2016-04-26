@@ -8,6 +8,7 @@
 #include "mojo/data_pipe_utils/data_pipe_utils.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
 #include "mojo/services/http_server/interfaces/http_server.mojom.h"
@@ -97,10 +98,10 @@ class HttpServerApplicationTest : public mojo::test::ApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
 
-    application_impl()->ConnectToServiceDeprecated("mojo:http_server",
-                                                   &http_server_factory_);
-    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
-                                                   &network_service_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:http_server",
+                           GetProxy(&http_server_factory_));
+    mojo::ConnectToService(application_impl()->shell(), "mojo:network_service",
+                           GetProxy(&network_service_));
   }
 
   http_server::HttpServerPtr CreateHttpServer();

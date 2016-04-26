@@ -8,6 +8,7 @@
 #include "base/strings/string_tokenizer.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
 #include "services/authentication/credentials_impl_db.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -24,7 +25,8 @@ class AccountsDBTest : public mojo::test::ApplicationTestBase {
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
     mojo::files::FilesPtr files;
-    application_impl()->ConnectToServiceDeprecated("mojo:files", &files);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:files",
+                           GetProxy(&files));
 
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     mojo::files::DirectoryPtr directory;

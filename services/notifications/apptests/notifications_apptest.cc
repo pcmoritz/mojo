@@ -6,6 +6,7 @@
 #include "base/message_loop/message_loop.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/callback.h"
 #include "mojo/public/cpp/environment/logging.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -30,8 +31,8 @@ class NotificationsApplicationTest : public test::ApplicationTestBase,
   // ApplicationTestBase:
   void SetUp() override {
     ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:notifications",
-                                                   &notification_service_);
+    ConnectToService(application_impl()->shell(), "mojo:notifications",
+                     GetProxy(&notification_service_));
   }
 
   notifications::NotificationServicePtr notification_service_;

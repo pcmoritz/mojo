@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "mojo/public/cpp/application/connect.h"
 #include "services/js/test/js_application_test_base.h"
 #include "services/js/test/pingpong_service.mojom.h"
 
@@ -45,7 +46,8 @@ class JSPingPongTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("pingpong.js");
-    application_impl()->ConnectToServiceDeprecated(url, &pingpong_service_);
+    mojo::ConnectToService(application_impl()->shell(), url,
+                           GetProxy(&pingpong_service_));
     PingPongClientPtr client_ptr;
     pingpong_client_.Bind(GetProxy(&client_ptr));
     pingpong_service_->SetClient(client_ptr.Pass());
@@ -92,8 +94,8 @@ TEST_F(JSPingPongTest, PingTargetURL) {
 // pingpong-target.js URL, we provide a connection to its PingPongService.
 TEST_F(JSPingPongTest, PingTargetService) {
   PingPongServicePtr target;
-  application_impl()->ConnectToServiceDeprecated(JSAppURL("pingpong_target.js"),
-                                                 &target);
+  mojo::ConnectToService(application_impl()->shell(),
+                         JSAppURL("pingpong_target.js"), GetProxy(&target));
   bool returned_value = false;
   PingTargetCallback callback(&returned_value);
   pingpong_service_->PingTargetService(target.Pass(), 9, callback);

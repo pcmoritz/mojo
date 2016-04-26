@@ -16,6 +16,7 @@
 #include "mojo/nacl/nonsfi/nexe_launcher_nonsfi.h"
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/array.h"
 #include "mojo/services/files/interfaces/files.mojom.h"
 #include "services/nacl/nonsfi/pnacl_compile.mojom.h"
@@ -78,9 +79,11 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
  private:
   // Overridden from ApplicationDelegate:
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:pnacl_compile", &compiler_init_);
-    app->ConnectToServiceDeprecated("mojo:pnacl_link", &linker_init_);
-    app->ConnectToServiceDeprecated("mojo:files", &files_);
+    mojo::ConnectToService(app->shell(), "mojo:pnacl_compile",
+                           GetProxy(&compiler_init_));
+    mojo::ConnectToService(app->shell(), "mojo:pnacl_link",
+                           GetProxy(&linker_init_));
+    mojo::ConnectToService(app->shell(), "mojo:files", GetProxy(&files_));
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     files_->OpenFileSystem("app_persistent_cache",
                            GetProxy(&nexe_cache_directory),

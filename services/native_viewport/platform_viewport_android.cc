@@ -13,6 +13,7 @@
 #include "mojo/converters/geometry/geometry_type_converters.h"
 #include "mojo/converters/input_events/input_events_type_converters.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/native_viewport/native_viewport_support.mojom.h"
 #include "ui/events/event.h"
 #include "ui/events/keycodes/keyboard_code_conversion_android.h"
@@ -166,8 +167,8 @@ void PlatformViewportAndroid::Init(const gfx::Rect& bounds) {
   Java_PlatformViewportAndroid_createRequest(env,
                                              reinterpret_cast<intptr_t>(this));
 
-  application_->ConnectToServiceDeprecated("mojo:native_viewport_support",
-                                           &support_service_);
+  mojo::ConnectToService(application_->shell(), "mojo:native_viewport_support",
+                         GetProxy(&support_service_));
   support_service_->CreateNewNativeWindow(
       base::Bind(&PlatformViewportAndroid::Close, weak_factory_.GetWeakPtr()));
 }

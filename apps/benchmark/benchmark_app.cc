@@ -24,6 +24,7 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
 namespace benchmark {
@@ -55,7 +56,8 @@ class BenchmarkApp : public mojo::ApplicationDelegate,
     // Connect to trace collector, which will fetch the trace events produced by
     // the app being benchmarked.
     tracing::TraceCollectorPtr trace_collector;
-    app->ConnectToServiceDeprecated("mojo:tracing", &trace_collector);
+    mojo::ConnectToService(app->shell(), "mojo:tracing",
+                           GetProxy(&trace_collector));
     trace_collector_client_.reset(
         new TraceCollectorClient(this, trace_collector.Pass()));
     trace_collector_client_->Start(categories_str);

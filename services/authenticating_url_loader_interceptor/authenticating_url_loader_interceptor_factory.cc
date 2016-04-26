@@ -10,6 +10,7 @@
 #include "base/logging.h"
 #include "base/stl_util.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/authenticating_url_loader_interceptor/authenticating_url_loader_interceptor.h"
 
 namespace mojo {
@@ -26,7 +27,8 @@ AuthenticatingURLLoaderInterceptorFactory::
           std::move(authentication_service))),
       app_(app),
       cached_tokens_(cached_tokens) {
-  app_->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
+  ConnectToService(app_->shell(), "mojo:network_service",
+                   GetProxy(&network_service_));
   authentication_service_.set_connection_error_handler(
       [this]() { ClearAuthenticationService(); });
 }

@@ -16,6 +16,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
@@ -186,8 +187,8 @@ class DartContentHandlerApp : public mojo::ApplicationDelegate {
         base::MessageLoop::current()->task_runner());
     strict_content_handler_.set_handler_task_runner(
         base::MessageLoop::current()->task_runner());
-    app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
-                                    &url_response_disk_cache_);
+    mojo::ConnectToService(app->shell(), "mojo:url_response_disk_cache",
+                           GetProxy(&url_response_disk_cache_));
     service_connector_ = new ContentHandlerAppServiceConnector(app);
 
     if (app->HasArg(kRunOnMessageLoop)) {

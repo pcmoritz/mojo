@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "base/files/file_util.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/js/test/js_application_test_base.h"
 #include "services/js/test/network_test_service.mojom.h"
 
@@ -19,7 +20,8 @@ class JSNetworkTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("network_test.js");
-    application_impl()->ConnectToServiceDeprecated(url, &network_test_service_);
+    mojo::ConnectToService(application_impl()->shell(), url,
+                           GetProxy(&network_test_service_));
   }
 
   NetworkTestServicePtr network_test_service_;

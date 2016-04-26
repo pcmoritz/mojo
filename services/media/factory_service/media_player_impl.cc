@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "base/logging.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "services/media/factory_service/media_player_impl.h"
 #include "services/media/framework/parts/reader.h"
 #include "services/media/framework/util/callback_joiner.h"
@@ -39,7 +40,7 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  app()->ConnectToServiceDeprecated("mojo:media_factory", &factory_);
+  ConnectToService(app()->shell(), "mojo:media_factory", GetProxy(&factory_));
 
   factory_->CreateDemux(reader.Pass(), GetProxy(&demux_));
 

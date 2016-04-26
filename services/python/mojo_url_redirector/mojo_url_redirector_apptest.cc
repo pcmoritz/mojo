@@ -10,6 +10,7 @@
 #include "mojo/data_pipe_utils/data_pipe_utils.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
 #include "mojo/services/http_server/interfaces/http_server.mojom.h"
 #include "mojo/services/http_server/interfaces/http_server_factory.mojom.h"
@@ -97,8 +98,8 @@ class MojoUrlRedirectorApplicationTest :
     binding_.Bind(GetProxy(&location_files_handler));
 
     http_server::HttpServerFactoryPtr http_server_factory;
-    application_impl()->ConnectToServiceDeprecated("mojo:http_server",
-                                                   &http_server_factory);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:http_server",
+                           GetProxy(&http_server_factory));
 
     mojo::NetAddressPtr location_files_server_addr(mojo::NetAddress::New());
     location_files_server_addr->family = mojo::NetAddressFamily::IPV4;
@@ -124,8 +125,8 @@ class MojoUrlRedirectorApplicationTest :
     // handler with the server on |redirector_port_|.
     application_impl()->ConnectToApplicationDeprecated(
         "mojo:mojo_url_redirector");
-    application_impl()->ConnectToServiceDeprecated("mojo:network_service",
-                                                   &network_service_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:network_service",
+                           GetProxy(&network_service_));
     WaitForRedirectorRegistration();
   }
 

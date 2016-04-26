@@ -22,6 +22,7 @@
 #include "mojo/application/content_handler_factory.h"
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 
 using base::android::AttachCurrentThread;
 using base::android::ScopedJavaLocalRef;
@@ -91,8 +92,8 @@ void JavaHandler::RunApplication(
 void JavaHandler::Initialize(mojo::ApplicationImpl* app) {
   tracing_.Initialize(app);
   handler_task_runner_ = base::MessageLoop::current()->task_runner();
-  app->ConnectToServiceDeprecated("mojo:url_response_disk_cache",
-                                  &url_response_disk_cache_);
+  mojo::ConnectToService(app->shell(), "mojo:url_response_disk_cache",
+                         GetProxy(&url_response_disk_cache_));
 }
 
 void JavaHandler::GetApplication(base::FilePath* archive_path,

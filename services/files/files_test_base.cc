@@ -5,6 +5,7 @@
 #include "services/files/files_test_base.h"
 
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/files/interfaces/files.mojom.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
 
@@ -17,11 +18,8 @@ FilesTestBase::~FilesTestBase() {}
 
 void FilesTestBase::SetUp() {
   test::ApplicationTestBase::SetUp();
-  // TODO(vtl): Fix this.
-  FilesPtr files_async;
-  application_impl()->ConnectToServiceDeprecated("mojo:files", &files_async);
-  files_ =
-      SynchronousInterfacePtr<Files>::Create(files_async.PassInterfaceHandle());
+  ConnectToService(application_impl()->shell(), "mojo:files",
+                   GetSynchronousProxy(&files_));
 }
 
 void FilesTestBase::GetTemporaryRoot(

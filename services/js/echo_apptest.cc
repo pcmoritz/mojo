@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "mojo/public/cpp/application/connect.h"
 #include "services/js/test/echo_service.mojom.h"
 #include "services/js/test/js_application_test_base.h"
 
@@ -20,7 +21,8 @@ class JSEchoTest : public test::JSApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
     const std::string& url = JSAppURL("echo.js");
-    application_impl()->ConnectToServiceDeprecated(url, &echo_service_);
+    mojo::ConnectToService(application_impl()->shell(), url,
+                           GetProxy(&echo_service_));
   }
 
   mojo::EchoServicePtr echo_service_;

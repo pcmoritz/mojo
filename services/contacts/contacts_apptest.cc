@@ -5,6 +5,7 @@
 #include "base/run_loop.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/contacts/interfaces/contacts.mojom.h"
 
 namespace contacts {
@@ -16,8 +17,8 @@ class ContactAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:contacts",
-                                                   &contacts_service_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:contacts",
+                           GetProxy(&contacts_service_));
   }
 
  protected:

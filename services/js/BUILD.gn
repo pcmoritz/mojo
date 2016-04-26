@@ -73,6 +73,7 @@ mojo_native_application("js_apptests") {
 
   deps = [
     "//base",
+    "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings",
     "//mojo/public/cpp/system",
     "//services/js/test:echo_service",

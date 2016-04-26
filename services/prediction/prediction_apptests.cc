@@ -8,6 +8,7 @@
 #include "base/message_loop/message_loop.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/prediction/interfaces/prediction.mojom.h"
 
 namespace prediction {
@@ -26,8 +27,8 @@ class PredictionApptest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:prediction_service",
-                                                   &prediction_);
+    mojo::ConnectToService(application_impl()->shell(),
+                           "mojo:prediction_service", GetProxy(&prediction_));
   }
 
   std::vector<std::string> GetPredictionListClient(

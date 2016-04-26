@@ -13,6 +13,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
 #include "mojo/services/http_server/interfaces/http_server.mojom.h"
@@ -47,7 +48,8 @@ class Debugger : public mojo::ApplicationDelegate,
     }
     base::StringToUint(app->args()[1], &command_port_);
     http_server::HttpServerFactoryPtr http_server_factory;
-    app->ConnectToServiceDeprecated("mojo:http_server", &http_server_factory);
+    mojo::ConnectToService(app->shell(), "mojo:http_server",
+                           GetProxy(&http_server_factory));
 
     mojo::NetAddressPtr local_address(mojo::NetAddress::New());
     local_address->family = mojo::NetAddressFamily::IPV4;
@@ -120,8 +122,10 @@ class Debugger : public mojo::ApplicationDelegate,
       return;
     }
 
-    if (!tracing_)
-      app_->ConnectToServiceDeprecated("mojo:tracing", &tracing_);
+    if (!tracing_) {
+      mojo::ConnectToService(app_->shell(), "mojo:tracing",
+                             GetProxy(&tracing_));
+    }
     is_tracing_ = true;
     mojo::DataPipe pipe;
     tracing_->Start(pipe.producer_handle.Pass(), mojo::String("*"));

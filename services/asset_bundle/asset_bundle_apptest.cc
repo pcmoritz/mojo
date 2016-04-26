@@ -10,6 +10,7 @@
 #include "mojo/data_pipe_utils/data_pipe_utils.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/asset_bundle/interfaces/asset_bundle.mojom.h"
 #include "third_party/zlib/google/zip.h"
 
@@ -22,8 +23,8 @@ class AssetBundleAppTest : public mojo::test::ApplicationTestBase {
 
   void SetUp() override {
     mojo::test::ApplicationTestBase::SetUp();
-    application_impl()->ConnectToServiceDeprecated("mojo:asset_bundle",
-                                                   &asset_unpacker_);
+    mojo::ConnectToService(application_impl()->shell(), "mojo:asset_bundle",
+                           GetProxy(&asset_unpacker_));
   }
 
  protected:

@@ -15,6 +15,7 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
 #include "mojo/services/network/interfaces/url_loader.mojom.h"
 #include "native_client/src/public/nacl_desc.h"
@@ -81,7 +82,8 @@ class NaClContentHandler : public mojo::ApplicationDelegate,
     url_ = GURL(app->url());
 
     mojo::NetworkServicePtr network_service;
-    app->ConnectToServiceDeprecated("mojo:network_service", &network_service);
+    mojo::ConnectToService(app->shell(), "mojo:network_service",
+                           GetProxy(&network_service));
 
     network_service->CreateURLLoader(GetProxy(&url_loader_));
   }

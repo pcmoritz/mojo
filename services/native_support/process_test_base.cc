@@ -5,6 +5,7 @@
 #include "services/native_support/process_test_base.h"
 
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/native_support/interfaces/process.mojom.h"
 
 using mojo::SynchronousInterfacePtr;
@@ -17,12 +18,8 @@ ProcessTestBase::~ProcessTestBase() {}
 
 void ProcessTestBase::SetUp() {
   mojo::test::ApplicationTestBase::SetUp();
-  ProcessPtr process_async;
-  // TODO(vtl): Fix this.
-  application_impl()->ConnectToServiceDeprecated("mojo:native_support",
-                                                 &process_async);
-  process_ = SynchronousInterfacePtr<Process>::Create(
-      process_async.PassInterfaceHandle());
+  mojo::ConnectToService(application_impl()->shell(), "mojo:native_support",
+                         GetSynchronousProxy(&process_));
 }
 
 }  // namespace native_support

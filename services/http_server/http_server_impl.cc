@@ -9,6 +9,7 @@
 #include "base/bind.h"
 #include "base/logging.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/data_pipe.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
 #include "services/http_server/connection.h"
@@ -23,7 +24,8 @@ HttpServerImpl::HttpServerImpl(mojo::ApplicationImpl* app,
       requested_local_address_(requested_local_address.Pass()),
       assigned_port_(0),
       weak_ptr_factory_(this) {
-  app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
+  mojo::ConnectToService(app->shell(), "mojo:network_service",
+                         GetProxy(&network_service_));
   Start();
 }
 
