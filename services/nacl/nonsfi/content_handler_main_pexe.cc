@@ -18,6 +18,8 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/array.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+#include "mojo/services/files/interfaces/directory.mojom-sync.h"
 #include "mojo/services/files/interfaces/files.mojom.h"
 #include "services/nacl/nonsfi/pnacl_compile.mojom.h"
 #include "services/nacl/nonsfi/pnacl_link.mojom.h"
@@ -86,7 +88,7 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
     mojo::ConnectToService(app->shell(), "mojo:files", GetProxy(&files_));
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     files_->OpenFileSystem("app_persistent_cache",
-                           GetProxy(&nexe_cache_directory),
+                           GetSynchronousProxy(&nexe_cache_directory_),
                            [&error](mojo::files::Error e) { error = e; });
     CHECK(files_.WaitForIncomingResponse());
     CHECK_EQ(mojo::files::Error::OK, error);
@@ -102,10 +104,8 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
   int AccessFileFromCache(std::string& digest) {
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     mojo::files::FilePtr nexe_cache_file;
-    nexe_cache_directory->OpenFile(
-        digest, GetProxy(&nexe_cache_file), mojo::files::kOpenFlagRead,
-        [&error](mojo::files::Error e) { error = e; });
-    CHECK(nexe_cache_directory.WaitForIncomingResponse());
+    CHECK(nexe_cache_directory_->OpenFile(digest, GetProxy(&nexe_cache_file),
+                                          mojo::files::kOpenFlagRead, &error));
     if (mojo::files::Error::OK == error)
       // Copy the mojo cached file into an open temporary file.
       return ::nacl::MojoFileToTempFileDescriptor(nexe_cache_file.Pass());
@@ -119,8 +119,9 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
     // First, open a "temporary" file.
     mojo::files::Error error = mojo::files::Error::INTERNAL;
     std::string temp_file_name;
-    mojo::files::FilePtr nexe_cache_file = file_utils::CreateTemporaryFileInDir(
-        &nexe_cache_directory, &temp_file_name);
+    auto nexe_cache_file =
+        mojo::files::FilePtr::Create(file_utils::CreateTemporaryFileInDir(
+            &nexe_cache_directory_, &temp_file_name));
     CHECK(nexe_cache_file);
 
     // Copy the contents of nexe_fd into the temporary Mojo file.
@@ -129,9 +130,7 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
     // The file is named after the hash of the requesting pexe.
     // This makes it usable by future requests for the same pexe under different
     // names. It also atomically moves the entire temp file.
-    nexe_cache_directory->Rename(temp_file_name, digest,
-                                 [&error](mojo::files::Error e) { error = e; });
-    CHECK(nexe_cache_directory.WaitForIncomingResponse());
+    CHECK(nexe_cache_directory_->Rename(temp_file_name, digest, &error));
     CHECK_EQ(mojo::files::Error::OK, error);
   }
 
@@ -203,7 +202,7 @@ class PexeContentHandler : public mojo::ApplicationDelegate,
   }
 
  private:
-  mojo::files::DirectoryPtr nexe_cache_directory;
+  mojo::SynchronousInterfacePtr<mojo::files::Directory> nexe_cache_directory_;
   mojo::files::FilesPtr files_;
   mojo::ContentHandlerFactory content_handler_factory_;
   mojo::nacl::PexeCompilerInitPtr compiler_init_;

@@ -13,7 +13,8 @@ source_set("file_utils") {
   ]
 
   public_deps = [
-    "//mojo/services/files/interfaces:interfaces",
+    "//mojo/services/files/interfaces",
+    "//mojo/services/files/interfaces:interfaces_sync",
   ]
 }
 

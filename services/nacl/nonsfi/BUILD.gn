@@ -43,6 +43,8 @@ if (!is_nacl) {
         "//mojo/file_utils",
         "//mojo/message_pump",
         "//mojo/nacl/nonsfi:irt_mojo",
+        "//mojo/services/files/interfaces",
+        "//mojo/services/files/interfaces:interfaces_sync",
         "//native_client/src/nonsfi/loader:elf_loader",
       ]
     }

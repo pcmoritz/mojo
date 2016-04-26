@@ -6,20 +6,18 @@
 
 #include <stdint.h>
 
-#include "mojo/services/files/interfaces/directory.mojom.h"
-#include "mojo/services/files/interfaces/file.mojom.h"
 #include "mojo/services/files/interfaces/types.mojom.h"
 
 namespace file_utils {
 
-mojo::files::FilePtr CreateTemporaryFileInDir(
-    mojo::files::DirectoryPtr* directory,
+mojo::InterfaceHandle<mojo::files::File> CreateTemporaryFileInDir(
+    mojo::SynchronousInterfacePtr<mojo::files::Directory>* directory,
     std::string* path_name) {
   std::string internal_path_name;
   const std::string charset("abcdefghijklmnopqrstuvwxyz1234567890");
   const unsigned kSuffixLength = 6;
   const unsigned kMaxNumAttempts = 10;
-  mojo::files::FilePtr temp_file;
+  mojo::InterfaceHandle<mojo::files::File> temp_file;
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   uint64_t random_value = 0;
   for (unsigned attempt = 0; attempt < kMaxNumAttempts; attempt++) {
@@ -31,13 +29,13 @@ mojo::files::FilePtr CreateTemporaryFileInDir(
       random_value += (microseconds << 16) ^ (microseconds / 1000000);
       internal_path_name.push_back(charset[random_value % charset.length()]);
     }
-    (*directory)
-        ->OpenFile(internal_path_name, GetProxy(&temp_file),
-                   mojo::files::kOpenFlagWrite | mojo::files::kOpenFlagRead |
-                       mojo::files::kOpenFlagCreate |
-                       mojo::files::kOpenFlagExclusive,
-                   [&error](mojo::files::Error e) { error = e; });
-    if (!directory->WaitForIncomingResponse())
+    if (!(*directory)
+             ->OpenFile(internal_path_name, GetProxy(&temp_file),
+                        mojo::files::kOpenFlagWrite |
+                            mojo::files::kOpenFlagRead |
+                            mojo::files::kOpenFlagCreate |
+                            mojo::files::kOpenFlagExclusive,
+                        &error))
       return nullptr;
     // TODO(smklein): React to error code when ErrnoToError can return something
     // other than Error::UNKNOWN. We only want to retry when "EEXIST" is thrown.

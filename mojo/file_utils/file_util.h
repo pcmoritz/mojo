@@ -9,7 +9,9 @@
 
 #include <string>
 
-#include "mojo/services/files/interfaces/directory.mojom.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
+#include "mojo/services/files/interfaces/directory.mojom-sync.h"
 #include "mojo/services/files/interfaces/file.mojom.h"
 
 namespace file_utils {
@@ -20,8 +22,8 @@ namespace file_utils {
 // when this function is called.
 // Returns a FilePtr on success, and null on failure.
 // On failure, |path_name| is unchanged.
-mojo::files::FilePtr CreateTemporaryFileInDir(
-    mojo::files::DirectoryPtr* directory,
+mojo::InterfaceHandle<mojo::files::File> CreateTemporaryFileInDir(
+    mojo::SynchronousInterfacePtr<mojo::files::Directory>* directory,
     std::string* path_name);
 
 }  // namespace file_utils
