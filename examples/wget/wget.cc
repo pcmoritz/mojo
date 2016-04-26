@@ -10,6 +10,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/wait.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
@@ -77,7 +78,8 @@ class ResponsePrinter {
 class WGetApp : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:network_service", &network_service_);
+    ConnectToService(app->shell(), "mojo:network_service",
+                     GetProxy(&network_service_));
     Start(app->args());
   }
 

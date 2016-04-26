@@ -7,6 +7,7 @@
 #include "files/interfaces/files.mojom-sync.h"
 #include "files/interfaces/files.mojom.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/public/cpp/environment/logging.h"
@@ -25,11 +26,9 @@ MojioImplTestBase::~MojioImplTestBase() {
 void MojioImplTestBase::SetUp() {
   mojo::test::ApplicationTestBase::SetUp();
 
-  mojo::files::FilesPtr files_async;
-  // TODO(vtl): Fix this.
-  application_impl()->ConnectToServiceDeprecated("mojo:files", &files_async);
-  auto files = SynchronousInterfacePtr<mojo::files::Files>::Create(
-      files_async.PassInterfaceHandle());
+  SynchronousInterfacePtr<mojo::files::Files> files;
+  mojo::ConnectToService(application_impl()->shell(), "mojo:files",
+                         GetSynchronousProxy(&files));
 
   mojo::files::Error error = mojo::files::Error::INTERNAL;
   MOJO_CHECK(

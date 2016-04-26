@@ -4,6 +4,7 @@
 
 #include "base/bind.h"
 #include "examples/ui/tile/tile_view.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/geometry/cpp/geometry_util.h"
 
 namespace examples {
@@ -40,7 +41,7 @@ void TileView::ConnectViews() {
   for (const auto& url : params_.view_urls) {
     // Start connecting to the view provider.
     mojo::ui::ViewProviderPtr provider;
-    app_impl()->ConnectToServiceDeprecated(url, &provider);
+    mojo::ConnectToService(app_impl()->shell(), url, mojo::GetProxy(&provider));
 
     LOG(INFO) << "Connecting to view: child_key=" << child_key
               << ", url=" << url;

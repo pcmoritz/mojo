@@ -14,6 +14,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 
 namespace mojo {
 namespace examples {
@@ -94,10 +95,10 @@ class IndirectServiceDemoAppDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
     IntegerServicePtr indirect_service_delegate;
-    app->ConnectToServiceDeprecated("mojo:indirect_integer_service",
-                                    &indirect_integer_service_);
-    app->ConnectToServiceDeprecated("mojo:integer_service",
-                                    &indirect_service_delegate);
+    ConnectToService(app->shell(), "mojo:indirect_integer_service",
+                     GetProxy(&indirect_integer_service_));
+    ConnectToService(app->shell(), "mojo:integer_service",
+                     GetProxy(&indirect_service_delegate));
     indirect_integer_service_->Set(
         indirect_service_delegate.PassInterfaceHandle());
 

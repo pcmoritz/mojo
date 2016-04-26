@@ -7,6 +7,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/interface_ptr.h"
 #include "mojo/public/cpp/system/message_pipe.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
@@ -33,7 +34,8 @@ class HttpHandler : public ApplicationDelegate,
     binding_.Bind(GetProxy(&http_handler_ptr));
 
     http_server::HttpServerFactoryPtr http_server_factory;
-    app->ConnectToServiceDeprecated("mojo:http_server", &http_server_factory);
+    ConnectToService(app->shell(), "mojo:http_server",
+                     GetProxy(&http_server_factory));
 
     mojo::NetAddressPtr local_address(mojo::NetAddress::New());
     local_address->family = mojo::NetAddressFamily::IPV4;

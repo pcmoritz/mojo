@@ -11,6 +11,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/notifications/interfaces/notifications.mojom.h"
 
 namespace examples {
@@ -27,8 +28,8 @@ class NotificationGeneratorDelegate : public mojo::ApplicationDelegate,
 
   // mojo::ApplicationDelegate implementation.
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:notifications",
-                                    &notification_service_);
+    mojo::ConnectToService(app->shell(), "mojo:notifications",
+                           GetProxy(&notification_service_));
     PostFirstNotification();
   }
 

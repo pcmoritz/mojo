@@ -8,6 +8,7 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/vanadium/security/interfaces/principal.mojom.h"
 
@@ -25,7 +26,8 @@ class LoginHandler {
 class BankCustomer : public mojo::ApplicationDelegate {
  public:
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:principal_service", &login_service_);
+    mojo::ConnectToService(app->shell(), "mojo:principal_service",
+                           GetProxy(&login_service_));
 
     // Login to the principal service to get a user identity.
     login_service_->Login(LoginHandler());
@@ -35,7 +37,7 @@ class BankCustomer : public mojo::ApplicationDelegate {
     }
 
     BankPtr bank;
-    app->ConnectToServiceDeprecated("mojo:bank", &bank);
+    mojo::ConnectToService(app->shell(), "mojo:bank", GetProxy(&bank));
     bank->Deposit(500/*usd*/);
     bank->Withdraw(100/*usd*/);
     auto gb_callback = [](const int32_t& balance) {

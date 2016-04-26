@@ -12,6 +12,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 
@@ -25,8 +26,8 @@ class HelloMojoClientApp : public mojo::ApplicationDelegate {
   ~HelloMojoClientApp() override {}
 
   void Initialize(mojo::ApplicationImpl* application) override {
-    application->ConnectToServiceDeprecated("mojo:hello_mojo_server",
-                                            &hello_mojo_);
+    mojo::ConnectToService(application->shell(), "mojo:hello_mojo_server",
+                           GetProxy(&hello_mojo_));
 
     DoIt("hello");
     DoIt("goodbye");

@@ -5,10 +5,10 @@
 #include "base/bind.h"
 #include "base/logging.h"
 #include "mojo/public/c/system/main.h"
-#include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/authentication/interfaces/authentication.mojom.h"
 
@@ -23,8 +23,8 @@ class GoogleAuthApp : public mojo::ApplicationDelegate {
 
   void Initialize(mojo::ApplicationImpl* app) override {
     DLOG(INFO) << "Connecting to authentication service...";
-    app->ConnectToServiceDeprecated("mojo:authentication",
-                                    &authentication_service_);
+    mojo::ConnectToService(app->shell(), "mojo:authentication",
+                           GetProxy(&authentication_service_));
 
     mojo::Array<mojo::String> scopes;
     scopes.push_back("profile");

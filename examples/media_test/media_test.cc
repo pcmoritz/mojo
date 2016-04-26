@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "examples/media_test/media_test.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/services/media/common/cpp/linear_transform.h"
 #include "mojo/services/media/common/cpp/local_time.h"
 #include "mojo/services/media/control/interfaces/media_factory.mojom.h"
@@ -22,7 +23,7 @@ MediaTest::MediaTest(mojo::ApplicationImpl* app,
                      const std::string& input_file_name)
     : state_(MediaState::UNPREPARED) {
   MediaFactoryPtr factory;
-  app->ConnectToServiceDeprecated("mojo:media_factory", &factory);
+  ConnectToService(app->shell(), "mojo:media_factory", GetProxy(&factory));
 
   SeekingReaderPtr reader;
   factory->CreateNetworkReader(input_file_name, GetProxy(&reader));

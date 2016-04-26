@@ -10,6 +10,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 
 namespace mojo {
@@ -26,7 +27,7 @@ class ResponsePrinter {
 class EchoClientDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:echo_server", &echo_);
+    ConnectToService(app->shell(), "mojo:echo_server", GetProxy(&echo_));
 
     echo_->EchoString("hello world", ResponsePrinter());
   }

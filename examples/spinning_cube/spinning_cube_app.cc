@@ -14,6 +14,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/services/native_viewport/interfaces/native_viewport.mojom.h"
@@ -32,7 +33,8 @@ class SpinningCubeApp : public mojo::ApplicationDelegate,
   }
 
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:native_viewport_service", &viewport_);
+    mojo::ConnectToService(app->shell(), "mojo:native_viewport_service",
+                           GetProxy(&viewport_));
     viewport_.set_connection_error_handler(
         [this]() { OnViewportConnectionError(); });
 

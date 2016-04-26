@@ -10,11 +10,11 @@
 #include <utility>
 
 #include "examples/echo/echo.mojom-sync.h"
-#include "examples/echo/echo.mojom.h"
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/public/cpp/environment/logging.h"
 #include "mojo/public/cpp/utility/run_loop.h"
@@ -25,13 +25,12 @@ namespace examples {
 class EchoClientDelegate : public ApplicationDelegate {
  public:
   void Initialize(ApplicationImpl* app) override {
-    EchoPtr echo;
-    app->ConnectToServiceDeprecated("mojo:echo_server", &echo);
+    SynchronousInterfacePtr<Echo> echo;
+    ConnectToService(app->shell(), "mojo:echo_server",
+                     GetSynchronousProxy(&echo));
 
     mojo::String out = "yo!";
-    auto echo_proxy =
-        SynchronousInterfacePtr<Echo>::Create(echo.PassInterfaceHandle());
-    MOJO_CHECK(echo_proxy->EchoString("hello", &out));
+    MOJO_CHECK(echo->EchoString("hello", &out));
     MOJO_LOG(INFO) << "Got response: " << out;
     RunLoop::current()->Quit();
   }

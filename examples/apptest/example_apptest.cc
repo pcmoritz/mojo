@@ -5,6 +5,7 @@
 #include "examples/apptest/example_service.mojom.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/callback.h"
 #include "mojo/public/cpp/environment/logging.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -23,8 +24,8 @@ class ExampleApplicationTest : public test::ApplicationTestBase {
   void SetUp() override {
     ApplicationTestBase::SetUp();
 
-    application_impl()->ConnectToServiceDeprecated("mojo:example_service",
-                                                   &example_service_);
+    ConnectToService(application_impl()->shell(), "mojo:example_service",
+                     GetProxy(&example_service_));
   }
 
   ExampleServicePtr example_service_;

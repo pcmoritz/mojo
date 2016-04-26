@@ -14,6 +14,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 
 namespace mojo {
@@ -57,9 +58,10 @@ class EchoClientDelegate : public ApplicationDelegate {
     for (int i = 0; i < num_clients_; i++) {
       EchoPtr echo;
       if (use_dart_server_) {
-        app->ConnectToServiceDeprecated("mojo:dart_echo_server", &echo);
+        ConnectToService(app->shell(), "mojo:dart_echo_server",
+                         GetProxy(&echo));
       } else {
-        app->ConnectToServiceDeprecated("mojo:echo_server", &echo);
+        ConnectToService(app->shell(), "mojo:echo_server", GetProxy(&echo));
       }
       echoClients_.push_back(echo.Pass());
     }

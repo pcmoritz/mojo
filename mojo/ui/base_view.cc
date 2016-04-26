@@ -5,6 +5,7 @@
 #include "mojo/ui/base_view.h"
 
 #include "base/logging.h"
+#include "mojo/public/cpp/application/connect.h"
 
 namespace mojo {
 namespace ui {
@@ -17,8 +18,8 @@ BaseView::BaseView(
       view_listener_binding_(this),
       view_container_listener_binding_(this) {
   DCHECK(app_impl_);
-  app_impl_->ConnectToServiceDeprecated("mojo:view_manager_service",
-                                        &view_manager_);
+  ConnectToService(app_impl_->shell(), "mojo:view_manager_service",
+                   mojo::GetProxy(&view_manager_));
 
   mojo::ui::ViewListenerPtr view_listener;
   view_listener_binding_.Bind(mojo::GetProxy(&view_listener));

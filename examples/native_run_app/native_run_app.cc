@@ -27,6 +27,7 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
@@ -231,8 +232,8 @@ class NativeRunApp : public mojo::ApplicationDelegate,
   void Initialize(mojo::ApplicationImpl* application_impl) override {
     DCHECK(!application_impl_);
     application_impl_ = application_impl;
-    application_impl_->ConnectToServiceDeprecated("mojo:native_support",
-                                                  &native_support_process_);
+    mojo::ConnectToService(application_impl_->shell(), "mojo:native_support",
+                           GetProxy(&native_support_process_));
   }
 
   bool ConfigureIncomingConnection(

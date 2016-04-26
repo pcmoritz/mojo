@@ -11,6 +11,7 @@
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_runner.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
 #include "mojo/public/cpp/utility/run_loop.h"
@@ -48,10 +49,11 @@ class BankUser {
 class BankApp : public mojo::ApplicationDelegate,
                 public mojo::InterfaceFactory<Bank> {
  public:
-  BankApp() {
-  }
+  BankApp() {}
+
   void Initialize(mojo::ApplicationImpl* app) override {
-    app->ConnectToServiceDeprecated("mojo:principal_service", &login_service_);
+    mojo::ConnectToService(app->shell(), "mojo:principal_service",
+                           GetProxy(&login_service_));
   }
 
   // From ApplicationDelegate
