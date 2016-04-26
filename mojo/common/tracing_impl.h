@@ -8,6 +8,7 @@
 #include "base/macros.h"
 #include "mojo/common/trace_provider_impl.h"
 #include "mojo/public/cpp/application/interface_factory.h"
+#include "mojo/public/cpp/application/service_provider_impl.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
 namespace mojo {
@@ -27,6 +28,9 @@ class TracingImpl : public InterfaceFactory<tracing::TraceProvider> {
   // InterfaceFactory<tracing::TraceProvider> implementation.
   void Create(ApplicationConnection* connection,
               InterfaceRequest<tracing::TraceProvider> request) override;
+
+  // Used to provide services *to* mojo:tracing.
+  ServiceProviderImpl outgoing_sp_for_tracing_service_;
 
   TraceProviderImpl provider_impl_;
 

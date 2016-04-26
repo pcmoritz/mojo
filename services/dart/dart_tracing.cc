@@ -8,6 +8,9 @@
 
 #include "dart/runtime/include/dart_tools_api.h"
 #include "mojo/public/cpp/application/application_impl.h"
+#include "mojo/public/cpp/bindings/interface_handle.h"
+#include "mojo/public/cpp/bindings/interface_request.h"
+#include "mojo/public/interfaces/application/service_provider.mojom.h"
 
 namespace dart {
 
@@ -130,8 +133,13 @@ DartTracingImpl::~DartTracingImpl() {
 }
 
 void DartTracingImpl::Initialize(mojo::ApplicationImpl* app) {
-  auto connection = app->ConnectToApplicationDeprecated("mojo:tracing");
-  connection->AddService(this);
+  mojo::InterfaceHandle<mojo::ServiceProvider> outgoing_sp_handle;
+  mojo::InterfaceRequest<mojo::ServiceProvider> outgoing_sp_request =
+      GetProxy(&outgoing_sp_handle);
+  app->shell()->ConnectToApplication("mojo:tracing", nullptr,
+                                     outgoing_sp_handle.Pass());
+  outgoing_sp_for_tracing_service_.Bind(outgoing_sp_request.Pass());
+  outgoing_sp_for_tracing_service_.AddService(this);
 }
 
 void DartTracingImpl::Create(

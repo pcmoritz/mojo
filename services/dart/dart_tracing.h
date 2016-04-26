@@ -7,6 +7,7 @@
 
 #include "base/trace_event/trace_event.h"
 #include "mojo/common/tracing_impl.h"
+#include "mojo/public/cpp/application/service_provider_impl.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
@@ -56,6 +57,9 @@ class DartTracingImpl :
    void Create(mojo::ApplicationConnection* connection,
                mojo::InterfaceRequest<tracing::TraceProvider> request) override;
  private:
+  // Used to provide services *to* mojo:tracing.
+  mojo::ServiceProviderImpl outgoing_sp_for_tracing_service_;
+
   DartTraceProvider provider_impl_;
 
   DISALLOW_COPY_AND_ASSIGN(DartTracingImpl);
