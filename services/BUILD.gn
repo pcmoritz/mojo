@@ -17,12 +17,16 @@ group("services") {
     "//services/http_server",
     "//services/icu_data",
     "//services/log",
-    "//services/media",
     "//services/native_support",
     "//services/prediction",
     "//services/test_service:bindings",
     "//services/tracing",
   ]
+
+  # TODO: fix ffmpeg build
+  if (!is_fnl) {
+    deps += [ "//services/media" ]
+  }
 
   if (is_android) {
     deps += [
@@ -78,10 +82,14 @@ group("tests") {
     "//services/clipboard:apptests",
     "//services/gfx/compositor:apptests",
     "//services/http_server:apptests",
-    "//services/media/framework:apptests",
     "//services/native_support:apptests",
     "//services/prediction:apptests",
   ]
+
+  # TODO: fix ffmpeg build
+  if (!is_fnl) {
+    deps += [ "//services/media/framework:apptests" ]
+  }
 
   if (!is_android) {
     deps += [ "//services/authentication:apptests" ]
