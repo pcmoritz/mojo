@@ -4,8 +4,6 @@
 
 #include "services/log/log_impl.h"
 
-#include <stdio.h>
-
 #include <utility>
 
 #include "base/logging.h"
@@ -41,19 +39,19 @@ std::string LogLevelToString(int32_t log_level) {
 
 LogImpl::LogImpl(const std::string& remote_url,
                  InterfaceRequest<Log> request,
-                 FILE* out_file)
+                 PrintLogMessageFunction print_log_message_function)
     : remote_url_(remote_url),
       binding_(this, std::move(request)),
-      out_file_(out_file) {}
+      print_log_message_function_(print_log_message_function) {}
 
 LogImpl::~LogImpl() {}
 
 // static
 void LogImpl::Create(ApplicationConnection* connection,
                      InterfaceRequest<Log> request,
-                     FILE* out_file) {
+                     PrintLogMessageFunction print_log_message_function) {
   DCHECK(connection);
-  DCHECK(out_file);
+  DCHECK(print_log_message_function);
 
   const std::string& remote_url = connection->GetRemoteApplicationURL();
   if (remote_url.empty()) {
@@ -61,15 +59,13 @@ void LogImpl::Create(ApplicationConnection* connection,
     return;
   }
 
-  new LogImpl(remote_url, std::move(request), out_file);
+  new LogImpl(remote_url, std::move(request),
+              std::move(print_log_message_function));
 }
 
 void LogImpl::AddEntry(EntryPtr entry) {
   DCHECK(entry);
-
-  // In order to keep LogImpl thread-safe (for the future), we should only print
-  // one thing here (otherwise, it could interleave with other prints).
-  fprintf(out_file_, "%s\n", FormatEntry(entry).c_str());
+  print_log_message_function_(FormatEntry(entry));
 }
 
 // This should return:

@@ -2,13 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
+#include <string>
 #include <utility>
+#include <vector>
 
-#include "base/files/scoped_file.h"
 #include "base/message_loop/message_loop.h"
 #include "base/test/test_timeouts.h"
 #include "mojo/public/c/environment/logger.h"
@@ -46,19 +43,15 @@ class TestApplicationConnection : public ApplicationConnection {
 };
 
 // Tests the Log service implementation by calling its AddEntry and verifying
-// the log message it prints to the supplied FILE stream.
+// the log message that it "prints".
 TEST_F(LogImplTest, AddEntryOutput) {
-  // LogImpl will write to p[1] (which we wrap into a FILE*), we will EXPECT
-  // what's written by reading in p[0].
-  int p[2];
-  ASSERT_EQ(0, pipe(p));
-
-  base::ScopedFILE output_file(fdopen(p[1], "w"));
-  ASSERT_NE(nullptr, output_file.get());
+  std::vector<std::string> messages;
 
   LogPtr log;
   TestApplicationConnection app_connection;
-  LogImpl::Create(&app_connection, GetProxy(&log), output_file.get());
+  LogImpl::Create(
+      &app_connection, GetProxy(&log),
+      [&messages](const std::string& message) { messages.push_back(message); });
 
   Entry entry;
   entry.log_level = MOJO_LOG_LEVEL_INFO;
@@ -84,21 +77,14 @@ TEST_F(LogImplTest, AddEntryOutput) {
                                           TestTimeouts::tiny_timeout());
 
   MessageLoop::current()->Run();
-  output_file.reset();  // This closes p[1].
 
-  const char expected_string[] =
-      "<mojo:log_impl_unittest> [INFO] file.ext: 1234567890\n"
-      "<mojo:log_impl_unittest> [INFO] file.ext:1: 1234567890\n"
-      "<mojo:log_impl_unittest> [INFO] 1234567890\n"
-      "<mojo:log_impl_unittest> [INFO] <no message>\n";
-  char actual_string[1024 * 10];
-  ssize_t nbytes = read(p[0], actual_string, strlen(expected_string));
-  ASSERT_EQ(static_cast<ssize_t>(strlen(expected_string)), nbytes);
-
-  close(p[0]);
-
-  actual_string[nbytes] = '\0';
-  EXPECT_STREQ(expected_string, actual_string);
+  const std::vector<std::string> kExpectedMessages = {
+      "<mojo:log_impl_unittest> [INFO] file.ext: 1234567890",
+      "<mojo:log_impl_unittest> [INFO] file.ext:1: 1234567890",
+      "<mojo:log_impl_unittest> [INFO] 1234567890",
+      "<mojo:log_impl_unittest> [INFO] <no message>",
+  };
+  EXPECT_EQ(kExpectedMessages, messages);
 }
 
 }  // namespace

@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <stdio.h>
+
 #include <utility>
 
 #include "mojo/application/application_runner_chromium.h"
@@ -34,7 +36,10 @@ class LogApp : public ApplicationDelegate, public InterfaceFactory<Log> {
   // We maintain a separate |LogImpl| for each incoming connection.
   void Create(ApplicationConnection* connection,
               InterfaceRequest<Log> request) override {
-    LogImpl::Create(connection, std::move(request), stderr);
+    LogImpl::Create(connection, std::move(request),
+                    [](const std::string& message) {
+                      fprintf(stderr, "%s\n", message.c_str());
+                    });
   }
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(LogApp);
