@@ -139,12 +139,12 @@ scoped_refptr<ui::NativePixmap> GbmSurfaceFactory::CreateNativePixmapFromHandle(
       drm_device_manager_->GetDrmDevice(widget).get();
   DCHECK(drm);
 
-  scoped_refptr<VgemPixmap> pixmap(new VgemPixmap(drm));
+  scoped_refptr<DrmDmabufPixmap> pixmap(new DrmDmabufPixmap(drm));
   pixmap->Initialize(base::ScopedFD(handle.fd.fd), size.width(), size.height(),
                      handle.stride);
 
-  return scoped_refptr<VgemPixmapWrapper>(
-      new VgemPixmapWrapper(screen_manager_, pixmap));
+  return scoped_refptr<DrmDmabufPixmapWrapper>(
+      new DrmDmabufPixmapWrapper(screen_manager_, pixmap));
 }
 
 bool GbmSurfaceFactory::CanShowPrimaryPlaneAsOverlay() {
