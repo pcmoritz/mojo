@@ -54,12 +54,9 @@ class GTestListTestsTest(unittest.TestCase):
       "mojo_use_nacl": [False, True],
       "mojo_use_go": [False],
       "dcheck_always_on": [False, True],
-      "ffmpeg_branding": ["ChromeOS"],
     }
 
     for args in _iterate_over_config(configs_to_test):
-      if args.get("target_os") == "android" and args["ffmpeg_branding"]:
-        continue
       config = gn.ConfigForGNArgs(args)
       new_args = gn.GNArgsForConfig(config)
       self.assertDictEqual(args, new_args)

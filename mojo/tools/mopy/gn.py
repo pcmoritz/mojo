@@ -54,9 +54,6 @@ def GNArgsForConfig(config):
   gn_args["is_official_build"] = bool(config.is_official_build)
   gn_args["is_asan"] = config.sanitizer == Config.SANITIZER_ASAN
 
-  if config.target_os != Config.OS_ANDROID:
-    gn_args["ffmpeg_branding"] = "ChromeOS"
-
   if config.is_clang is not None:
     gn_args["is_clang"] = bool(config.is_clang)
   else:
