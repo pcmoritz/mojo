@@ -6,7 +6,7 @@
 #define SERVICES_TEST_SERVICE_TEST_REQUEST_TRACKER_APPLICATION_H_
 
 #include "mojo/public/cpp/application/application_delegate.h"
-#include "mojo/public/cpp/application/interface_factory_impl.h"
+#include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "services/test_service/test_request_tracker_impl.h"
 

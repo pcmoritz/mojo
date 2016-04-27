@@ -16,7 +16,6 @@
 #include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
-#include "mojo/public/cpp/application/interface_factory_impl.h"
 #include "mojo/services/native_viewport/cpp/args.h"
 #include "services/gles2/gpu_impl.h"
 #include "services/native_viewport/native_viewport_impl.h"

@@ -10,7 +10,6 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
-#include "mojo/public/cpp/application/interface_factory_impl.h"
 #include "mojo/services/content_handler/interfaces/content_handler.mojom.h"
 
 namespace mojo {

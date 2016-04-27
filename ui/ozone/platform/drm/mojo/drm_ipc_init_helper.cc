@@ -4,7 +4,6 @@
 
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/connect.h"
-#include "mojo/public/cpp/application/interface_factory_impl.h"
 #include "mojo/services/ozone_drm_gpu/interfaces/ozone_drm_gpu.mojom.h"
 #include "mojo/services/ozone_drm_host/interfaces/ozone_drm_host.mojom.h"
 #include "ui/ozone/platform/drm/mojo/drm_gpu_delegate.h"
