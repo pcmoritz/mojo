@@ -45,7 +45,7 @@ class ActiveSinkStage : public Stage {
   Input input_;
   std::shared_ptr<ActiveSink> sink_;
   ActiveSink::DemandCallback demand_function_;
-  Demand sink_demand_;
+  Demand sink_demand_ = Demand::kNegative;
 };
 
 }  // namespace media

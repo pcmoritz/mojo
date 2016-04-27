@@ -62,6 +62,87 @@ class VideoStreamType : public StreamType {
     kSdRec601
   };
 
+  static const size_t kFrameSizeAlignment = 16;
+  static const size_t kFrameSizePadding = 16;
+  static const size_t kYPlaneIndex = 0;
+  static const size_t kARGBPlaneIndex = 0;
+  static const size_t kUPlaneIndex = 1;
+  static const size_t kUVPlaneIndex = 1;
+  static const size_t kVPlaneIndex = 2;
+  static const size_t kAPlaneIndex = 3;
+  static const size_t kMaxPlaneIndex = 3;
+
+  // Width and height.
+  struct Extent {
+    Extent() : width_(0), height_(0) {}
+    Extent(int width, int height) : width_(width), height_(height) {}
+    size_t width() const { return width_; }
+    size_t height() const { return height_; }
+
+   private:
+    size_t width_;
+    size_t height_;
+  };
+
+  // Describes the layout of a frame of a particular extent.
+  struct FrameLayout {
+    size_t line_stride_for_plane(size_t plane) {
+      DCHECK(plane < plane_count);
+      return line_stride[plane];
+    }
+
+    size_t plane_offset_for_plane(size_t plane) {
+      DCHECK(plane < plane_count);
+      return plane_offset[plane];
+    }
+
+    size_t plane_count;
+    size_t line_stride[kMaxPlaneIndex + 1];
+    size_t plane_offset[kMaxPlaneIndex + 1];
+    size_t size;
+  };
+
+  // Information regarding a pixel format.
+  struct PixelFormatInfo {
+    // Returns the number of bytes per element for the specified plane.
+    size_t bytes_per_element_for_plane(size_t plane) const {
+      DCHECK(plane < plane_count);
+      return bytes_per_element[plane];
+    }
+
+    // Returns the sample size of the specified plane.
+    const Extent& sample_size_for_plane(size_t plane) const {
+      DCHECK(plane < plane_count);
+      return sample_size[plane];
+    }
+
+    // Returns the row count for the specified plane.
+    size_t RowCount(size_t plane, size_t height) const;
+
+    // Returns the column count for the specified plane.
+    size_t ColumnCount(size_t plane, size_t width) const;
+
+    // Returns the number of bytes per row for the specified plane.
+    size_t BytesPerRow(size_t plane, size_t width) const;
+
+    // Calculates an aligned size from an unaligned size.
+    Extent AlignedSize(const Extent& unaligned_size) const;
+
+    // Determines a common alignment for all planes.
+    Extent CommonAlignment() const;
+
+    // Fills in a FrameLayout structure for the given coded size.
+    void BuildFrameLayout(const Extent& coded_size,
+                          FrameLayout* frame_layout) const;
+
+    const size_t plane_count;
+    const size_t bytes_per_element[kMaxPlaneIndex + 1];
+    const Extent sample_size[kMaxPlaneIndex + 1];
+  };
+
+  // Gets information for the specified pixel format.
+  static const PixelFormatInfo& InfoForPixelFormat(PixelFormat pixel_format);
+
   // Creates a VideoStreamType.
   static std::unique_ptr<StreamType> Create(
       const std::string& encoding,
@@ -105,6 +186,10 @@ class VideoStreamType : public StreamType {
   uint32_t coded_width() const { return coded_width_; }
 
   uint32_t coded_height() const { return coded_height_; }
+
+  const PixelFormatInfo& GetPixelFormatInfo() const {
+    return InfoForPixelFormat(pixel_format_);
+  }
 
   std::unique_ptr<StreamType> Clone() const override;
 

@@ -20,6 +20,8 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
 
  protected:
   // FfmpegDecoderBase overrides.
+  void Flush() override;
+
   int Decode(const AVPacket& av_packet,
              const ffmpeg::AvFramePtr& av_frame_ptr,
              PayloadAllocator* allocator,
@@ -31,6 +33,8 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
   PacketPtr CreateOutputEndOfStreamPacket() override;
 
  private:
+  using Extent = VideoStreamType::Extent;
+
   // Callback used by the ffmpeg decoder to acquire a buffer.
   static int AllocateBufferForAvFrame(AVCodecContext* av_codec_context,
                                       AVFrame* av_frame,
@@ -39,13 +43,18 @@ class FfmpegVideoDecoder : public FfmpegDecoderBase {
   // Callback used by the ffmpeg decoder to release a buffer.
   static void ReleaseBufferForAvFrame(void* opaque, uint8_t* buffer);
 
-  // AllocateBufferForAvFrame deposits the packet size here, because there's
-  // no good evidence of it after avcodec_decode_audio4 completes.
-  uint64_t packet_size_;
+  // The allocator used by avcodec_decode_audio4 to provide context for
+  // AllocateBufferForAvFrame. This is set only during the call to
+  // avcodec_decode_audio4.
+  PayloadAllocator* allocator_;
 
-  // This is used to verify that an allocated buffer is being used as expected
-  // by ffmpeg avcodec_decode_audio4. AllocateBufferForAvFrame sets it.
-  // void* packet_buffer_;
+  // Used to supply PTS for end-of-stream.
+  int64_t next_pts_ = Packet::kUnknownPts;
+
+  // TODO(dalesat): For investigation only...remove these three fields.
+  bool first_frame_ = true;
+  AVColorSpace colorspace_;
+  Extent coded_size_;
 };
 
 }  // namespace media

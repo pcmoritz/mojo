@@ -11,6 +11,9 @@ extern "C" {
 #include "third_party/ffmpeg/libavformat/avformat.h"
 }
 
+// Ffmeg defines this...undefine.
+#undef PixelFormat
+
 namespace mojo {
 namespace media {
 
@@ -28,6 +31,14 @@ struct AvCodecContext {
 
   static std::unique_ptr<StreamType> GetStreamType(const AVCodecContext& from);
 };
+
+// Converts an AVPixelFormat to a PixelFormat.
+VideoStreamType::PixelFormat PixelFormatFromAVPixelFormat(
+    AVPixelFormat av_pixel_format);
+
+// Converts a PixelFormat to an AVPixelFormat.
+AVPixelFormat AVPixelFormatFromPixelFormat(
+    VideoStreamType::PixelFormat pixel_format);
 
 }  // namespace media
 }  // namespace mojo

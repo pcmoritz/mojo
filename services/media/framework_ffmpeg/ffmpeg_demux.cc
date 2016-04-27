@@ -235,8 +235,8 @@ void FfmpegDemuxImpl::Worker() {
 
     {
       std::unique_lock<std::mutex> lock(mutex_);
-      if (!packet_requested_ && !terminating_ &&
-          seek_position_ == kNotSeeking) {
+      while (!packet_requested_ && !terminating_ &&
+             seek_position_ == kNotSeeking) {
         condition_variable_.wait(lock);
       }
 

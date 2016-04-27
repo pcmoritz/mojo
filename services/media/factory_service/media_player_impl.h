@@ -97,13 +97,12 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
   void SetReportedMediaState(MediaState media_state);
 
   // Prepares a stream.
-  void PrepareStream(const std::unique_ptr<Stream>& stream,
+  void PrepareStream(Stream* stream,
                      const String& url,
                      const std::function<void()>& callback);
 
   // Creates a sink for a stream.
-  // TODO(dalesat): Use raw pointers rather than const std::unique_ptr<>&.
-  void CreateSink(const std::unique_ptr<Stream>& stream,
+  void CreateSink(Stream* stream,
                   const MediaTypePtr& input_media_type,
                   const String& url,
                   const std::function<void()>& callback);
@@ -116,7 +115,7 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
 
   // Handles a status update from a sink. When called with the default
   // argument values, initiates sink status updates.
-  void HandleSinkStatusUpdates(const std::unique_ptr<Stream>& stream,
+  void HandleSinkStatusUpdates(Stream* stream,
                                uint64_t version = MediaSink::kInitialStatus,
                                MediaSinkStatusPtr status = nullptr);
 

@@ -509,16 +509,22 @@ MediaTypePtr Convert(const std::unique_ptr<StreamType>& stream_type) {
       return media_type;
     }
     case StreamType::Medium::kText: {
+      MediaTypeDetailsPtr details = MediaTypeDetails::New();
+      details->set_text(TextMediaTypeDetails::New());
       MediaTypePtr media_type = MediaType::New();
       media_type->medium = MediaTypeMedium::TEXT;
+      media_type->details = details.Pass();
       media_type->encoding = stream_type->encoding();
       media_type->encoding_parameters =
           Convert(stream_type->encoding_parameters());
       return media_type;
     }
     case StreamType::Medium::kSubpicture: {
+      MediaTypeDetailsPtr details = MediaTypeDetails::New();
+      details->set_subpicture(SubpictureMediaTypeDetails::New());
       MediaTypePtr media_type = MediaType::New();
       media_type->medium = MediaTypeMedium::SUBPICTURE;
+      media_type->details = details.Pass();
       media_type->encoding = stream_type->encoding();
       media_type->encoding_parameters =
           Convert(stream_type->encoding_parameters());
@@ -589,15 +595,21 @@ MediaTypeSetPtr Convert(const std::unique_ptr<StreamTypeSet>& stream_type_set) {
       return media_type_set;
     }
     case StreamType::Medium::kText: {
+      MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
+      details->set_text(TextMediaTypeSetDetails::New());
       MediaTypeSetPtr media_type_set = MediaTypeSet::New();
       media_type_set->medium = MediaTypeMedium::TEXT;
+      media_type_set->details = details.Pass();
       media_type_set->encodings =
           Array<String>::From(stream_type_set->encodings());
       return media_type_set;
     }
     case StreamType::Medium::kSubpicture: {
+      MediaTypeSetDetailsPtr details = MediaTypeSetDetails::New();
+      details->set_subpicture(SubpictureMediaTypeSetDetails::New());
       MediaTypeSetPtr media_type_set = MediaTypeSet::New();
       media_type_set->medium = MediaTypeMedium::SUBPICTURE;
+      media_type_set->details = details.Pass();
       media_type_set->encodings =
           Array<String>::From(stream_type_set->encodings());
       return media_type_set;

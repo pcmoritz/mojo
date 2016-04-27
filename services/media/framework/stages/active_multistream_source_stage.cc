@@ -15,9 +15,13 @@ ActiveMultistreamSourceStage::ActiveMultistreamSourceStage(
   outputs_.resize(source->stream_count());
 
   supply_function_ = [this](size_t output_index, PacketPtr packet) {
+    lock_.Acquire();
     DCHECK(!cached_packet_) << "source supplied unrequested packet";
     DCHECK(output_index < outputs_.size());
     DCHECK(packet);
+    DCHECK(packet_request_outstanding_);
+
+    packet_request_outstanding_ = false;
 
     cached_packet_output_index_ = output_index;
     cached_packet_ = std::move(packet);
@@ -28,7 +32,10 @@ ActiveMultistreamSourceStage::ActiveMultistreamSourceStage(
 
     Output& output = outputs_[cached_packet_output_index_];
     if (output.demand() != Demand::kNegative) {
+      lock_.Release();
       RequestUpdate();
+    } else {
+      lock_.Release();
     }
   };
 
@@ -82,6 +89,7 @@ void ActiveMultistreamSourceStage::UnprepareOutput(
 }
 
 void ActiveMultistreamSourceStage::Update(Engine* engine) {
+  base::AutoLock lock(lock_);
   DCHECK(engine);
 
   if (cached_packet_) {
@@ -92,9 +100,11 @@ void ActiveMultistreamSourceStage::Update(Engine* engine) {
     }
   }
 
-  if (!cached_packet_ && HasPositiveDemand(outputs_)) {
+  if (!cached_packet_ && HasPositiveDemand(outputs_) &&
+      !packet_request_outstanding_) {
     // We have no cached packet and positive demand. Request a packet.
     source_->RequestPacket();
+    packet_request_outstanding_ = true;
   }
 }
 
@@ -105,12 +115,14 @@ void ActiveMultistreamSourceStage::FlushInput(
 }
 
 void ActiveMultistreamSourceStage::FlushOutput(size_t index) {
+  base::AutoLock lock(lock_);
   DCHECK(index < outputs_.size());
   DCHECK(source_);
   outputs_[index].Flush();
   cached_packet_.reset(nullptr);
   cached_packet_output_index_ = 0;
   ended_streams_ = 0;
+  packet_request_outstanding_ = false;
 }
 
 }  // namespace media

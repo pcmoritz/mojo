@@ -74,6 +74,15 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
     }
   });
 
+  // TODO(dalesat): Temporary, remove.
+  if (destination_url == "nowhere") {
+    // Throwing away the content.
+    graph_.ConnectParts(consumer_ref, producer_ref);
+    graph_.Prepare();
+    ready_.Occur();
+    return;
+  }
+
   if (destination_url != "mojo:audio_server") {
     LOG(ERROR) << "mojo:audio_server is the only supported destination";
     if (binding_.is_bound()) {
@@ -161,7 +170,11 @@ void MediaSinkImpl::MaybeSetRate() {
     return;
   }
 
-  DCHECK(rate_control_);
+  if (!rate_control_) {
+    rate_ = target_rate_;
+    status_publisher_.SendUpdates();
+    return;
+  }
 
   // Desired rate in frames per second.
   LinearTransform::Ratio rate_frames_per_second(

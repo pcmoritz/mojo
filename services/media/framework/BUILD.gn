@@ -89,7 +89,6 @@ source_set("framework") {
     "//base",
     "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings:callback",
-    "//url",
   ]
 }
 

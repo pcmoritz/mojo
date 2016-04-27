@@ -24,19 +24,19 @@ void MojoProducer::AddBinding(InterfaceRequest<MediaProducer> producer) {
   bindings_.AddBinding(this, producer.Pass());
 }
 
-void MojoProducer::PrimeConnection(const FlushConnectionCallback& callback) {
+void MojoProducer::PrimeConnection(const PrimeConnectionCallback& callback) {
   Demand demand;
 
   if (consumer_.is_bound()) {
     base::AutoLock lock(lock_);
-    max_pushes_outstanding_ = 10;  // TODO(dalesat): Made up!
+    max_pushes_outstanding_ = 3;  // TODO(dalesat): Made up!
     demand = current_pushes_outstanding_ < max_pushes_outstanding_
                  ? Demand::kPositive
                  : Demand::kNegative;
   } else {
     demand = Demand::kNeutral;
     if (!mojo_allocator_.initialized()) {
-      mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
+      mojo_allocator_.InitNew(2048 * 1024);  // TODO(dalesat): Made up!
     }
   }
 
@@ -60,8 +60,12 @@ void MojoProducer::FlushConnection(const FlushConnectionCallback& callback) {
   DCHECK(demand_callback_);
   demand_callback_(Demand::kNegative);
 
-  DCHECK(consumer_.is_bound());
-  consumer_->Flush(callback);
+  if (consumer_.is_bound()) {
+    consumer_->Flush(callback);
+  } else {
+    callback.Run();
+  }
+
   first_pts_since_flush_ = Packet::kUnknownPts;
   end_of_stream_ = false;
 }
@@ -89,8 +93,17 @@ Demand MojoProducer::SupplyPacket(PacketPtr packet) {
     first_pts_since_flush_ = packet->pts();
   }
 
-  // If we're no longer connected, throw the packet away.
+  // If we're not connected, throw the packet away.
   if (!consumer_.is_bound()) {
+    if (packet->end_of_stream()) {
+      {
+        base::AutoLock lock(lock_);
+        end_of_stream_ = true;
+      }
+      SetState(MediaState::ENDED);
+      return Demand::kNegative;
+    }
+
     return Demand::kNeutral;
   }
 
@@ -130,7 +143,7 @@ void MojoProducer::Connect(InterfaceHandle<MediaConsumer> consumer,
   consumer_ = MediaConsumerPtr::Create(std::move(consumer));
 
   if (!mojo_allocator_.initialized()) {
-    mojo_allocator_.InitNew(256 * 1024);  // TODO(dalesat): Made up!
+    mojo_allocator_.InitNew(2048 * 1024);  // TODO(dalesat): Made up!
   }
 
   consumer_->SetBuffer(mojo_allocator_.GetDuplicateHandle(),

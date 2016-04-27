@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "base/synchronization/lock.h"
 #include "services/media/framework/models/active_multistream_source.h"
 #include "services/media/framework/stages/stage.h"
 
@@ -47,9 +48,12 @@ class ActiveMultistreamSourceStage : public Stage {
   std::vector<Output> outputs_;
   std::shared_ptr<ActiveMultistreamSource> source_;
   ActiveMultistreamSource::SupplyCallback supply_function_;
+
+  mutable base::Lock lock_;
   PacketPtr cached_packet_;
   size_t cached_packet_output_index_;
   size_t ended_streams_ = 0;
+  bool packet_request_outstanding_ = false;
 };
 
 }  // namespace media

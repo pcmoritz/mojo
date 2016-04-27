@@ -73,6 +73,8 @@ PacketPtr FfmpegAudioDecoder::CreateOutputPacket(const AVFrame& av_frame,
   if (pts == AV_NOPTS_VALUE) {
     pts = next_pts_;
     next_pts_ += av_frame.nb_samples;
+  } else {
+    next_pts_ = pts;
   }
 
   uint64_t payload_size;

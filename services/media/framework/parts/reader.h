@@ -10,7 +10,6 @@
 
 #include "mojo/public/cpp/application/application_impl.h"
 #include "services/media/framework/result.h"
-#include "url/gurl.h"
 
 namespace mojo {
 namespace media {

@@ -13,9 +13,6 @@ extern "C" {
 #include "third_party/ffmpeg/libavformat/avformat.h"
 }
 
-// Ffmeg defines this...undefine.
-#undef PixelFormat
-
 namespace mojo {
 namespace media {
 
@@ -160,59 +157,9 @@ int FfmpegProfileFromVideoProfile(VideoStreamType::VideoProfile video_profile) {
   }
 }
 
-// Converts an AVPixelFormat to a PixelFormat.
-VideoStreamType::PixelFormat PixelFormatFromAVPixelFormat(
-    AVPixelFormat av_pixel_format) {
-  // TODO(dalesat): Blindly copied from Chromium.
-  switch (av_pixel_format) {
-    case AV_PIX_FMT_YUV422P:
-    case AV_PIX_FMT_YUVJ422P:
-      return VideoStreamType::PixelFormat::kYv16;
-    case AV_PIX_FMT_YUV444P:
-    case AV_PIX_FMT_YUVJ444P:
-      return VideoStreamType::PixelFormat::kYv24;
-    case AV_PIX_FMT_YUV420P:
-    case AV_PIX_FMT_YUVJ420P:
-      return VideoStreamType::PixelFormat::kYv12;
-    case AV_PIX_FMT_YUVA420P:
-      return VideoStreamType::PixelFormat::kYv12A;
-    default:
-      return VideoStreamType::PixelFormat::kUnknown;
-  }
-}
-
-// Converts a PixelFormat to an AVPixelFormat.
-AVPixelFormat AVPixelFormatFromPixelFormat(
-    VideoStreamType::PixelFormat pixel_format) {
-  // TODO(dalesat): Blindly copied from Chromium.
-  switch (pixel_format) {
-    case VideoStreamType::PixelFormat::kYv12:
-      return AV_PIX_FMT_YUV420P;
-    case VideoStreamType::PixelFormat::kYv16:
-      return AV_PIX_FMT_YUV422P;
-    case VideoStreamType::PixelFormat::kYv12A:
-      return AV_PIX_FMT_YUVA420P;
-    case VideoStreamType::PixelFormat::kYv24:
-      return AV_PIX_FMT_YUV444P;
-    case VideoStreamType::PixelFormat::kUnknown:
-    case VideoStreamType::PixelFormat::kI420:
-    case VideoStreamType::PixelFormat::kNv12:
-    case VideoStreamType::PixelFormat::kNv21:
-    case VideoStreamType::PixelFormat::kUyvy:
-    case VideoStreamType::PixelFormat::kYuy2:
-    case VideoStreamType::PixelFormat::kArgb:
-    case VideoStreamType::PixelFormat::kXrgb:
-    case VideoStreamType::PixelFormat::kRgb24:
-    case VideoStreamType::PixelFormat::kRgb32:
-    case VideoStreamType::PixelFormat::kMjpeg:
-    case VideoStreamType::PixelFormat::kMt21:
-    default:
-      return AV_PIX_FMT_NONE;
-  }
-}
-
-// Creates a StreamType from an AVCodecContext describing a video type.
-std::unique_ptr<StreamType> StreamTypeFromVideoCodecContext(
+// Creates a StreamType from an AVCodecContext describing a compressed video
+// type.
+std::unique_ptr<StreamType> StreamTypeFromCompressedVideoCodecContext(
     const AVCodecContext& from) {
   const char* encoding;
   switch (from.codec_id) {
@@ -249,20 +196,31 @@ std::unique_ptr<StreamType> StreamTypeFromVideoCodecContext(
       from.width, from.height, from.coded_width, from.coded_height);
 }
 
+// Creates a StreamType from an AVCodecContext describing an uncompressed video
+// type.
+std::unique_ptr<StreamType> StreamTypeFromUncompressedVideoCodecContext(
+    const AVCodecContext& from) {
+  return VideoStreamType::Create(
+      StreamType::kVideoEncodingUncompressed, nullptr,
+      VideoStreamType::VideoProfile::kNotApplicable,
+      PixelFormatFromAVPixelFormat(from.pix_fmt),
+      ColorSpaceFromAVColorSpaceAndRange(from.colorspace, from.color_range),
+      from.width, from.height, from.coded_width, from.coded_height);
+}
+
 // Creates a StreamType from an AVCodecContext describing a data type.
 std::unique_ptr<StreamType> StreamTypeFromDataCodecContext(
     const AVCodecContext& from) {
   // TODO(dalesat): Implement.
-  LOG(ERROR) << "StreamTypeFromDataCodecContext not implemented";
-  abort();
+  return TextStreamType::Create("UNSUPPORTED TYPE (FFMPEG DATA)", nullptr);
 }
 
 // Creates a StreamType from an AVCodecContext describing a subtitle type.
 std::unique_ptr<StreamType> StreamTypeFromSubtitleCodecContext(
     const AVCodecContext& from) {
   // TODO(dalesat): Implement.
-  LOG(ERROR) << "StreamTypeFromSubtitleCodecContext not implemented";
-  abort();
+  return SubpictureStreamType::Create("UNSUPPORTED TYPE (FFMPEG SUBTITLE)",
+                                      nullptr);
 }
 
 // Creates an AVCodecContext from an AudioStreamType.
@@ -338,7 +296,22 @@ AvCodecContextPtr AVCodecContextFromVideoStreamType(
     const VideoStreamType& stream_type) {
   AVCodecID codec_id = AV_CODEC_ID_NONE;
 
-  // TODO(dalesat): codec_id
+  if (stream_type.encoding() == StreamType::kVideoEncodingH263) {
+    codec_id = AV_CODEC_ID_H263;
+  } else if (stream_type.encoding() == StreamType::kVideoEncodingH264) {
+    codec_id = AV_CODEC_ID_H264;
+  } else if (stream_type.encoding() == StreamType::kVideoEncodingMpeg4) {
+    codec_id = AV_CODEC_ID_MPEG4;
+  } else if (stream_type.encoding() == StreamType::kVideoEncodingTheora) {
+    codec_id = AV_CODEC_ID_THEORA;
+  } else if (stream_type.encoding() == StreamType::kVideoEncodingVp3) {
+    codec_id = AV_CODEC_ID_VP3;
+  } else if (stream_type.encoding() == StreamType::kVideoEncodingVp8) {
+    codec_id = AV_CODEC_ID_VP8;
+  } else {
+    LOG(ERROR) << "unsupported encoding " << stream_type.encoding();
+    abort();
+  }
 
   if (codec_id == AV_CODEC_ID_NONE) {
     return nullptr;
@@ -381,6 +354,55 @@ AvCodecContextPtr AVCodecContextFromSubpictureStreamType(
 
 }  // namespace
 
+VideoStreamType::PixelFormat PixelFormatFromAVPixelFormat(
+    AVPixelFormat av_pixel_format) {
+  // TODO(dalesat): Blindly copied from Chromium.
+  switch (av_pixel_format) {
+    case AV_PIX_FMT_YUV422P:
+    case AV_PIX_FMT_YUVJ422P:
+      return VideoStreamType::PixelFormat::kYv16;
+    case AV_PIX_FMT_YUV444P:
+    case AV_PIX_FMT_YUVJ444P:
+      return VideoStreamType::PixelFormat::kYv24;
+    case AV_PIX_FMT_YUV420P:
+    case AV_PIX_FMT_YUVJ420P:
+      return VideoStreamType::PixelFormat::kYv12;
+    case AV_PIX_FMT_YUVA420P:
+      return VideoStreamType::PixelFormat::kYv12A;
+    default:
+      return VideoStreamType::PixelFormat::kUnknown;
+  }
+}
+
+AVPixelFormat AVPixelFormatFromPixelFormat(
+    VideoStreamType::PixelFormat pixel_format) {
+  // TODO(dalesat): Blindly copied from Chromium.
+  switch (pixel_format) {
+    case VideoStreamType::PixelFormat::kYv12:
+      return AV_PIX_FMT_YUV420P;
+    case VideoStreamType::PixelFormat::kYv16:
+      return AV_PIX_FMT_YUV422P;
+    case VideoStreamType::PixelFormat::kYv12A:
+      return AV_PIX_FMT_YUVA420P;
+    case VideoStreamType::PixelFormat::kYv24:
+      return AV_PIX_FMT_YUV444P;
+    case VideoStreamType::PixelFormat::kUnknown:
+    case VideoStreamType::PixelFormat::kI420:
+    case VideoStreamType::PixelFormat::kNv12:
+    case VideoStreamType::PixelFormat::kNv21:
+    case VideoStreamType::PixelFormat::kUyvy:
+    case VideoStreamType::PixelFormat::kYuy2:
+    case VideoStreamType::PixelFormat::kArgb:
+    case VideoStreamType::PixelFormat::kXrgb:
+    case VideoStreamType::PixelFormat::kRgb24:
+    case VideoStreamType::PixelFormat::kRgb32:
+    case VideoStreamType::PixelFormat::kMjpeg:
+    case VideoStreamType::PixelFormat::kMt21:
+    default:
+      return AV_PIX_FMT_NONE;
+  }
+}
+
 // static
 std::unique_ptr<StreamType> AvCodecContext::GetStreamType(
     const AVCodecContext& from) {
@@ -401,7 +423,11 @@ std::unique_ptr<StreamType> AvCodecContext::GetStreamType(
           }
       }
     case AVMEDIA_TYPE_VIDEO:
-      return StreamTypeFromVideoCodecContext(from);
+      if (from.codec == nullptr) {
+        return StreamTypeFromCompressedVideoCodecContext(from);
+      } else {
+        return StreamTypeFromUncompressedVideoCodecContext(from);
+      }
     case AVMEDIA_TYPE_UNKNOWN:
     // Treated as AVMEDIA_TYPE_DATA.
     case AVMEDIA_TYPE_DATA:

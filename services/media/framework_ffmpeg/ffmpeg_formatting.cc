@@ -673,32 +673,31 @@ std::ostream& operator<<(std::ostream& os, AVSampleFormat value) {
 std::ostream& operator<<(std::ostream& os, AVColorSpace value) {
   switch (value) {
     case AVCOL_SPC_RGB:
-      return os << "AVCOL_SPC_RGB" << std::endl;
+      return os << "AVCOL_SPC_RGB";
     case AVCOL_SPC_BT709:
-      return os << "AVCOL_SPC_BT709" << std::endl;
+      return os << "AVCOL_SPC_BT709";
     case AVCOL_SPC_UNSPECIFIED:
-      return os << "AVCOL_SPC_UNSPECIFIED" << std::endl;
+      return os << "AVCOL_SPC_UNSPECIFIED";
     case AVCOL_SPC_RESERVED:
-      return os << "AVCOL_SPC_RESERVED" << std::endl;
+      return os << "AVCOL_SPC_RESERVED";
     case AVCOL_SPC_FCC:
-      return os << "AVCOL_SPC_FCC" << std::endl;
+      return os << "AVCOL_SPC_FCC";
     case AVCOL_SPC_BT470BG:
-      return os << "AVCOL_SPC_BT470BG" << std::endl;
+      return os << "AVCOL_SPC_BT470BG";
     case AVCOL_SPC_SMPTE170M:
-      return os << "AVCOL_SPC_SMPTE170M" << std::endl;
+      return os << "AVCOL_SPC_SMPTE170M";
     case AVCOL_SPC_SMPTE240M:
-      return os << "AVCOL_SPC_SMPTE240M" << std::endl;
+      return os << "AVCOL_SPC_SMPTE240M";
     case AVCOL_SPC_YCOCG:
-      return os << "AVCOL_SPC_YCOCG" << std::endl;
+      return os << "AVCOL_SPC_YCOCG";
     case AVCOL_SPC_BT2020_NCL:
-      return os << "AVCOL_SPC_BT2020_NCL" << std::endl;
+      return os << "AVCOL_SPC_BT2020_NCL";
     case AVCOL_SPC_BT2020_CL:
-      return os << "AVCOL_SPC_BT2020_CL" << std::endl;
+      return os << "AVCOL_SPC_BT2020_CL";
     case AVCOL_SPC_NB:
-      return os << "AVCOL_SPC_NB" << std::endl;
+      return os << "AVCOL_SPC_NB";
     default:
-      return os << "<UNKNOWN AVColorSpace: " << static_cast<int>(value) << ">"
-                << std::endl;
+      return os << "<UNKNOWN AVColorSpace: " << static_cast<int>(value) << ">";
   }
 }
 

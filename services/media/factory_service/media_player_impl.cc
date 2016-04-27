@@ -57,8 +57,13 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
       switch (stream.media_type_->medium) {
         case MediaTypeMedium::AUDIO:
           stream.enabled_ = true;
-          PrepareStream(streams_.back(), "mojo:audio_server",
+          PrepareStream(&stream, "mojo:audio_server",
                         callback_joiner->NewCallback());
+          break;
+        case MediaTypeMedium::VIDEO:
+          stream.enabled_ = true;
+          // TODO(dalesat): Send video somewhere.
+          PrepareStream(&stream, "nowhere", callback_joiner->NewCallback());
           break;
         // TODO(dalesat): Enable other stream types.
         default:
@@ -249,17 +254,18 @@ void MediaPlayerImpl::Seek(int64_t position) {
   Update();
 }
 
-void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
+void MediaPlayerImpl::PrepareStream(Stream* stream,
                                     const String& url,
                                     const std::function<void()>& callback) {
   DCHECK(factory_);
 
   demux_->GetProducer(stream->index_, GetProxy(&stream->encoded_producer_));
 
-  if (stream->media_type_->encoding != MediaType::kAudioEncodingLpcm) {
+  if (stream->media_type_->encoding != MediaType::kAudioEncodingLpcm &&
+      stream->media_type_->encoding != MediaType::kVideoEncodingUncompressed) {
     std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
-    // Compressed audio. Insert a decoder in front of the sink. The sink would
+    // Compressed media. Insert a decoder in front of the sink. The sink would
     // add its own internal decoder, but we want to test the decoder.
     factory_->CreateDecoder(stream->media_type_.Clone(),
                             GetProxy(&stream->decoder_));
@@ -269,14 +275,14 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
 
     callback_joiner->Spawn();
     stream->encoded_producer_->Connect(decoder_consumer.Pass(),
-                                       [&stream, callback_joiner]() {
+                                       [stream, callback_joiner]() {
                                          stream->encoded_producer_.reset();
                                          callback_joiner->Complete();
                                        });
 
     callback_joiner->Spawn();
     stream->decoder_->GetOutputType(
-        [this, &stream, url, callback_joiner](MediaTypePtr output_type) {
+        [this, stream, url, callback_joiner](MediaTypePtr output_type) {
           stream->decoder_->GetProducer(GetProxy(&stream->decoded_producer_));
           CreateSink(stream, output_type, url, callback_joiner->NewCallback());
           callback_joiner->Complete();
@@ -284,15 +290,15 @@ void MediaPlayerImpl::PrepareStream(const std::unique_ptr<Stream>& stream,
 
     callback_joiner->WhenJoined(callback);
   } else {
-    // Uncompressed audio. Connect the demux stream directly to the sink. This
-    // would work for compressed audio as well (the sink would decode), but we
+    // Uncompressed media. Connect the demux stream directly to the sink. This
+    // would work for compressed media as well (the sink would decode), but we
     // want to test the decoder.
     stream->decoded_producer_ = stream->encoded_producer_.Pass();
     CreateSink(stream, stream->media_type_, url, callback);
   }
 }
 
-void MediaPlayerImpl::CreateSink(const std::unique_ptr<Stream>& stream,
+void MediaPlayerImpl::CreateSink(Stream* stream,
                                  const MediaTypePtr& input_media_type,
                                  const String& url,
                                  const std::function<void()>& callback) {
@@ -306,7 +312,7 @@ void MediaPlayerImpl::CreateSink(const std::unique_ptr<Stream>& stream,
   stream->sink_->GetConsumer(GetProxy(&consumer));
 
   stream->decoded_producer_->Connect(
-      consumer.Pass(), [this, callback, &stream]() {
+      consumer.Pass(), [this, callback, stream]() {
         stream->decoded_producer_.reset();
 
         DCHECK(stream->state_ == MediaState::UNPREPARED);
@@ -334,10 +340,9 @@ void MediaPlayerImpl::HandleDemuxMetadataUpdates(uint64_t version,
                       });
 }
 
-void MediaPlayerImpl::HandleSinkStatusUpdates(
-    const std::unique_ptr<Stream>& stream,
-    uint64_t version,
-    MediaSinkStatusPtr status) {
+void MediaPlayerImpl::HandleSinkStatusUpdates(Stream* stream,
+                                              uint64_t version,
+                                              MediaSinkStatusPtr status) {
   if (status && status->state > MediaState::UNPREPARED) {
     // We transition to PAUSED when Connect completes.
     DCHECK(stream->state_ > MediaState::UNPREPARED);
@@ -348,7 +353,7 @@ void MediaPlayerImpl::HandleSinkStatusUpdates(
   }
 
   stream->sink_->GetStatus(
-      version, [this, &stream](uint64_t version, MediaSinkStatusPtr status) {
+      version, [this, stream](uint64_t version, MediaSinkStatusPtr status) {
         HandleSinkStatusUpdates(stream, version, status.Pass());
       });
 }
