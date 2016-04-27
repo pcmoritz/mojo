@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "mojo/public/cpp/application/application_connection.h"
+#include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/application/interface_factory_impl.h"
 #include "mojo/services/ozone_drm_gpu/interfaces/ozone_drm_gpu.mojom.h"
 #include "mojo/services/ozone_drm_host/interfaces/ozone_drm_host.mojom.h"
@@ -63,14 +64,14 @@ DrmIpcInitHelperMojo::DrmIpcInitHelperMojo() {}
 DrmIpcInitHelperMojo::~DrmIpcInitHelperMojo() {}
 
 void DrmIpcInitHelperMojo::HostInitialize(mojo::ApplicationImpl* application) {
-  application->ConnectToService("mojo:native_viewport_service",
-                                &ozone_drm_gpu_);
+  mojo::ConnectToService(application->shell(), "mojo:native_viewport_service",
+                         GetProxy(&ozone_drm_gpu_));
   new MojoDrmHostDelegate(ozone_drm_gpu_.get());
 }
 
 void DrmIpcInitHelperMojo::GpuInitialize(mojo::ApplicationImpl* application) {
-  application->ConnectToService("mojo:native_viewport_service",
-                                &ozone_drm_host_);
+  mojo::ConnectToService(application->shell(), "mojo:native_viewport_service",
+                         GetProxy(&ozone_drm_host_));
   new MojoDrmGpuDelegate(ozone_drm_host_.get());
 }
 
