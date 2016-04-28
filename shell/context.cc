@@ -204,7 +204,7 @@ class TracingServiceProvider : public ServiceProvider {
                         mojo::ScopedMessagePipeHandle client_handle) override {
     if (tracer_ && service_name == tracing::TraceProvider::Name_) {
       tracer_->ConnectToProvider(
-          mojo::MakeRequest<tracing::TraceProvider>(client_handle.Pass()));
+          mojo::InterfaceRequest<tracing::TraceProvider>(client_handle.Pass()));
     }
   }
 

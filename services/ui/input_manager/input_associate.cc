@@ -49,9 +49,9 @@ void InputAssociate::ConnectToViewService(
   DCHECK(view_token);  // checked by mojom
 
   if (service_name == mojo::ui::InputConnection::Name_) {
-    CreateInputConnection(
-        view_token.Pass(),
-        mojo::MakeRequest<mojo::ui::InputConnection>(client_handle.Pass()));
+    CreateInputConnection(view_token.Pass(),
+                          mojo::InterfaceRequest<mojo::ui::InputConnection>(
+                              client_handle.Pass()));
   }
 }
 
@@ -62,9 +62,9 @@ void InputAssociate::ConnectToViewTreeService(
   DCHECK(view_tree_token);  // checked by mojom
 
   if (service_name == mojo::ui::InputDispatcher::Name_) {
-    CreateInputDispatcher(
-        view_tree_token.Pass(),
-        mojo::MakeRequest<mojo::ui::InputDispatcher>(client_handle.Pass()));
+    CreateInputDispatcher(view_tree_token.Pass(),
+                          mojo::InterfaceRequest<mojo::ui::InputDispatcher>(
+                              client_handle.Pass()));
   }
 }
 

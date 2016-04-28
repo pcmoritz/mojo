@@ -44,7 +44,7 @@ void RunAndroidApplication(JNIEnv* env,
                            const base::FilePath& app_path,
                            jint j_handle) {
   mojo::InterfaceRequest<mojo::Application> application_request =
-      mojo::MakeRequest<mojo::Application>(
+      mojo::InterfaceRequest<mojo::Application>(
           mojo::MakeScopedHandle(mojo::MessagePipeHandle(j_handle)));
 
   // Load the library, so that we can set the application context there if
