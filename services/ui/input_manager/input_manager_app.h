@@ -11,6 +11,7 @@
 #include "mojo/common/strong_binding_set.h"
 #include "mojo/common/tracing_impl.h"
 #include "mojo/public/cpp/application/application_delegate.h"
+#include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/services/ui/views/interfaces/view_associates.mojom.h"
 
 namespace input_manager {

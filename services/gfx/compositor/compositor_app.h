@@ -12,6 +12,7 @@
 #include "mojo/common/strong_binding_set.h"
 #include "mojo/common/tracing_impl.h"
 #include "mojo/public/cpp/application/application_delegate.h"
+#include "mojo/public/cpp/application/interface_factory.h"
 #include "mojo/services/gfx/composition/interfaces/compositor.mojom.h"
 #include "services/gfx/compositor/compositor_engine.h"
 

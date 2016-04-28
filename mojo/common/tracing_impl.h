@@ -7,7 +7,6 @@
 
 #include "base/macros.h"
 #include "mojo/common/trace_provider_impl.h"
-#include "mojo/public/cpp/application/service_provider_impl.h"
 
 namespace mojo {
 

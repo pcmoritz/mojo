@@ -7,7 +7,6 @@
 
 #include "base/trace_event/trace_event.h"
 #include "mojo/common/tracing_impl.h"
-#include "mojo/public/cpp/application/service_provider_impl.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
@@ -42,24 +41,16 @@ class DartTraceProvider : public tracing::TraceProvider {
   DISALLOW_COPY_AND_ASSIGN(DartTraceProvider);
 };
 
-class DartTracingImpl :
-    public mojo::InterfaceFactory<tracing::TraceProvider> {
+class DartTracingImpl {
  public:
-   DartTracingImpl();
-   ~DartTracingImpl() override;
+  DartTracingImpl();
+  ~DartTracingImpl();
 
-   // This connects to the tracing service and registers ourselves to provide
-   // tracing data on demand.
-   void Initialize(mojo::ApplicationImpl* app);
+  // This connects to the tracing service and registers ourselves to provide
+  // tracing data on demand.
+  void Initialize(mojo::ApplicationImpl* app);
 
-  private:
-   // InterfaceFactory<tracing::TraceProvider> implementation.
-   void Create(mojo::ApplicationConnection* connection,
-               mojo::InterfaceRequest<tracing::TraceProvider> request) override;
  private:
-  // Used to provide services *to* mojo:tracing.
-  mojo::ServiceProviderImpl outgoing_sp_for_tracing_service_;
-
   DartTraceProvider provider_impl_;
 
   DISALLOW_COPY_AND_ASSIGN(DartTracingImpl);

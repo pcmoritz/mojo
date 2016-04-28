@@ -9,7 +9,6 @@
 #include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/bindings/interface_handle.h"
 #include "mojo/public/cpp/bindings/interface_request.h"
-#include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "mojo/services/tracing/interfaces/trace_provider_registry.mojom.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 
