@@ -118,7 +118,7 @@ void ServeTranslateRequest(const struct nacl_irt_pnacl_compile_funcs* funcs) {
   // Convert the MojoHandle into a ScopedMessagePipeHandle, and use that to
   // implement the PexeCompiler interface.
   PexeCompilerImpl impl(
-      mojo::MakeRequest<mojo::nacl::PexeCompiler>(
+      mojo::InterfaceRequest<mojo::nacl::PexeCompiler>(
           mojo::ScopedMessagePipeHandle(mojo::MessagePipeHandle(handle))),
       funcs);
   mojo::RunLoop::current()->Run();
