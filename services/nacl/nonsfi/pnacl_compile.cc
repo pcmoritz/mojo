@@ -21,13 +21,14 @@ namespace nacl {
 
 class PexeCompilerImpl : public PexeCompilerInit {
  public:
-  void PexeCompilerStart(ScopedMessagePipeHandle handle) override {
+  void PexeCompilerStart(
+      InterfaceRequest<PexeCompiler> compiler_request) override {
     int nexe_fd =
         ::nacl::DataToTempFileDescriptor(::nacl::kPnaclTranslatorCompile);
     CHECK(nexe_fd >= 0) << "Could not open compiler nexe";
-    ::nacl::MojoLaunchNexeNonsfi(nexe_fd,
-                                 handle.release().value(),
-                                 true /* enable_translate_irt */);
+    ::nacl::MojoLaunchNexeNonsfi(
+        nexe_fd, compiler_request.PassMessagePipe().release().value(),
+        true /* enable_translate_irt */);
   }
 };
 

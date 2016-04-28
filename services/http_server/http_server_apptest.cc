@@ -9,9 +9,10 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
 #include "mojo/public/cpp/application/connect.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
-#include "mojo/services/http_server/interfaces/http_server.mojom.h"
+#include "mojo/services/http_server/interfaces/http_server.mojom-sync.h"
 #include "mojo/services/http_server/interfaces/http_server_factory.mojom.h"
 #include "mojo/services/network/interfaces/net_address.mojom.h"
 #include "mojo/services/network/interfaces/network_service.mojom.h"
@@ -20,6 +21,7 @@
 namespace http_server {
 
 namespace {
+
 void WriteMessageToDataPipe(
     const std::string message,
     mojo::ScopedDataPipeConsumerHandle* data_pipe_consumer) {
@@ -40,7 +42,8 @@ void WriteMessageToDataPipe(
   ASSERT_EQ(message.size(), bytes);
 }
 
-const char* kExampleMessage = "Hello, world!";
+const char kExampleMessage[] = "Hello, world!";
+
 }  // namespace
 
 // Test handler that responds to all requests with the status OK and
@@ -104,7 +107,7 @@ class HttpServerApplicationTest : public mojo::test::ApplicationTestBase {
                            GetProxy(&network_service_));
   }
 
-  http_server::HttpServerPtr CreateHttpServer();
+  mojo::SynchronousInterfacePtr<http_server::HttpServer> CreateHttpServer();
 
   http_server::HttpServerFactoryPtr http_server_factory_;
   mojo::NetworkServicePtr network_service_;
@@ -113,8 +116,9 @@ class HttpServerApplicationTest : public mojo::test::ApplicationTestBase {
   MOJO_DISALLOW_COPY_AND_ASSIGN(HttpServerApplicationTest);
 };
 
-http_server::HttpServerPtr HttpServerApplicationTest::CreateHttpServer() {
-  http_server::HttpServerPtr http_server;
+mojo::SynchronousInterfacePtr<http_server::HttpServer>
+HttpServerApplicationTest::CreateHttpServer() {
+  mojo::SynchronousInterfacePtr<http_server::HttpServer> http_server;
   mojo::NetAddressPtr local_address(mojo::NetAddress::New());
   local_address->family = mojo::NetAddressFamily::IPV4;
   local_address->ipv4 = mojo::NetAddressIPv4::New();
@@ -124,7 +128,7 @@ http_server::HttpServerPtr HttpServerApplicationTest::CreateHttpServer() {
   local_address->ipv4->addr[2] = 0;
   local_address->ipv4->addr[3] = 1;
   local_address->ipv4->port = 0;
-  http_server_factory_->CreateHttpServer(GetProxy(&http_server).Pass(),
+  http_server_factory_->CreateHttpServer(GetSynchronousProxy(&http_server),
                                          local_address.Pass());
   return http_server;
 }
@@ -140,18 +144,19 @@ void CheckServerResponse(mojo::URLResponsePtr response) {
 // Verifies that the server responds to http GET requests using example
 // GetHandler.
 TEST_F(HttpServerApplicationTest, ServerResponse) {
-  http_server::HttpServerPtr http_server(CreateHttpServer());
-  uint16_t assigned_port;
-  http_server->GetPort([&assigned_port](uint16_t p) { assigned_port = p; });
-  http_server.WaitForIncomingResponse();
+  auto http_server = CreateHttpServer();
+  uint16_t assigned_port = 0;
+  EXPECT_TRUE(http_server->GetPort(&assigned_port));
+  EXPECT_NE(assigned_port, 0u);
 
   HttpHandlerPtr http_handler_ptr;
   GetHandler handler(GetProxy(&http_handler_ptr).Pass());
 
   // Set the test handler and wait for confirmation.
-  http_server->SetHandler("/test", http_handler_ptr.Pass(),
-                          [](bool result) { EXPECT_TRUE(result); });
-  http_server.WaitForIncomingResponse();
+  bool result = false;
+  EXPECT_TRUE(
+      http_server->SetHandler("/test", http_handler_ptr.Pass(), &result));
+  EXPECT_TRUE(result);
 
   mojo::URLLoaderPtr url_loader;
   network_service_->CreateURLLoader(GetProxy(&url_loader));
@@ -167,18 +172,19 @@ TEST_F(HttpServerApplicationTest, ServerResponse) {
 // Verifies that the server correctly passes the POST request payload using
 // example PostHandler.
 TEST_F(HttpServerApplicationTest, PostData) {
-  http_server::HttpServerPtr http_server(CreateHttpServer());
-  uint16_t assigned_port;
-  http_server->GetPort([&assigned_port](uint16_t p) { assigned_port = p; });
-  http_server.WaitForIncomingResponse();
+  auto http_server = CreateHttpServer();
+  uint16_t assigned_port = 0;
+  EXPECT_TRUE(http_server->GetPort(&assigned_port));
+  EXPECT_NE(assigned_port, 0u);
 
   HttpHandlerPtr http_handler_ptr;
   PostHandler handler(GetProxy(&http_handler_ptr).Pass());
 
   // Set the test handler and wait for confirmation.
-  http_server->SetHandler("/post", http_handler_ptr.Pass(),
-                          [](bool result) { EXPECT_TRUE(result); });
-  http_server.WaitForIncomingResponse();
+  bool result = false;
+  EXPECT_TRUE(
+      http_server->SetHandler("/post", http_handler_ptr.Pass(), &result));
+  EXPECT_TRUE(result);
 
   mojo::URLLoaderPtr url_loader;
   network_service_->CreateURLLoader(GetProxy(&url_loader));

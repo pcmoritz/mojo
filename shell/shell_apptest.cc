@@ -15,10 +15,11 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/application_test_base.h"
 #include "mojo/public/cpp/application/connect.h"
+#include "mojo/public/cpp/bindings/synchronous_interface_ptr.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/interfaces/application/application_connector.mojom.h"
 #include "mojo/services/http_server/cpp/http_server_util.h"
-#include "mojo/services/http_server/interfaces/http_server.mojom.h"
+#include "mojo/services/http_server/interfaces/http_server.mojom-sync.h"
 #include "mojo/services/http_server/interfaces/http_server_factory.mojom.h"
 #include "mojo/services/network/interfaces/net_address.mojom.h"
 #include "shell/kPingable.h"
@@ -92,23 +93,22 @@ class ShellHTTPAppTest : public ShellAppTest {
     local_address->ipv4->addr[2] = 0;
     local_address->ipv4->addr[3] = 1;
     local_address->ipv4->port = 0;
-    http_server_factory_->CreateHttpServer(GetProxy(&http_server_),
+    http_server_factory_->CreateHttpServer(GetSynchronousProxy(&http_server_),
                                            local_address.Pass());
 
-    http_server_->GetPort([this](uint16_t p) { port_ = p; });
-    EXPECT_TRUE(http_server_.WaitForIncomingResponse());
+    EXPECT_TRUE(http_server_->GetPort(&port_));
 
     http_server::HttpHandlerPtr http_handler;
     handler_.reset(new GetHandler(GetProxy(&http_handler).Pass(), port_));
-    http_server_->SetHandler(".*", http_handler.Pass(),
-                             [](bool result) { EXPECT_TRUE(result); });
-    EXPECT_TRUE(http_server_.WaitForIncomingResponse());
+    bool result = false;
+    EXPECT_TRUE(http_server_->SetHandler(".*", http_handler.Pass(), &result));
+    EXPECT_TRUE(result);
   }
 
   std::string GetURL(const std::string& path) { return ::GetURL(port_, path); }
 
   http_server::HttpServerFactoryPtr http_server_factory_;
-  http_server::HttpServerPtr http_server_;
+  mojo::SynchronousInterfacePtr<http_server::HttpServer> http_server_;
   scoped_ptr<GetHandler> handler_;
   uint16_t port_;
 

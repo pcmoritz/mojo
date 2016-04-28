@@ -21,9 +21,10 @@ namespace {
 // with the nexe compiler service.
 class PexeCompilerImpl : public mojo::nacl::PexeCompiler {
  public:
-  PexeCompilerImpl(mojo::ScopedMessagePipeHandle handle,
-                   const struct nacl_irt_pnacl_compile_funcs* funcs)
-      : funcs_(funcs), strong_binding_(this, handle.Pass()) {}
+  PexeCompilerImpl(
+      mojo::InterfaceRequest<mojo::nacl::PexeCompiler> compiler_request,
+      const struct nacl_irt_pnacl_compile_funcs* funcs)
+      : funcs_(funcs), strong_binding_(this, compiler_request.Pass()) {}
   void PexeCompile(const mojo::String& pexe_file_name, const
                    mojo::Callback<void(mojo::Array<mojo::String>)>& callback)
       override {
@@ -117,7 +118,8 @@ void ServeTranslateRequest(const struct nacl_irt_pnacl_compile_funcs* funcs) {
   // Convert the MojoHandle into a ScopedMessagePipeHandle, and use that to
   // implement the PexeCompiler interface.
   PexeCompilerImpl impl(
-      mojo::ScopedMessagePipeHandle(mojo::MessagePipeHandle(handle)).Pass(),
+      mojo::MakeRequest<mojo::nacl::PexeCompiler>(
+          mojo::ScopedMessagePipeHandle(mojo::MessagePipeHandle(handle))),
       funcs);
   mojo::RunLoop::current()->Run();
 }

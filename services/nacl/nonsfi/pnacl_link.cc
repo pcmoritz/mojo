@@ -21,12 +21,12 @@ namespace nacl {
 
 class PexeLinkerImpl : public PexeLinkerInit {
  public:
-  void PexeLinkerStart(ScopedMessagePipeHandle handle) override {
+  void PexeLinkerStart(InterfaceRequest<PexeLinker> linker_request) override {
     int nexe_fd = ::nacl::DataToTempFileDescriptor(::nacl::kLdNexe);
     CHECK(nexe_fd >= 0) << "Could not open linker nexe";
-    ::nacl::MojoLaunchNexeNonsfi(nexe_fd,
-                                 handle.release().value(),
-                                 true /* enable_translate_irt */);
+    ::nacl::MojoLaunchNexeNonsfi(
+        nexe_fd, linker_request.PassMessagePipe().release().value(),
+        true /* enable_translate_irt */);
   }
 };
 

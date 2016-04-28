@@ -673,6 +673,7 @@ mojo_native_application("apptests") {
     "//mojo/public/interfaces/application",
     "//mojo/services/http_server/cpp",
     "//mojo/services/http_server/interfaces",
+    "//mojo/services/http_server/interfaces:interfaces_sync",
     "//mojo/services/network/interfaces",
     "//shell/test:bindings",
   ]

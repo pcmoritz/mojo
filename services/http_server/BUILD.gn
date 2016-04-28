@@ -60,8 +60,11 @@ mojo_native_application("apptests") {
     "//mojo/public/cpp/system",
     "//mojo/services/http_server/cpp",
     "//mojo/services/http_server/interfaces",
+    "//mojo/services/http_server/interfaces:interfaces_sync",
     "//mojo/services/network/interfaces",
   ]
 
-  data_deps = [ ":http_server($default_toolchain)" ]
+  data_deps = [
+    ":http_server($default_toolchain)",
+  ]
 }

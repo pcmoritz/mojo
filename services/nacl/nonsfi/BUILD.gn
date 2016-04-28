@@ -35,7 +35,7 @@ if (!is_nacl) {
       ]
 
       deps = [
-        ":pnacl_translator_bindings",
+        ":pnacl_translator_bindings_sync",
         "//base",
         "//mojo/application:application",
         "//mojo/application:content_handler",
