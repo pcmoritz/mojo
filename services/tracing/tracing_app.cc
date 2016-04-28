@@ -27,7 +27,8 @@ bool TracingApp::ConfigureIncomingConnection(
   // TODO(vtl): Remove this once we remove the "wrong way" ServiceProvider.
   TraceProviderPtr provider_ptr;
   connection->ConnectToService(&provider_ptr);
-  RegisterTraceProvider(provider_ptr.PassInterfaceHandle());
+  if (provider_ptr)
+    RegisterTraceProvider(provider_ptr.PassInterfaceHandle());
 
   return true;
 }
