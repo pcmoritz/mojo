@@ -64,11 +64,11 @@ class RateControlBase : public RateControl {
   void GetCurrentTransform(const GetCurrentTransformCallback& cbk) override;
   void SetTargetTimelineID(uint32_t id) override;
   void SetCurrentQuad(TimelineQuadPtr quad) override;
-  void SetRate(int32_t reference_delta, uint32_t target_delta) override;
-  void SetRateAtReferenceTime(int32_t  reference_delta,
+  void SetRate(uint32_t reference_delta, uint32_t target_delta) override;
+  void SetRateAtReferenceTime(uint32_t reference_delta,
                               uint32_t target_delta,
                               int64_t  reference_time) override;
-  void SetRateAtTargetTime(int32_t  reference_delta,
+  void SetRateAtTargetTime(uint32_t reference_delta,
                            uint32_t target_delta,
                            int64_t  target_time) override;
   void CancelPendingChanges() override;
@@ -79,7 +79,7 @@ class RateControlBase : public RateControl {
     // bump the generation counter.  Do not use the value 0.
     while (!(++generation_)) {}
   }
-  void OnIllegalRateChange(int32_t numerator, uint32_t denominator);
+  void OnIllegalRateChange(uint32_t numerator, uint32_t denominator);
 
   Binding<RateControl> binding_;
   uint32_t target_timeline_id = TimelineTransform::kLocalTimeID;

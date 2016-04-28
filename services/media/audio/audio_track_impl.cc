@@ -182,8 +182,10 @@ void AudioTrackImpl::Configure(AudioTrackConfigurationPtr configuration,
   }
 
   // Sanity check the ratio which relates audio frames to media time.
-  int32_t  numerator   = static_cast<int32_t>(configuration->audio_frame_ratio);
-  uint32_t denominator = static_cast<int32_t>(configuration->media_time_ratio);
+  uint32_t  numerator  =
+      static_cast<uint32_t>(configuration->audio_frame_ratio);
+  uint32_t denominator =
+      static_cast<uint32_t>(configuration->media_time_ratio);
   if ((numerator < 1) || (denominator < 1)) {
     LOG(ERROR) << "Invalid (audio frames:media time ticks) ratio ("
                << numerator << "/" << denominator << ")";

@@ -64,7 +64,7 @@ class TimelineQuad extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.referenceDelta = decoder0.decodeInt32(24);
+      result.referenceDelta = decoder0.decodeUint32(24);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -90,7 +90,7 @@ class TimelineQuad extends bindings.Struct {
       rethrow;
     }
     try {
-      encoder0.encodeInt32(referenceDelta, 24);
+      encoder0.encodeUint32(referenceDelta, 24);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "referenceDelta of struct TimelineQuad: $e";
@@ -547,7 +547,7 @@ class _RateControlSetRateParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.referenceDelta = decoder0.decodeInt32(8);
+      result.referenceDelta = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -559,7 +559,7 @@ class _RateControlSetRateParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInt32(referenceDelta, 8);
+      encoder0.encodeUint32(referenceDelta, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "referenceDelta of struct _RateControlSetRateParams: $e";
@@ -634,7 +634,7 @@ class _RateControlSetRateAtReferenceTimeParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.referenceDelta = decoder0.decodeInt32(8);
+      result.referenceDelta = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -650,7 +650,7 @@ class _RateControlSetRateAtReferenceTimeParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInt32(referenceDelta, 8);
+      encoder0.encodeUint32(referenceDelta, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "referenceDelta of struct _RateControlSetRateAtReferenceTimeParams: $e";
@@ -734,7 +734,7 @@ class _RateControlSetRateAtTargetTimeParams extends bindings.Struct {
     }
     if (mainDataHeader.version >= 0) {
       
-      result.referenceDelta = decoder0.decodeInt32(8);
+      result.referenceDelta = decoder0.decodeUint32(8);
     }
     if (mainDataHeader.version >= 0) {
       
@@ -750,7 +750,7 @@ class _RateControlSetRateAtTargetTimeParams extends bindings.Struct {
   void encode(bindings.Encoder encoder) {
     var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
     try {
-      encoder0.encodeInt32(referenceDelta, 8);
+      encoder0.encodeUint32(referenceDelta, 8);
     } on bindings.MojoCodecError catch(e) {
       e.message = "Error encountered while encoding field "
           "referenceDelta of struct _RateControlSetRateAtTargetTimeParams: $e";

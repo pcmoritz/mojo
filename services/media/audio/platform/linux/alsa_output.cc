@@ -230,7 +230,6 @@ bool AlsaOutput::StartMixJob(MixJob* job, const LocalTime& process_start) {
     }
 
     DCHECK_GE(fill_amt, 0);
-    DCHECK_LE(fill_amt, std::numeric_limits<int32_t>::max());
     fill_amt *= frames_per_tick_.numerator;
     fill_amt += frames_per_tick_.denominator - 1;
     fill_amt /= frames_per_tick_.denominator;

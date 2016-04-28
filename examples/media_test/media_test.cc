@@ -40,7 +40,9 @@ int64_t MediaTest::position_ns() const {
   transform_.DoForwardTransform(LocalClock::now().time_since_epoch().count(),
                                 &position);
 
-  MOJO_DCHECK(position >= 0);
+  if (position < 0) {
+    position = 0;
+  }
 
   if (metadata_ && static_cast<uint64_t>(position) > metadata_->duration) {
     position = metadata_->duration;

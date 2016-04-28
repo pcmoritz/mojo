@@ -101,7 +101,7 @@ void RateControlBase::SetCurrentQuad(TimelineQuadPtr quad) {
   }
 }
 
-void RateControlBase::SetRate(int32_t reference_delta, uint32_t target_delta) {
+void RateControlBase::SetRate(uint32_t reference_delta, uint32_t target_delta) {
   // Only rate changes with a non-zero target_delta are permitted.  See comment
   // in SetCurrentQuad.
   if (!target_delta) {
@@ -134,7 +134,7 @@ void RateControlBase::SetRate(int32_t reference_delta, uint32_t target_delta) {
   }
 }
 
-void RateControlBase::SetRateAtReferenceTime(int32_t  reference_delta,
+void RateControlBase::SetRateAtReferenceTime(uint32_t reference_delta,
                                              uint32_t target_delta,
                                              int64_t  reference_time) {
   // Only rate changes with a non-zero target_delta are permitted.  See comment
@@ -159,7 +159,7 @@ void RateControlBase::SetRateAtReferenceTime(int32_t  reference_delta,
   }
 }
 
-void RateControlBase::SetRateAtTargetTime(int32_t  reference_delta,
+void RateControlBase::SetRateAtTargetTime(uint32_t reference_delta,
                                           uint32_t target_delta,
                                           int64_t  target_time) {
   // Only rate changes with a non-zero target_delta are permitted.  See comment
@@ -278,7 +278,7 @@ void RateControlBase::ApplyPendingChangesLocked(int64_t target_now) {
   }
 }
 
-void RateControlBase::OnIllegalRateChange(int32_t  numerator,
+void RateControlBase::OnIllegalRateChange(uint32_t numerator,
                                           uint32_t denominator) {
   LOG(ERROR) << "Illegal rate change requested ("
              << numerator << "/" << denominator << ")";

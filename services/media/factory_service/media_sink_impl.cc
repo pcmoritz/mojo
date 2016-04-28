@@ -259,7 +259,7 @@ void MediaSinkImpl::MaybeSetRate() {
   DCHECK(success)
       << "LinearTransform::DoReverseTransform reports loss of precision";
   status_transform_->quad->reference_delta =
-      static_cast<int32_t>(presentation_delta);
+      static_cast<uint32_t>(presentation_delta);
   status_transform_->quad->target_delta = rate_frames_per_tick.denominator;
   LinearTransform::Ratio::Reduce(&status_transform_->quad->reference_delta,
                                  &status_transform_->quad->target_delta);
