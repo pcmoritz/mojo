@@ -7,6 +7,7 @@ import argparse
 import codecs
 import logging
 import os.path
+import platform
 import requests
 import signal
 import subprocess
@@ -194,8 +195,7 @@ def _gdb_attach(args):
       # TODO(etiennej): Always select the most recent toolchain?
       'arm-linux-androideabi-4.9',
       'prebuilt',
-      # TODO(etiennej): DEPS mac NDK and use it on macs.
-      'linux-x86_64',
+      '%s-%s' % (platform.system().lower(), platform.machine()),
       'bin',
       'arm-linux-androideabi-gdb')
   python_gdb_script_path = os.path.join(os.path.dirname(__file__),
