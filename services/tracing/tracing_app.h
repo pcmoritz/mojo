@@ -8,10 +8,12 @@
 #include "base/macros.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/memory/scoped_vector.h"
+#include "mojo/common/binding_set.h"
 #include "mojo/common/interface_ptr_set.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
+#include "mojo/services/tracing/interfaces/trace_provider_registry.mojom.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 #include "services/tracing/trace_data_sink.h"
 #include "services/tracing/trace_recorder_impl.h"
@@ -20,7 +22,9 @@ namespace tracing {
 
 class TracingApp : public mojo::ApplicationDelegate,
                    public mojo::InterfaceFactory<TraceCollector>,
-                   public TraceCollector {
+                   public mojo::InterfaceFactory<TraceProviderRegistry>,
+                   public TraceCollector,
+                   public TraceProviderRegistry {
  public:
   TracingApp();
   ~TracingApp() override;
@@ -34,10 +38,18 @@ class TracingApp : public mojo::ApplicationDelegate,
   void Create(mojo::ApplicationConnection* connection,
               mojo::InterfaceRequest<TraceCollector> request) override;
 
-  // tracing::TraceCollector implementation.
+  // mojo::InterfaceFactory<TraceProviderRegistry> implementation.
+  void Create(mojo::ApplicationConnection* connection,
+              mojo::InterfaceRequest<TraceProviderRegistry> request) override;
+
+  // TraceCollector implementation.
   void Start(mojo::ScopedDataPipeProducerHandle stream,
              const mojo::String& categories) override;
   void StopAndFlush() override;
+
+  // TraceProviderRegistry implementation.
+  void RegisterTraceProvider(
+      mojo::InterfaceHandle<TraceProvider> trace_provider) override;
 
   void AllDataCollected();
 
@@ -45,6 +57,7 @@ class TracingApp : public mojo::ApplicationDelegate,
   ScopedVector<TraceRecorderImpl> recorder_impls_;
   mojo::InterfacePtrSet<TraceProvider> provider_ptrs_;
   mojo::Binding<TraceCollector> collector_binding_;
+  mojo::BindingSet<TraceProviderRegistry> provider_registry_bindings_;
   bool tracing_active_;
   mojo::String tracing_categories_;
 

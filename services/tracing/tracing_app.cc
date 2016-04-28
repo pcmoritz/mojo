@@ -24,19 +24,14 @@ bool TracingApp::ConfigureIncomingConnection(
   // to connect to the TraceProvider interface to see if the application
   // connecting to us wants to be traced. They can refuse the connection or
   // close the pipe if not.
+  // TODO(vtl): Remove this once we remove the "wrong way" ServiceProvider.
   TraceProviderPtr provider_ptr;
   connection->ConnectToService(&provider_ptr);
-  if (tracing_active_) {
-    TraceRecorderPtr recorder_ptr;
-    recorder_impls_.push_back(
-        new TraceRecorderImpl(GetProxy(&recorder_ptr), sink_.get()));
-    provider_ptr->StartTracing(tracing_categories_, recorder_ptr.Pass());
-  }
-  provider_ptrs_.AddInterfacePtr(provider_ptr.Pass());
+  RegisterTraceProvider(provider_ptr.PassInterfaceHandle());
+
   return true;
 }
 
-// mojo::InterfaceFactory<TraceCollector> implementation.
 void TracingApp::Create(mojo::ApplicationConnection* connection,
                         mojo::InterfaceRequest<TraceCollector> request) {
   if (collector_binding_.is_bound()) {
@@ -47,7 +42,11 @@ void TracingApp::Create(mojo::ApplicationConnection* connection,
   collector_binding_.Bind(request.Pass());
 }
 
-// tracing::TraceCollector implementation.
+void TracingApp::Create(mojo::ApplicationConnection* connection,
+                        mojo::InterfaceRequest<TraceProviderRegistry> request) {
+  provider_registry_bindings_.AddBinding(this, request.Pass());
+}
+
 void TracingApp::Start(mojo::ScopedDataPipeProducerHandle stream,
                        const mojo::String& categories) {
   tracing_categories_ = categories;
@@ -124,6 +123,18 @@ void TracingApp::StopAndFlush() {
     }
   }
   AllDataCollected();
+}
+
+void TracingApp::RegisterTraceProvider(
+    mojo::InterfaceHandle<TraceProvider> trace_provider) {
+  auto provider_ptr = TraceProviderPtr::Create(trace_provider.Pass());
+  if (tracing_active_) {
+    TraceRecorderPtr recorder_ptr;
+    recorder_impls_.push_back(
+        new TraceRecorderImpl(GetProxy(&recorder_ptr), sink_.get()));
+    provider_ptr->StartTracing(tracing_categories_, recorder_ptr.Pass());
+  }
+  provider_ptrs_.AddInterfacePtr(provider_ptr.Pass());
 }
 
 void TracingApp::AllDataCollected() {
