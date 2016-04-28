@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 
 	"mojo/public/go/bindings"
-	"mojom/mojom_tool/generated/mojom_files"
+	"mojom/generated/mojom_files"
 )
 
 // GetConfig provides the primary interface for generators.

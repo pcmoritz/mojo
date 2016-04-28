@@ -26,8 +26,8 @@ import (
 	"text/template"
 
 	"mojo/public/go/bindings"
-	"mojom/mojom_tool/generated/mojom_files"
-	"mojom/mojom_tool/generated/mojom_types"
+	"mojom/generated/mojom_files"
+	"mojom/generated/mojom_types"
 )
 
 func main() {

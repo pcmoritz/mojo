@@ -33,7 +33,7 @@ ninja -C out/Debug mojo/public/interfaces/bindings.
 into the appropriate locations in this directory.
 4) mojom_files.mojom.go needs to be manually patched in a minor way. In the
 import section at the top replace "mojo/public/interfaces/bindings/mojom_types"
-with "mojom/mojom_tool/generated/mojom_types".
+with "mojom/generated/mojom_types".
 5) Update the Go code in the serialization module of the parser to compensate
 for the changes if necessary. (Not necessary if the changes in step 1 were
 backward compatible.)

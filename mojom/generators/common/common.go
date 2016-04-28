@@ -5,7 +5,7 @@
 package common
 
 import (
-	"mojom/mojom_tool/generated/mojom_files"
+	"mojom/generated/mojom_files"
 )
 
 // common groups together functions which make it easier for generators

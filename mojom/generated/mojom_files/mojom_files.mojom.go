@@ -13,7 +13,7 @@ package mojom_files
 import (
 	fmt "fmt"
 	bindings "mojo/public/go/bindings"
-	mojom_types "mojom/mojom_tool/generated/mojom_types"
+	mojom_types "mojom/generated/mojom_types"
 	sort "sort"
 )
 

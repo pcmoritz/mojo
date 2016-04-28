@@ -11,8 +11,8 @@ action("mojom_tool") {
   script = "../tools/build_mojom_tool.py"
 
   inputs = [
-    "generated/mojom_files/mojom_files.mojom.go",
-    "generated/mojom_types/mojom_types.mojom.go",
+    "../generated/mojom_files/mojom_files.mojom.go",
+    "../generated/mojom_types/mojom_types.mojom.go",
     "integration_tests/comment_merger_test.go",
     "integration_tests/computed_data_test.go",
     "integration_tests/resolution_test.go",
