@@ -428,9 +428,17 @@ func translateUserDefinedConstant(t *mojom.UserDefinedConstant) *mojom_types.Use
 	declaredConstant.Value.Type = translateTypeRef(t.DeclaredType())
 	declaredConstant.Value.DeclData = *translateDeclarationData(&t.DeclarationData)
 	declaredConstant.Value.Value = translateValueRef(t.ValueRef())
-	// TODO(rudominer) implement UserDefinedValue.resolved_concrete_value.
-	// declaredConstant.ResolvedConcreteValue =
-	//     translateConcreteValue(t.ValueRef().ResolvedConcreteValue()))
+	// We set the |resolved_concrete_value| field only in the following situation.
+	// See the comments in mojom_types.mojom.
+	if _, ok := declaredConstant.Value.Value.(*mojom_types.ValueUserValueReference); ok {
+		// If the type of the |value| field is a UserValueReference...
+		userValueRef := t.ValueRef().(*mojom.UserValueRef)
+		if _, ok := userValueRef.ResolvedDeclaredValue().(*mojom.UserDefinedConstant); ok {
+			// and if that reference resolves to a user-defined constant.
+			declaredConstant.Value.ResolvedConcreteValue = translateConcreteValue(t.ValueRef().ResolvedConcreteValue())
+		}
+	}
+
 	return &declaredConstant
 }
 
@@ -553,6 +561,29 @@ func translateValueRef(valueRef mojom.ValueRef) mojom_types.Value {
 		return translateUserValueRef(valueRef)
 	default:
 		panic(fmt.Sprintf("Unexpected ValueRef type %T", valueRef))
+	}
+}
+
+func translateConcreteValue(cv mojom.ConcreteValue) mojom_types.Value {
+	switch cv := cv.(type) {
+	case mojom.LiteralValue:
+		return translateLiteralValue(cv)
+	// NOTE: See the comments at the top of types.go for a discussion of the difference
+	// between a value and a value reference. In this function we are translating a
+	// value, not a value reference. In the case of a LiteralValue or a
+	// BuiltInConstantValue the distinction is immaterial. But in the case of an
+	// enum value the distinction is important. Here we are building and returning
+	// a synthetic mojom_types.UserValueReference to represent the enum value.
+	// It is only the |value_key| field that needs to be populated. It does not
+	// make sense to populate the |identifier| field for example because we
+	// aren't representing any actual occrence in the .mojom file.
+	case *mojom.EnumValue:
+		return &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
+			ValueKey: stringPointer(cv.ValueKey())}}
+	case mojom.BuiltInConstantValue:
+		return translateBuiltInConstantValue(cv)
+	default:
+		panic(fmt.Sprintf("Unexpected ConcreteValue type %T", cv))
 	}
 }
 

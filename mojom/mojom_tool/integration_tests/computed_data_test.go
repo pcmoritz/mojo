@@ -913,3 +913,133 @@ func TestInterfaceComputedData(t *testing.T) {
 		}
 	}
 }
+
+// TestEnumComputedDataErrors test the method MojomEnum.ComputeEnumValueIntegers which
+// is invoked by ComputeFinalData. This phase occurs after resolution
+// and type validation. We test that different types of errors are correctly detected.
+func TestEnumComputedDataErrors(t *testing.T) {
+	test := singleFileTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Test that a circular reference of enum value definitions is detected.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+		enum MyEnum {
+			x = FIRST_VALUE,
+			y,
+			z
+		};
+		const MyEnum FIRST_VALUE = MyEnum.x;`
+		test.addTestCase(contents, []string{
+			"The reference FIRST_VALUE is being used as an enum value initializer",
+			"but it has resolved to a different enum value that itself does not yet have an integer value."})
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for i, c := range test.cases {
+		// Parse anresolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		specifiedName := ""
+		if c.importedFrom == nil {
+			specifiedName = c.fileName
+		}
+		parser := parser.MakeParser(c.fileName, specifiedName, c.mojomContents, descriptor, c.importedFrom)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", c.fileName, parser.GetError().Error())
+			continue
+		}
+		err := descriptor.Resolve()
+		if err != nil {
+			t.Errorf("Resolution error for %s: %s", c.fileName, err)
+			continue
+		}
+
+		err = descriptor.ComputeFinalData()
+
+		if err == nil {
+			t.Errorf("Data computation unexpectedly succeeded for test case %d.", i)
+			continue
+		}
+
+		got := err.Error()
+		for _, expected := range c.expectedErrors {
+			if !strings.Contains(got, expected) {
+				t.Errorf("%s:\n*****expected to contain:\n%s\n****actual\n%s", c.fileName, expected, got)
+			}
+		}
+	}
+}
+
+// TestEnumComputedData() iterates through a series of test cases.
+// For each case we expect for parsing, resolution and final data computation to succeed.
+// Then we execute a given callback test function to test that the methods
+// MojomEnum.ComputeFinalData() produced the desired result.
+func TestEnumComputedData(t *testing.T) {
+	test := singleFileSuccessTest{}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: A non-circular chain of enum value definitions.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+		enum MyEnum {
+			x,
+			y  = FIRST_VALUE,
+			z
+		};
+		const MyEnum FIRST_VALUE = MyEnum.x;`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			xValue := descriptor.ValuesByKey["TYPE_KEY:MyEnum.x"].(*mojom.EnumValue)
+			yValue := descriptor.ValuesByKey["TYPE_KEY:MyEnum.y"].(*mojom.EnumValue)
+			zValue := descriptor.ValuesByKey["TYPE_KEY:MyEnum.z"].(*mojom.EnumValue)
+			if xValue.ComputedIntValue != 0 {
+				return fmt.Errorf("xValue.ComputedIntValue=%d", xValue.ComputedIntValue)
+			}
+			if yValue.ComputedIntValue != 0 {
+				return fmt.Errorf("yValue.ComputedIntValue=%d", yValue.ComputedIntValue)
+			}
+			if zValue.ComputedIntValue != 1 {
+				return fmt.Errorf("zValue.ComputedIntValue=%d", zValue.ComputedIntValue)
+			}
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Execute all of the test cases.
+	////////////////////////////////////////////////////////////
+	for i, c := range test.cases {
+		// Parse and resolve the mojom input.
+		descriptor := mojom.NewMojomDescriptor()
+		fileName := fmt.Sprintf("file%d", i)
+		parser := parser.MakeParser(fileName, fileName, c.mojomContents, descriptor, nil)
+		parser.Parse()
+		if !parser.OK() {
+			t.Errorf("Parsing error for %s: %s", fileName, parser.GetError().Error())
+			continue
+		}
+		err := descriptor.Resolve()
+		if err != nil {
+			t.Errorf("Resolution failed for test case %d: %s", i, err.Error())
+			continue
+		}
+
+		if err := descriptor.ComputeFinalData(); err != nil {
+			t.Errorf("ComputeFinalData error for test case %d: %s", i, err.Error())
+			continue
+		}
+
+		if c.testFunc != nil {
+			if err := c.testFunc(descriptor); err != nil {
+				t.Errorf("%s:\n%s", fileName, err.Error())
+				continue
+			}
+		}
+	}
+}

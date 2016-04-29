@@ -1122,7 +1122,7 @@ func (e *MojomEnum) InitAsScope(parentScope *Scope) *Scope {
 // Adds an EnumValue to this enum
 func (e *MojomEnum) AddEnumValue(declData DeclarationData, valueRef ValueRef) DuplicateNameError {
 	enumValue := new(EnumValue)
-	enumValue.Init(declData, UserDefinedValueKindEnum, enumValue, valueRef)
+	enumValue.Init(declData, UserDefinedValueKindEnumValue, enumValue, valueRef)
 	e.Values = append(e.Values, enumValue)
 	e.DeclaredObjects = append(e.DeclaredObjects, enumValue)
 	enumValue.enumType = e
@@ -1188,14 +1188,14 @@ func (ev *EnumValue) String() string {
 type UserDefinedValueKind int
 
 const (
-	UserDefinedValueKindEnum UserDefinedValueKind = iota
+	UserDefinedValueKindEnumValue UserDefinedValueKind = iota
 	UserDefinedValueKindDeclaredConst
 	UserDefinedValueKindBuiltInConst
 )
 
 func (k UserDefinedValueKind) String() string {
 	switch k {
-	case UserDefinedValueKindEnum:
+	case UserDefinedValueKindEnumValue:
 		return "enum value"
 	case UserDefinedValueKindDeclaredConst:
 		return "const"
@@ -1243,7 +1243,7 @@ func (v *UserDefinedValueBase) RegisterInScope(scope *Scope) DuplicateNameError 
 		return err
 	}
 
-	if v.thisValue.Kind() == UserDefinedValueKindEnum {
+	if v.thisValue.Kind() == UserDefinedValueKindEnumValue {
 		if scope.kind != ScopeEnum {
 			panic("An enum value may only be registered within the scope of an enum.")
 		}

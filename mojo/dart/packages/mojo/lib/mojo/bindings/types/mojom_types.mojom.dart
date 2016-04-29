@@ -2002,11 +2002,12 @@ class UserValueReference extends bindings.Struct {
 
 class DeclaredConstant extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
-    const bindings.StructDataHeader(48, 0)
+    const bindings.StructDataHeader(64, 0)
   ];
   DeclarationData declData = null;
   Type type = null;
   Value value = null;
+  Value resolvedConcreteValue = null;
 
   DeclaredConstant() : super(kVersions.last.size);
 
@@ -2064,6 +2065,10 @@ class DeclaredConstant extends bindings.Struct {
             'Trying to decode null union for non-nullable Value.');
         }
     }
+    if (mainDataHeader.version >= 0) {
+      
+        result.resolvedConcreteValue = Value.decode(decoder0, 48);
+    }
     return result;
   }
 
@@ -2090,13 +2095,21 @@ class DeclaredConstant extends bindings.Struct {
           "value of struct DeclaredConstant: $e";
       rethrow;
     }
+    try {
+      encoder0.encodeUnion(resolvedConcreteValue, 48, true);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "resolvedConcreteValue of struct DeclaredConstant: $e";
+      rethrow;
+    }
   }
 
   String toString() {
     return "DeclaredConstant("
            "declData: $declData" ", "
            "type: $type" ", "
-           "value: $value" ")";
+           "value: $value" ", "
+           "resolvedConcreteValue: $resolvedConcreteValue" ")";
   }
 
   Map toJson() {
@@ -2104,6 +2117,7 @@ class DeclaredConstant extends bindings.Struct {
     map["declData"] = declData;
     map["type"] = type;
     map["value"] = value;
+    map["resolvedConcreteValue"] = resolvedConcreteValue;
     return map;
   }
 }

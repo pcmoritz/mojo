@@ -232,7 +232,7 @@ func TestUserDefinedValueKind(t *testing.T) {
 		kind             UserDefinedValueKind
 	}{
 		{NewTestConstant("const", 42), UserDefinedValueKindDeclaredConst},
-		{NewTestEnumValue("foo"), UserDefinedValueKindEnum},
+		{NewTestEnumValue("foo"), UserDefinedValueKindEnumValue},
 		{FloatInfinity, UserDefinedValueKindBuiltInConst},
 	}
 	for _, c := range cases {

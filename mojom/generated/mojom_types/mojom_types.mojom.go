@@ -1770,11 +1770,12 @@ type DeclaredConstant struct {
 	DeclData DeclarationData
 	Type Type
 	Value Value
+	ResolvedConcreteValue Value
 }
 
 
 func (s *DeclaredConstant) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(40, 0)
+	encoder.StartStruct(56, 0)
 	if err := encoder.WritePointer(); err != nil {
 		return err
 	}
@@ -1793,6 +1794,13 @@ func (s *DeclaredConstant) Encode(encoder *bindings.Encoder) error {
 	if err := s.Value.Encode(encoder); err != nil {
 		return err
 	}
+	if s.ResolvedConcreteValue == nil {
+		encoder.WriteNullUnion()
+	} else {
+		if err := s.ResolvedConcreteValue.Encode(encoder); err != nil {
+			return err
+		}
+	}
 	if err := encoder.Finish(); err != nil {
 		return err
 	}
@@ -1800,7 +1808,7 @@ func (s *DeclaredConstant) Encode(encoder *bindings.Encoder) error {
 }
 
 var declaredConstant_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{48, 0},
+	bindings.DataHeader{64, 0},
 }
 
 func (s *DeclaredConstant) Decode(decoder *bindings.Decoder) error {
@@ -1853,6 +1861,13 @@ func (s *DeclaredConstant) Decode(decoder *bindings.Decoder) error {
 		}
 		if s.Value == nil {
 			return &bindings.ValidationError{bindings.UnexpectedNullUnion, "unexpected null union"}
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		var err error
+		s.ResolvedConcreteValue, err = DecodeValue(decoder)
+		if err != nil {
+			return err
 		}
 	}
 	if err := decoder.Finish(); err != nil {

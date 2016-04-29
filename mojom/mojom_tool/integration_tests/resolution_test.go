@@ -107,6 +107,22 @@ func TestSingleFileResolutionErrors(t *testing.T) {
 	}
 
 	////////////////////////////////////////////////////////////
+	// Test Case: Circular reference of constants
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+		const int32 MyConst1 = MyConst2;
+		const int32 MyConst2 = MyConst3;
+		const int32 MyConst3 = MyConst1;`
+
+		test.addTestCase(contents, []string{
+			"Use of unresolved value: \"MyConst2\"",
+			"Use of unresolved value: \"MyConst3\"",
+			"Use of unresolved value: \"MyConst1\"",
+		})
+	}
+
+	////////////////////////////////////////////////////////////
 	// Execute all of the test cases.
 	////////////////////////////////////////////////////////////
 	for i, c := range test.cases {
@@ -1055,6 +1071,48 @@ func TestSingleFileResolutionSuccess(t *testing.T) {
 			return nil
 		}
 		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: A non-circular list of constant references.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+		const int32 MyConst1 = MyConst2;
+		const int32 MyConst2 = MyConst3;
+		const int32 MyConst3 = 42;`
+
+		testFunc := func(descriptor *mojom.MojomDescriptor) error {
+			myConst1 := descriptor.ValuesByKey["TYPE_KEY:MyConst1"].(*mojom.UserDefinedConstant)
+			value := myConst1.ValueRef().ResolvedConcreteValue().Value()
+			if value != int8(42) {
+				return fmt.Errorf("%v(%T) != 42", value, value)
+			}
+
+			return nil
+		}
+		test.addTestCase("", contents, testFunc)
+	}
+
+	////////////////////////////////////////////////////////////
+	// Test Case: Circular reference of enum values
+	//
+	// NOTE: Even though we have a circular reference of enum values
+	// this case passes resolution. But the error will be detected during
+	// data computation phase when we attempt to produce integer values
+	// for the enum values. See TestEnumComputedDataError in computed_data_test.go. The reason this
+	// passes resoultion is that an enum value is a concrete value and so
+	// FIRST_VALUE has fully resolved to the concrete value MyEnum.x.
+	////////////////////////////////////////////////////////////
+	{
+		contents := `
+		enum MyEnum {
+			x = FIRST_VALUE,
+			y,
+			z
+		};
+		const MyEnum FIRST_VALUE = MyEnum.x;`
+		test.addTestCase("", contents, nil)
 	}
 
 	////////////////////////////////////////////////////////////
