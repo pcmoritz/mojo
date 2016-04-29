@@ -28,12 +28,15 @@ import (
 ///////////////////////////////////////////////////
 // Node type
 //
-// A |Node| is a node in a directed graph.
+// A |Node| is a node in a directed graph. A user of this library is responsible
+// for implementing this interface. This library will use the Go equality operator
+// to compare instances of |Node| and it is the responsibility of the user
+// to ensure that x == y iff x and y represent the same logical node.
 ///////////////////////////////////////////////////
 
 type Node interface {
 	// Returns the list of children of this node.
-	OutEdges() []Node
+	OutEdges() []OutEdge
 
 	// Returns whether or not this node is a square node.
 	IsSquare() bool
@@ -53,8 +56,18 @@ type Node interface {
 	// this library.
 	KnownWellFounded() bool
 
-	// Returns the name of this node, appropriate for debugging.
-	DebugName() string
+	// Returns a human-readable name for this node. Not used by the algorithm
+	// but used for generating debugging and error messages.
+	Name() string
+}
+
+type OutEdge struct {
+	// The Label on an edge is opaque data that may be used by the client however it wishes.
+	// The algorithm never inspects this data.
+	Label interface{}
+
+	// The target node of the out edge.
+	Target Node
 }
 
 ///////////////////////////////////////////////////
@@ -134,13 +147,14 @@ func checkWellFounded(root Node, debugDataRequest *debugData) *CycleDescription 
 ///////////////////////////////////////////////////
 type cycleFinder struct {
 
-	// Maps each node seen by the computation to its holder.
+	// Maps each node seen by the computation to its holder. Note that this assumes
+	// that the implementation of Node uses values that are comparable and
+	// obey identity semantics.
 	nodeToHolder map[Node]*nodeHolder
 
 	foundationSet, pendingSet NodeSet
 
 	visitationIndex int
-	currentPath     nodeStack
 
 	debugDataRequest *debugData
 }
@@ -155,7 +169,6 @@ func makeCycleFinder() cycleFinder {
 	finder.nodeToHolder = make(map[Node]*nodeHolder)
 	finder.foundationSet = MakeNodeSet()
 	finder.pendingSet = MakeNodeSet()
-	finder.currentPath = nodeStack{}
 	return finder
 }
 
@@ -206,7 +219,7 @@ func (finder *cycleFinder) checkWellFounded(nodeHolder *nodeHolder) *CycleDescri
 	// build a canonical cycle.
 	freshCycleFinder := makeCycleFinder()
 	holder := freshCycleFinder.holderForNode(minIllfoundedNode)
-	return freshCycleFinder.findKnownIllFoundedCycle(holder)
+	return freshCycleFinder.findKnownIllFoundedCycle(holder, nil)
 }
 
 // checkWellFoundedPhase1 is a recursive helper function that does a depth-first traversal
@@ -246,8 +259,8 @@ func (finder *cycleFinder) checkWellFoundedPhase1(nodeHolder *nodeHolder) {
 
 	// Next we examine each of the children and recurse into the unvisited ones.
 	sawUnverifiedChild := false
-	for _, child := range nodeHolder.node.OutEdges() {
-		childHolder := finder.holderForNode(child)
+	for _, edge := range nodeHolder.node.OutEdges() {
+		childHolder := finder.holderForNode(edge.Target)
 		if childHolder.state == vsUnvisited {
 			// Recursively visit this child.
 			finder.checkWellFoundedPhase1(childHolder)
@@ -323,7 +336,8 @@ func (finder *cycleFinder) checkWellFoundedPhase2() {
 			if finder.pendingSet.Contains(p) {
 				knownWellFounded := true
 				if !p.node.IsSquare() {
-					for _, child := range p.node.OutEdges() {
+					for _, edge := range p.node.OutEdges() {
+						child := edge.Target
 						if child != p.node && !child.KnownWellFounded() {
 							knownWellFounded = false
 							break
@@ -340,6 +354,14 @@ func (finder *cycleFinder) checkWellFoundedPhase2() {
 	}
 }
 
+// A pathElement is a node and one of its out-edges.
+type pathElement struct {
+	node Node
+	edge OutEdge
+}
+
+type nodePath []pathElement
+
 // findKnownIllFoundedCycle finds and returns a |CycleDescription| starting from a node that is known
 // to be ill-founded. This proceeds by following edges from an ill-founded node to
 // an ill-founded child node until a cycle is formed. We return a *canonical* cycle,
@@ -348,18 +370,28 @@ func (finder *cycleFinder) checkWellFoundedPhase2() {
 // We are not concerned with optimizing the performance of phase 3 because in the intended application
 // phase 3 can occur at most once in the lifetime of a program: Once an ill-founded node is detected the
 // program exits with a cycle description allowing the user to fix the ill-foundedness.
-func (finder *cycleFinder) findKnownIllFoundedCycle(nodeHolder *nodeHolder) *CycleDescription {
+//
+// This method is recursive. To initiate the recursion |nodeHolder| should be set to the starting node and
+// |path| should be nil. In subsequent recursive calls |nodeHolder| is the current node of the walk and
+// |path| is the path from the starting node to the current node.
+func (finder *cycleFinder) findKnownIllFoundedCycle(nodeHolder *nodeHolder, path nodePath) *CycleDescription {
+	// If this is the start of the recursion initialize the path.
+	if path == nil {
+		path = make(nodePath, 0)
+	}
+
 	// Mark the current node as started
 	nodeHolder.state = vsVisitStarted
-	finder.currentPath.Push(nodeHolder)
-	for _, child := range nodeHolder.node.OutEdges() {
-		childHolder := finder.holderForNode(child)
+	for _, edge := range nodeHolder.node.OutEdges() {
+		childHolder := finder.holderForNode(edge.Target)
 		if childHolder.state == vsVisitStarted {
 			// If the child has been started but not finished then we have found a cycle
 			// from the child to the current node back to the child.
-			return newCycleDescription(finder.currentPath.elements, childHolder, nodeHolder)
+			path = append(path, pathElement{nodeHolder.node, edge})
+			return newCycleDescription(path, childHolder.node, nodeHolder.node)
 		} else if !childHolder.node.KnownWellFounded() {
-			return finder.findKnownIllFoundedCycle(childHolder)
+			path = append(path, pathElement{nodeHolder.node, edge})
+			return finder.findKnownIllFoundedCycle(childHolder, path)
 		}
 	}
 	panic("Program logic error: Could not find a known ill-founded cycle.")
@@ -411,49 +443,6 @@ func newNodeHolder(node Node, visitationOrder int) *nodeHolder {
 	nodeHolder.state = vsUnvisited
 	nodeHolder.visitationOrder = visitationOrder
 	return nodeHolder
-}
-
-//////////////////////////////////////////////
-///  nodeStack type
-//////////////////////////////////////////////
-
-// A nodeStack is a stack of *nodeHolders
-type nodeStack struct {
-	elements []*nodeHolder
-}
-
-func (stack *nodeStack) Push(n *nodeHolder) {
-	stack.elements = append(stack.elements, n)
-}
-
-func (stack *nodeStack) Size() int {
-	return len(stack.elements)
-}
-
-func (stack *nodeStack) Pop() (n *nodeHolder) {
-	lastIndex := stack.Size() - 1
-	n = stack.elements[lastIndex]
-	stack.elements = stack.elements[:lastIndex]
-	return
-}
-
-func (stack *nodeStack) Peek() (n *nodeHolder) {
-	return stack.elements[stack.Size()-1]
-}
-
-func (stack *nodeStack) String() string {
-	var buffer bytes.Buffer
-	fmt.Fprintf(&buffer, "[")
-	first := true
-	for _, e := range stack.elements {
-		if !first {
-			fmt.Fprintf(&buffer, ", ")
-		}
-		fmt.Fprintf(&buffer, "%s", e.node.DebugName())
-		first = false
-	}
-	fmt.Fprintln(&buffer, "]")
-	return buffer.String()
 }
 
 ///////////////////////////////////////////////////
@@ -542,12 +531,12 @@ func (set *NodeSet) Size() int {
 func compareNodeSets(expected, actual *NodeSet) error {
 	for n, _ := range expected.elements {
 		if !actual.Contains(n) {
-			return fmt.Errorf("%s is in expected but not actual", n.node.DebugName())
+			return fmt.Errorf("%s is in expected but not actual", n.node.Name())
 		}
 	}
 	for n, _ := range actual.elements {
 		if !expected.Contains(n) {
-			return fmt.Errorf("%s is in actual but not expected", n.node.DebugName())
+			return fmt.Errorf("%s is in actual but not expected", n.node.Name())
 		}
 	}
 	return nil
@@ -562,7 +551,7 @@ func (set *NodeSet) String() string {
 		if !first {
 			fmt.Fprintf(&buffer, ", ")
 		}
-		fmt.Fprintf(&buffer, "%s", e.node.DebugName())
+		fmt.Fprintf(&buffer, "%s", e.node.Name())
 		first = false
 	}
 	fmt.Fprintln(&buffer, "}")
@@ -576,39 +565,57 @@ func (set *NodeSet) String() string {
 ///////////////////////////////////////////////////
 
 type CycleDescription struct {
-	first, last Node
-	path        []Node
+	First, Last Node
+	Path        []OutEdge
 }
 
 func (c *CycleDescription) String() string {
 	var buffer bytes.Buffer
-	fmt.Fprintf(&buffer, "first:%s", c.first.DebugName())
-	fmt.Fprintf(&buffer, ", last:%s", c.last.DebugName())
+	fmt.Fprintf(&buffer, "first:%s", c.First.Name())
+	fmt.Fprintf(&buffer, ", last:%s", c.Last.Name())
 	fmt.Fprintf(&buffer, ", path:{")
-	first := true
-	for _, n := range c.path {
-		if !first {
+	fmt.Fprintf(&buffer, "%s", c.First.Name())
+	for _, edge := range c.Path {
+		if edge.Target != c.First {
 			fmt.Fprintf(&buffer, ", ")
+			fmt.Fprintf(&buffer, "%s", edge.Target.Name())
 		}
-		fmt.Fprintf(&buffer, "%s", n.DebugName())
-		first = false
 	}
 	fmt.Fprintln(&buffer, "}")
 	return buffer.String()
 }
 
-func newCycleDescription(path []*nodeHolder, first, last *nodeHolder) *CycleDescription {
+// newCycleDescription builds a CycleDescription based on the given data.
+// |path| should be a nodePath that ends with a cycle. That is it should look like
+//  {x1, ->x2}, {x2, ->x3}, {x3, ->x4}, {x4, ->x5}, {x5, ->x2}
+//
+// |cycleStart| should be the first node of |path| included in the cycle. In
+// the above example it would be x2.
+//
+// |end| should be the last node of the path. In the above example it would be x5.
+//
+// The return value using our example would be:
+// {First: x2, Last: x5, Path:[{x2, x2->x3}, {x3, x3->x4}, {x4, x4->x5}, {x5, x5->x2}]}
+func newCycleDescription(path nodePath, cycleStart, end Node) *CycleDescription {
+	lastNode := path[len(path)-1].node
+	if lastNode != end {
+		panic(fmt.Sprintf("%s != %s", lastNode.Name(), end.Name()))
+	}
+	lastTarget := path[len(path)-1].edge.Target
+	if lastTarget != cycleStart {
+		panic(fmt.Sprintf("(%T)%s != (%T)%s", lastTarget, lastTarget.Name(), cycleStart, cycleStart.Name()))
+	}
 	description := CycleDescription{}
-	description.first = first.node
-	description.last = last.node
-	description.path = make([]Node, 0, len(path))
-	for _, n := range path {
-		if len(description.path) > 0 || n.node == first.node {
-			description.path = append(description.path, n.node)
+	description.First = cycleStart
+	description.Last = end
+	description.Path = make([]OutEdge, 0, len(path))
+	for _, element := range path {
+		if len(description.Path) > 0 || element.node == cycleStart {
+			description.Path = append(description.Path, element.edge)
 		}
 	}
-	if description.path[len(description.path)-1] != last.node {
-		panic(fmt.Sprintf("%s != %s", description.path[len(description.path)-1], last.node))
+	if description.Path[len(description.Path)-1].Target != cycleStart {
+		panic(fmt.Sprintf("%s != %s", description.Path[len(description.Path)-1].Target.Name(), cycleStart.Name()))
 	}
 	return &description
 }

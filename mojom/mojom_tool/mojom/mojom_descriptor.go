@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"mojom/mojom_tool/lexer"
+	"sort"
 	"strings"
 )
 
@@ -306,6 +307,9 @@ type MojomDescriptor struct {
 	// there are unresolved references in the .mojom files.
 	unresolvedTypeReferences  []*UserTypeRef
 	unresolvedValueReferences []*UserValueRef
+
+	// In testing mode we iterate through some maps in deterministic order.
+	testingMode bool
 }
 
 func NewMojomDescriptor() *MojomDescriptor {
@@ -322,6 +326,13 @@ func NewMojomDescriptor() *MojomDescriptor {
 	descriptor.unresolvedTypeReferences = make([]*UserTypeRef, 0)
 	descriptor.unresolvedValueReferences = make([]*UserValueRef, 0)
 	return descriptor
+}
+
+// SetTestingMode is used to enable or disable testing mode. It is disabled by
+// default. In testing mode some operations will iterate through maps in a
+// deterministic order. This is less performant but enables deterministic testing.
+func (d *MojomDescriptor) SetTestingMode(testingMode bool) {
+	d.testingMode = testingMode
 }
 
 func (d *MojomDescriptor) getAbstractModuleScope(fullyQualifiedName string) *Scope {
@@ -359,6 +370,41 @@ func (d *MojomDescriptor) RegisterUnresolvedValueReference(valueReference *UserV
 func (d *MojomDescriptor) ContainsFile(fileName string) bool {
 	_, ok := d.MojomFilesByName[fileName]
 	return ok
+}
+
+// DetectIllFoundedTypes() should be invoked after Resolve() has completed
+// successfully. It performs an analysis of the type graph in order to detect
+// ill-founded types. An ill-founded type is one for which it is impossible
+// to create an instance that would be legally serializable using Mojo
+// serialization. This method returns a non-nil error just in case an
+// ill-founded type is detected. The contained error message is appropriate
+// for display to an end-user.
+//
+// An example of an ill-founded type is a struct |Foo| with a field whose type
+// is a non-nullable Foo. Thus ill-foundedness may be due to a cycle in the
+// type graph. But not all cycles cause ill-foundedness. Firstly nullable
+// fields do not lead to ill-foundedness as the potential cycle can be broken
+// by setting the field to null. Also the situation with unions is more complicated:
+// Type graphs involving unions are only ill-founded if every possible way of
+// chosing a value for all of the unions still leads to an unbreakable cycle.
+func (d *MojomDescriptor) DetectIllFoundedTypes() error {
+	// We capture the keys of the map TypesByKey in a list and iterate over that list
+	// rather than iterating over the map. This is so that in testing mode
+	// we can first sort the list so as to iterate in a deterministic order.
+	keyList := make([]string, 0, len(d.TypesByKey))
+	for key, _ := range d.TypesByKey {
+		keyList = append(keyList, key)
+	}
+	if d.testingMode {
+		sort.Strings(keyList)
+	}
+	for _, key := range keyList {
+		udt := d.TypesByKey[key]
+		if err := udt.CheckWellFounded(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 /////////////////////////////////////////

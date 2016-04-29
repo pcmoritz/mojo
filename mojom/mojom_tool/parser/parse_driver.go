@@ -170,7 +170,12 @@ func (d *ParseDriver) ParseFiles(fileNames []string) (descriptor *mojom.MojomDes
 	}
 
 	// Compute data for generators.
-	err = descriptor.ComputeFinalData()
+	if err = descriptor.ComputeFinalData(); err != nil {
+		return
+	}
+
+	// Check for ill-founded types.
+	err = descriptor.DetectIllFoundedTypes()
 	return
 }
 

@@ -5,6 +5,7 @@
 package mojom
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
@@ -83,6 +84,30 @@ type UserDefinedType interface {
 	// See computed_data.go.
 	ComputeFinalData() error
 
+	// CheckWellFounded() is invoked on each user-defined type in a MojomDescriptor
+	// after the resolution and type validation phases have completed successfully.
+	// The method performs an analysis of the type graph below a given type in order
+	// to detect ill-founded types. An ill-founded type is one for which it is impossible
+	// to create an instance that would be legally serializable using Mojo
+	// serialization. This method returns a non-nil error just in case an
+	// ill-founded type is detected. The contained error message is appropriate
+	// for display to an end-user.
+	//
+	// An example of an ill-founded type is a struct |Foo| with a field whose type
+	// is a non-nullable Foo. Thus ill-foundedness may be due to a cycle in the
+	// type graph. But not all cycles cause ill-foundedness. Firstly nullable
+	// fields do not lead to ill-foundedness as the potential cycle can be broken
+	// by setting the field to null. Also the situation with unions is more complicated:
+	// Type graphs involving unions are only ill-founded if every possible way of
+	// chosing a value for all of the unions still leads to an unbreakable cycle.
+	//
+	// We model this using the notion of a well-founded two-sorted graph. See
+	// utils/well-founded_graphs.go. Using the terminology from that file, we
+	// model structs as circle nodes and unions as square nodes. In this context
+	// the type graph only includes edges for non-nullable fields and arrays of
+	// fixed positive length.
+	CheckWellFounded() error
+
 	// SerializationSize() returns the number of bytes necessary to serialize an
 	// instance of this type in Mojo serialization.
 	SerializationSize() uint32
@@ -92,12 +117,19 @@ type UserDefinedType interface {
 	SerializationAlignment() uint32
 }
 
+/////////////////////////////////////////////////////////////
+// type UserDefinedTypeBase
+/////////////////////////////////////////////////////////////
+
 // This struct is embedded in each of MojomStruct, MojomInterface
 // MojomEnum and MojomUnion
 type UserDefinedTypeBase struct {
 	DeclarationData
 	thisType UserDefinedType
 	typeKey  string
+
+	// Cache the fact that |SetKnownWellFounded| has been invoked.
+	knownWellFounded bool
 }
 
 // This method is invoked from the constructors for the containing types:
@@ -154,6 +186,101 @@ func (b UserDefinedTypeBase) Scope() *Scope {
 	return b.scope
 }
 
+func (b *UserDefinedTypeBase) CheckWellFounded() error {
+	cycleDescription := utils.CheckWellFounded(b)
+	if cycleDescription != nil {
+		firstIllFoundedType := nodeToUserDefinedType(cycleDescription.First)
+		var buffer bytes.Buffer
+		fmt.Fprintf(&buffer, "The type %s is unserializable: Every instance of this type would include a cycle.",
+			firstIllFoundedType.FullyQualifiedName())
+		fmt.Fprintf(&buffer, "\nExample cycle: %s", firstIllFoundedType.SimpleName())
+		for _, edge := range cycleDescription.Path {
+			fmt.Fprintf(&buffer, ".%s -> %s", edge.Label.(lexer.Token).Text, nodeToUserDefinedType(edge.Target).SimpleName())
+		}
+		fmt.Fprintf(&buffer, "\n")
+		fmt.Fprintf(&buffer, "One way to break this cycle is to make the field %q nullable.", cycleDescription.Path[0].Label.(lexer.Token).Text)
+		return fmt.Errorf(UserErrorMessage(
+			firstIllFoundedType.Scope().file, cycleDescription.Path[0].Label.(lexer.Token), buffer.String()))
+	}
+	return nil
+}
+
+// *UserDefinedTypeBase implements utils.Node for the sake of |CheckWellFounded|.
+func (b *UserDefinedTypeBase) KnownWellFounded() bool {
+	return b.knownWellFounded
+}
+
+// *UserDefinedTypeBase implements utils.Node for the sake of |CheckWellFounded|.
+func (b *UserDefinedTypeBase) SetKnownWellFounded() {
+	b.knownWellFounded = true
+}
+
+// *UserDefinedTypeBase implements utils.Node for the sake of |CheckWellFounded|.
+func (b *UserDefinedTypeBase) Name() string {
+	return b.FullyQualifiedName()
+}
+
+// *UserDefinedTypeBase implements utils.Node for the sake of |CheckWellFounded|.
+func (b *UserDefinedTypeBase) IsSquare() bool {
+	// A node in the type graph is square if and only if the type is a union.
+	return b.thisType.Kind() == UserDefinedTypeKindUnion
+}
+
+// *UserDefinedTypeBase implements utils.Node for the sake of |CheckWellFounded|.
+func (b *UserDefinedTypeBase) OutEdges() []utils.OutEdge {
+	// The only types we need to model as nodes are structs and unions.
+	// We model some of their fields as children: fields whose type is a non-nullable
+	// pointer or a fixed-length array to another struct or union.
+	outEdges := make([]utils.OutEdge, 0)
+	switch udt := b.thisType.(type) {
+	case *MojomEnum, *MojomInterface:
+		return nil
+	case *MojomStruct:
+		for _, field := range udt.FieldsInLexicalOrder {
+			childType := field.FieldType.NonAvoidableUserType()
+			if childType != nil {
+				outEdges = append(outEdges, utils.OutEdge{field.nameToken, getTypeBase(childType)})
+			}
+		}
+	case *MojomUnion:
+		for _, field := range udt.FieldsInLexicalOrder {
+			childType := field.FieldType.NonAvoidableUserType()
+			if childType != nil {
+				outEdges = append(outEdges, utils.OutEdge{field.nameToken, getTypeBase(childType)})
+			}
+		}
+	default:
+		panic(fmt.Sprintf("unexpected kind %T", udt))
+	}
+	return outEdges
+}
+
+// getTypeBase returns the *UserDefinedTypeBase contained in the given UserDefinedType
+func getTypeBase(udt UserDefinedType) *UserDefinedTypeBase {
+	switch udt := udt.(type) {
+	case *MojomStruct:
+		return &udt.UserDefinedTypeBase
+	case *MojomUnion:
+		return &udt.UserDefinedTypeBase
+	case *MojomEnum:
+		return &udt.UserDefinedTypeBase
+	case *MojomInterface:
+		return &udt.UserDefinedTypeBase
+	default:
+		panic(fmt.Sprintf("Unrecognized user defined type %T", udt))
+	}
+}
+
+// nodeToUserDefinedType assumes that the type of |node| is *UserDefinedTypeBase
+// and returns the associated UserDefinedType
+func nodeToUserDefinedType(node utils.Node) UserDefinedType {
+	return node.(*UserDefinedTypeBase).thisType
+}
+
+/////////////////////////////////////////////////////////////
+// type DeclaredObjectsContainerBase
+/////////////////////////////////////////////////////////////
+
 // DeclaredObjectsContainerBase holds a list of DeclaredObjects in order of
 // occurrence in the source.
 // It includes all declared objects (for example methods and fields) not just
@@ -180,6 +307,10 @@ func (c *DeclaredObjectsContainerBase) SetClosingBraceToken(closingBraceToken *l
 type DeclaredObjectsContainer interface {
 	GetDeclaredObjects() []DeclaredObject
 }
+
+/////////////////////////////////////////////////////////////
+// type NestedDeclarations
+/////////////////////////////////////////////////////////////
 
 // Some user-defined types, namely interfaces and structs, may act as
 // namespaced scopes for declarations of constants and enums.

@@ -131,6 +131,33 @@ type TypeRef interface {
 	// It returns the number of bytes on which an instance of the type to which this
 	// type reference resolves must be aligned during Mojo serialization.
 	SerializationAlignment() uint32
+
+	// NonAvoidableUserType is invoked after the resolution and validation phases.
+	// It returns a non-nil UserDefinedType just in case this type
+	// reference resolves to a type the serialization of which will
+	// include a non-nullable pointer to a struct or union. In that case a
+	// non-nil UserDefinedType representing that struct or union is returnd.
+	//
+	// This method is used during the analysis of ill-founded types. The goal of
+	// that analysis is to find user-defined types that are unserializable because
+	// every instance of the type would involve a cycle.
+	//
+	// For example, suppose there is a struct Foo that contains a field |x|
+	// and the type of x is Foo. An instance of Foo could not be serialized because
+	// the cycle would cause an infinite recursion.
+	//
+	// However a cycle in the type graph is allowed if it is avoidable.
+	// For example if the type of x were instead Foo? then an instance
+	// of Foo could be serialized by setting x to null at some level
+	// of the recursion.
+	//
+	// Similarly if the type of x were array<Foo, 1> then an instance of
+	// Foo would not be serializable. However it allowed for the type of
+	// x to be any of the following:
+	//   - array<Foo>
+	//   - array<Foo?, 1>
+	//   - array<Foo, 1>?
+	NonAvoidableUserType() UserDefinedType
 }
 
 /////////////////////////////////////////////////////////////
@@ -361,6 +388,10 @@ func (t SimpleType) SerializationAlignment() uint32 {
 	return t.SerializationSize()
 }
 
+func (SimpleType) NonAvoidableUserType() UserDefinedType {
+	return nil
+}
+
 func (t SimpleType) String() string {
 	switch t {
 	case SimpleTypeBool:
@@ -419,6 +450,10 @@ func (StringType) SerializationSize() uint32 {
 
 func (StringType) SerializationAlignment() uint32 {
 	return 8
+}
+
+func (StringType) NonAvoidableUserType() UserDefinedType {
+	return nil
 }
 
 // StringLiteralType is a global singleton representing the unique LiteralType string.
@@ -516,6 +551,10 @@ func (HandleTypeRef) SerializationSize() uint32 {
 
 func (HandleTypeRef) SerializationAlignment() uint32 {
 	return 4
+}
+
+func (HandleTypeRef) NonAvoidableUserType() UserDefinedType {
+	return nil
 }
 
 func (h HandleTypeRef) HandleKind() HandleKind {
@@ -663,6 +702,13 @@ func (a ArrayTypeRef) ElementType() TypeRef {
 	return a.elementType
 }
 
+func (a ArrayTypeRef) NonAvoidableUserType() UserDefinedType {
+	if a.nullable || a.fixedLength <= 0 {
+		return nil
+	}
+	return a.elementType.NonAvoidableUserType()
+}
+
 // An ArrayTypeRef is a TypeRef:
 
 func (ArrayTypeRef) TypeRefKind() TypeKind {
@@ -745,6 +791,10 @@ func (MapTypeRef) SerializationSize() uint32 {
 
 func (MapTypeRef) SerializationAlignment() uint32 {
 	return 8
+}
+
+func (MapTypeRef) NonAvoidableUserType() UserDefinedType {
+	return nil
 }
 
 func (m MapTypeRef) KeyType() TypeRef {
@@ -883,6 +933,20 @@ func (t *UserTypeRef) SerializationAlignment() uint32 {
 		panic("This method should only be invoked after successful resolution.")
 	}
 	return t.resolvedType.SerializationAlignment()
+}
+
+func (t *UserTypeRef) NonAvoidableUserType() UserDefinedType {
+	if t.nullable || t.interfaceRequest {
+		return nil
+	}
+	if t.resolvedType == nil {
+		panic("This method should only be invoked after successful resolution.")
+	}
+	switch udt := t.resolvedType.(type) {
+	case *MojomStruct, *MojomUnion:
+		return udt
+	}
+	return nil
 }
 
 func (t *UserTypeRef) IsInterfaceRequest() bool {

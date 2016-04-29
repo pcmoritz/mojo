@@ -20,18 +20,18 @@ type SimpleNode struct {
 	// Is this node a square node?
 	isSquare bool
 
-	// The list of out-edges. The elements will be *SimpleNodes.
-	edges []Node
+	// The list of out-edges.
+	edges []OutEdge
 
 	// Cache the fact that |SetKnownWellFounded| has been invoked.
 	knownWellFounded bool
 }
 
-func (node *SimpleNode) DebugName() string {
+func (node *SimpleNode) Name() string {
 	return fmt.Sprintf("Node%d", node.value)
 }
 
-func (node *SimpleNode) OutEdges() []Node {
+func (node *SimpleNode) OutEdges() []OutEdge {
 	return node.edges
 }
 
@@ -45,7 +45,7 @@ func (node *SimpleNode) KnownWellFounded() bool {
 
 func (node *SimpleNode) SetKnownWellFounded() {
 	if node.knownWellFounded {
-		panic(fmt.Sprintf("SetKnownWellFounded invoked twice on %s", node.DebugName()))
+		panic(fmt.Sprintf("SetKnownWellFounded invoked twice on %s", node.Name()))
 	}
 	node.knownWellFounded = true
 }
@@ -54,7 +54,7 @@ func (node *SimpleNode) SetKnownWellFounded() {
 func NewNode(value, numEdges int, isSquare bool) *SimpleNode {
 	node := new(SimpleNode)
 	node.value = value
-	node.edges = make([]Node, numEdges)
+	node.edges = make([]OutEdge, numEdges)
 	node.isSquare = isSquare
 	return node
 }
@@ -89,7 +89,7 @@ func buildTestGraph(connectionMatrix [][]int, squares []int) (nodes []*SimpleNod
 	}
 	for index, connectionList := range connectionMatrix {
 		for i, target := range connectionList {
-			nodes[index].edges[i] = nodes[target]
+			nodes[index].edges[i] = OutEdge{"", nodes[target]}
 		}
 	}
 	return
@@ -120,7 +120,7 @@ func compareNodeSlice(expected []string, actual []Node, name string) error {
 		expectedMap[n] = true
 	}
 	for _, n := range actual {
-		actualMap[n.DebugName()] = true
+		actualMap[n.Name()] = true
 	}
 	for _, n := range expected {
 		if _, ok := actualMap[n]; !ok {
@@ -128,8 +128,8 @@ func compareNodeSlice(expected []string, actual []Node, name string) error {
 		}
 	}
 	for _, n := range actual {
-		if _, ok := expectedMap[n.DebugName()]; !ok {
-			return fmt.Errorf("%s: unexpected: %s, expected: %v, actual: %s", name, n.DebugName(), expected, NodeSliceToString(actual))
+		if _, ok := expectedMap[n.Name()]; !ok {
+			return fmt.Errorf("%s: unexpected: %s, expected: %v, actual: %s", name, n.Name(), expected, NodeSliceToString(actual))
 		}
 	}
 	return nil
@@ -143,7 +143,7 @@ func NodeSliceToString(nodeSlice []Node) string {
 		if !first {
 			fmt.Fprintf(&buffer, ", ")
 		}
-		fmt.Fprintf(&buffer, "%s", n.DebugName())
+		fmt.Fprintf(&buffer, "%s", n.Name())
 		first = false
 	}
 	fmt.Fprintln(&buffer, "]")
@@ -458,13 +458,13 @@ func TestWellFoundedNotWellFoundedCirclesOnly(t *testing.T) {
 				t.Fatalf("Case %d: Expected a cycle.", i)
 			}
 			if !strings.Contains(cycleDescription.String(), fmt.Sprintf("first:%s", c.expectedFirstA)) {
-				t.Fatalf("Case %d: got=%s expectedFirst=%q", i, cycleDescription.String(), c.expectedFirstA)
+				t.Fatalf("Case %d: got=%s expectedFirstA=%q", i, cycleDescription.String(), c.expectedFirstA)
 			}
 			if !strings.Contains(cycleDescription.String(), fmt.Sprintf("last:%s", c.expectedLastA)) {
-				t.Fatalf("Case %d: got=%s expectedLast=%q", i, cycleDescription.String(), c.expectedLastA)
+				t.Fatalf("Case %d: got=%s expectedLastA=%q", i, cycleDescription.String(), c.expectedLastA)
 			}
 			if !strings.Contains(cycleDescription.String(), fmt.Sprintf("{%s}", c.expectedPathA)) {
-				t.Fatalf("Case %d: got=%s expectedPath=%q", i, cycleDescription.String(), c.expectedPathA)
+				t.Fatalf("Case %d: got=%s expectedPathA=%q", i, cycleDescription.String(), c.expectedPathA)
 			}
 		}
 
@@ -484,13 +484,13 @@ func TestWellFoundedNotWellFoundedCirclesOnly(t *testing.T) {
 					t.Fatalf("Case %dB: Expected a cycle.", i)
 				}
 				if !strings.Contains(cycleDescription.String(), fmt.Sprintf("first:%s", c.expectedFirstB)) {
-					t.Fatalf("Case %dB: got=%s expectedFirst=%q", i, cycleDescription.String(), c.expectedFirstB)
+					t.Fatalf("Case %dB: got=%s expectedFirstB=%q", i, cycleDescription.String(), c.expectedFirstB)
 				}
 				if !strings.Contains(cycleDescription.String(), fmt.Sprintf("last:%s", c.expectedLastB)) {
-					t.Fatalf("Case %dB: got=%s expectedLast=%q", i, cycleDescription.String(), c.expectedLastB)
+					t.Fatalf("Case %dB: got=%s expectedLastB=%q", i, cycleDescription.String(), c.expectedLastB)
 				}
 				if !strings.Contains(cycleDescription.String(), fmt.Sprintf("{%s}", c.expectedPathB)) {
-					t.Fatalf("Case %dB: got=%s expectedPath=%q", i, cycleDescription.String(), c.expectedPathB)
+					t.Fatalf("Case %dB: got=%s expectedPathB=%q", i, cycleDescription.String(), c.expectedPathB)
 				}
 			}
 		}

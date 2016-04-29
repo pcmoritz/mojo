@@ -1148,6 +1148,10 @@ func TestSingleFileSerialization(t *testing.T) {
 			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
 			continue
 		}
+		if err := descriptor.DetectIllFoundedTypes(); err != nil {
+			t.Errorf("DetectIllFoundedTypes error for %s: %s", c.fileName, err.Error())
+			continue
+		}
 
 		// Simulate setting the canonical file name for the imported files. In real operation
 		// this step is done in parser_driver.go when each of the imported files are parsed.
@@ -2082,7 +2086,7 @@ func TestWithComputedData(t *testing.T) {
 	struct MyStruct1 {
 	  int8          x;
 	  MyUnion1      my_union;
-	  MyStruct1     my_struct;
+	  MyStruct1?    my_struct;
 	  MyInterface1& my_interface_request;
 	  int32         y;
 	  MyInterface1  my_interface;
@@ -2117,7 +2121,7 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(2, -1, "my_struct"),
 					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
-						false, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
+						true, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
 					Offset: 24,
 				},
 				// field my_interface_request
@@ -2181,7 +2185,7 @@ func TestWithComputedData(t *testing.T) {
 	struct MyStruct1 {
 	  int8          x;
 	  MyUnion1      my_union;
-	  MyStruct1     my_struct;
+	  MyStruct1?    my_struct;
 
 	  [MinVersion=1]
 	  MyInterface1&? my_interface_request;
@@ -2222,7 +2226,7 @@ func TestWithComputedData(t *testing.T) {
 				{
 					DeclData: test.newShortDeclDataO(2, -1, "my_struct"),
 					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
-						false, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
+						true, false, stringPointer("MyStruct1"), stringPointer("TYPE_KEY:MyStruct1")}},
 					Offset: 24,
 				},
 				// field my_interface_request
@@ -2301,6 +2305,10 @@ func TestWithComputedData(t *testing.T) {
 		}
 		if err := descriptor.ComputeFinalData(); err != nil {
 			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+		if err := descriptor.DetectIllFoundedTypes(); err != nil {
+			t.Errorf("DetectIllFoundedTypes error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
@@ -2410,6 +2418,10 @@ func TestMetaDataOnlyMode(t *testing.T) {
 		}
 		if err := descriptor.ComputeFinalData(); err != nil {
 			t.Errorf("ComputeFinalData error for %s: %s", c.fileName, err.Error())
+			continue
+		}
+		if err := descriptor.DetectIllFoundedTypes(); err != nil {
+			t.Errorf("DetectIllFoundedTypes error for %s: %s", c.fileName, err.Error())
 			continue
 		}
 
@@ -2685,6 +2697,10 @@ func TestTwoFileSerialization(t *testing.T) {
 		}
 		if err := descriptor.ComputeFinalData(); err != nil {
 			t.Errorf("ComputeFinalData error for case %d: %s", i, err.Error())
+			continue
+		}
+		if err := descriptor.DetectIllFoundedTypes(); err != nil {
+			t.Errorf("DetectIllFoundedTypes error for case %d: %s", i, err.Error())
 			continue
 		}
 
@@ -3294,6 +3310,10 @@ func TestRuntimeTypeInfo(t *testing.T) {
 		}
 		if err := descriptor.ComputeFinalData(); err != nil {
 			t.Errorf("ComputeFinalData error for case %d: %s", i, err.Error())
+			continue
+		}
+		if err := descriptor.DetectIllFoundedTypes(); err != nil {
+			t.Errorf("DetectIllFoundedTypes error for case %d: %s", i, err.Error())
 			continue
 		}
 
