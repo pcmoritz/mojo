@@ -47,6 +47,7 @@ mojo_edk_source_set("system") {
     "dispatcher.h",
     "endpoint_relayer.cc",
     "endpoint_relayer.h",
+    "entrypoint_class.h",
     "handle.cc",
     "handle.h",
     "handle_signals_state.h",

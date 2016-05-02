@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "mojo/edk/platform/scoped_platform_handle.h"
+#include "mojo/edk/system/entrypoint_class.h"
 #include "mojo/edk/system/handle_signals_state.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/util/mutex.h"
@@ -74,37 +75,16 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
     PLATFORM_HANDLE = -1
   };
 
-  // Classes of "entrypoints"/"syscalls": Each dispatcher should support entire
-  // classes of methods (and if they don't support a given class, they should
-  // return |MOJO_RESULT_INVALID_ARGUMENT| for all the methods in that class).
-  // Warning: A method may be called even if |SupportsEntrypointClass()|
-  // indicates that the method's class is not supported (see below).
-  enum class EntrypointClass {
-    // |ReadMessage()|, |WriteMessage()|:
-    MESSAGE_PIPE,
-
-    // |SetDataPipeProducerOptions()|, |GetDataPipeProducerOptions()|,
-    // |WriteData()|, |BeginWriteData()|, |EndWriteData()|:
-    DATA_PIPE_PRODUCER,
-
-    // |SetDataPipeConsumerOptions()|, |GetDataPipeConsumerOptions()|,
-    // |ReadData()|, |BeginReadData()|, |EndReadData()|:
-    DATA_PIPE_CONSUMER,
-
-    // |DuplicateBufferHandle()|, |GetBufferInformation()|, |MapBuffer()|:
-    BUFFER,
-  };
-
   // Gets the type of the dispatcher; see |Type| above.
   virtual Type GetType() const = 0;
 
-  // Gets whether the given entrypoint class is supported; see |EntrypointClass|
-  // above. This is ONLY called when a rights check has failed, to determine
-  // whether |MOJO_RESULT_PERMISSION_DENIED| (if the entrypoint class is
-  // supported) or |MOJO_RESULT_INVALID_ARGUMENT| (if not) should be returned.
-  // In the case that the rights check passes, |Core| will proceed immediately
-  // to call the method (so if the method is not supported, it must still return
-  // |MOJO_RESULT_INVALID_ARGUMENT|).
+  // Gets whether the given entrypoint class is supported; see the definition of
+  // |EntrypointClass|. This is ONLY called when a rights check has failed, to
+  // determine whether |MOJO_RESULT_PERMISSION_DENIED| (if the entrypoint class
+  // is supported) or |MOJO_RESULT_INVALID_ARGUMENT| (if not) should be
+  // returned. In the case that the rights check passes, |Core| will proceed
+  // immediately to call the method (so if the method is not supported, it must
+  // still return |MOJO_RESULT_INVALID_ARGUMENT|).
   virtual bool SupportsEntrypointClass(
       EntrypointClass entrypoint_class) const = 0;
 

@@ -180,13 +180,10 @@ TEST(MessagePipeDispatcherTest, SupportsEntrypointClass) {
     EXPECT_EQ(MOJO_RESULT_OK, d_peer->Close());
   }
 
-  EXPECT_TRUE(
-      d->SupportsEntrypointClass(Dispatcher::EntrypointClass::MESSAGE_PIPE));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_PRODUCER));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_CONSUMER));
-  EXPECT_FALSE(d->SupportsEntrypointClass(Dispatcher::EntrypointClass::BUFFER));
+  EXPECT_TRUE(d->SupportsEntrypointClass(EntrypointClass::MESSAGE_PIPE));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_PRODUCER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_CONSUMER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::BUFFER));
 
   // TODO(vtl): Check that it actually returns |MOJO_RESULT_INVALID_ARGUMENT|
   // for methods in unsupported entrypoint classes.

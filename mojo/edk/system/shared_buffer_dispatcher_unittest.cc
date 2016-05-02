@@ -191,13 +191,10 @@ TEST_F(SharedBufferDispatcherTest, SupportsEntrypointClass) {
   ASSERT_TRUE(d);
   EXPECT_EQ(MOJO_RESULT_OK, result);
 
-  EXPECT_FALSE(
-      d->SupportsEntrypointClass(Dispatcher::EntrypointClass::MESSAGE_PIPE));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_PRODUCER));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_CONSUMER));
-  EXPECT_TRUE(d->SupportsEntrypointClass(Dispatcher::EntrypointClass::BUFFER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::MESSAGE_PIPE));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_PRODUCER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_CONSUMER));
+  EXPECT_TRUE(d->SupportsEntrypointClass(EntrypointClass::BUFFER));
 
   // TODO(vtl): Check that it actually returns |MOJO_RESULT_INVALID_ARGUMENT|
   // for methods in unsupported entrypoint classes.

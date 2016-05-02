@@ -74,13 +74,10 @@ TEST(PlatformHandleDispatcher, SupportsEntrypointClass) {
   ASSERT_TRUE(d);
   EXPECT_FALSE(h.is_valid());
 
-  EXPECT_FALSE(
-      d->SupportsEntrypointClass(Dispatcher::EntrypointClass::MESSAGE_PIPE));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_PRODUCER));
-  EXPECT_FALSE(d->SupportsEntrypointClass(
-      Dispatcher::EntrypointClass::DATA_PIPE_CONSUMER));
-  EXPECT_FALSE(d->SupportsEntrypointClass(Dispatcher::EntrypointClass::BUFFER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::MESSAGE_PIPE));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_PRODUCER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_CONSUMER));
+  EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::BUFFER));
 
   // TODO(vtl): Check that it actually returns |MOJO_RESULT_INVALID_ARGUMENT|
   // for methods in unsupported entrypoint classes.
