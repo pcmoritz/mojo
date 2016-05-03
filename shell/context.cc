@@ -29,7 +29,8 @@
 #include "mojo/public/cpp/application/application_connection.h"
 #include "mojo/public/cpp/application/application_delegate.h"
 #include "mojo/public/cpp/application/application_impl.h"
-#include "mojo/public/cpp/bindings/strong_binding.h"
+#include "mojo/public/cpp/application/connect.h"
+#include "mojo/services/tracing/interfaces/trace_provider_registry.mojom.h"
 #include "mojo/services/tracing/interfaces/tracing.mojom.h"
 #include "shell/application_manager/application_loader.h"
 #include "shell/application_manager/application_manager.h"
@@ -193,28 +194,6 @@ void InitNativeOptions(ApplicationManager* manager,
       ->new_process_per_connection = true;
 }
 
-class TracingServiceProvider : public ServiceProvider {
- public:
-  TracingServiceProvider(Tracer* tracer,
-                         mojo::InterfaceRequest<ServiceProvider> request)
-      : tracer_(tracer), binding_(this, request.Pass()) {}
-  ~TracingServiceProvider() override {}
-
-  void ConnectToService(const mojo::String& service_name,
-                        mojo::ScopedMessagePipeHandle client_handle) override {
-    if (tracer_ && service_name == tracing::TraceProvider::Name_) {
-      tracer_->ConnectToProvider(
-          mojo::InterfaceRequest<tracing::TraceProvider>(client_handle.Pass()));
-    }
-  }
-
- private:
-  Tracer* tracer_;
-  mojo::StrongBinding<mojo::ServiceProvider> binding_;
-
-  DISALLOW_COPY_AND_ASSIGN(TracingServiceProvider);
-};
-
 }  // namespace
 
 Context::Context(Tracer* tracer)
@@ -330,18 +309,22 @@ bool Context::InitWithPaths(
     ApplyApplicationArgs(this, current->argv()[i]);
 
   ServiceProviderPtr tracing_services;
-  ServiceProviderPtr tracing_exposed_services;
-  new TracingServiceProvider(tracer_, GetProxy(&tracing_exposed_services));
-  application_manager_.ConnectToApplication(
-      GURL("mojo:tracing"), GURL(""), GetProxy(&tracing_services),
-      tracing_exposed_services.Pass(), base::Closure());
+  application_manager_.ConnectToApplication(GURL("mojo:tracing"), GURL(""),
+                                            GetProxy(&tracing_services),
+                                            nullptr, base::Closure());
+  if (tracer_) {
+    tracing::TraceProviderRegistryPtr registry;
+    mojo::ConnectToService(tracing_services.get(), GetProxy(&registry));
+
+    mojo::InterfaceHandle<tracing::TraceProvider> provider;
+    tracer_->ConnectToProvider(GetProxy(&provider));
+    registry->RegisterTraceProvider(provider.Pass());
+  }
 
   if (command_line.HasSwitch(switches::kTraceStartup)) {
     DCHECK(tracer_);
     tracing::TraceCollectorPtr coordinator;
-    auto coordinator_request = GetProxy(&coordinator);
-    tracing_services->ConnectToService(tracing::TraceCollector::Name_,
-                                       coordinator_request.PassMessagePipe());
+    mojo::ConnectToService(tracing_services.get(), GetProxy(&coordinator));
     tracer_->StartCollectingFromTracingService(coordinator.Pass());
   }
 
