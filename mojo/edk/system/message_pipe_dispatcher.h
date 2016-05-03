@@ -16,7 +16,6 @@ namespace system {
 
 class ChannelEndpoint;
 class MessagePipe;
-class MessagePipeDispatcherTransport;
 
 // This is the |Dispatcher| implementation for message pipes (created by the
 // Mojo primitive |MojoCreateMessagePipe()|). This class is thread-safe.
@@ -64,8 +63,6 @@ class MessagePipeDispatcher final : public Dispatcher {
                                                          size_t size);
 
  private:
-  friend class MessagePipeDispatcherTransport;
-
   MessagePipeDispatcher();
   ~MessagePipeDispatcher() override;
 
@@ -80,8 +77,9 @@ class MessagePipeDispatcher final : public Dispatcher {
   // |Dispatcher| protected methods:
   void CancelAllAwakablesNoLock() override;
   void CloseImplNoLock() override;
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
   MojoResult WriteMessageImplNoLock(
       UserPointer<const void> bytes,
       uint32_t num_bytes,
@@ -115,23 +113,6 @@ class MessagePipeDispatcher final : public Dispatcher {
   unsigned port_ MOJO_GUARDED_BY(mutex());
 
   MOJO_DISALLOW_COPY_AND_ASSIGN(MessagePipeDispatcher);
-};
-
-class MessagePipeDispatcherTransport : public DispatcherTransport {
- public:
-  explicit MessagePipeDispatcherTransport(DispatcherTransport transport);
-
-  MessagePipe* GetMessagePipe() {
-    return message_pipe_dispatcher()->GetMessagePipeNoLock();
-  }
-  unsigned GetPort() { return message_pipe_dispatcher()->GetPortNoLock(); }
-
- private:
-  MessagePipeDispatcher* message_pipe_dispatcher() {
-    return static_cast<MessagePipeDispatcher*>(dispatcher());
-  }
-
-  // Copy and assign allowed.
 };
 
 }  // namespace system

@@ -102,7 +102,8 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
   EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE, transport.GetType());
   EXPECT_FALSE(transport.IsBusy());
 
-  auto generic_dispatcher = transport.CreateEquivalentDispatcherAndClose();
+  auto generic_dispatcher =
+      transport.CreateEquivalentDispatcherAndClose(nullptr, 0u);
   ASSERT_TRUE(generic_dispatcher);
 
   transport.End();

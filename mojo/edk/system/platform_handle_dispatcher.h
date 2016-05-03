@@ -46,8 +46,9 @@ class PlatformHandleDispatcher final : public SimpleDispatcher {
 
   // |Dispatcher| protected methods:
   void CloseImplNoLock() override;
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
   void StartSerializeImplNoLock(Channel* channel,
                                 size_t* max_size,
                                 size_t* max_platform_handles) override

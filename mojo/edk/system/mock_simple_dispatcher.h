@@ -37,8 +37,9 @@ class MockSimpleDispatcher final : public SimpleDispatcher {
   explicit MockSimpleDispatcher(const HandleSignalsState& state);
   ~MockSimpleDispatcher() override;
 
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
 
   // |Dispatcher| override:
   HandleSignalsState GetHandleSignalsStateImplNoLock() const override;

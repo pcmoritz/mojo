@@ -526,13 +526,14 @@ void Dispatcher::CloseNoLock() {
   CloseImplNoLock();
 }
 
-RefPtr<Dispatcher> Dispatcher::CreateEquivalentDispatcherAndCloseNoLock() {
+RefPtr<Dispatcher> Dispatcher::CreateEquivalentDispatcherAndCloseNoLock(
+    MessagePipe* message_pipe,
+    unsigned port) {
   mutex_.AssertHeld();
   DCHECK(!is_closed_);
 
   is_closed_ = true;
-  CancelAllAwakablesNoLock();
-  return CreateEquivalentDispatcherAndCloseImplNoLock();
+  return CreateEquivalentDispatcherAndCloseImplNoLock(message_pipe, port);
 }
 
 void Dispatcher::StartSerialize(Channel* channel,

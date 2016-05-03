@@ -46,8 +46,9 @@ class DataPipeConsumerDispatcher final : public Dispatcher {
   // |Dispatcher| protected methods:
   void CancelAllAwakablesNoLock() override;
   void CloseImplNoLock() override;
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
   MojoResult SetDataPipeConsumerOptionsImplNoLock(
       UserPointer<const MojoDataPipeConsumerOptions> options) override;
   MojoResult GetDataPipeConsumerOptionsImplNoLock(

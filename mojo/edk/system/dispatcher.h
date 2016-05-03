@@ -35,15 +35,16 @@ class PlatformSharedBufferMapping;
 
 namespace system {
 
+class Awakable;
 class Channel;
 class Core;
 class Dispatcher;
 class DispatcherTransport;
 class HandleTable;
 class LocalMessagePipeEndpoint;
+class MessagePipe;
 class ProxyMessagePipeEndpoint;
 class TransportData;
-class Awakable;
 
 using DispatcherVector = std::vector<util::RefPtr<Dispatcher>>;
 
@@ -259,9 +260,15 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   virtual void CancelAllAwakablesNoLock() MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   virtual void CloseImplNoLock() MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
-  virtual util::RefPtr<Dispatcher>
-  CreateEquivalentDispatcherAndCloseImplNoLock()
-      MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_) = 0;
+  // This is called by |CreateEquivalentDispatcherAndCloseNoLock()|. It should
+  // produce "close" this dispatcher and return a new one equivalent to it.
+  // Note: Probably the first thing an implementation should do is call
+  // |CancelAllAwakablesNoLock()| (or equivalent); unlike |CloseNoLock()|,
+  // |CreateEquivalentDispatcherAndCloseNoLock()| does not do this
+  // automatically.
+  virtual util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_) = 0;
 
   // These are to be overridden by subclasses (if necessary). They are never
   // called after the dispatcher has been closed. See the descriptions of the
@@ -379,9 +386,12 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // dispatcher -- and close (i.e., disable) this dispatcher. I.e., this
   // dispatcher will look as though it was closed, but the resource it
   // represents will be assigned to the new dispatcher. This must be called
-  // under the dispatcher's lock.
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseNoLock()
-      MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+  // under the dispatcher's lock. If the resulting dispatcher will be put into a
+  // message on a message pipe, then |message_pipe| will be set appropriately
+  // (otherwise, it may be null) and |port| will be set to the destination port.
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // API to serialize dispatchers to a |Channel|, exposed to only
   // |TransportData| (via |TransportData|). They may only be called on a
@@ -440,7 +450,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
 //
 // Note: This class is deliberately "thin" -- no more expensive than a
 // |Dispatcher*|.
-class DispatcherTransport {
+class DispatcherTransport final {
  public:
   DispatcherTransport() : dispatcher_(nullptr) {}
 
@@ -451,15 +461,14 @@ class DispatcherTransport {
     return dispatcher_->IsBusyNoLock();
   }
   void Close() MOJO_NOT_THREAD_SAFE { dispatcher_->CloseNoLock(); }
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndClose()
-      MOJO_NOT_THREAD_SAFE {
-    return dispatcher_->CreateEquivalentDispatcherAndCloseNoLock();
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndClose(
+      MessagePipe* message_pipe,
+      unsigned port) MOJO_NOT_THREAD_SAFE {
+    return dispatcher_->CreateEquivalentDispatcherAndCloseNoLock(message_pipe,
+                                                                 port);
   }
 
   bool is_valid() const { return !!dispatcher_; }
-
- protected:
-  Dispatcher* dispatcher() { return dispatcher_; }
 
  private:
   friend class Dispatcher::HandleTableAccess;

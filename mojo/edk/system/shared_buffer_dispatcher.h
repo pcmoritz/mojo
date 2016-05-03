@@ -87,8 +87,9 @@ class SharedBufferDispatcher final : public SimpleDispatcher {
 
   // |Dispatcher| protected methods:
   void CloseImplNoLock() override;
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
   MojoResult DuplicateBufferHandleImplNoLock(
       UserPointer<const MojoDuplicateBufferHandleOptions> options,
       util::RefPtr<Dispatcher>* new_dispatcher) override;

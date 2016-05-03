@@ -86,8 +86,11 @@ void PlatformHandleDispatcher::CloseImplNoLock() {
 }
 
 RefPtr<Dispatcher>
-PlatformHandleDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock() {
+PlatformHandleDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock(
+    MessagePipe* /*message_pipe*/,
+    unsigned /*port*/) {
   mutex().AssertHeld();
+  CancelAllAwakablesNoLock();
   return Create(platform_handle_.Pass());
 }
 

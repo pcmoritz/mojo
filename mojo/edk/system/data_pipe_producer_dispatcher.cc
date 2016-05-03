@@ -72,8 +72,12 @@ void DataPipeProducerDispatcher::CloseImplNoLock() {
 }
 
 RefPtr<Dispatcher>
-DataPipeProducerDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock() {
+DataPipeProducerDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock(
+    MessagePipe* /*message_pipe*/,
+    unsigned /*port*/) {
   mutex().AssertHeld();
+
+  CancelAllAwakablesNoLock();
 
   auto dispatcher = DataPipeProducerDispatcher::Create();
   dispatcher->Init(std::move(data_pipe_));

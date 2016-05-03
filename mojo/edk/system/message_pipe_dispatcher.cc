@@ -133,8 +133,21 @@ void MessagePipeDispatcher::CloseImplNoLock() {
 }
 
 RefPtr<Dispatcher>
-MessagePipeDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock() {
+MessagePipeDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock(
+    MessagePipe* message_pipe,
+    unsigned port) {
   mutex().AssertHeld();
+
+  // "We" are being sent over our peer.
+  if (message_pipe == message_pipe_.get()) {
+    // A message pipe dispatcher can't be sent over itself (this should be
+    // disallowed by |Core|). Note that |port| is the destination port.
+    DCHECK_EQ(port, port_);
+    // In this case, |message_pipe_|'s mutex should already be held!
+    message_pipe_->CancelAllAwakablesNoLock(port_);
+  } else {
+    CancelAllAwakablesNoLock();
+  }
 
   // TODO(vtl): Currently, there are no options, so we just use
   // |kDefaultCreateOptions|. Eventually, we'll have to duplicate the options
@@ -218,15 +231,6 @@ bool MessagePipeDispatcher::EndSerializeAndCloseImplNoLock(
   message_pipe_ = nullptr;
   port_ = kInvalidPort;
   return rv;
-}
-
-// MessagePipeDispatcherTransport ----------------------------------------------
-
-MessagePipeDispatcherTransport::MessagePipeDispatcherTransport(
-    DispatcherTransport transport)
-    : DispatcherTransport(transport) {
-  DCHECK_EQ(message_pipe_dispatcher()->GetType(),
-            Dispatcher::Type::MESSAGE_PIPE);
 }
 
 }  // namespace system

@@ -216,8 +216,13 @@ void SharedBufferDispatcher::CloseImplNoLock() {
 }
 
 RefPtr<Dispatcher>
-SharedBufferDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock() {
+SharedBufferDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock(
+    MessagePipe* /*message_pipe*/,
+    unsigned /*port*/) {
   mutex().AssertHeld();
+
+  CancelAllAwakablesNoLock();
+
   DCHECK(shared_buffer_);
   return CreateInternal(std::move(shared_buffer_));
 }

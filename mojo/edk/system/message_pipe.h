@@ -117,6 +117,12 @@ class MessagePipe final : public ChannelEndpointClient {
       size_t* actual_size,
       std::vector<platform::ScopedPlatformHandle>* platform_handles);
 
+  // This "implements" |CancelAllAwakables()|, but assumes that |mutex_| is
+  // already held. This is for use by
+  // |MessagePipeDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock()|.
+  void CancelAllAwakablesNoLock(unsigned port)
+      MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
+
   // |ChannelEndpointClient| methods:
   bool OnReadMessage(unsigned port, MessageInTransit* message) override;
   void OnDetachFromChannel(unsigned port) override;

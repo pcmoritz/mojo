@@ -124,11 +124,8 @@ MessagePipeEndpoint::Type MessagePipe::GetType(unsigned port) {
 }
 
 void MessagePipe::CancelAllAwakables(unsigned port) {
-  DCHECK(port == 0 || port == 1);
-
   MutexLocker locker(&mutex_);
-  DCHECK(endpoints_[port]);
-  endpoints_[port]->CancelAllAwakables();
+  CancelAllAwakablesNoLock(port);
 }
 
 void MessagePipe::Close(unsigned port) {
@@ -286,6 +283,13 @@ bool MessagePipe::EndSerialize(
   return true;
 }
 
+void MessagePipe::CancelAllAwakablesNoLock(unsigned port) {
+  DCHECK(port == 0 || port == 1);
+  mutex_.AssertHeld();
+  DCHECK(endpoints_[port]);
+  endpoints_[port]->CancelAllAwakables();
+}
+
 bool MessagePipe::OnReadMessage(unsigned port, MessageInTransit* message) {
   MutexLocker locker(&mutex_);
 
@@ -355,27 +359,6 @@ MojoResult MessagePipe::AttachTransportsNoLock(
     std::vector<DispatcherTransport>* transports) {
   DCHECK(!message->has_dispatchers());
 
-  // You're not allowed to send either handle to a message pipe over the message
-  // pipe, so check for this. (The case of trying to write a handle to itself is
-  // taken care of by |Core|. That case kind of makes sense, but leads to
-  // complications if, e.g., both sides try to do the same thing with their
-  // respective handles simultaneously. The other case, of trying to write the
-  // peer handle to a handle, doesn't make sense -- since no handle will be
-  // available to read the message from.)
-  for (size_t i = 0; i < transports->size(); i++) {
-    if (!(*transports)[i].is_valid())
-      continue;
-    if ((*transports)[i].GetType() == Dispatcher::Type::MESSAGE_PIPE) {
-      MessagePipeDispatcherTransport mp_transport((*transports)[i]);
-      if (mp_transport.GetMessagePipe() == this) {
-        // The other case should have been disallowed by |Core|. (Note: |port|
-        // is the peer port of the handle given to |WriteMessage()|.)
-        DCHECK_EQ(mp_transport.GetPort(), port);
-        return MOJO_RESULT_INVALID_ARGUMENT;
-      }
-    }
-  }
-
   // Clone the dispatchers and attach them to the message. (This must be done as
   // a separate loop, since we want to leave the dispatchers alone on failure.)
   std::unique_ptr<DispatcherVector> dispatchers(new DispatcherVector());
@@ -383,7 +366,7 @@ MojoResult MessagePipe::AttachTransportsNoLock(
   for (size_t i = 0; i < transports->size(); i++) {
     if ((*transports)[i].is_valid()) {
       dispatchers->push_back(
-          (*transports)[i].CreateEquivalentDispatcherAndClose());
+          (*transports)[i].CreateEquivalentDispatcherAndClose(this, port));
     } else {
       LOG(WARNING) << "Enqueueing null dispatcher";
       dispatchers->push_back(nullptr);

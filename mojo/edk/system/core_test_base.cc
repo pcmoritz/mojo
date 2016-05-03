@@ -191,7 +191,10 @@ class MockDispatcher : public Dispatcher {
     mutex().AssertHeld();
   }
 
-  RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock() override {
+  RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* /*message_pipe*/,
+      unsigned /*port*/) override {
+    CancelAllAwakablesNoLock();
     return Create(info_);
   }
 

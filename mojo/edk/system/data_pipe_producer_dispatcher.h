@@ -46,8 +46,9 @@ class DataPipeProducerDispatcher final : public Dispatcher {
   // |Dispatcher| protected methods:
   void CancelAllAwakablesNoLock() override;
   void CloseImplNoLock() override;
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock()
-      override;
+  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
+      MessagePipe* message_pipe,
+      unsigned port) override;
   MojoResult SetDataPipeProducerOptionsImplNoLock(
       UserPointer<const MojoDataPipeProducerOptions> options) override;
   MojoResult GetDataPipeProducerOptionsImplNoLock(
