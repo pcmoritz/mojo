@@ -58,60 +58,9 @@ void Choreographer::DoFrame(mojo::gfx::composition::FrameInfoPtr frame_info) {
     // this exacerbates starvation issues in the Mojo message pump.
     // ScheduleFrame();
 
-    // Ensure frame info is sane since it comes from another service.
-    // TODO(jeffbrown): Would be better to report an error to the client
-    // who can shut things down if needed.
-    MojoTimeTicks now = mojo::GetTimeTicksNow();
-    if (frame_info->frame_time > now) {
-      LOG(WARNING) << "Frame time is in the future: frame_time="
-                   << frame_info->frame_time << ", now=" << now;
-      frame_info->frame_time = now;
-    }
-    if (frame_info->frame_deadline < frame_info->frame_time) {
-      LOG(WARNING)
-          << "Frame deadline is earlier than frame time: frame_deadline="
-          << frame_info->frame_deadline
-          << ", frame_time=" << frame_info->frame_time << ", now=" << now;
-      frame_info->frame_deadline = frame_info->frame_time;
-    }
-    if (frame_info->presentation_time < frame_info->frame_deadline) {
-      LOG(WARNING) << "Presentation time is earlier than frame deadline: "
-                      "presentation_time="
-                   << frame_info->presentation_time
-                   << ", frame_deadline=" << frame_info->frame_deadline
-                   << ", now=" << now;
-      frame_info->presentation_time = frame_info->frame_deadline;
-    }
-
-    // Compensate for significant lag by adjusting the frame time if needed
-    // to step past skipped frames.
-    uint64_t lag = now - frame_info->frame_time;
-    if (frame_info->frame_interval > 0u && lag > frame_info->frame_interval) {
-      uint64_t offset = lag % frame_info->frame_interval;
-      uint64_t adjustment = now - offset - frame_info->frame_time;
-      frame_info->frame_time = now - offset;
-      frame_info->frame_deadline += adjustment;
-      frame_info->presentation_time += adjustment;
-
-      // Jank warning.
-      // TODO(jeffbrown): Suppress this once we're happy with things.
-      LOG(WARNING) << "Missed " << frame_info->frame_interval
-                   << " us frame deadline by " << lag << " us, skipping "
-                   << (lag / frame_info->frame_interval) << " frames";
-    }
-
-    // Ensure frame time isn't going backwards, just in case the compositor's
-    // timing is seriously broken.
-    base::TimeDelta time_delta;
-    if (last_frame_info_) {
-      DCHECK(frame_info->frame_time >= last_frame_info_->frame_time);
-      time_delta = base::TimeDelta::FromMicroseconds(
-          frame_info->frame_time - last_frame_info_->frame_time);
-    }
-
-    // Invoke the callback.
-    last_frame_info_ = frame_info.Pass();
-    delegate_->OnDraw(*last_frame_info_, time_delta);
+    base::TimeDelta time_delta = base::TimeDelta::FromMicroseconds(
+        frame_tracker_.Update(*frame_info, mojo::GetTimeTicksNow()));
+    delegate_->OnDraw(frame_tracker_.frame_info(), time_delta);
   }
 }
 

@@ -7,6 +7,7 @@
 
 #include "base/time/time.h"
 #include "mojo/public/cpp/system/macros.h"
+#include "mojo/services/gfx/composition/cpp/frame_tracker.h"
 #include "mojo/services/gfx/composition/interfaces/scenes.mojom.h"
 #include "mojo/services/gfx/composition/interfaces/scheduling.mojom.h"
 
@@ -27,7 +28,7 @@ class ChoreographerDelegate;
 //          const mojo::ui::ViewProvider::CreateViewCallback&
 //              create_view_callback)
 //          : BaseView(app_impl, "MyView", create_view_callback),
-//            choreographer_(scene_scheduler(), this) {}
+//            choreographer_(scene(), this) {}
 //   ~MyView() override {}
 //
 //  private:
@@ -51,9 +52,9 @@ class Choreographer {
     return scene_scheduler_.get();
   }
 
-  // Gets the most recent frame info, or null if none.
-  mojo::gfx::composition::FrameInfo* last_frame_info() {
-    return last_frame_info_.get();
+  // Gets the frame tracker.
+  mojo::gfx::composition::FrameTracker& frame_tracker() {
+    return frame_tracker_;
   }
 
   // Schedules a call to the delegate's |OnDraw| using the scene scheduler.
@@ -62,7 +63,7 @@ class Choreographer {
  private:
   mojo::gfx::composition::SceneSchedulerPtr scene_scheduler_;
   ChoreographerDelegate* delegate_;
-  mojo::gfx::composition::FrameInfoPtr last_frame_info_;
+  mojo::gfx::composition::FrameTracker frame_tracker_;
 
   void ScheduleFrame();
   void DoFrame(mojo::gfx::composition::FrameInfoPtr frame_info);

@@ -22,6 +22,7 @@ source_set("ui") {
     "//mojo/common",
     "//mojo/public/cpp/bindings",
     "//mojo/public/interfaces/application",
+    "//mojo/services/gfx/composition/cpp",
     "//mojo/services/gfx/composition/interfaces",
     "//mojo/services/ui/input/interfaces",
     "//mojo/services/ui/views/interfaces",
