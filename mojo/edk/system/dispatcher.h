@@ -261,8 +261,8 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   virtual void CloseImplNoLock() MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // This is called by |CreateEquivalentDispatcherAndCloseNoLock()|. It should
-  // produce "close" this dispatcher and return a new one equivalent to it.
-  // Note: Probably the first thing an implementation should do is call
+  // "close" this dispatcher and return a new one equivalent to it. Note:
+  // Probably the first thing an implementation should do is call
   // |CancelAllAwakablesNoLock()| (or equivalent); unlike |CloseNoLock()|,
   // |CreateEquivalentDispatcherAndCloseNoLock()| does not do this
   // automatically.
