@@ -19,6 +19,7 @@
 #include "mojo/edk/system/data_pipe_producer_dispatcher.h"
 #include "mojo/edk/system/dispatcher.h"
 #include "mojo/edk/system/handle_signals_state.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/system/message_pipe.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"

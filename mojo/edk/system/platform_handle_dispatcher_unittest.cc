@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "mojo/edk/platform/platform_handle_utils_posix.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/test/scoped_test_dir.h"
 #include "mojo/edk/util/scoped_file.h"
 #include "testing/gtest/include/gtest/gtest.h"

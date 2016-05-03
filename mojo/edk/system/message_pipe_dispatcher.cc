@@ -8,6 +8,7 @@
 
 #include "base/logging.h"
 #include "mojo/edk/system/configuration.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/local_message_pipe_endpoint.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/system/message_pipe.h"

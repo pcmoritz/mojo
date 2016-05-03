@@ -10,14 +10,14 @@
 #include "base/logging.h"
 #include "mojo/edk/system/configuration.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle_transport.h"
 
 using mojo::util::RefPtr;
 
 namespace mojo {
 namespace system {
 
-HandleTable::Entry::Entry() : busy(false) {
-}
+HandleTable::Entry::Entry() : busy(false) {}
 
 HandleTable::Entry::Entry(Handle&& handle)
     : handle(std::move(handle)), busy(false) {}

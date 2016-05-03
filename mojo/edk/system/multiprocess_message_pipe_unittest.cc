@@ -19,6 +19,7 @@
 #include "mojo/edk/platform/scoped_platform_handle.h"
 #include "mojo/edk/system/channel.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe.h"
 #include "mojo/edk/system/message_pipe_test_utils.h"
 #include "mojo/edk/system/platform_handle_dispatcher.h"

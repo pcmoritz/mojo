@@ -16,6 +16,7 @@
 #include "mojo/edk/system/channel_manager.h"
 #include "mojo/edk/system/connection_identifier.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"
 #include "mojo/edk/system/process_identifier.h"

@@ -11,6 +11,7 @@
 #include "mojo/edk/system/channel.h"
 #include "mojo/edk/system/channel_endpoint.h"
 #include "mojo/edk/system/channel_endpoint_id.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/incoming_endpoint.h"
 #include "mojo/edk/system/local_message_pipe_endpoint.h"
 #include "mojo/edk/system/message_in_transit.h"
@@ -317,8 +318,7 @@ void MessagePipe::OnDetachFromChannel(unsigned port) {
   Close(port);
 }
 
-MessagePipe::MessagePipe() {
-}
+MessagePipe::MessagePipe() {}
 
 MessagePipe::~MessagePipe() {
   // Owned by the dispatchers. The owning dispatchers should only release us via

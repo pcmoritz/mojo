@@ -444,43 +444,6 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   MOJO_DISALLOW_COPY_AND_ASSIGN(Dispatcher);
 };
 
-// Wrapper around a |Dispatcher| pointer, while it's being processed to be
-// passed in a message pipe. See the comment about
-// |Dispatcher::HandleTableAccess| for more details.
-//
-// Note: This class is deliberately "thin" -- no more expensive than a
-// |Dispatcher*|.
-class DispatcherTransport final {
- public:
-  DispatcherTransport() : dispatcher_(nullptr) {}
-
-  void End() MOJO_NOT_THREAD_SAFE;
-
-  Dispatcher::Type GetType() const { return dispatcher_->GetType(); }
-  bool IsBusy() const MOJO_NOT_THREAD_SAFE {
-    return dispatcher_->IsBusyNoLock();
-  }
-  void Close() MOJO_NOT_THREAD_SAFE { dispatcher_->CloseNoLock(); }
-  util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndClose(
-      MessagePipe* message_pipe,
-      unsigned port) MOJO_NOT_THREAD_SAFE {
-    return dispatcher_->CreateEquivalentDispatcherAndCloseNoLock(message_pipe,
-                                                                 port);
-  }
-
-  bool is_valid() const { return !!dispatcher_; }
-
- private:
-  friend class Dispatcher::HandleTableAccess;
-
-  explicit DispatcherTransport(Dispatcher* dispatcher)
-      : dispatcher_(dispatcher) {}
-
-  Dispatcher* dispatcher_;
-
-  // Copy and assign allowed.
-};
-
 // So logging macros and |DCHECK_EQ()|, etc. work.
 inline std::ostream& operator<<(std::ostream& out, Dispatcher::Type type) {
   return out << static_cast<int>(type);

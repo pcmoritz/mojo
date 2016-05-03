@@ -8,6 +8,7 @@
 #include "mojo/edk/system/configuration.h"
 #include "mojo/edk/system/data_pipe_consumer_dispatcher.h"
 #include "mojo/edk/system/data_pipe_producer_dispatcher.h"
+#include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"
 #include "mojo/edk/system/platform_handle_dispatcher.h"
 #include "mojo/edk/system/shared_buffer_dispatcher.h"
@@ -28,8 +29,6 @@ DispatcherTransport DispatcherTryStartTransport(Dispatcher* dispatcher) {
 }
 
 }  // namespace test
-
-// Dispatcher ------------------------------------------------------------------
 
 // TODO(vtl): The thread-safety analyzer isn't smart enough to deal with the
 // fact that we give up if |TryLock()| fails.
@@ -300,8 +299,7 @@ void Dispatcher::RemoveAwakable(Awakable* awakable,
   RemoveAwakableImplNoLock(awakable, handle_signals_state);
 }
 
-Dispatcher::Dispatcher() : is_closed_(false) {
-}
+Dispatcher::Dispatcher() : is_closed_(false) {}
 
 Dispatcher::~Dispatcher() {
   // Make sure that |Close()| was called.
@@ -571,14 +569,6 @@ bool Dispatcher::EndSerializeAndClose(
 
   return EndSerializeAndCloseImplNoLock(channel, destination, actual_size,
                                         platform_handles);
-}
-
-// DispatcherTransport ---------------------------------------------------------
-
-void DispatcherTransport::End() {
-  DCHECK(dispatcher_);
-  dispatcher_->mutex_.Unlock();
-  dispatcher_ = nullptr;
 }
 
 }  // namespace system
