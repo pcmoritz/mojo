@@ -66,6 +66,7 @@ if (is_linux) {
       "tests/application_impl_test.go",
       "tests/async_waiter_test.go",
       "tests/encoding_test.go",
+      "tests/enums_test.go",
       "tests/interface_test.go",
       "tests/message_test.go",
       "tests/regression_test.go",
