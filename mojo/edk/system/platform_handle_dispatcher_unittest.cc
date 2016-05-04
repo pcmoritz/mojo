@@ -98,26 +98,30 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
   auto dispatcher =
       PlatformHandleDispatcher::Create(PlatformHandleFromFILE(std::move(fp)));
   // TODO(vtl): Are these the correct rights for a |PlatformHandleDispatcher|?
-  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
-                                           MOJO_HANDLE_RIGHT_READ |
-                                           MOJO_HANDLE_RIGHT_WRITE);
+  const MojoHandleRights kRights = MOJO_HANDLE_RIGHT_TRANSFER |
+                                   MOJO_HANDLE_RIGHT_READ |
+                                   MOJO_HANDLE_RIGHT_WRITE;
+  Handle handle(std::move(dispatcher), kRights);
 
   HandleTransport transport(test::HandleTryStartTransport(handle));
   EXPECT_TRUE(transport.is_valid());
   EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE, transport.GetType());
   EXPECT_FALSE(transport.IsBusy());
 
-  auto generic_dispatcher =
-      transport.CreateEquivalentDispatcherAndClose(nullptr, 0u);
-  ASSERT_TRUE(generic_dispatcher);
+  Handle equivalent_handle =
+      transport.CreateEquivalentHandleAndClose(nullptr, 0u);
+  ASSERT_TRUE(equivalent_handle.dispatcher);
+  EXPECT_EQ(kRights, equivalent_handle.rights);
 
   transport.End();
   EXPECT_TRUE(handle.dispatcher->HasOneRef());
   handle.reset();
 
-  ASSERT_EQ(Dispatcher::Type::PLATFORM_HANDLE, generic_dispatcher->GetType());
-  dispatcher = RefPtr<PlatformHandleDispatcher>(
-      static_cast<PlatformHandleDispatcher*>(generic_dispatcher.get()));
+  ASSERT_EQ(Dispatcher::Type::PLATFORM_HANDLE,
+            equivalent_handle.dispatcher->GetType());
+  dispatcher =
+      RefPtr<PlatformHandleDispatcher>(static_cast<PlatformHandleDispatcher*>(
+          equivalent_handle.dispatcher.get()));
 
   fp = FILEFromPlatformHandle(dispatcher->PassPlatformHandle(), "rb");
   EXPECT_TRUE(fp);

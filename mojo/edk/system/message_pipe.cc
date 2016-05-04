@@ -364,8 +364,10 @@ MojoResult MessagePipe::AttachTransportsNoLock(
   dispatchers->reserve(transports->size());
   for (size_t i = 0; i < transports->size(); i++) {
     if ((*transports)[i].is_valid()) {
-      dispatchers->push_back(
-          (*transports)[i].CreateEquivalentDispatcherAndClose(this, port));
+      // TODO(vtl): Plumb this into |MessageInTransit|. (I.e., |dispatchers| ->
+      // |handles|, etc.)
+      Handle h = (*transports)[i].CreateEquivalentHandleAndClose(this, port);
+      dispatchers->push_back(std::move(h.dispatcher));
     } else {
       LOG(WARNING) << "Enqueueing null dispatcher";
       dispatchers->push_back(nullptr);
