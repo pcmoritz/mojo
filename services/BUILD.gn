@@ -82,6 +82,7 @@ group("tests") {
     "//services/clipboard:apptests",
     "//services/gfx/compositor:apptests",
     "//services/http_server:apptests",
+    "//services/media/common:apptests",
     "//services/native_support:apptests",
     "//services/prediction:apptests",
   ]
