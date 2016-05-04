@@ -150,8 +150,7 @@ MojoResult HandleTable::MarkBusyAndStartTransport(
 
     // Try to start the transport.
     DispatcherTransport transport =
-        Dispatcher::HandleTableAccess::TryStartTransport(
-            entries[i]->handle.dispatcher.get());
+        Dispatcher::HandleTableAccess::TryStartTransport(entries[i]->handle);
     if (!transport.is_valid()) {
       // Only log for Debug builds, since this is not a problem with the system
       // code, but with user code.

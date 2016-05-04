@@ -16,6 +16,7 @@
 #include "mojo/edk/system/channel_manager.h"
 #include "mojo/edk/system/connection_identifier.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"
@@ -78,12 +79,17 @@ void TestWriteReadMessage(MessagePipeDispatcher* write_mp,
 // Writes a message pipe dispatcher (in a message) to |write_mp| and reads it
 // from |read_mp| (it should be the next message, i.e., there should be no other
 // other messages already enqueued in that direction).
+// TODO(vtl): Probably |mp_to_send| should be a |Handle|, and so should the
+// return value.
 RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
     MessagePipeDispatcher* write_mp,
     MessagePipeDispatcher* read_mp,
     RefPtr<MessagePipeDispatcher>&& mp_to_send) {
   CHECK_NE(mp_to_send.get(), write_mp);
   CHECK_NE(mp_to_send.get(), read_mp);
+  Handle mp_handle_to_send(std::move(mp_to_send), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                      MOJO_HANDLE_RIGHT_READ |
+                                                      MOJO_HANDLE_RIGHT_WRITE);
 
   // Set up waiting on the read end first (to avoid racing).
   Waiter waiter;
@@ -92,9 +98,9 @@ RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
       read_mp->AddAwakable(&waiter, MOJO_HANDLE_SIGNAL_READABLE, 0, nullptr),
       MOJO_RESULT_OK);
 
-  // Write a message with just |mp_to_send| through the write end.
+  // Write a message with just |mp_handle_to_send| through the write end.
   DispatcherTransport transport(
-      test::DispatcherTryStartTransport(mp_to_send.get()));
+      test::HandleTryStartTransport(mp_handle_to_send));
   CHECK(transport.is_valid());
   std::vector<DispatcherTransport> transports;
   transports.push_back(transport);
@@ -102,7 +108,7 @@ RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
                                   MOJO_WRITE_MESSAGE_FLAG_NONE),
            MOJO_RESULT_OK);
   transport.End();
-  mp_to_send = nullptr;
+  mp_handle_to_send.reset();
 
   // Wait for it to arrive.
   CHECK_EQ(waiter.Wait(test::ActionTimeout(), nullptr), MOJO_RESULT_OK);
@@ -411,6 +417,7 @@ class IPCSupportTest : public testing::Test {
 
 using MessagePipeDispatcherPair =
     std::pair<RefPtr<MessagePipeDispatcher>, RefPtr<MessagePipeDispatcher>>;
+
 MessagePipeDispatcherPair CreateMessagePipe() {
   MessagePipeDispatcherPair rv;
   rv.first = MessagePipeDispatcher::Create(

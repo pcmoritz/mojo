@@ -18,6 +18,7 @@
 #include "mojo/edk/system/data_pipe.h"
 #include "mojo/edk/system/data_pipe_consumer_dispatcher.h"
 #include "mojo/edk/system/data_pipe_producer_dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/system/message_pipe.h"
@@ -176,6 +177,9 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerWithClosedProducer) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
+  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
 
   // Write to the producer and close it, before sending the consumer.
   int32_t elements[10] = {123};
@@ -195,7 +199,7 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerWithClosedProducer) {
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
     DispatcherTransport transport(
-        test::DispatcherTryStartTransport(consumer.get()));
+        test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -205,10 +209,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerWithClosedProducer) {
                                   MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |consumer| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(consumer->HasOneRef());
-    consumer = nullptr;
+    // |consumer_handle.dispatcher| should have been closed. This is
+    // |DCHECK()|ed when it is destroyed.
+    EXPECT_TRUE(consumer_handle.dispatcher->HasOneRef());
+    consumer_handle.reset();
   }
   EXPECT_EQ(MOJO_RESULT_OK, waiter.Wait(test::ActionTimeout(), &context));
   EXPECT_EQ(123u, context);
@@ -297,6 +301,9 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringTwoPhaseWrite) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
+  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
 
   void* write_ptr = nullptr;
   uint32_t num_bytes = 0u;
@@ -314,7 +321,7 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringTwoPhaseWrite) {
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
     DispatcherTransport transport(
-        test::DispatcherTryStartTransport(consumer.get()));
+        test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -324,10 +331,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringTwoPhaseWrite) {
                                   MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |consumer| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(consumer->HasOneRef());
-    consumer = nullptr;
+    // |consumer_handle.dispatcher| should have been closed. This is
+    // |DCHECK()|ed when it is destroyed.
+    EXPECT_TRUE(consumer_handle.dispatcher->HasOneRef());
+    consumer_handle.reset();
   }
   EXPECT_EQ(MOJO_RESULT_OK, waiter.Wait(test::ActionTimeout(), &context));
   EXPECT_EQ(123u, context);
@@ -410,6 +417,9 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringSecondTwoPhaseWrite) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
+  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
 
   void* write_ptr = nullptr;
   uint32_t num_bytes = 0u;
@@ -437,7 +447,7 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringSecondTwoPhaseWrite) {
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
     DispatcherTransport transport(
-        test::DispatcherTryStartTransport(consumer.get()));
+        test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -447,10 +457,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringSecondTwoPhaseWrite) {
                                   MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |consumer| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(consumer->HasOneRef());
-    consumer = nullptr;
+    // |consumer_handle.dispatcher| should have been closed. This is
+    // |DCHECK()|ed when it is destroyed.
+    EXPECT_TRUE(consumer_handle.dispatcher->HasOneRef());
+    consumer_handle.reset();
   }
   EXPECT_EQ(MOJO_RESULT_OK, waiter.Wait(test::ActionTimeout(), &context));
   EXPECT_EQ(123u, context);

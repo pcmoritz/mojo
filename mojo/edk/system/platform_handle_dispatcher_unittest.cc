@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "mojo/edk/platform/platform_handle_utils_posix.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/test/scoped_test_dir.h"
 #include "mojo/edk/util/scoped_file.h"
@@ -96,9 +97,12 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
 
   auto dispatcher =
       PlatformHandleDispatcher::Create(PlatformHandleFromFILE(std::move(fp)));
+  // TODO(vtl): Are these the correct rights for a |PlatformHandleDispatcher|?
+  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                           MOJO_HANDLE_RIGHT_READ |
+                                           MOJO_HANDLE_RIGHT_WRITE);
 
-  DispatcherTransport transport(
-      test::DispatcherTryStartTransport(dispatcher.get()));
+  DispatcherTransport transport(test::HandleTryStartTransport(handle));
   EXPECT_TRUE(transport.is_valid());
   EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE, transport.GetType());
   EXPECT_FALSE(transport.IsBusy());
@@ -108,8 +112,8 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
   ASSERT_TRUE(generic_dispatcher);
 
   transport.End();
-  EXPECT_TRUE(dispatcher->HasOneRef());
-  dispatcher = nullptr;
+  EXPECT_TRUE(handle.dispatcher->HasOneRef());
+  handle.reset();
 
   ASSERT_EQ(Dispatcher::Type::PLATFORM_HANDLE, generic_dispatcher->GetType());
   dispatcher = RefPtr<PlatformHandleDispatcher>(

@@ -8,6 +8,7 @@
 #include "mojo/edk/system/configuration.h"
 #include "mojo/edk/system/data_pipe_consumer_dispatcher.h"
 #include "mojo/edk/system/data_pipe_producer_dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe_dispatcher.h"
 #include "mojo/edk/system/platform_handle_dispatcher.h"
@@ -24,8 +25,8 @@ namespace system {
 namespace test {
 
 // TODO(vtl): Maybe this should be defined in a test-only file instead.
-DispatcherTransport DispatcherTryStartTransport(Dispatcher* dispatcher) {
-  return Dispatcher::HandleTableAccess::TryStartTransport(dispatcher);
+DispatcherTransport HandleTryStartTransport(const Handle& handle) {
+  return Dispatcher::HandleTableAccess::TryStartTransport(handle);
 }
 
 }  // namespace test
@@ -34,18 +35,18 @@ DispatcherTransport DispatcherTryStartTransport(Dispatcher* dispatcher) {
 // fact that we give up if |TryLock()| fails.
 // static
 DispatcherTransport Dispatcher::HandleTableAccess::TryStartTransport(
-    Dispatcher* dispatcher) MOJO_NO_THREAD_SAFETY_ANALYSIS {
-  DCHECK(dispatcher);
+    const Handle& handle) MOJO_NO_THREAD_SAFETY_ANALYSIS {
+  DCHECK(handle.dispatcher);
 
-  if (!dispatcher->mutex_.TryLock())
+  if (!handle.dispatcher->mutex_.TryLock())
     return DispatcherTransport();
 
   // We shouldn't race with things that close dispatchers, since closing can
   // only take place either under |handle_table_mutex_| or when the handle is
   // marked as busy.
-  DCHECK(!dispatcher->is_closed_);
+  DCHECK(!handle.dispatcher->is_closed_);
 
-  return DispatcherTransport(dispatcher);
+  return DispatcherTransport(handle);
 }
 
 // static

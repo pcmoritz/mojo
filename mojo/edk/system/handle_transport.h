@@ -6,25 +6,30 @@
 #define MOJO_EDK_SYSTEM_HANDLE_TRANSPORT_H_
 
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/util/ref_ptr.h"
 #include "mojo/edk/util/thread_annotations.h"
+#include "mojo/public/c/system/handle.h"
 
 namespace mojo {
 namespace system {
 
 class MessagePipe;
 
-// Wrapper around a |Dispatcher| pointer, while it's being processed to be
-// passed in a message pipe. See the comment about
-// |Dispatcher::HandleTableAccess| for more details.
+// Like |Handle|, but non-owning, for use while a handle is being processed to
+// be passed in a message pipe (note this is only *during* the "write message"
+// call). (I.e., this is a wrapper around a |Dispatcher*| and a
+// |MojoHandleRights|.) See the comment about |Dispatcher::HandleTableAccess|
+// for more details.
 //
-// Note: This class is deliberately "thin" -- no more expensive than a
-// |Dispatcher*|.
+// Note: This class is deliberately "thin" -- no more expensive than a struct
+// containing a |Dispatcher*| and a |MojoHandleRights|.
 //
-// TODO(vtl): Add handle rights to this, and rename it to HandleTransport.
+// TODO(vtl): Rename this class to HandleTransport.
 class DispatcherTransport final {
  public:
-  DispatcherTransport() : dispatcher_(nullptr) {}
+  DispatcherTransport()
+      : dispatcher_(nullptr), rights_(MOJO_HANDLE_RIGHT_NONE) {}
 
   void End() MOJO_NOT_THREAD_SAFE;
 
@@ -45,10 +50,11 @@ class DispatcherTransport final {
  private:
   friend class Dispatcher::HandleTableAccess;
 
-  explicit DispatcherTransport(Dispatcher* dispatcher)
-      : dispatcher_(dispatcher) {}
+  explicit DispatcherTransport(const Handle& handle)
+      : dispatcher_(handle.dispatcher.get()), rights_(handle.rights) {}
 
   Dispatcher* dispatcher_;
+  MojoHandleRights rights_;
 
   // Copy and assign allowed.
 };

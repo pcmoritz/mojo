@@ -40,6 +40,7 @@ class Channel;
 class Core;
 class Dispatcher;
 class DispatcherTransport;
+struct Handle;
 class HandleTable;
 class LocalMessagePipeEndpoint;
 class MessagePipe;
@@ -51,7 +52,7 @@ using DispatcherVector = std::vector<util::RefPtr<Dispatcher>>;
 namespace test {
 
 // Test helper. We need to declare it here so we can friend it.
-DispatcherTransport DispatcherTryStartTransport(Dispatcher* dispatcher);
+DispatcherTransport HandleTryStartTransport(const Handle& handle);
 
 }  // namespace test
 
@@ -202,12 +203,12 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
     friend class Core;
     friend class HandleTable;
     // Tests also need this, to avoid needing |Core|.
-    friend DispatcherTransport test::DispatcherTryStartTransport(Dispatcher*);
+    friend DispatcherTransport test::HandleTryStartTransport(const Handle&);
 
     // This must be called under the handle table lock and only if the handle
     // table entry is not marked busy. The caller must maintain a reference to
     // |dispatcher| until |DispatcherTransport::End()| is called.
-    static DispatcherTransport TryStartTransport(Dispatcher* dispatcher);
+    static DispatcherTransport TryStartTransport(const Handle& handle);
   };
 
   // A |TransportData| may serialize dispatchers that are given to it (and which

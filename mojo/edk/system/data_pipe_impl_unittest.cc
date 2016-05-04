@@ -265,9 +265,10 @@ class RemoteDataPipeImplTestHelper : public DataPipeImplTestHelper {
   bool IsStrictCircularBuffer() const override { return false; }
 
  protected:
-  void SendDispatcher(size_t source_i,
-                      RefPtr<Dispatcher> to_send,
-                      RefPtr<Dispatcher>* to_receive) {
+  // TODO(vtl): |to_receive| should be a |Handle*| too.
+  void SendHandle(size_t source_i,
+                  const Handle& to_send,
+                  RefPtr<Dispatcher>* to_receive) {
     DCHECK(source_i == 0 || source_i == 1);
     size_t dest_i = source_i ^ 1;
 
@@ -280,8 +281,7 @@ class RemoteDataPipeImplTestHelper : public DataPipeImplTestHelper {
               message_pipe(dest_i)->AddAwakable(
                   0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 987, nullptr));
     {
-      DispatcherTransport transport(
-          test::DispatcherTryStartTransport(to_send.get()));
+      DispatcherTransport transport(test::HandleTryStartTransport(to_send));
       ASSERT_TRUE(transport.is_valid());
 
       std::vector<DispatcherTransport> transports;
@@ -385,12 +385,15 @@ class RemoteProducerDataPipeImplTestHelper
     // This is the producer dispatcher we'll send.
     auto to_send = DataPipeProducerDispatcher::Create();
     to_send->Init(dp());
+    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
     RefPtr<Dispatcher> to_receive;
-    SendDispatcher(0, to_send, &to_receive);
-    // |to_send| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(0, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
 
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_PRODUCER, to_receive->GetType());
     producer_dispatcher_ = RefPtr<DataPipeProducerDispatcher>(
@@ -434,12 +437,15 @@ class RemoteConsumerDataPipeImplTestHelper
     // This is the consumer dispatcher we'll send.
     auto to_send = DataPipeConsumerDispatcher::Create();
     to_send->Init(dp());
+    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
     RefPtr<Dispatcher> to_receive;
-    SendDispatcher(0, to_send, &to_receive);
-    // |to_send| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(0, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
 
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_CONSUMER, to_receive->GetType());
     consumer_dispatcher_ = RefPtr<DataPipeConsumerDispatcher>(
@@ -488,23 +494,26 @@ class RemoteProducerDataPipeImplTestHelper2
     // This is the producer dispatcher we'll send.
     auto to_send = DataPipeProducerDispatcher::Create();
     to_send->Init(dp());
+    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
     RefPtr<Dispatcher> to_receive;
-    SendDispatcher(0, to_send, &to_receive);
-    // |to_send| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(0, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_PRODUCER, to_receive->GetType());
-    to_send = RefPtr<DataPipeProducerDispatcher>(
-        static_cast<DataPipeProducerDispatcher*>(to_receive.get()));
-    to_receive = nullptr;
+    handle_to_send = Handle(std::move(to_receive), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                       MOJO_HANDLE_RIGHT_READ |
+                                                       MOJO_HANDLE_RIGHT_WRITE);
 
     // Now send it back the other way.
-    SendDispatcher(1, to_send, &to_receive);
-    // |producer_dispatcher_| should have been closed. This is |DCHECK()|ed when
-    // it is destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(1, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
 
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_PRODUCER, to_receive->GetType());
     producer_dispatcher_ = RefPtr<DataPipeProducerDispatcher>(
@@ -535,23 +544,26 @@ class RemoteConsumerDataPipeImplTestHelper2
     // This is the consumer dispatcher we'll send.
     auto to_send = DataPipeConsumerDispatcher::Create();
     to_send->Init(dp());
+    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                  MOJO_HANDLE_RIGHT_READ |
+                                                  MOJO_HANDLE_RIGHT_WRITE);
     RefPtr<Dispatcher> to_receive;
-    SendDispatcher(0, to_send, &to_receive);
-    // |to_send| should have been closed. This is |DCHECK()|ed when it is
-    // destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(0, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_CONSUMER, to_receive->GetType());
-    to_send = RefPtr<DataPipeConsumerDispatcher>(
-        static_cast<DataPipeConsumerDispatcher*>(to_receive.get()));
-    to_receive = nullptr;
+    handle_to_send = Handle(std::move(to_receive), MOJO_HANDLE_RIGHT_TRANSFER |
+                                                       MOJO_HANDLE_RIGHT_READ |
+                                                       MOJO_HANDLE_RIGHT_WRITE);
 
     // Now send it back the other way.
-    SendDispatcher(1, to_send, &to_receive);
-    // |consumer_dispatcher_| should have been closed. This is |DCHECK()|ed when
-    // it is destroyed.
-    EXPECT_TRUE(to_send->HasOneRef());
-    to_send = nullptr;
+    SendHandle(1, handle_to_send, &to_receive);
+    // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
+    // when it is destroyed.
+    EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
+    handle_to_send.reset();
 
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_CONSUMER, to_receive->GetType());
     consumer_dispatcher_ = RefPtr<DataPipeConsumerDispatcher>(

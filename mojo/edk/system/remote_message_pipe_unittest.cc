@@ -20,6 +20,7 @@
 #include "mojo/edk/system/channel.h"
 #include "mojo/edk/system/channel_endpoint.h"
 #include "mojo/edk/system/channel_endpoint_id.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/incoming_endpoint.h"
 #include "mojo/edk/system/message_pipe.h"
@@ -626,6 +627,9 @@ TEST_F(RemoteMessagePipeTest, HandlePassing) {
       MessagePipeDispatcher::kDefaultCreateOptions);
   auto local_mp = MessagePipe::CreateLocalLocal();
   dispatcher->Init(local_mp.Clone(), 0);
+  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                           MOJO_HANDLE_RIGHT_READ |
+                                           MOJO_HANDLE_RIGHT_WRITE);
 
   // Prepare to wait on MP 1, port 1. (Add the waiter now. Otherwise, if we do
   // it later, it might already be readable.)
@@ -636,8 +640,7 @@ TEST_F(RemoteMessagePipeTest, HandlePassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -648,10 +651,10 @@ TEST_F(RemoteMessagePipeTest, HandlePassing) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.
@@ -771,6 +774,9 @@ TEST_F(RemoteMessagePipeTest, HandlePassingHalfClosed) {
       MessagePipeDispatcher::kDefaultCreateOptions);
   auto local_mp = MessagePipe::CreateLocalLocal();
   dispatcher->Init(local_mp.Clone(), 0);
+  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                           MOJO_HANDLE_RIGHT_READ |
+                                           MOJO_HANDLE_RIGHT_WRITE);
 
   hss = local_mp->GetHandleSignalsState(0);
   EXPECT_EQ(MOJO_HANDLE_SIGNAL_WRITABLE, hss.satisfied_signals);
@@ -811,8 +817,7 @@ TEST_F(RemoteMessagePipeTest, HandlePassingHalfClosed) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -823,10 +828,10 @@ TEST_F(RemoteMessagePipeTest, HandlePassingHalfClosed) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.
@@ -919,10 +924,13 @@ TEST_F(RemoteMessagePipeTest, SharedBufferPassing) {
       &result);
   EXPECT_EQ(MOJO_RESULT_OK, result);
   ASSERT_TRUE(dispatcher);
+  Handle handle(std::move(dispatcher),
+                MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_TRANSFER |
+                    MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE);
 
   // Make a mapping.
   std::unique_ptr<PlatformSharedBufferMapping> mapping0;
-  EXPECT_EQ(MOJO_RESULT_OK, dispatcher->MapBuffer(
+  EXPECT_EQ(MOJO_RESULT_OK, handle.dispatcher->MapBuffer(
                                 0, 100, MOJO_MAP_BUFFER_FLAG_NONE, &mapping0));
   ASSERT_TRUE(mapping0);
   ASSERT_TRUE(mapping0->GetBase());
@@ -940,8 +948,7 @@ TEST_F(RemoteMessagePipeTest, SharedBufferPassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -952,10 +959,10 @@ TEST_F(RemoteMessagePipeTest, SharedBufferPassing) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.
@@ -1040,6 +1047,10 @@ TEST_F(RemoteMessagePipeTest, PlatformHandlePassing) {
   // be passed.
   auto dispatcher =
       PlatformHandleDispatcher::Create(PlatformHandleFromFILE(std::move(fp)));
+  // TODO(vtl): Are these the correct rights for a |PlatformHandleDispatcher|?
+  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                           MOJO_HANDLE_RIGHT_READ |
+                                           MOJO_HANDLE_RIGHT_WRITE);
 
   // Prepare to wait on MP 1, port 1. (Add the waiter now. Otherwise, if we do
   // it later, it might already be readable.)
@@ -1050,8 +1061,7 @@ TEST_F(RemoteMessagePipeTest, PlatformHandlePassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -1062,10 +1072,10 @@ TEST_F(RemoteMessagePipeTest, PlatformHandlePassing) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.
@@ -1175,6 +1185,9 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
       MessagePipeDispatcher::kDefaultCreateOptions);
   auto local_mp = MessagePipe::CreateLocalLocal();
   dispatcher->Init(local_mp.Clone(), 0);
+  Handle handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                           MOJO_HANDLE_RIGHT_READ |
+                                           MOJO_HANDLE_RIGHT_WRITE);
 
   // Prepare to wait on MP 1, port 1. (Add the waiter now. Otherwise, if we do
   // it later, it might already be readable.)
@@ -1185,8 +1198,7 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -1197,10 +1209,10 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.
@@ -1233,6 +1245,10 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
   dispatcher = RefPtr<MessagePipeDispatcher>(
       static_cast<MessagePipeDispatcher*>(read_dispatchers[0].get()));
   read_dispatchers.clear();
+  // TODO(vtl): We should really get |handle| from |ReadMessage()|.
+  handle = Handle(std::move(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER |
+                                             MOJO_HANDLE_RIGHT_READ |
+                                             MOJO_HANDLE_RIGHT_WRITE);
 
   // Now pass it back.
 
@@ -1245,8 +1261,7 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
 
   // Write to MP 1, port 1.
   {
-    DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+    DispatcherTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
     std::vector<DispatcherTransport> transports;
@@ -1257,10 +1272,10 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
                           &transports, MOJO_WRITE_MESSAGE_FLAG_NONE));
     transport.End();
 
-    // |dispatcher| should have been closed. This is |DCHECK()|ed when the
-    // |dispatcher| is destroyed.
-    EXPECT_TRUE(dispatcher->HasOneRef());
-    dispatcher = nullptr;
+    // |handle.dispatcher| should have been closed. This is |DCHECK()|ed when
+    // the |handle.dispatcher| is destroyed.
+    EXPECT_TRUE(handle.dispatcher->HasOneRef());
+    handle.reset();
   }
 
   // Wait.

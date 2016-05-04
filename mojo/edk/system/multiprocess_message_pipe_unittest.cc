@@ -19,6 +19,7 @@
 #include "mojo/edk/platform/scoped_platform_handle.h"
 #include "mojo/edk/system/channel.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_transport.h"
 #include "mojo/edk/system/message_pipe.h"
 #include "mojo/edk/system/message_pipe_test_utils.h"
@@ -323,19 +324,21 @@ TEST_F(MultiprocessMessagePipeTest, MAYBE_SharedBufferPassing) {
       &result);
   EXPECT_EQ(MOJO_RESULT_OK, result);
   ASSERT_TRUE(dispatcher);
+  Handle handle(std::move(dispatcher),
+                MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_TRANSFER |
+                    MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE);
 
   // Make a mapping.
   std::unique_ptr<PlatformSharedBufferMapping> mapping;
-  EXPECT_EQ(MOJO_RESULT_OK,
-            dispatcher->MapBuffer(0, 100, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
+  EXPECT_EQ(MOJO_RESULT_OK, handle.dispatcher->MapBuffer(
+                                0, 100, MOJO_MAP_BUFFER_FLAG_NONE, &mapping));
   ASSERT_TRUE(mapping);
   ASSERT_TRUE(mapping->GetBase());
   ASSERT_EQ(100u, mapping->GetLength());
 
   // Send the shared buffer.
   const std::string go1("go 1");
-  DispatcherTransport transport(
-      test::DispatcherTryStartTransport(dispatcher.get()));
+  DispatcherTransport transport(test::HandleTryStartTransport(handle));
   ASSERT_TRUE(transport.is_valid());
 
   std::vector<DispatcherTransport> transports;
@@ -346,8 +349,8 @@ TEST_F(MultiprocessMessagePipeTest, MAYBE_SharedBufferPassing) {
                              MOJO_WRITE_MESSAGE_FLAG_NONE));
   transport.End();
 
-  EXPECT_TRUE(dispatcher->HasOneRef());
-  dispatcher = nullptr;
+  EXPECT_TRUE(handle.dispatcher->HasOneRef());
+  handle.reset();
 
   // Wait for a message from the child.
   HandleSignalsState hss;
@@ -464,7 +467,7 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
   auto mp = MessagePipe::CreateLocalProxy(&ep);
   Init(std::move(ep));
 
-  std::vector<RefPtr<PlatformHandleDispatcher>> dispatchers;
+  std::vector<Handle> handles;
   std::vector<DispatcherTransport> transports;
 
   size_t pipe_count = GetParam();
@@ -475,11 +478,13 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
     fflush(fp.get());
     rewind(fp.get());
 
-    auto dispatcher = PlatformHandleDispatcher::Create(
-        ScopedPlatformHandle(PlatformHandleFromFILE(std::move(fp))));
-    dispatchers.push_back(dispatcher);
+    Handle handle(PlatformHandleDispatcher::Create(ScopedPlatformHandle(
+                      PlatformHandleFromFILE(std::move(fp)))),
+                  MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
+                      MOJO_HANDLE_RIGHT_WRITE);
+    handles.push_back(std::move(handle));
     DispatcherTransport transport(
-        test::DispatcherTryStartTransport(dispatcher.get()));
+        test::HandleTryStartTransport(handles.back()));
     ASSERT_TRUE(transport.is_valid());
     transports.push_back(transport);
   }
@@ -493,10 +498,10 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
 
   for (size_t i = 0; i < pipe_count; ++i) {
     transports[i].End();
-    EXPECT_TRUE(dispatchers[i]->HasOneRef());
+    EXPECT_TRUE(handles[i].dispatcher->HasOneRef());
   }
 
-  dispatchers.clear();
+  handles.clear();
 
   // Wait for it to become readable, which should fail.
   HandleSignalsState hss;
