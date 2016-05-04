@@ -89,7 +89,7 @@ class MessagePipe final : public ChannelEndpointClient {
   MojoResult WriteMessage(unsigned port,
                           UserPointer<const void> bytes,
                           uint32_t num_bytes,
-                          std::vector<DispatcherTransport>* transports,
+                          std::vector<HandleTransport>* transports,
                           MojoWriteMessageFlags flags);
   MojoResult ReadMessage(unsigned port,
                          UserPointer<void> bytes,
@@ -136,14 +136,13 @@ class MessagePipe final : public ChannelEndpointClient {
   // dispatchers attached. Must be called with |lock_| held.
   MojoResult EnqueueMessageNoLock(unsigned port,
                                   std::unique_ptr<MessageInTransit> message,
-                                  std::vector<DispatcherTransport>* transports)
+                                  std::vector<HandleTransport>* transports)
       MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   // Helper for |EnqueueMessageNoLock()|.
-  MojoResult AttachTransportsNoLock(
-      unsigned port,
-      MessageInTransit* message,
-      std::vector<DispatcherTransport>* transports)
+  MojoResult AttachTransportsNoLock(unsigned port,
+                                    MessageInTransit* message,
+                                    std::vector<HandleTransport>* transports)
       MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   mutable util::Mutex mutex_;

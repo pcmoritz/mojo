@@ -39,9 +39,9 @@ class Awakable;
 class Channel;
 class Core;
 class Dispatcher;
-class DispatcherTransport;
 struct Handle;
 class HandleTable;
+class HandleTransport;
 class LocalMessagePipeEndpoint;
 class MessagePipe;
 class ProxyMessagePipeEndpoint;
@@ -52,7 +52,7 @@ using DispatcherVector = std::vector<util::RefPtr<Dispatcher>>;
 namespace test {
 
 // Test helper. We need to declare it here so we can friend it.
-DispatcherTransport HandleTryStartTransport(const Handle& handle);
+HandleTransport HandleTryStartTransport(const Handle& handle);
 
 }  // namespace test
 
@@ -106,7 +106,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // failure, they should remain in their original state.
   MojoResult WriteMessage(UserPointer<const void> bytes,
                           uint32_t num_bytes,
-                          std::vector<DispatcherTransport>* transports,
+                          std::vector<HandleTransport>* transports,
                           MojoWriteMessageFlags flags);
   // |dispatchers| must be non-null but empty, if |num_dispatchers| is non-null
   // and nonzero. On success, it will be set to the dispatchers to be received
@@ -195,20 +195,20 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // this, since there are requirements on the handle table (see below).
   //
   // In this special state, only a restricted set of operations is allowed.
-  // These are the ones available as |DispatcherTransport| methods. Other
-  // |Dispatcher| methods must not be called until |DispatcherTransport::End()|
-  // has been called.
+  // These are the ones available as |HandleTransport| methods. Other
+  // |Dispatcher| methods must not be called until |HandleTransport::End()| has
+  // been called.
   class HandleTableAccess {
    private:
     friend class Core;
     friend class HandleTable;
     // Tests also need this, to avoid needing |Core|.
-    friend DispatcherTransport test::HandleTryStartTransport(const Handle&);
+    friend HandleTransport test::HandleTryStartTransport(const Handle&);
 
     // This must be called under the handle table lock and only if the handle
     // table entry is not marked busy. The caller must maintain a reference to
-    // |dispatcher| until |DispatcherTransport::End()| is called.
-    static DispatcherTransport TryStartTransport(const Handle& handle);
+    // |dispatcher| until |HandleTransport::End()| is called.
+    static HandleTransport TryStartTransport(const Handle& handle);
   };
 
   // A |TransportData| may serialize dispatchers that are given to it (and which
@@ -217,7 +217,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // Note that the |MessageInTransit| "owns" (i.e., has the only ref to) these
   // dispatchers, so there are no locking issues. (There's no lock ordering
   // issue, and in fact no need to take dispatcher locks at all.)
-  // TODO(vtl): Consider making another wrapper similar to |DispatcherTransport|
+  // TODO(vtl): Consider making another wrapper similar to |HandleTransport|
   // (but with an owning, unique reference), and having
   // |CreateEquivalentDispatcherAndCloseImplNoLock()| return that wrapper (and
   // |MessageInTransit|, etc. only holding on to such wrappers).
@@ -277,7 +277,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   virtual MojoResult WriteMessageImplNoLock(
       UserPointer<const void> bytes,
       uint32_t num_bytes,
-      std::vector<DispatcherTransport>* transports,
+      std::vector<HandleTransport>* transports,
       MojoWriteMessageFlags flags) MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   virtual MojoResult ReadMessageImplNoLock(UserPointer<void> bytes,
                                            UserPointer<uint32_t> num_bytes,
@@ -375,7 +375,7 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
 
  private:
   FRIEND_REF_COUNTED_THREAD_SAFE(Dispatcher);
-  friend class DispatcherTransport;
+  friend class HandleTransport;
 
   // Closes the dispatcher. This must be done under lock, and unlike |Close()|,
   // the dispatcher must not be closed already. (This is the "equivalent" of
@@ -400,12 +400,11 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
   // |CoreImpl|'s handle table).
   //
   // TODO(vtl): The serialization API (and related implementation methods,
-  // including |DispatcherTransport|'s methods) is marked
-  // |MOJO_NOT_THREAD_SAFE|. This is because the threading requirements are
-  // somewhat complicated (e.g., |HandleTableAccess::TryStartTransport()| is
-  // really a try-lock function, amongst other things). We could/should do a
-  // more careful job annotating these methods.
-  // https://github.com/domokit/mojo/issues/322
+  // including |HandleTransport|'s methods) is marked |MOJO_NOT_THREAD_SAFE|.
+  // This is because the threading requirements are somewhat complicated (e.g.,
+  // |HandleTableAccess::TryStartTransport()| is really a try-lock function,
+  // amongst other things). We could/should do a more careful job annotating
+  // these methods. https://github.com/domokit/mojo/issues/322
   //
   // Starts the serialization. Returns (via the two "out" parameters) the
   // maximum amount of space that may be needed to serialize this dispatcher to

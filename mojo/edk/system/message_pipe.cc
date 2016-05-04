@@ -149,12 +149,11 @@ void MessagePipe::Close(unsigned port) {
 }
 
 // TODO(vtl): Handle flags.
-MojoResult MessagePipe::WriteMessage(
-    unsigned port,
-    UserPointer<const void> bytes,
-    uint32_t num_bytes,
-    std::vector<DispatcherTransport>* transports,
-    MojoWriteMessageFlags flags) {
+MojoResult MessagePipe::WriteMessage(unsigned port,
+                                     UserPointer<const void> bytes,
+                                     uint32_t num_bytes,
+                                     std::vector<HandleTransport>* transports,
+                                     MojoWriteMessageFlags flags) {
   DCHECK(port == 0 || port == 1);
 
   MutexLocker locker(&mutex_);
@@ -331,7 +330,7 @@ MessagePipe::~MessagePipe() {
 MojoResult MessagePipe::EnqueueMessageNoLock(
     unsigned port,
     std::unique_ptr<MessageInTransit> message,
-    std::vector<DispatcherTransport>* transports) {
+    std::vector<HandleTransport>* transports) {
   DCHECK(port == 0 || port == 1);
   DCHECK(message);
 
@@ -356,7 +355,7 @@ MojoResult MessagePipe::EnqueueMessageNoLock(
 MojoResult MessagePipe::AttachTransportsNoLock(
     unsigned port,
     MessageInTransit* message,
-    std::vector<DispatcherTransport>* transports) {
+    std::vector<HandleTransport>* transports) {
   DCHECK(!message->has_dispatchers());
 
   // Clone the dispatchers and attach them to the message. (This must be done as

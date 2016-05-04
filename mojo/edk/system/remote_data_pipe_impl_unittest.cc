@@ -198,11 +198,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerWithClosedProducer) {
             message_pipe(1)->AddAwakable(
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
-    DispatcherTransport transport(
-        test::HandleTryStartTransport(consumer_handle));
+    HandleTransport transport(test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(MOJO_RESULT_OK, message_pipe(0)->WriteMessage(
                                   0, NullUserPointer(), 0, &transports,
@@ -320,11 +319,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringTwoPhaseWrite) {
             message_pipe(1)->AddAwakable(
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
-    DispatcherTransport transport(
-        test::HandleTryStartTransport(consumer_handle));
+    HandleTransport transport(test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(MOJO_RESULT_OK, message_pipe(0)->WriteMessage(
                                   0, NullUserPointer(), 0, &transports,
@@ -446,11 +444,10 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringSecondTwoPhaseWrite) {
             message_pipe(1)->AddAwakable(
                 0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 123, nullptr));
   {
-    DispatcherTransport transport(
-        test::HandleTryStartTransport(consumer_handle));
+    HandleTransport transport(test::HandleTryStartTransport(consumer_handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(MOJO_RESULT_OK, message_pipe(0)->WriteMessage(
                                   0, NullUserPointer(), 0, &transports,

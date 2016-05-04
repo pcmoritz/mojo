@@ -99,10 +99,9 @@ RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
       MOJO_RESULT_OK);
 
   // Write a message with just |mp_handle_to_send| through the write end.
-  DispatcherTransport transport(
-      test::HandleTryStartTransport(mp_handle_to_send));
+  HandleTransport transport(test::HandleTryStartTransport(mp_handle_to_send));
   CHECK(transport.is_valid());
-  std::vector<DispatcherTransport> transports;
+  std::vector<HandleTransport> transports;
   transports.push_back(transport);
   CHECK_EQ(write_mp->WriteMessage(NullUserPointer(), 0, &transports,
                                   MOJO_WRITE_MESSAGE_FLAG_NONE),

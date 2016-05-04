@@ -9,7 +9,7 @@
 namespace mojo {
 namespace system {
 
-void DispatcherTransport::End() {
+void HandleTransport::End() {
   DCHECK(dispatcher_);
   dispatcher_->mutex_.Unlock();
   dispatcher_ = nullptr;

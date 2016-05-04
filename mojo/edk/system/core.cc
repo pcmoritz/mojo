@@ -291,7 +291,7 @@ MojoResult Core::WriteMessage(MojoHandle message_pipe_handle,
   // without accessing the handle table. These can be dumb pointers, since their
   // entries in the handle table won't get removed (since they'll be marked as
   // busy).
-  std::vector<DispatcherTransport> transports(num_handles);
+  std::vector<HandleTransport> transports(num_handles);
 
   // When we pass handles, we have to try to take all their dispatchers' locks
   // and mark the handles as busy. If the call succeeds, we then remove the

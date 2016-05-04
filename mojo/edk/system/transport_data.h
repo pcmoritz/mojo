@@ -24,7 +24,7 @@ class Channel;
 // in various stages of serialization.
 //
 // The stages are:
-//   - Before reaching |TransportData|: Turn |DispatcherTransport|s into
+//   - Before reaching |TransportData|: Turn |HandleTransport|s into
 //     |Dispatcher|s that are "owned" by (and attached to) a |MessageInTransit|.
 //     This invalidates the handles in the space of the sending application
 //     (and, e.g., if another thread is waiting on such a handle, it'll be

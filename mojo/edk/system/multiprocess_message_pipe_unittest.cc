@@ -338,10 +338,10 @@ TEST_F(MultiprocessMessagePipeTest, MAYBE_SharedBufferPassing) {
 
   // Send the shared buffer.
   const std::string go1("go 1");
-  DispatcherTransport transport(test::HandleTryStartTransport(handle));
+  HandleTransport transport(test::HandleTryStartTransport(handle));
   ASSERT_TRUE(transport.is_valid());
 
-  std::vector<DispatcherTransport> transports;
+  std::vector<HandleTransport> transports;
   transports.push_back(transport);
   EXPECT_EQ(MOJO_RESULT_OK,
             mp->WriteMessage(0, UserPointer<const void>(&go1[0]),
@@ -468,7 +468,7 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
   Init(std::move(ep));
 
   std::vector<Handle> handles;
-  std::vector<DispatcherTransport> transports;
+  std::vector<HandleTransport> transports;
 
   size_t pipe_count = GetParam();
   for (size_t i = 0; i < pipe_count; ++i) {
@@ -483,8 +483,7 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
                   MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
                       MOJO_HANDLE_RIGHT_WRITE);
     handles.push_back(std::move(handle));
-    DispatcherTransport transport(
-        test::HandleTryStartTransport(handles.back()));
+    HandleTransport transport(test::HandleTryStartTransport(handles.back()));
     ASSERT_TRUE(transport.is_valid());
     transports.push_back(transport);
   }

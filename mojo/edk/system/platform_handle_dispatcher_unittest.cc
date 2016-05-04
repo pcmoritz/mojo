@@ -102,7 +102,7 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
                                            MOJO_HANDLE_RIGHT_READ |
                                            MOJO_HANDLE_RIGHT_WRITE);
 
-  DispatcherTransport transport(test::HandleTryStartTransport(handle));
+  HandleTransport transport(test::HandleTryStartTransport(handle));
   EXPECT_TRUE(transport.is_valid());
   EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE, transport.GetType());
   EXPECT_FALSE(transport.IsBusy());

@@ -281,10 +281,10 @@ class RemoteDataPipeImplTestHelper : public DataPipeImplTestHelper {
               message_pipe(dest_i)->AddAwakable(
                   0, &waiter, MOJO_HANDLE_SIGNAL_READABLE, 987, nullptr));
     {
-      DispatcherTransport transport(test::HandleTryStartTransport(to_send));
+      HandleTransport transport(test::HandleTryStartTransport(to_send));
       ASSERT_TRUE(transport.is_valid());
 
-      std::vector<DispatcherTransport> transports;
+      std::vector<HandleTransport> transports;
       transports.push_back(transport);
       ASSERT_EQ(MOJO_RESULT_OK, message_pipe(source_i)->WriteMessage(
                                     0, NullUserPointer(), 0, &transports,

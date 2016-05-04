@@ -640,10 +640,10 @@ TEST_F(RemoteMessagePipeTest, HandlePassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,
@@ -817,10 +817,10 @@ TEST_F(RemoteMessagePipeTest, HandlePassingHalfClosed) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,
@@ -948,10 +948,10 @@ TEST_F(RemoteMessagePipeTest, SharedBufferPassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,
@@ -1061,10 +1061,10 @@ TEST_F(RemoteMessagePipeTest, PlatformHandlePassing) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,
@@ -1198,10 +1198,10 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
 
   // Write to MP 0, port 0.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,
@@ -1261,10 +1261,10 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
 
   // Write to MP 1, port 1.
   {
-    DispatcherTransport transport(test::HandleTryStartTransport(handle));
+    HandleTransport transport(test::HandleTryStartTransport(handle));
     EXPECT_TRUE(transport.is_valid());
 
-    std::vector<DispatcherTransport> transports;
+    std::vector<HandleTransport> transports;
     transports.push_back(transport);
     EXPECT_EQ(
         MOJO_RESULT_OK,

@@ -25,7 +25,7 @@ namespace system {
 namespace test {
 
 // TODO(vtl): Maybe this should be defined in a test-only file instead.
-DispatcherTransport HandleTryStartTransport(const Handle& handle) {
+HandleTransport HandleTryStartTransport(const Handle& handle) {
   return Dispatcher::HandleTableAccess::TryStartTransport(handle);
 }
 
@@ -34,19 +34,19 @@ DispatcherTransport HandleTryStartTransport(const Handle& handle) {
 // TODO(vtl): The thread-safety analyzer isn't smart enough to deal with the
 // fact that we give up if |TryLock()| fails.
 // static
-DispatcherTransport Dispatcher::HandleTableAccess::TryStartTransport(
+HandleTransport Dispatcher::HandleTableAccess::TryStartTransport(
     const Handle& handle) MOJO_NO_THREAD_SAFETY_ANALYSIS {
   DCHECK(handle.dispatcher);
 
   if (!handle.dispatcher->mutex_.TryLock())
-    return DispatcherTransport();
+    return HandleTransport();
 
   // We shouldn't race with things that close dispatchers, since closing can
   // only take place either under |handle_table_mutex_| or when the handle is
   // marked as busy.
   DCHECK(!handle.dispatcher->is_closed_);
 
-  return DispatcherTransport(handle);
+  return HandleTransport(handle);
 }
 
 // static
@@ -108,11 +108,10 @@ MojoResult Dispatcher::Close() {
   return MOJO_RESULT_OK;
 }
 
-MojoResult Dispatcher::WriteMessage(
-    UserPointer<const void> bytes,
-    uint32_t num_bytes,
-    std::vector<DispatcherTransport>* transports,
-    MojoWriteMessageFlags flags) {
+MojoResult Dispatcher::WriteMessage(UserPointer<const void> bytes,
+                                    uint32_t num_bytes,
+                                    std::vector<HandleTransport>* transports,
+                                    MojoWriteMessageFlags flags) {
   DCHECK(!transports ||
          (transports->size() > 0 &&
           transports->size() < GetConfiguration().max_message_num_handles));
@@ -324,7 +323,7 @@ void Dispatcher::CloseImplNoLock() {
 MojoResult Dispatcher::WriteMessageImplNoLock(
     UserPointer<const void> /*bytes*/,
     uint32_t /*num_bytes*/,
-    std::vector<DispatcherTransport>* /*transports*/,
+    std::vector<HandleTransport>* /*transports*/,
     MojoWriteMessageFlags /*flags*/) {
   mutex_.AssertHeld();
   DCHECK(!is_closed_);

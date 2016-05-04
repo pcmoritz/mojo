@@ -162,7 +162,7 @@ MessagePipeDispatcher::CreateEquivalentDispatcherAndCloseImplNoLock(
 MojoResult MessagePipeDispatcher::WriteMessageImplNoLock(
     UserPointer<const void> bytes,
     uint32_t num_bytes,
-    std::vector<DispatcherTransport>* transports,
+    std::vector<HandleTransport>* transports,
     MojoWriteMessageFlags flags) {
   DCHECK(!transports ||
          (transports->size() > 0 &&

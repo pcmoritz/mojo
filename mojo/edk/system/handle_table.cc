@@ -113,7 +113,7 @@ MojoResult HandleTable::MarkBusyAndStartTransport(
     MojoHandle disallowed_handle,
     const MojoHandle* handle_values,
     uint32_t num_handles,
-    std::vector<DispatcherTransport>* transports) {
+    std::vector<HandleTransport>* transports) {
   DCHECK_NE(disallowed_handle, MOJO_HANDLE_INVALID);
   DCHECK(handle_values);
   DCHECK_LE(num_handles, GetConfiguration().max_message_num_handles);
@@ -149,7 +149,7 @@ MojoResult HandleTable::MarkBusyAndStartTransport(
     entries[i]->busy = true;
 
     // Try to start the transport.
-    DispatcherTransport transport =
+    HandleTransport transport =
         Dispatcher::HandleTableAccess::TryStartTransport(entries[i]->handle);
     if (!transport.is_valid()) {
       // Only log for Debug builds, since this is not a problem with the system

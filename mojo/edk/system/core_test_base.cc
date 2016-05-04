@@ -54,11 +54,10 @@ class MockDispatcher : public Dispatcher {
     mutex().AssertHeld();
   }
 
-  MojoResult WriteMessageImplNoLock(
-      UserPointer<const void> bytes,
-      uint32_t num_bytes,
-      std::vector<DispatcherTransport>* transports,
-      MojoWriteMessageFlags /*flags*/) override {
+  MojoResult WriteMessageImplNoLock(UserPointer<const void> bytes,
+                                    uint32_t num_bytes,
+                                    std::vector<HandleTransport>* transports,
+                                    MojoWriteMessageFlags /*flags*/) override {
     info_->IncrementWriteMessageCallCount();
     mutex().AssertHeld();
 

@@ -22,7 +22,7 @@ namespace system {
 
 class Core;
 class Dispatcher;
-class DispatcherTransport;
+class HandleTransport;
 
 using DispatcherVector = std::vector<util::RefPtr<Dispatcher>>;
 
@@ -91,7 +91,7 @@ class HandleTable {
       MojoHandle disallowed_handle,
       const MojoHandle* handle_values,
       uint32_t num_handles,
-      std::vector<DispatcherTransport>* transports);
+      std::vector<HandleTransport>* transports);
 
   // Remove the given handle values, which must all be present and which should
   // have previously been marked busy by |MarkBusyAndStartTransport()|.

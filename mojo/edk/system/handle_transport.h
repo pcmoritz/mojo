@@ -24,12 +24,9 @@ class MessagePipe;
 //
 // Note: This class is deliberately "thin" -- no more expensive than a struct
 // containing a |Dispatcher*| and a |MojoHandleRights|.
-//
-// TODO(vtl): Rename this class to HandleTransport.
-class DispatcherTransport final {
+class HandleTransport final {
  public:
-  DispatcherTransport()
-      : dispatcher_(nullptr), rights_(MOJO_HANDLE_RIGHT_NONE) {}
+  HandleTransport() : dispatcher_(nullptr), rights_(MOJO_HANDLE_RIGHT_NONE) {}
 
   void End() MOJO_NOT_THREAD_SAFE;
 
@@ -50,7 +47,7 @@ class DispatcherTransport final {
  private:
   friend class Dispatcher::HandleTableAccess;
 
-  explicit DispatcherTransport(const Handle& handle)
+  explicit HandleTransport(const Handle& handle)
       : dispatcher_(handle.dispatcher.get()), rights_(handle.rights) {}
 
   Dispatcher* dispatcher_;

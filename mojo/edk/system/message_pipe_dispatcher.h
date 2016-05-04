@@ -80,11 +80,10 @@ class MessagePipeDispatcher final : public Dispatcher {
   util::RefPtr<Dispatcher> CreateEquivalentDispatcherAndCloseImplNoLock(
       MessagePipe* message_pipe,
       unsigned port) override;
-  MojoResult WriteMessageImplNoLock(
-      UserPointer<const void> bytes,
-      uint32_t num_bytes,
-      std::vector<DispatcherTransport>* transports,
-      MojoWriteMessageFlags flags) override;
+  MojoResult WriteMessageImplNoLock(UserPointer<const void> bytes,
+                                    uint32_t num_bytes,
+                                    std::vector<HandleTransport>* transports,
+                                    MojoWriteMessageFlags flags) override;
   MojoResult ReadMessageImplNoLock(UserPointer<void> bytes,
                                    UserPointer<uint32_t> num_bytes,
                                    DispatcherVector* dispatchers,
