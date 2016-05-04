@@ -4,6 +4,8 @@
 
 #include "mojo/edk/system/handle_table.h"
 
+#include <vector>
+
 #include "mojo/edk/system/dispatcher.h"
 #include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/mock_simple_dispatcher.h"
@@ -173,6 +175,73 @@ TEST(HandleTableTest, AddHandlePairTooMany) {
   EXPECT_EQ(MOJO_RESULT_OK, d2->Close());
   EXPECT_EQ(MOJO_RESULT_OK, d3->Close());
   EXPECT_EQ(MOJO_RESULT_OK, d4->Close());
+}
+
+TEST(HandleTableTest, AddHandleVector) {
+  static constexpr size_t kNumHandles = 10u;
+
+  HandleTable ht(1000u);
+
+  HandleVector handles;
+  std::vector<RefPtr<Dispatcher>> dispatchers;
+  for (size_t i = 0u; i < kNumHandles; i++) {
+    dispatchers.push_back(MakeRefCounted<test::MockSimpleDispatcher>());
+    handles.push_back(
+        Handle(dispatchers.back().Clone(), MOJO_HANDLE_RIGHT_NONE));
+    ASSERT_TRUE(handles[i]) << i;
+  }
+
+  std::vector<MojoHandle> handle_values(kNumHandles, MOJO_HANDLE_INVALID);
+
+  ASSERT_TRUE(ht.AddHandleVector(&handles, handle_values.data()));
+
+  for (size_t i = 0u; i < kNumHandles; i++) {
+    ASSERT_NE(handle_values[i], MOJO_HANDLE_INVALID) << i;
+
+    RefPtr<Dispatcher> d;
+    ASSERT_EQ(MOJO_RESULT_OK, ht.GetAndRemoveDispatcher(handle_values[i], &d))
+        << i;
+    ASSERT_EQ(dispatchers[i], d) << i;
+
+    EXPECT_EQ(MOJO_RESULT_OK, dispatchers[i]->Close()) << i;
+  }
+}
+
+TEST(HandleTableTest, AddHandleVectorTooMany) {
+  static constexpr size_t kHandleTableSize = 10u;
+  static constexpr size_t kNumHandles = kHandleTableSize + 1u;
+
+  HandleTable ht(kHandleTableSize);
+
+  HandleVector handles;
+  std::vector<RefPtr<Dispatcher>> dispatchers;
+  for (size_t i = 0u; i < kNumHandles; i++) {
+    dispatchers.push_back(MakeRefCounted<test::MockSimpleDispatcher>());
+    handles.push_back(
+        Handle(dispatchers.back().Clone(), MOJO_HANDLE_RIGHT_NONE));
+    ASSERT_TRUE(handles[i]) << i;
+  }
+
+  std::vector<MojoHandle> handle_values(kNumHandles, MOJO_HANDLE_INVALID);
+
+  EXPECT_FALSE(ht.AddHandleVector(&handles, handle_values.data()));
+
+  handles.pop_back();
+  handle_values.pop_back();
+
+  ASSERT_TRUE(ht.AddHandleVector(&handles, handle_values.data()));
+
+  for (size_t i = 0u; i < kNumHandles - 1u; i++) {
+    ASSERT_NE(handle_values[i], MOJO_HANDLE_INVALID) << i;
+
+    RefPtr<Dispatcher> d;
+    ASSERT_EQ(MOJO_RESULT_OK, ht.GetAndRemoveDispatcher(handle_values[i], &d))
+        << i;
+    ASSERT_EQ(dispatchers[i], d) << i;
+  }
+
+  for (size_t i = 0u; i < kNumHandles; i++)
+    EXPECT_EQ(MOJO_RESULT_OK, dispatchers[i]->Close()) << i;
 }
 
 }  // namespace

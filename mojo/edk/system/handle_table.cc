@@ -83,6 +83,33 @@ std::pair<MojoHandle, MojoHandle> HandleTable::AddHandlePair(Handle&& handle0,
              : std::make_pair(MOJO_HANDLE_INVALID, MOJO_HANDLE_INVALID);
 }
 
+bool HandleTable::AddHandleVector(HandleVector* handles,
+                                  MojoHandle* handle_values) {
+  size_t max_message_num_handles = GetConfiguration().max_message_num_handles;
+
+  DCHECK(handles);
+  DCHECK_LE(handles->size(), max_message_num_handles);
+  DCHECK(handle_values);
+  DCHECK_LT(
+      static_cast<uint64_t>(max_handle_table_size_) + max_message_num_handles,
+      std::numeric_limits<size_t>::max())
+      << "Addition may overflow";
+
+  if (handle_to_entry_map_.size() + handles->size() > max_handle_table_size_)
+    return false;
+
+  for (size_t i = 0; i < handles->size(); i++) {
+    if (handles->at(i)) {
+      handle_values[i] = AddHandleNoSizeCheck(std::move(handles->at(i)));
+    } else {
+      LOG(WARNING) << "Invalid dispatcher at index " << i;
+      handle_values[i] = MOJO_HANDLE_INVALID;
+    }
+  }
+  return true;
+}
+
+// TODO(vtl): Delete this.
 bool HandleTable::AddDispatcherVector(const DispatcherVector& dispatchers,
                                       MojoHandle* handles) {
   size_t max_message_num_handles = GetConfiguration().max_message_num_handles;

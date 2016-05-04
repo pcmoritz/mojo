@@ -74,12 +74,15 @@ class HandleTable {
   std::pair<MojoHandle, MojoHandle> AddHandlePair(Handle&& handle0,
                                                   Handle&& handle1);
 
-  // Adds the given vector of dispatchers (of size at most
+  // Adds the given vector of handles (of size at most
   // |kMaxMessageNumHandles|). |handle_values| must point to an array of size at
-  // least |dispatchers.size()|. Unlike the other |AddDispatcher...()|
-  // functions, some of the dispatchers may be invalid (null). Returns true on
-  // success and false on failure (if the handle table is full), in which case
-  // it leaves |handle_values[...]| untouched (and all dispatchers unadded).
+  // least |handles->size()|. Unlike the other |AddHandle...()| functions, some
+  // of the handles may be invalid ("null"). Returns true on success in which
+  // case all the handles in |*handles| are moved from, and false on failure (if
+  // the handle table is full), in which case it leaves all |handles->at(...)||
+  // (and all the handles unadded) and |handle_values[...]| untouched.
+  bool AddHandleVector(HandleVector* handles, MojoHandle* handle_values);
+  // TODO(vtl): Delete this version (use |AddHandleVector()| instead).
   bool AddDispatcherVector(const DispatcherVector& dispatchers,
                            MojoHandle* handle_values);
 
