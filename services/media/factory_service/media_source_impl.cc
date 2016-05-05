@@ -31,8 +31,7 @@ MediaSourceImpl::MediaSourceImpl(
     const Array<MediaTypeSetPtr>& allowed_media_types,
     InterfaceRequest<MediaSource> request,
     MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()),
+    : MediaFactoryService::Product<MediaSource>(this, request.Pass(), owner),
       allowed_media_types_(allowed_media_types.Clone()) {
   DCHECK(reader);
 
@@ -47,9 +46,6 @@ MediaSourceImpl::MediaSourceImpl(
             demux_ ? MediaMetadata::From(demux_->metadata()) : nullptr;
         callback.Run(version, status.Pass());
       });
-
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   std::shared_ptr<Reader> reader_ptr = MojoReader::Create(reader.Pass());
   if (!reader_ptr) {
@@ -109,7 +105,7 @@ void MediaSourceImpl::GetStreams(const GetStreamsCallback& callback) {
 
 void MediaSourceImpl::GetProducer(uint32_t stream_index,
                                   InterfaceRequest<MediaProducer> producer) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   if (stream_index >= streams_.size()) {
     return;
@@ -121,7 +117,7 @@ void MediaSourceImpl::GetProducer(uint32_t stream_index,
 void MediaSourceImpl::GetPullModeProducer(
     uint32_t stream_index,
     InterfaceRequest<MediaPullModeProducer> producer) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   if (stream_index >= streams_.size()) {
     return;
@@ -136,7 +132,7 @@ void MediaSourceImpl::GetStatus(uint64_t version_last_seen,
 }
 
 void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   for (std::unique_ptr<Stream>& stream : streams_) {
     stream->EnsureSink();
@@ -148,7 +144,7 @@ void MediaSourceImpl::Prepare(const PrepareCallback& callback) {
 }
 
 void MediaSourceImpl::Prime(const PrimeCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
@@ -160,7 +156,7 @@ void MediaSourceImpl::Prime(const PrimeCallback& callback) {
 }
 
 void MediaSourceImpl::Flush(const FlushCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   graph_.FlushAllOutputs(demux_part_);
 
@@ -174,7 +170,7 @@ void MediaSourceImpl::Flush(const FlushCallback& callback) {
 }
 
 void MediaSourceImpl::Seek(int64_t position, const SeekCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   demux_->Seek(position, [this, callback]() {
     task_runner_->PostTask(FROM_HERE, base::Bind(&RunSeekCallback, callback));

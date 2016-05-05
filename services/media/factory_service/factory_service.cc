@@ -13,12 +13,12 @@
 namespace mojo {
 namespace media {
 
-MediaFactoryService::Product::Product(MediaFactoryService* owner)
+MediaFactoryService::ProductBase::ProductBase(MediaFactoryService* owner)
     : owner_(owner) {
   DCHECK(owner_);
 }
 
-MediaFactoryService::Product::~Product() {}
+MediaFactoryService::ProductBase::~ProductBase() {}
 
 MediaFactoryService::MediaFactoryService() {}
 
@@ -41,41 +41,42 @@ void MediaFactoryService::Create(ApplicationConnection* connection,
 
 void MediaFactoryService::CreatePlayer(InterfaceHandle<SeekingReader> reader,
                                        InterfaceRequest<MediaPlayer> player) {
-  products_.insert(std::static_pointer_cast<Product>(
+  products_.insert(std::static_pointer_cast<ProductBase>(
       MediaPlayerImpl::Create(reader.Pass(), player.Pass(), this)));
 }
 
 void MediaFactoryService::CreateSource(InterfaceHandle<SeekingReader> reader,
                                        Array<MediaTypeSetPtr> media_types,
                                        InterfaceRequest<MediaSource> source) {
-  products_.insert(std::static_pointer_cast<Product>(MediaSourceImpl::Create(
-      reader.Pass(), media_types, source.Pass(), this)));
+  products_.insert(
+      std::static_pointer_cast<ProductBase>(MediaSourceImpl::Create(
+          reader.Pass(), media_types, source.Pass(), this)));
 }
 
 void MediaFactoryService::CreateSink(const String& destination_url,
                                      MediaTypePtr media_type,
                                      InterfaceRequest<MediaSink> sink) {
-  products_.insert(std::static_pointer_cast<Product>(MediaSinkImpl::Create(
+  products_.insert(std::static_pointer_cast<ProductBase>(MediaSinkImpl::Create(
       destination_url, media_type.Pass(), sink.Pass(), this)));
 }
 
 void MediaFactoryService::CreateDemux(InterfaceHandle<SeekingReader> reader,
                                       InterfaceRequest<MediaDemux> demux) {
-  products_.insert(std::static_pointer_cast<Product>(
+  products_.insert(std::static_pointer_cast<ProductBase>(
       MediaDemuxImpl::Create(reader.Pass(), demux.Pass(), this)));
 }
 
 void MediaFactoryService::CreateDecoder(
     MediaTypePtr input_media_type,
     InterfaceRequest<MediaTypeConverter> decoder) {
-  products_.insert(std::static_pointer_cast<Product>(
+  products_.insert(std::static_pointer_cast<ProductBase>(
       MediaDecoderImpl::Create(input_media_type.Pass(), decoder.Pass(), this)));
 }
 
 void MediaFactoryService::CreateNetworkReader(
     const String& url,
     InterfaceRequest<SeekingReader> reader) {
-  products_.insert(std::static_pointer_cast<Product>(
+  products_.insert(std::static_pointer_cast<ProductBase>(
       NetworkReaderImpl::Create(url, reader.Pass(), this)));
 }
 

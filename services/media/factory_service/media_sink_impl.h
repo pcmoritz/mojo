@@ -25,7 +25,8 @@ namespace media {
 
 // Mojo agent that consumes a stream and delivers it to a destination specified
 // by URL.
-class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
+class MediaSinkImpl : public MediaFactoryService::Product<MediaSink>,
+                      public MediaSink {
  public:
   static std::shared_ptr<MediaSinkImpl> Create(
       const String& destination_url,
@@ -56,7 +57,6 @@ class MediaSinkImpl : public MediaFactoryService::Product, public MediaSink {
   void MaybeSetRate();
 
   Incident ready_;
-  Binding<MediaSink> binding_;
   Graph graph_;
   std::shared_ptr<MojoConsumer> consumer_;
   std::shared_ptr<MojoProducer> producer_;

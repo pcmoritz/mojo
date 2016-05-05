@@ -27,12 +27,8 @@ std::shared_ptr<NetworkReaderImpl> NetworkReaderImpl::Create(
 NetworkReaderImpl::NetworkReaderImpl(const String& url,
                                      InterfaceRequest<SeekingReader> request,
                                      MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()),
+    : MediaFactoryService::Product<SeekingReader>(this, request.Pass(), owner),
       url_(url) {
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
-
   NetworkServicePtr network_service;
 
   ConnectToService(app()->shell(), "mojo:network_service",

@@ -20,7 +20,7 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that renders streams from an origin specified by URL.
-class MediaPlayerImpl : public MediaFactoryService::Product,
+class MediaPlayerImpl : public MediaFactoryService::Product<MediaPlayer>,
                         public MediaPlayer {
  public:
   static std::shared_ptr<MediaPlayerImpl> Create(
@@ -119,7 +119,6 @@ class MediaPlayerImpl : public MediaFactoryService::Product,
                                uint64_t version = MediaSink::kInitialStatus,
                                MediaSinkStatusPtr status = nullptr);
 
-  Binding<MediaPlayer> binding_;
   MediaFactoryPtr factory_;
   MediaDemuxPtr demux_;
   std::vector<std::unique_ptr<Stream>> streams_;

@@ -26,7 +26,7 @@ std::shared_ptr<MediaDemuxImpl> MediaDemuxImpl::Create(
 MediaDemuxImpl::MediaDemuxImpl(InterfaceHandle<SeekingReader> reader,
                                InterfaceRequest<MediaDemux> request,
                                MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
+    : MediaFactoryService::Product<MediaDemux>(this, request.Pass(), owner) {
   DCHECK(reader);
 
   task_runner_ = base::MessageLoop::current()->task_runner();
@@ -37,9 +37,6 @@ MediaDemuxImpl::MediaDemuxImpl(InterfaceHandle<SeekingReader> reader,
         callback.Run(version, demux_ ? MediaMetadata::From(demux_->metadata())
                                      : nullptr);
       });
-
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   std::shared_ptr<Reader> reader_ptr = MojoReader::Create(reader.Pass());
   if (!reader_ptr) {
@@ -101,7 +98,7 @@ void MediaDemuxImpl::Describe(const DescribeCallback& callback) {
 
 void MediaDemuxImpl::GetProducer(uint32_t stream_index,
                                  InterfaceRequest<MediaProducer> producer) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   if (stream_index >= streams_.size()) {
     return;
@@ -116,7 +113,7 @@ void MediaDemuxImpl::GetMetadata(uint64_t version_last_seen,
 }
 
 void MediaDemuxImpl::Prime(const PrimeCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   std::shared_ptr<CallbackJoiner> callback_joiner = CallbackJoiner::Create();
 
@@ -128,7 +125,7 @@ void MediaDemuxImpl::Prime(const PrimeCallback& callback) {
 }
 
 void MediaDemuxImpl::Flush(const FlushCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   graph_.FlushAllOutputs(demux_part_);
 
@@ -142,7 +139,7 @@ void MediaDemuxImpl::Flush(const FlushCallback& callback) {
 }
 
 void MediaDemuxImpl::Seek(int64_t position, const SeekCallback& callback) {
-  DCHECK(init_complete_.occurred());
+  RCHECK(init_complete_.occurred());
 
   demux_->Seek(position, [this, callback]() {
     task_runner_->PostTask(FROM_HERE, base::Bind(&RunSeekCallback, callback));

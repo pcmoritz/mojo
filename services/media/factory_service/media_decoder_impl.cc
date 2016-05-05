@@ -21,23 +21,19 @@ std::shared_ptr<MediaDecoderImpl> MediaDecoderImpl::Create(
 MediaDecoderImpl::MediaDecoderImpl(MediaTypePtr input_media_type,
                                    InterfaceRequest<MediaTypeConverter> request,
                                    MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()),
+    : MediaFactoryService::Product<MediaTypeConverter>(this,
+                                                       request.Pass(),
+                                                       owner),
       consumer_(MojoConsumer::Create()),
       producer_(MojoProducer::Create()) {
   DCHECK(input_media_type);
-
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   std::unique_ptr<StreamType> input_stream_type =
       input_media_type.To<std::unique_ptr<StreamType>>();
 
   if (Decoder::Create(*input_stream_type, &decoder_) != Result::kOk) {
     LOG(WARNING) << "Couldn't find decoder for stream type";
-    if (binding_.is_bound()) {
-      binding_.Close();
-    }
+    UnbindAndReleaseFromOwner();
     return;
   }
 

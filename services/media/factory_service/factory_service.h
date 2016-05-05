@@ -20,12 +20,12 @@ class MediaFactoryService : public ApplicationDelegate,
                             public MediaFactory {
  public:
   // Provides common behavior for all objects created by the factory service.
-  class Product : public std::enable_shared_from_this<Product> {
+  class ProductBase : public std::enable_shared_from_this<ProductBase> {
    public:
-    virtual ~Product();
+    virtual ~ProductBase();
 
    protected:
-    Product(MediaFactoryService* owner);
+    ProductBase(MediaFactoryService* owner);
 
     // Returns the ApplicationImpl.
     ApplicationImpl* app() {
@@ -41,6 +41,33 @@ class MediaFactoryService : public ApplicationDelegate,
 
    private:
     MediaFactoryService* owner_;
+  };
+
+  template <typename Interface>
+  class Product : public ProductBase {
+   public:
+    virtual ~Product() {}
+
+   protected:
+    Product(Interface* impl,
+            InterfaceRequest<Interface> request,
+            MediaFactoryService* owner)
+        : ProductBase(owner), binding_(impl, request.Pass()) {
+      DCHECK(impl);
+      binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
+    }
+
+    // Closes the binding and calls ReleaseFromOwner.
+    void UnbindAndReleaseFromOwner() {
+      if (binding_.is_bound()) {
+        binding_.Close();
+      }
+
+      ReleaseFromOwner();
+    }
+
+   private:
+    Binding<Interface> binding_;
   };
 
   MediaFactoryService();
@@ -80,8 +107,19 @@ class MediaFactoryService : public ApplicationDelegate,
  private:
   BindingSet<MediaFactory> bindings_;
   ApplicationImpl* app_;
-  std::unordered_set<std::shared_ptr<Product>> products_;
+  std::unordered_set<std::shared_ptr<ProductBase>> products_;
 };
+
+// For use by products when handling mojo requests.
+// Checks the condition, and, if it's false, unbinds, releases from the owner
+// and calls return. Doesn't support stream arguments.
+// TODO(dalesat): Support stream arguments.
+#define RCHECK(condition)                                         \
+  if (!(condition)) {                                             \
+    LOG(ERROR) << "request precondition failed: " #condition "."; \
+    UnbindAndReleaseFromOwner();                                  \
+    return;                                                       \
+  }
 
 }  // namespace media
 }  // namespace mojo

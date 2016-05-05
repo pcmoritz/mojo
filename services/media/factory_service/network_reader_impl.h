@@ -17,7 +17,7 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that decodes a stream.
-class NetworkReaderImpl : public MediaFactoryService::Product,
+class NetworkReaderImpl : public MediaFactoryService::Product<SeekingReader>,
                           public SeekingReader {
  public:
   static std::shared_ptr<NetworkReaderImpl> Create(
@@ -48,7 +48,6 @@ class NetworkReaderImpl : public MediaFactoryService::Product,
                     InterfaceRequest<SeekingReader> request,
                     MediaFactoryService* owner);
 
-  Binding<SeekingReader> binding_;
   std::string url_;
   URLLoaderPtr url_loader_;
   MediaResult result_ = MediaResult::OK;

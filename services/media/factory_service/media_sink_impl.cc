@@ -26,15 +26,11 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
                              MediaTypePtr media_type,
                              InterfaceRequest<MediaSink> request,
                              MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner),
-      binding_(this, request.Pass()),
+    : MediaFactoryService::Product<MediaSink>(this, request.Pass(), owner),
       consumer_(MojoConsumer::Create()),
       producer_(MojoProducer::Create()) {
   DCHECK(destination_url);
   DCHECK(media_type);
-
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   status_publisher_.SetCallbackRunner(
       [this](const GetStatusCallback& callback, uint64_t version) {
@@ -83,13 +79,7 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
     return;
   }
 
-  if (destination_url != "mojo:audio_server") {
-    LOG(ERROR) << "mojo:audio_server is the only supported destination";
-    if (binding_.is_bound()) {
-      binding_.Close();
-    }
-    return;
-  }
+  RCHECK(destination_url == "mojo:audio_server");
 
   // TODO(dalesat): Once we have c++14, get rid of this shared pointer hack.
   std::shared_ptr<StreamType> captured_stream_type(

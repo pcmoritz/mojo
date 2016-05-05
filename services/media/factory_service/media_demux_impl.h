@@ -24,7 +24,8 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that decodes a stream.
-class MediaDemuxImpl : public MediaFactoryService::Product, public MediaDemux {
+class MediaDemuxImpl : public MediaFactoryService::Product<MediaDemux>,
+                       public MediaDemux {
  public:
   static std::shared_ptr<MediaDemuxImpl> Create(
       InterfaceHandle<SeekingReader> reader,
@@ -86,7 +87,6 @@ class MediaDemuxImpl : public MediaFactoryService::Product, public MediaDemux {
   static void RunSeekCallback(const SeekCallback& callback);
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
-  Binding<MediaDemux> binding_;
   Graph graph_;
   PartRef demux_part_;
   std::shared_ptr<Demux> demux_;

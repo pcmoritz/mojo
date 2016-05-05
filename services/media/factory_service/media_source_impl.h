@@ -26,7 +26,7 @@ namespace mojo {
 namespace media {
 
 // Mojo agent that produces streams from an origin specified by URL.
-class MediaSourceImpl : public MediaFactoryService::Product,
+class MediaSourceImpl : public MediaFactoryService::Product<MediaSource>,
                         public MediaSource {
  public:
   static std::shared_ptr<MediaSourceImpl> Create(
@@ -112,7 +112,6 @@ class MediaSourceImpl : public MediaFactoryService::Product,
   static void RunSeekCallback(const SeekCallback& callback);
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
-  Binding<MediaSource> binding_;
   Array<MediaTypeSetPtr> allowed_media_types_;
   Graph graph_;
   PartRef demux_part_;

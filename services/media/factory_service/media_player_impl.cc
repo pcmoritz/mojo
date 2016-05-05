@@ -23,7 +23,7 @@ std::shared_ptr<MediaPlayerImpl> MediaPlayerImpl::Create(
 MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
                                  InterfaceRequest<MediaPlayer> request,
                                  MediaFactoryService* owner)
-    : MediaFactoryService::Product(owner), binding_(this, request.Pass()) {
+    : MediaFactoryService::Product<MediaPlayer>(this, request.Pass(), owner) {
   DCHECK(reader);
 
   status_publisher_.SetCallbackRunner(
@@ -36,9 +36,6 @@ MediaPlayerImpl::MediaPlayerImpl(InterfaceHandle<SeekingReader> reader,
       });
 
   state_ = State::kWaiting;
-
-  // Go away when the client is no longer connected.
-  binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
   ConnectToService(app()->shell(), "mojo:media_factory", GetProxy(&factory_));
 
