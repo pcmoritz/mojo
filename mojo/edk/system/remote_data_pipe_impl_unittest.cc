@@ -177,9 +177,8 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerWithClosedProducer) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
-  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+  Handle consumer_handle(std::move(consumer),
+                         DataPipeConsumerDispatcher::kDefaultHandleRights);
 
   // Write to the producer and close it, before sending the consumer.
   int32_t elements[10] = {123};
@@ -300,9 +299,8 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringTwoPhaseWrite) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
-  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+  Handle consumer_handle(std::move(consumer),
+                         DataPipeConsumerDispatcher::kDefaultHandleRights);
 
   void* write_ptr = nullptr;
   uint32_t num_bytes = 0u;
@@ -415,9 +413,8 @@ TEST_F(RemoteDataPipeImplTest, SendConsumerDuringSecondTwoPhaseWrite) {
   // This is the consumer dispatcher we'll send.
   auto consumer = DataPipeConsumerDispatcher::Create();
   consumer->Init(dp.Clone());
-  Handle consumer_handle(std::move(consumer), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+  Handle consumer_handle(std::move(consumer),
+                         DataPipeConsumerDispatcher::kDefaultHandleRights);
 
   void* write_ptr = nullptr;
   uint32_t num_bytes = 0u;

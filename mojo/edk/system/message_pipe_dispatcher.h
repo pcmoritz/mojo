@@ -21,6 +21,11 @@ class MessagePipe;
 // Mojo primitive |MojoCreateMessagePipe()|). This class is thread-safe.
 class MessagePipeDispatcher final : public Dispatcher {
  public:
+  // The default/standard rights for a message pipe handle.
+  static constexpr MojoHandleRights kDefaultHandleRights =
+      MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
+      MOJO_HANDLE_RIGHT_WRITE;
+
   // The default options to use for |MojoCreateMessagePipe()|. (Real uses
   // should obtain this via |ValidateCreateOptions()| with a null |in_options|;
   // this is exposed directly for testing convenience.)

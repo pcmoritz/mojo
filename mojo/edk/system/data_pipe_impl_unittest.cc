@@ -385,9 +385,8 @@ class RemoteProducerDataPipeImplTestHelper
     // This is the producer dispatcher we'll send.
     auto to_send = DataPipeProducerDispatcher::Create();
     to_send->Init(dp());
-    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+    Handle handle_to_send(std::move(to_send),
+                          DataPipeProducerDispatcher::kDefaultHandleRights);
     RefPtr<Dispatcher> to_receive;
     SendHandle(0, handle_to_send, &to_receive);
     // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
@@ -437,9 +436,8 @@ class RemoteConsumerDataPipeImplTestHelper
     // This is the consumer dispatcher we'll send.
     auto to_send = DataPipeConsumerDispatcher::Create();
     to_send->Init(dp());
-    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+    Handle handle_to_send(std::move(to_send),
+                          DataPipeConsumerDispatcher::kDefaultHandleRights);
     RefPtr<Dispatcher> to_receive;
     SendHandle(0, handle_to_send, &to_receive);
     // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
@@ -494,9 +492,8 @@ class RemoteProducerDataPipeImplTestHelper2
     // This is the producer dispatcher we'll send.
     auto to_send = DataPipeProducerDispatcher::Create();
     to_send->Init(dp());
-    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+    Handle handle_to_send(std::move(to_send),
+                          DataPipeProducerDispatcher::kDefaultHandleRights);
     RefPtr<Dispatcher> to_receive;
     SendHandle(0, handle_to_send, &to_receive);
     // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
@@ -504,9 +501,8 @@ class RemoteProducerDataPipeImplTestHelper2
     EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
     handle_to_send.reset();
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_PRODUCER, to_receive->GetType());
-    handle_to_send = Handle(std::move(to_receive), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                       MOJO_HANDLE_RIGHT_READ |
-                                                       MOJO_HANDLE_RIGHT_WRITE);
+    handle_to_send = Handle(std::move(to_receive),
+                            DataPipeProducerDispatcher::kDefaultHandleRights);
 
     // Now send it back the other way.
     SendHandle(1, handle_to_send, &to_receive);
@@ -544,9 +540,8 @@ class RemoteConsumerDataPipeImplTestHelper2
     // This is the consumer dispatcher we'll send.
     auto to_send = DataPipeConsumerDispatcher::Create();
     to_send->Init(dp());
-    Handle handle_to_send(std::move(to_send), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                  MOJO_HANDLE_RIGHT_READ |
-                                                  MOJO_HANDLE_RIGHT_WRITE);
+    Handle handle_to_send(std::move(to_send),
+                          DataPipeConsumerDispatcher::kDefaultHandleRights);
     RefPtr<Dispatcher> to_receive;
     SendHandle(0, handle_to_send, &to_receive);
     // |handle_to_send.dispatcher| should have been closed. This is |DCHECK()|ed
@@ -554,9 +549,8 @@ class RemoteConsumerDataPipeImplTestHelper2
     EXPECT_TRUE(handle_to_send.dispatcher->HasOneRef());
     handle_to_send.reset();
     ASSERT_EQ(Dispatcher::Type::DATA_PIPE_CONSUMER, to_receive->GetType());
-    handle_to_send = Handle(std::move(to_receive), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                       MOJO_HANDLE_RIGHT_READ |
-                                                       MOJO_HANDLE_RIGHT_WRITE);
+    handle_to_send = Handle(std::move(to_receive),
+                            DataPipeConsumerDispatcher::kDefaultHandleRights);
 
     // Now send it back the other way.
     SendHandle(1, handle_to_send, &to_receive);

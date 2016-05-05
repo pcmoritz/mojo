@@ -4,6 +4,7 @@
 
 #include "mojo/edk/system/core_test_base.h"
 
+#include <utility>
 #include <vector>
 
 #include "base/logging.h"
@@ -11,6 +12,7 @@
 #include "mojo/edk/system/configuration.h"
 #include "mojo/edk/system/core.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/util/ref_ptr.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -224,7 +226,11 @@ void CoreTestBase::TearDown() {
 MojoHandle CoreTestBase::CreateMockHandle(CoreTestBase::MockHandleInfo* info) {
   CHECK(core_);
   auto dispatcher = MockDispatcher::Create(info);
-  MojoHandle rv = core_->AddDispatcher(dispatcher.get());
+  MojoHandle rv = core_->AddHandle(
+      Handle(std::move(dispatcher),
+             MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_TRANSFER |
+                 MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE |
+                 MOJO_HANDLE_RIGHT_EXECUTE));
   CHECK_NE(rv, MOJO_HANDLE_INVALID);
   return rv;
 }

@@ -325,8 +325,7 @@ TEST_F(MultiprocessMessagePipeTest, MAYBE_SharedBufferPassing) {
   EXPECT_EQ(MOJO_RESULT_OK, result);
   ASSERT_TRUE(dispatcher);
   Handle handle(std::move(dispatcher),
-                MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_TRANSFER |
-                    MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE);
+                SharedBufferDispatcher::kDefaultHandleRights);
 
   // Make a mapping.
   std::unique_ptr<PlatformSharedBufferMapping> mapping;
@@ -480,8 +479,7 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
 
     Handle handle(PlatformHandleDispatcher::Create(ScopedPlatformHandle(
                       PlatformHandleFromFILE(std::move(fp)))),
-                  MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
-                      MOJO_HANDLE_RIGHT_WRITE);
+                  PlatformHandleDispatcher::kDefaultHandleRights);
     handles.push_back(std::move(handle));
     HandleTransport transport(test::HandleTryStartTransport(handles.back()));
     ASSERT_TRUE(transport.is_valid());

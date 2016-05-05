@@ -26,6 +26,9 @@ const unsigned kInvalidPort = static_cast<unsigned>(-1);
 // MessagePipeDispatcher -------------------------------------------------------
 
 // static
+constexpr MojoHandleRights MessagePipeDispatcher::kDefaultHandleRights;
+
+// static
 const MojoCreateMessagePipeOptions
     MessagePipeDispatcher::kDefaultCreateOptions = {
         static_cast<uint32_t>(sizeof(MojoCreateMessagePipeOptions)),

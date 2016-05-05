@@ -97,11 +97,8 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
 
   auto dispatcher =
       PlatformHandleDispatcher::Create(PlatformHandleFromFILE(std::move(fp)));
-  // TODO(vtl): Are these the correct rights for a |PlatformHandleDispatcher|?
-  const MojoHandleRights kRights = MOJO_HANDLE_RIGHT_TRANSFER |
-                                   MOJO_HANDLE_RIGHT_READ |
-                                   MOJO_HANDLE_RIGHT_WRITE;
-  Handle handle(std::move(dispatcher), kRights);
+  Handle handle(std::move(dispatcher),
+                PlatformHandleDispatcher::kDefaultHandleRights);
 
   HandleTransport transport(test::HandleTryStartTransport(handle));
   EXPECT_TRUE(transport.is_valid());
@@ -111,7 +108,8 @@ TEST(PlatformHandleDispatcherTest, CreateEquivalentDispatcherAndClose) {
   Handle equivalent_handle =
       transport.CreateEquivalentHandleAndClose(nullptr, 0u);
   ASSERT_TRUE(equivalent_handle.dispatcher);
-  EXPECT_EQ(kRights, equivalent_handle.rights);
+  EXPECT_EQ(PlatformHandleDispatcher::kDefaultHandleRights,
+            equivalent_handle.rights);
 
   transport.End();
   EXPECT_TRUE(handle.dispatcher->HasOneRef());

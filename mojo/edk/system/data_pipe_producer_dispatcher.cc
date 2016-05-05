@@ -18,6 +18,9 @@ using mojo::util::RefPtr;
 namespace mojo {
 namespace system {
 
+// static
+constexpr MojoHandleRights DataPipeProducerDispatcher::kDefaultHandleRights;
+
 void DataPipeProducerDispatcher::Init(RefPtr<DataPipe>&& data_pipe) {
   DCHECK(data_pipe);
   data_pipe_ = std::move(data_pipe);

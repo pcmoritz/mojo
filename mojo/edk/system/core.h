@@ -52,12 +52,6 @@ class Core {
   // if the handle table is full.
   MojoHandle AddHandle(Handle&& handle);
 
-  // DEPRECATED. TODO(vtl): Remove this.
-  // Adds |dispatcher| to the handle table, returning the handle value for it.
-  // Returns |MOJO_HANDLE_INVALID| on failure, namely if the handle table is
-  // full.
-  MojoHandle AddDispatcher(Dispatcher* dispatcher);
-
   // Looks up the dispatcher for the given handle. On success, gets the
   // dispatcher for a given handle. On failure, returns an appropriate result
   // and leaves |dispatcher| alone), namely |MOJO_RESULT_INVALID_ARGUMENT| if

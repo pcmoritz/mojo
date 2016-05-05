@@ -20,6 +20,11 @@ namespace system {
 // the embedder).
 class PlatformHandleDispatcher final : public SimpleDispatcher {
  public:
+  // The default/standard rights for a platform handle (wrapper) handle.
+  static constexpr MojoHandleRights kDefaultHandleRights =
+      MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
+      MOJO_HANDLE_RIGHT_WRITE;
+
   static util::RefPtr<PlatformHandleDispatcher> Create(
       platform::ScopedPlatformHandle platform_handle) {
     return AdoptRef(new PlatformHandleDispatcher(platform_handle.Pass()));

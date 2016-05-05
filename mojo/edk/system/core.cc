@@ -97,12 +97,6 @@ MojoHandle Core::AddHandle(Handle&& handle) {
   return handle_table_.AddHandle(std::move(handle));
 }
 
-// FIXME
-MojoHandle Core::AddDispatcher(Dispatcher* dispatcher) {
-  return AddHandle(
-      Handle(RefPtr<Dispatcher>(dispatcher), MOJO_HANDLE_RIGHT_TRANSFER));
-}
-
 MojoResult Core::GetDispatcher(MojoHandle handle,
                                RefPtr<Dispatcher>* dispatcher) {
   if (handle == MOJO_HANDLE_INVALID)
@@ -227,12 +221,10 @@ MojoResult Core::CreateMessagePipe(
   {
     MutexLocker locker(&handle_table_mutex_);
     handle_pair = handle_table_.AddHandlePair(
-        Handle(dispatcher0.Clone(), MOJO_HANDLE_RIGHT_TRANSFER |
-                                        MOJO_HANDLE_RIGHT_READ |
-                                        MOJO_HANDLE_RIGHT_WRITE),
-        Handle(dispatcher1.Clone(), MOJO_HANDLE_RIGHT_TRANSFER |
-                                        MOJO_HANDLE_RIGHT_READ |
-                                        MOJO_HANDLE_RIGHT_WRITE));
+        Handle(dispatcher0.Clone(),
+               MessagePipeDispatcher::kDefaultHandleRights),
+        Handle(dispatcher1.Clone(),
+               MessagePipeDispatcher::kDefaultHandleRights));
   }
   if (handle_pair.first == MOJO_HANDLE_INVALID) {
     DCHECK_EQ(handle_pair.second, MOJO_HANDLE_INVALID);
@@ -398,9 +390,9 @@ MojoResult Core::CreateDataPipe(
     MutexLocker locker(&handle_table_mutex_);
     handle_pair = handle_table_.AddHandlePair(
         Handle(producer_dispatcher.Clone(),
-               MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_WRITE),
+               DataPipeProducerDispatcher::kDefaultHandleRights),
         Handle(consumer_dispatcher.Clone(),
-               MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ));
+               DataPipeConsumerDispatcher::kDefaultHandleRights));
   }
   if (handle_pair.first == MOJO_HANDLE_INVALID) {
     DCHECK_EQ(handle_pair.second, MOJO_HANDLE_INVALID);
@@ -551,12 +543,8 @@ MojoResult Core::CreateSharedBuffer(
     return result;
   }
 
-  // Note that shared buffer handles are duplicatable (by default).
-  MojoHandle h = AddHandle(Handle(
-      dispatcher.Clone(), MOJO_HANDLE_RIGHT_DUPLICATE |
-                              MOJO_HANDLE_RIGHT_TRANSFER |
-                              MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE |
-                              MOJO_HANDLE_RIGHT_EXECUTE));
+  MojoHandle h = AddHandle(
+      Handle(dispatcher.Clone(), SharedBufferDispatcher::kDefaultHandleRights));
   if (h == MOJO_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     dispatcher->Close();
@@ -582,7 +570,9 @@ MojoResult Core::DuplicateBufferHandle(
   if (result != MOJO_RESULT_OK)
     return result;
 
-  MojoHandle new_handle = AddDispatcher(new_dispatcher.get());
+  // TODO(vtl): This should be done with the original handle's rights.
+  MojoHandle new_handle = AddHandle(Handle(
+      new_dispatcher.Clone(), SharedBufferDispatcher::kDefaultHandleRights));
   if (new_handle == MOJO_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     new_dispatcher->Close();

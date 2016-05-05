@@ -26,6 +26,9 @@ struct SerializedPlatformHandleDispatcher {
 
 }  // namespace
 
+// static
+constexpr MojoHandleRights PlatformHandleDispatcher::kDefaultHandleRights;
+
 ScopedPlatformHandle PlatformHandleDispatcher::PassPlatformHandle() {
   MutexLocker locker(&mutex());
   return platform_handle_.Pass();

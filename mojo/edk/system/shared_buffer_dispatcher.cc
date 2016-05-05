@@ -34,6 +34,9 @@ struct MOJO_ALIGNAS(8) SerializedSharedBufferDispatcher {
 }  // namespace
 
 // static
+constexpr MojoHandleRights SharedBufferDispatcher::kDefaultHandleRights;
+
+// static
 const MojoCreateSharedBufferOptions
     SharedBufferDispatcher::kDefaultCreateOptions = {
         static_cast<uint32_t>(sizeof(MojoCreateSharedBufferOptions)),

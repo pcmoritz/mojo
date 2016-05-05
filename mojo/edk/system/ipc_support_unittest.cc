@@ -87,9 +87,8 @@ RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
     RefPtr<MessagePipeDispatcher>&& mp_to_send) {
   CHECK_NE(mp_to_send.get(), write_mp);
   CHECK_NE(mp_to_send.get(), read_mp);
-  Handle mp_handle_to_send(std::move(mp_to_send), MOJO_HANDLE_RIGHT_TRANSFER |
-                                                      MOJO_HANDLE_RIGHT_READ |
-                                                      MOJO_HANDLE_RIGHT_WRITE);
+  Handle mp_handle_to_send(std::move(mp_to_send),
+                           MessagePipeDispatcher::kDefaultHandleRights);
 
   // Set up waiting on the read end first (to avoid racing).
   Waiter waiter;

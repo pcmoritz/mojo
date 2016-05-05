@@ -20,6 +20,11 @@ class DataPipe;
 // thread-safe.
 class DataPipeConsumerDispatcher final : public Dispatcher {
  public:
+  // The default/standard rights for a data pipe consumer handle.
+  static constexpr MojoHandleRights kDefaultHandleRights =
+      MOJO_HANDLE_RIGHT_TRANSFER | MOJO_HANDLE_RIGHT_READ |
+      MOJO_HANDLE_RIGHT_WRITE;
+
   static util::RefPtr<DataPipeConsumerDispatcher> Create() {
     return AdoptRef(new DataPipeConsumerDispatcher());
   }
