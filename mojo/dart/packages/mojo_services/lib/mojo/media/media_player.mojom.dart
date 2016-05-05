@@ -646,14 +646,19 @@ class MediaPlayerProxy implements bindings.ProxyBase {
 
 
 class MediaPlayerStub extends bindings.Stub {
-  MediaPlayer _impl = null;
+  MediaPlayer _impl;
 
   MediaPlayerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaPlayer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaPlayerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaPlayerStub.fromHandle(
+      core.MojoHandle handle, [MediaPlayer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaPlayerStub.unbound() : super.unbound();
 
@@ -677,7 +682,9 @@ class MediaPlayerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaPlayerMethodPlayName:
         _impl.play();
@@ -721,8 +728,21 @@ class MediaPlayerStub extends bindings.Stub {
 
   MediaPlayer get impl => _impl;
   set impl(MediaPlayer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

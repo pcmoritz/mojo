@@ -508,14 +508,19 @@ class PredictionServiceProxy implements bindings.ProxyBase {
 
 
 class PredictionServiceStub extends bindings.Stub {
-  PredictionService _impl = null;
+  PredictionService _impl;
 
   PredictionServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [PredictionService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  PredictionServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  PredictionServiceStub.fromHandle(
+      core.MojoHandle handle, [PredictionService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   PredictionServiceStub.unbound() : super.unbound();
 
@@ -538,7 +543,9 @@ class PredictionServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _predictionServiceMethodGetPredictionListName:
         var params = _PredictionServiceGetPredictionListParams.deserialize(
@@ -571,8 +578,21 @@ class PredictionServiceStub extends bindings.Stub {
 
   PredictionService get impl => _impl;
   set impl(PredictionService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

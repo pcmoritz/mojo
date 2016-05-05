@@ -431,14 +431,19 @@ class CompositorProxy implements bindings.ProxyBase {
 
 
 class CompositorStub extends bindings.Stub {
-  Compositor _impl = null;
+  Compositor _impl;
 
   CompositorStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Compositor impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  CompositorStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  CompositorStub.fromHandle(
+      core.MojoHandle handle, [Compositor impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   CompositorStub.unbound() : super.unbound();
 
@@ -461,7 +466,9 @@ class CompositorStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _compositorMethodCreateSceneName:
         var params = _CompositorCreateSceneParams.deserialize(
@@ -499,8 +506,21 @@ class CompositorStub extends bindings.Stub {
 
   Compositor get impl => _impl;
   set impl(Compositor d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

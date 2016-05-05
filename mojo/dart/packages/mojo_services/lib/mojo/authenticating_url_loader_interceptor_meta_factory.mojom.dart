@@ -225,14 +225,19 @@ class AuthenticatingUrlLoaderInterceptorMetaFactoryProxy implements bindings.Pro
 
 
 class AuthenticatingUrlLoaderInterceptorMetaFactoryStub extends bindings.Stub {
-  AuthenticatingUrlLoaderInterceptorMetaFactory _impl = null;
+  AuthenticatingUrlLoaderInterceptorMetaFactory _impl;
 
   AuthenticatingUrlLoaderInterceptorMetaFactoryStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [AuthenticatingUrlLoaderInterceptorMetaFactory impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  AuthenticatingUrlLoaderInterceptorMetaFactoryStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  AuthenticatingUrlLoaderInterceptorMetaFactoryStub.fromHandle(
+      core.MojoHandle handle, [AuthenticatingUrlLoaderInterceptorMetaFactory impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   AuthenticatingUrlLoaderInterceptorMetaFactoryStub.unbound() : super.unbound();
 
@@ -250,7 +255,9 @@ class AuthenticatingUrlLoaderInterceptorMetaFactoryStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _authenticatingUrlLoaderInterceptorMetaFactoryMethodCreateUrlLoaderInterceptorFactoryName:
         var params = _AuthenticatingUrlLoaderInterceptorMetaFactoryCreateUrlLoaderInterceptorFactoryParams.deserialize(
@@ -266,8 +273,21 @@ class AuthenticatingUrlLoaderInterceptorMetaFactoryStub extends bindings.Stub {
 
   AuthenticatingUrlLoaderInterceptorMetaFactory get impl => _impl;
   set impl(AuthenticatingUrlLoaderInterceptorMetaFactory d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

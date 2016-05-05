@@ -1903,14 +1903,19 @@ class ServiceProxy implements bindings.ProxyBase {
 
 
 class ServiceStub extends bindings.Stub {
-  Service _impl = null;
+  Service _impl;
 
   ServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Service impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ServiceStub.fromHandle(
+      core.MojoHandle handle, [Service impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ServiceStub.unbound() : super.unbound();
 
@@ -1933,7 +1938,9 @@ class ServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _serviceMethodFrobinateName:
         var params = _ServiceFrobinateParams.deserialize(
@@ -1971,8 +1978,21 @@ class ServiceStub extends bindings.Stub {
 
   Service get impl => _impl;
   set impl(Service d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2121,14 +2141,19 @@ class PortProxy implements bindings.ProxyBase {
 
 
 class PortStub extends bindings.Stub {
-  Port _impl = null;
+  Port _impl;
 
   PortStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Port impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  PortStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  PortStub.fromHandle(
+      core.MojoHandle handle, [Port impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   PortStub.unbound() : super.unbound();
 
@@ -2146,7 +2171,9 @@ class PortStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _portMethodPostMessageName:
         var params = _PortPostMessageParams.deserialize(
@@ -2162,8 +2189,21 @@ class PortStub extends bindings.Stub {
 
   Port get impl => _impl;
   set impl(Port d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2195,7 +2235,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "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";
+  var serializedRuntimeTypeInfo = "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";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

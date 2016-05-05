@@ -385,14 +385,19 @@ class AssetBundleProxy implements bindings.ProxyBase {
 
 
 class AssetBundleStub extends bindings.Stub {
-  AssetBundle _impl = null;
+  AssetBundle _impl;
 
   AssetBundleStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [AssetBundle impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  AssetBundleStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  AssetBundleStub.fromHandle(
+      core.MojoHandle handle, [AssetBundle impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   AssetBundleStub.unbound() : super.unbound();
 
@@ -415,7 +420,9 @@ class AssetBundleStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _assetBundleMethodGetAsStreamName:
         var params = _AssetBundleGetAsStreamParams.deserialize(
@@ -448,8 +455,21 @@ class AssetBundleStub extends bindings.Stub {
 
   AssetBundle get impl => _impl;
   set impl(AssetBundle d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -598,14 +618,19 @@ class AssetUnpackerProxy implements bindings.ProxyBase {
 
 
 class AssetUnpackerStub extends bindings.Stub {
-  AssetUnpacker _impl = null;
+  AssetUnpacker _impl;
 
   AssetUnpackerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [AssetUnpacker impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  AssetUnpackerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  AssetUnpackerStub.fromHandle(
+      core.MojoHandle handle, [AssetUnpacker impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   AssetUnpackerStub.unbound() : super.unbound();
 
@@ -623,7 +648,9 @@ class AssetUnpackerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _assetUnpackerMethodUnpackZipStreamName:
         var params = _AssetUnpackerUnpackZipStreamParams.deserialize(
@@ -639,8 +666,21 @@ class AssetUnpackerStub extends bindings.Stub {
 
   AssetUnpacker get impl => _impl;
   set impl(AssetUnpacker d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

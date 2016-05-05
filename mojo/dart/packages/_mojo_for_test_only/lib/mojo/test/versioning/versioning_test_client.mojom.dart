@@ -1024,14 +1024,19 @@ class HumanResourceDatabaseProxy implements bindings.ProxyBase {
 
 
 class HumanResourceDatabaseStub extends bindings.Stub {
-  HumanResourceDatabase _impl = null;
+  HumanResourceDatabase _impl;
 
   HumanResourceDatabaseStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [HumanResourceDatabase impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  HumanResourceDatabaseStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  HumanResourceDatabaseStub.fromHandle(
+      core.MojoHandle handle, [HumanResourceDatabase impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   HumanResourceDatabaseStub.unbound() : super.unbound();
 
@@ -1070,7 +1075,9 @@ class HumanResourceDatabaseStub extends bindings.Stub {
                                                           2,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _humanResourceDatabaseMethodAddEmployeeName:
         var params = _HumanResourceDatabaseAddEmployeeParams.deserialize(
@@ -1167,8 +1174,21 @@ class HumanResourceDatabaseStub extends bindings.Stub {
 
   HumanResourceDatabase get impl => _impl;
   set impl(HumanResourceDatabase d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1200,7 +1220,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xaT4/bRBS3nS2bbqm69F8MhW0WBESFxgiEFKWXXbFBRRQUWFRRcQheZ0qM1nawnVV64yPwUXrkyLEfgSMfYY+90ZnNm3oynvGfxGsn0o705LXjzMz7zXu/+b3Z6MqsbcP1b7jyz/vMvYqtDvdfYruPzfF+97rdEAVht3uC/MD2XNv9rdt9OHFM90cUeBPfQgdmaB6ZARL08wDbF9h+etLvDb7tPemSDtukv3bUXVvWW3y+L+DaxFZjPt+D6wiun2FrpY57gMamHzrIDdv43Y9S3+8542PvGULL+9WB+VO/Wvw6bET3Z+9dFq9fXZ33X2H8Z5//D+1nRdyuY9vCFiEye/4xtrsQBwnwxeZ1BdslbBa2X7AZI89Bhj8Zeo7tIt8g/RmBb83+GE+Ojm3LsN0Q+U9NCwXGke0O8RCBQcYMjGjQAXkwsI5tsmjky85rXDRm/JE6jwPFt6kqiU2GYycjjlfB78P9R71DyKEP0/Fr0/d5HN8Ev8rCMW/eZMVXLQjfK5APB73HZ/efYPsgA770fR7fqyuOb5PjbZrv/27kw7MvwXMbuJoyG4nV92R4RvQXw5FcN0vEkef/FuVBbR6XDjfPLSVbk+GqMLiKntN2A2IVAWQDeyiMv7ewXS4RNxEuBLqXEj/qC+CiMnzAN8JnJHRd00EiPK6XjMe2xD8Wn0ssgQnyJy8+WkLc0H14yO3DPE43gLvKzDeR380U/ZCX73j9qDNj1pjxWtz4z2F9/oOrJlnP55yOpPx4msCP7HyaAh29yTyneX+I/BPbQt9DmC+spwkX38Im+/xzbPdkfC2Xn7F4asD6lRVPi+KhS+JPB16hqapBvLTgOX2v/gbEzzWof26L44nGw1+189kX9odDZjeN+6WXrEv4uKb+j7TsfpPWkfh9B3xn/L7voz8meDJC/2krcx9g81y2D7wsWD+0UnQZ1Q+i+GisAP/rEh2Zt55O4n1Vku9snNYLitN3sd2MxWkw9twArUuc5mnLxuk12P+CiYXdCYQ8dq9CfGRxJOP7fzay1au83pXx/S3QaT9MkP8soX56Z0X4florJo+obpnzm2H8qvOIPy/S1XLrRlk+bcG8oFwUxkmj4noxqdUl5z30+1NJ/vy5hP6uMePROuQ72308820+Hn0U+jY6QYOn2GfkD8a+7YYSnI0K47GZwl86p3X1lP3xtKC83sF2W5DXdIdctbyequuh5+6A7iib/9Vz0nMivMm6PFSL5Y3pOfPGTTiz4uhCEa3fg4rWj2BB57HJ1Y/L8gmvk/YAsBcb0TmLmnG9tBJ4/m04U90PQ9MafX22an26aIJ126lYd1H+6efk5z0JjruAQcz/uWr7Qn8tqr92INer1F9awnn0ouf1svolK/8RXD6t6DxCxH9JdWCSXqL5uK0Vk4/vg5YU5WN0qnBxrpD3XIHE21drcK7QgTz9VYv+h6Fl3C9rBegbLWW/bADWj+wgpOrtm2Ec790VOZ84VYqpY+6C75zfr3fJqvOxnoHHlIT1pzi1CjoXbULfcbxmLLYO/KWVWO/R36nYOJdE/L4Lv62qul7YyhBnLL+9CgAA///TF/PBWCgAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xaT2/jRBS3nUCzXVZb9l8NC10XBEQLG1cgpCh7aUWDilhQoGjFniLXmbZGiR1sp+py2iNHPgZHjvsR+Bh75MixN5hZv1lPxjO2k7ixI+1IT1O7jmfeb977vd9MoitR24D+OfT8/R5zrWJrwPWX2B5gG3m/eJ1OiIKw0zlDfuB4ruOedDoHk5Hl/ogCb+LbaN8KrSMrQIL3PMT2BbafnvS6/W+7TzrkhS3yvlb8upbsbcn5/g29ga3G/H8X+lPod7A1M8fdR2PLD0fIDVv42Y8zn++OxkPvKUKL+9WG+VO/mtw6GPX4mjx3cEW8fhvqtP8K4z97/z9oPyvidgPbOrYYkej+J9juQRykwJeY11Vsb2BzsR1jMyeBbw492xqaJ553MkTmqTdC5m++ZZJXm4FvR3+MJ0dDxzYdN0T+sWWjwDxy3AEeLTDJ8IEZj98nN/r20CHrRz48ivDRmHmM1Wk8KM5NVUltMjzbOfG8Bv4f7j3qHkIufZSNY4s+z+P5Fvi1bDxnzaO8OKsF4XwV8mO/+/jl9afYPsyBM32ex/naiuBs8HwOgF7UZ8O1J8F1AzicMh6J3fdluMa0mOQnbGsl4MnXhx3Ap6dN49Pm5ruu5GsyfBUGX9F92m5C7CKAru8MhPH4NrYrJeAnwkdlE5drjTnwURme4BvhOxLKrjVCIlxulITLhsRPFifC+w1Vnlez4qSlxBGt2wOubvN43QRuKyMPRf4bGbpjVj7kdafOjFljxmty4z+HdfoHek2yrn9x+pPy578p/MnOxxDo7zXmPuWDQ+SfOTb6HsJ+bh1OuPo20Y2S/3+O7b6Mz+WyNRFXm7B+y46reXHRJXGoA99QitMgbppwnz6382bU/3496l/cEcfVBfR/1i6nbuwNBkzVTfqll6Rj+DinOJxr+f0nrS3x/y5gwPj/wEe/TvBMhDjQVkadYPNfVicUtVi90czQc1RviOJls0L1QZfo0Fn36Wl1QZXwABu3ekFx+x62W4m4DcaeG6BVi9tZ2qJxex3qZDCxsS+BkOfuVwAnWVzJ6sKLer59MK+XZXXhNui7HybIf5qyH3u3YnXhj1ox+UX1zpT/TGWoSn7x51OGutz9qCzP1mFesA0Vxs1mRfahaa0hOV+inz+X5NWzBXR8jRmP7me+c9zHkWPT8emj0HfQGeofY4eR3x/7jhtK8DarEJ8Z/KZzmlnPqKeNejH5voXtjiDfaUWtar4/U1dDD94FvVJWnVAvSQ+KcCfr01OL5ZPzS+aTW3BGxtGIIlrHhyWvI8GEzmeN258uyjO8vjqg5zn1+DxHzblu2hLqwDtwprsXhpZ9+vXL1evRxROs31ZF9Bp17HRGvbYrwXMbsEjgMLWbf63bFtVtW8ABVdBtWsq5+LzfH8j2Q3n5keDzWcnnHiJ+TNtfpuksmqeGVkyefgBaVJSn8enF6/OLec8vSPx9tULnF7sQX2Mt/m5Fy1lfawXoIi2jvm4C5o+cIKSq75tBEvftip2DXCjF7IvuAQac/6+qalXytJGD55SUeKB4tQs6nzXg3UncIpZbJX7TlriPpL+/cXCOierANvyGrCr7j/Ucccfy3/8BAAD//9CpxZ1IKQAA";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

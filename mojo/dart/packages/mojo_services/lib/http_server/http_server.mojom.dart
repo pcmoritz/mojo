@@ -621,14 +621,19 @@ class HttpServerProxy implements bindings.ProxyBase {
 
 
 class HttpServerStub extends bindings.Stub {
-  HttpServer _impl = null;
+  HttpServer _impl;
 
   HttpServerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [HttpServer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  HttpServerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  HttpServerStub.fromHandle(
+      core.MojoHandle handle, [HttpServer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   HttpServerStub.unbound() : super.unbound();
 
@@ -656,7 +661,9 @@ class HttpServerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _httpServerMethodSetHandlerName:
         var params = _HttpServerSetHandlerParams.deserialize(
@@ -709,8 +716,21 @@ class HttpServerStub extends bindings.Stub {
 
   HttpServer get impl => _impl;
   set impl(HttpServer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -878,14 +898,19 @@ class HttpHandlerProxy implements bindings.ProxyBase {
 
 
 class HttpHandlerStub extends bindings.Stub {
-  HttpHandler _impl = null;
+  HttpHandler _impl;
 
   HttpHandlerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [HttpHandler impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  HttpHandlerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  HttpHandlerStub.fromHandle(
+      core.MojoHandle handle, [HttpHandler impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   HttpHandlerStub.unbound() : super.unbound();
 
@@ -908,7 +933,9 @@ class HttpHandlerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _httpHandlerMethodHandleRequestName:
         var params = _HttpHandlerHandleRequestParams.deserialize(
@@ -941,8 +968,21 @@ class HttpHandlerStub extends bindings.Stub {
 
   HttpHandler get impl => _impl;
   set impl(HttpHandler d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

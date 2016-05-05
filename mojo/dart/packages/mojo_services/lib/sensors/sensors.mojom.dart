@@ -653,14 +653,19 @@ class SensorListenerProxy implements bindings.ProxyBase {
 
 
 class SensorListenerStub extends bindings.Stub {
-  SensorListener _impl = null;
+  SensorListener _impl;
 
   SensorListenerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SensorListener impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SensorListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SensorListenerStub.fromHandle(
+      core.MojoHandle handle, [SensorListener impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SensorListenerStub.unbound() : super.unbound();
 
@@ -678,7 +683,9 @@ class SensorListenerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sensorListenerMethodOnAccuracyChangedName:
         var params = _SensorListenerOnAccuracyChangedParams.deserialize(
@@ -699,8 +706,21 @@ class SensorListenerStub extends bindings.Stub {
 
   SensorListener get impl => _impl;
   set impl(SensorListener d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -849,14 +869,19 @@ class SensorServiceProxy implements bindings.ProxyBase {
 
 
 class SensorServiceStub extends bindings.Stub {
-  SensorService _impl = null;
+  SensorService _impl;
 
   SensorServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SensorService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SensorServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SensorServiceStub.fromHandle(
+      core.MojoHandle handle, [SensorService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SensorServiceStub.unbound() : super.unbound();
 
@@ -874,7 +899,9 @@ class SensorServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sensorServiceMethodAddListenerName:
         var params = _SensorServiceAddListenerParams.deserialize(
@@ -890,8 +917,21 @@ class SensorServiceStub extends bindings.Stub {
 
   SensorService get impl => _impl;
   set impl(SensorService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

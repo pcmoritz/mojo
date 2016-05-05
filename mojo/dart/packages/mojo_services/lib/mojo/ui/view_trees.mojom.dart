@@ -654,14 +654,19 @@ class ViewTreeProxy implements bindings.ProxyBase {
 
 
 class ViewTreeStub extends bindings.Stub {
-  ViewTree _impl = null;
+  ViewTree _impl;
 
   ViewTreeStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ViewTree impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ViewTreeStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ViewTreeStub.fromHandle(
+      core.MojoHandle handle, [ViewTree impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ViewTreeStub.unbound() : super.unbound();
 
@@ -684,7 +689,9 @@ class ViewTreeStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _viewTreeMethodGetTokenName:
         var response = _impl.getToken(_viewTreeGetTokenResponseParamsFactory);
@@ -730,8 +737,21 @@ class ViewTreeStub extends bindings.Stub {
 
   ViewTree get impl => _impl;
   set impl(ViewTree d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -898,14 +918,19 @@ class ViewTreeListenerProxy implements bindings.ProxyBase {
 
 
 class ViewTreeListenerStub extends bindings.Stub {
-  ViewTreeListener _impl = null;
+  ViewTreeListener _impl;
 
   ViewTreeListenerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ViewTreeListener impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ViewTreeListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ViewTreeListenerStub.fromHandle(
+      core.MojoHandle handle, [ViewTreeListener impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ViewTreeListenerStub.unbound() : super.unbound();
 
@@ -927,7 +952,9 @@ class ViewTreeListenerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _viewTreeListenerMethodOnRendererDiedName:
         var response = _impl.onRendererDied(_viewTreeListenerOnRendererDiedResponseParamsFactory);
@@ -958,8 +985,21 @@ class ViewTreeListenerStub extends bindings.Stub {
 
   ViewTreeListener get impl => _impl;
   set impl(ViewTreeListener d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

@@ -989,14 +989,19 @@ class ProcessProxy implements bindings.ProxyBase {
 
 
 class ProcessStub extends bindings.Stub {
-  Process _impl = null;
+  Process _impl;
 
   ProcessStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Process impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ProcessStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ProcessStub.fromHandle(
+      core.MojoHandle handle, [Process impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ProcessStub.unbound() : super.unbound();
 
@@ -1024,7 +1029,9 @@ class ProcessStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _processMethodSpawnName:
         var params = _ProcessSpawnParams.deserialize(
@@ -1079,8 +1086,21 @@ class ProcessStub extends bindings.Stub {
 
   Process get impl => _impl;
   set impl(Process d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1278,14 +1298,19 @@ class ProcessControllerProxy implements bindings.ProxyBase {
 
 
 class ProcessControllerStub extends bindings.Stub {
-  ProcessController _impl = null;
+  ProcessController _impl;
 
   ProcessControllerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ProcessController impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ProcessControllerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ProcessControllerStub.fromHandle(
+      core.MojoHandle handle, [ProcessController impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ProcessControllerStub.unbound() : super.unbound();
 
@@ -1314,7 +1339,9 @@ class ProcessControllerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _processControllerMethodWaitName:
         var response = _impl.wait(_processControllerWaitResponseParamsFactory);
@@ -1367,8 +1394,21 @@ class ProcessControllerStub extends bindings.Stub {
 
   ProcessController get impl => _impl;
   set impl(ProcessController d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

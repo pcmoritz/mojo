@@ -613,14 +613,19 @@ class NfcTransmissionProxy implements bindings.ProxyBase {
 
 
 class NfcTransmissionStub extends bindings.Stub {
-  NfcTransmission _impl = null;
+  NfcTransmission _impl;
 
   NfcTransmissionStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NfcTransmission impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NfcTransmissionStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NfcTransmissionStub.fromHandle(
+      core.MojoHandle handle, [NfcTransmission impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NfcTransmissionStub.unbound() : super.unbound();
 
@@ -638,7 +643,9 @@ class NfcTransmissionStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _nfcTransmissionMethodCancelName:
         _impl.cancel();
@@ -652,8 +659,21 @@ class NfcTransmissionStub extends bindings.Stub {
 
   NfcTransmission get impl => _impl;
   set impl(NfcTransmission d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -801,14 +821,19 @@ class NfcReceiverProxy implements bindings.ProxyBase {
 
 
 class NfcReceiverStub extends bindings.Stub {
-  NfcReceiver _impl = null;
+  NfcReceiver _impl;
 
   NfcReceiverStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NfcReceiver impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NfcReceiverStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NfcReceiverStub.fromHandle(
+      core.MojoHandle handle, [NfcReceiver impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NfcReceiverStub.unbound() : super.unbound();
 
@@ -826,7 +851,9 @@ class NfcReceiverStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _nfcReceiverMethodOnReceivedNfcDataName:
         var params = _NfcReceiverOnReceivedNfcDataParams.deserialize(
@@ -842,8 +869,21 @@ class NfcReceiverStub extends bindings.Stub {
 
   NfcReceiver get impl => _impl;
   set impl(NfcReceiver d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1032,14 +1072,19 @@ class NfcProxy implements bindings.ProxyBase {
 
 
 class NfcStub extends bindings.Stub {
-  Nfc _impl = null;
+  Nfc _impl;
 
   NfcStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Nfc impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NfcStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NfcStub.fromHandle(
+      core.MojoHandle handle, [Nfc impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NfcStub.unbound() : super.unbound();
 
@@ -1062,7 +1107,9 @@ class NfcStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _nfcMethodTransmitOnNextConnectionName:
         var params = _NfcTransmitOnNextConnectionParams.deserialize(
@@ -1101,8 +1148,21 @@ class NfcStub extends bindings.Stub {
 
   Nfc get impl => _impl;
   set impl(Nfc d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

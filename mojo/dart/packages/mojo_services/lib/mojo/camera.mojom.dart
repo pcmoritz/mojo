@@ -743,14 +743,19 @@ class CameraRollServiceProxy implements bindings.ProxyBase {
 
 
 class CameraRollServiceStub extends bindings.Stub {
-  CameraRollService _impl = null;
+  CameraRollService _impl;
 
   CameraRollServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [CameraRollService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  CameraRollServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  CameraRollServiceStub.fromHandle(
+      core.MojoHandle handle, [CameraRollService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   CameraRollServiceStub.unbound() : super.unbound();
 
@@ -778,7 +783,9 @@ class CameraRollServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _cameraRollServiceMethodUpdateName:
         _impl.update();
@@ -834,8 +841,21 @@ class CameraRollServiceStub extends bindings.Stub {
 
   CameraRollService get impl => _impl;
   set impl(CameraRollService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1002,14 +1022,19 @@ class CameraServiceProxy implements bindings.ProxyBase {
 
 
 class CameraServiceStub extends bindings.Stub {
-  CameraService _impl = null;
+  CameraService _impl;
 
   CameraServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [CameraService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  CameraServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  CameraServiceStub.fromHandle(
+      core.MojoHandle handle, [CameraService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   CameraServiceStub.unbound() : super.unbound();
 
@@ -1032,7 +1057,9 @@ class CameraServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _cameraServiceMethodGetLatestFrameName:
         var response = _impl.getLatestFrame(_cameraServiceGetLatestFrameResponseParamsFactory);
@@ -1063,8 +1090,21 @@ class CameraServiceStub extends bindings.Stub {
 
   CameraService get impl => _impl;
   set impl(CameraService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

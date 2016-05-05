@@ -715,14 +715,19 @@ class UrlLoaderInterceptorFactoryProxy implements bindings.ProxyBase {
 
 
 class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
-  UrlLoaderInterceptorFactory _impl = null;
+  UrlLoaderInterceptorFactory _impl;
 
   UrlLoaderInterceptorFactoryStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UrlLoaderInterceptorFactory impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UrlLoaderInterceptorFactoryStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UrlLoaderInterceptorFactoryStub.fromHandle(
+      core.MojoHandle handle, [UrlLoaderInterceptorFactory impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UrlLoaderInterceptorFactoryStub.unbound() : super.unbound();
 
@@ -740,7 +745,9 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _urlLoaderInterceptorFactoryMethodCreateName:
         var params = _UrlLoaderInterceptorFactoryCreateParams.deserialize(
@@ -756,8 +763,21 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
 
   UrlLoaderInterceptorFactory get impl => _impl;
   set impl(UrlLoaderInterceptorFactory d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -986,14 +1006,19 @@ class UrlLoaderInterceptorProxy implements bindings.ProxyBase {
 
 
 class UrlLoaderInterceptorStub extends bindings.Stub {
-  UrlLoaderInterceptor _impl = null;
+  UrlLoaderInterceptor _impl;
 
   UrlLoaderInterceptorStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UrlLoaderInterceptor impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UrlLoaderInterceptorStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UrlLoaderInterceptorStub.fromHandle(
+      core.MojoHandle handle, [UrlLoaderInterceptor impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UrlLoaderInterceptorStub.unbound() : super.unbound();
 
@@ -1026,7 +1051,9 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _urlLoaderInterceptorMethodInterceptRequestName:
         var params = _UrlLoaderInterceptorInterceptRequestParams.deserialize(
@@ -1101,8 +1128,21 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
 
   UrlLoaderInterceptor get impl => _impl;
   set impl(UrlLoaderInterceptor d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

@@ -866,14 +866,19 @@ class ViewContainerProxy implements bindings.ProxyBase {
 
 
 class ViewContainerStub extends bindings.Stub {
-  ViewContainer _impl = null;
+  ViewContainer _impl;
 
   ViewContainerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ViewContainer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ViewContainerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ViewContainerStub.fromHandle(
+      core.MojoHandle handle, [ViewContainer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ViewContainerStub.unbound() : super.unbound();
 
@@ -891,7 +896,9 @@ class ViewContainerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _viewContainerMethodSetListenerName:
         var params = _ViewContainerSetListenerParams.deserialize(
@@ -922,8 +929,21 @@ class ViewContainerStub extends bindings.Stub {
 
   ViewContainer get impl => _impl;
   set impl(ViewContainer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1123,14 +1143,19 @@ class ViewContainerListenerProxy implements bindings.ProxyBase {
 
 
 class ViewContainerListenerStub extends bindings.Stub {
-  ViewContainerListener _impl = null;
+  ViewContainerListener _impl;
 
   ViewContainerListenerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ViewContainerListener impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ViewContainerListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ViewContainerListenerStub.fromHandle(
+      core.MojoHandle handle, [ViewContainerListener impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ViewContainerListenerStub.unbound() : super.unbound();
 
@@ -1156,7 +1181,9 @@ class ViewContainerListenerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _viewContainerListenerMethodOnChildAttachedName:
         var params = _ViewContainerListenerOnChildAttachedParams.deserialize(
@@ -1211,8 +1238,21 @@ class ViewContainerListenerStub extends bindings.Stub {
 
   ViewContainerListener get impl => _impl;
   set impl(ViewContainerListener d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

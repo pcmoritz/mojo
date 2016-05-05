@@ -470,14 +470,19 @@ class ImportedInterfaceProxy implements bindings.ProxyBase {
 
 
 class ImportedInterfaceStub extends bindings.Stub {
-  ImportedInterface _impl = null;
+  ImportedInterface _impl;
 
   ImportedInterfaceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ImportedInterface impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ImportedInterfaceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ImportedInterfaceStub.fromHandle(
+      core.MojoHandle handle, [ImportedInterface impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ImportedInterfaceStub.unbound() : super.unbound();
 
@@ -495,7 +500,9 @@ class ImportedInterfaceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _importedInterfaceMethodDoSomethingName:
         _impl.doSomething();
@@ -509,8 +516,21 @@ class ImportedInterfaceStub extends bindings.Stub {
 
   ImportedInterface get impl => _impl;
   set impl(ImportedInterface d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -542,7 +562,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/8yYzXLTMBCA5YRC2qYlQH/SH8CFAgGGuMcOp3ZKhmboMJk2h5RLfw0xU/9guzNw48gjcOQReASOfZQeOXIDuV7F9lpKbUiMNbOj2JIj7afVarVV4pcK1CtQ4/esLqEa9yNS8D8jVGrwehNqC+ovUH+D+iGVO1Tau63G3qvG7nNNt0zbVY/r64bpdlV7p3tgqYQ8pX3uc/s14UfTcFX77cGRevG/d6nMcvu3TM1w+7T7Az6mbUvc9l3VjU7tonRA7wrS23suUmmNBM8eqh8lxK8cfe7c5HP+BfUaiZYV9P43lBbhlykYEqtym8o0FcEyxOZzC/R+Q2WbitI1dVWxT49NXTNUW9HN96bi2Ef+D+v08EQ7UjS2VI5yqBnHmvHOUVzVcR3FOdCtE3XPH73ufaP748jAkY1vgb19L0T1Z3ZXlZB9w/NYSn4dAb8bVEY9nRsb7fXXL7ca8P4R2B6XXz3ojTl661HIgGPS/cbsdozw+VYkPpfxS/iuJrTPSSpXqWw0tzc8uMv096KQK+sVt8/pnHFNyrE8II4V8Nnt7eaF4bF58jmyXnGOMznjyPjJWF/EU8RvE/HbF/Cbg73OP2UIuUdlPsxT0BHzXIa9NWyeeNxqyL4kZCdS6HzHfM8FfER8SYgv7z0JnR+ez3hh7lAAbpfqxJ33g4zsT0aczlGdRF+vrAr0XQCdQ/o+s9UPp3RW/LgKyrD1LgnsoIrmUSJ8Tj/Z98V0fmtNwGkC4go/WvP9z2R4n0ED5uWdvdcy2leFcJwsRfVeRfMaIclK0v1UE3w/Cuv3URCny7CGw+aTlsOVv+AgJeDwScBhKSMO/fZTgeOXKwn9Tdp9xOL32D6CBjz+eEZxfQ3WnvmTLuyjrxDXnxX7x589u5Yi19B/vh+J4nsZ1irKLwjsMcdyRufWZfdZFs9Lgni+JIhDCyntcDNhPB+7Z6JAHnOcyAnHpNyKA+KG43c2P8StF7hjbpM558b8I7uvD4pbGfzK1vpOOxx3IW6sOcbtek64ieJ3bBc18E2C/+kZyLDySbPADGfHYv4SdcDzmftP+aTPYH9ngnySjM6bNSnI26Tht5/yvHkCd0wRvzr6APOcz8iO0+ZL2Xk0lTK/ND2k/FIsb4c5Q0fMdyGnfEX5UFxmUvLsJDyn2HyFPINUE9duF3PK9U8AAAD//48kgpk4GQAA";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/9SYzW7TThDA18m/f9I2LQH6kX4AKRQwIGKOEadWJSIRFYraHNoDatPUNEZJbGxXKjxBH4Mjj8EjcOTII/TYG6zr2dge76Y2pMasNFrbu7Znfjv7MVMkbilA/Rxq/JzVOVTjfkTyvjNGRYbHNagNqE+h/gz1Qyp3qDR3G9W919XdF1rP0E1bPSyv93W7o5rbnZahEvKU9rnP7VeHi3rfVs13rbZ68d27VOa5/Ru61reHtLs/fEzbVrjtu6odVO2i7IDdBWS3c5917B/z7h1U57kgv0Y+eP/t5nDOayRY2Pix5z+hNAi/zFBxfolNuU1llopgGEL63AK7nba3VJRjy1S6ervVVY50/airKh29pyqfzJbS09/rimW23Qvj+KCrtRWNjZqlHGj9Q61/ZCm2atmWYrV6RlfdcxUpO+/06PdLwJPpcQI8vmaCHJj/laSgvhW4nyDxOO4ION6gMk5lq7rRXH/zarMKzx+BD3I5lr3emKczLpkEeUadf8yPJwifc1Hi85m8hHMlor9OU/mfykZ9a8OBvEqvl4V8Wa+wv86mlG9UnvkR8SzAWt7cql84ItOTz5P1CvOcSynPwfxHdmOuIo41xHFfwHEB1gD+LkTIPSqLfq6CjpjrKsy1pLji/xd9/iYhv5F85wDM+UzAScSZ+DjznhPfPuOsJS/1bWq33aEGcbk9SNgfS4jXGaqj2O2UisDuJbDdZ/czU/1wTFXinw+gJGV/TuAXRaRPDvkJaz9nfpSNt66tCXhNwXnEPeW569O0f/5BA+bm7NXXEp5vGf98Q+e6CtJvjEQrUeeZLHh/HMbxRHDOL8FYJsUpLo//foOHFIHHRwGPlYR5DJtnGc76XYi4HsWdXyweCM0vaMD/n0w4TpDBF9h6Y8D8+gJxwo/s8HMs01uWAmHXH8ddonihBGMW5OgFCphnPuF97rJ4mcUHkiA+KAjOs5mYflmLGB+E4lgUGGCeUynjGZVfdkT8cDzA9EP8BoEA5jf9j/Bj6yfLC4yKXx7Wm8317ab/3Ib4seYQv+sp4yeKB7CfyLB2Cb4zcJirymPNAzuclQutp6gD1mfhL+exToHHd0EeS0b7Uk3y8kVxOO7H3JeeQAwr4lhGL2Cuiwn7ddy8Ldu3ZmLmtWavKK8Vyhti3tARc15KOWdRXhaXuZhcdyLuZ0xfIVcvxcX14+WU8/0VAAD//41PNDrQGQAA";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

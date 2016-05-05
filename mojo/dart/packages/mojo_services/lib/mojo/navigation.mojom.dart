@@ -454,14 +454,19 @@ class NavigatorHostProxy implements bindings.ProxyBase {
 
 
 class NavigatorHostStub extends bindings.Stub {
-  NavigatorHost _impl = null;
+  NavigatorHost _impl;
 
   NavigatorHostStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NavigatorHost impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NavigatorHostStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NavigatorHostStub.fromHandle(
+      core.MojoHandle handle, [NavigatorHost impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NavigatorHostStub.unbound() : super.unbound();
 
@@ -479,7 +484,9 @@ class NavigatorHostStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _navigatorHostMethodRequestNavigateName:
         var params = _NavigatorHostRequestNavigateParams.deserialize(
@@ -505,8 +512,21 @@ class NavigatorHostStub extends bindings.Stub {
 
   NavigatorHost get impl => _impl;
   set impl(NavigatorHost d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

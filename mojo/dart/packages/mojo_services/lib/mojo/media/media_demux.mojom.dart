@@ -1046,14 +1046,19 @@ class MediaDemuxProxy implements bindings.ProxyBase {
 
 
 class MediaDemuxStub extends bindings.Stub {
-  MediaDemux _impl = null;
+  MediaDemux _impl;
 
   MediaDemuxStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaDemux impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaDemuxStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaDemuxStub.fromHandle(
+      core.MojoHandle handle, [MediaDemux impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaDemuxStub.unbound() : super.unbound();
 
@@ -1094,7 +1099,9 @@ class MediaDemuxStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaDemuxMethodDescribeName:
         var response = _impl.describe(_mediaDemuxDescribeResponseParamsFactory);
@@ -1214,8 +1221,21 @@ class MediaDemuxStub extends bindings.Stub {
 
   MediaDemux get impl => _impl;
   set impl(MediaDemux d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

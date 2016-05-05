@@ -1266,14 +1266,19 @@ class GeocoderProxy implements bindings.ProxyBase {
 
 
 class GeocoderStub extends bindings.Stub {
-  Geocoder _impl = null;
+  Geocoder _impl;
 
   GeocoderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Geocoder impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  GeocoderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  GeocoderStub.fromHandle(
+      core.MojoHandle handle, [Geocoder impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   GeocoderStub.unbound() : super.unbound();
 
@@ -1303,7 +1308,9 @@ class GeocoderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _geocoderMethodAddressToLocationName:
         var params = _GeocoderAddressToLocationParams.deserialize(
@@ -1358,8 +1365,21 @@ class GeocoderStub extends bindings.Stub {
 
   Geocoder get impl => _impl;
   set impl(Geocoder d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

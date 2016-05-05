@@ -212,14 +212,19 @@ class InputDispatcherProxy implements bindings.ProxyBase {
 
 
 class InputDispatcherStub extends bindings.Stub {
-  InputDispatcher _impl = null;
+  InputDispatcher _impl;
 
   InputDispatcherStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [InputDispatcher impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  InputDispatcherStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  InputDispatcherStub.fromHandle(
+      core.MojoHandle handle, [InputDispatcher impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   InputDispatcherStub.unbound() : super.unbound();
 
@@ -237,7 +242,9 @@ class InputDispatcherStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _inputDispatcherMethodDispatchEventName:
         var params = _InputDispatcherDispatchEventParams.deserialize(
@@ -253,8 +260,21 @@ class InputDispatcherStub extends bindings.Stub {
 
   InputDispatcher get impl => _impl;
   set impl(InputDispatcher d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

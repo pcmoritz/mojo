@@ -744,14 +744,19 @@ class AudioTrackProxy implements bindings.ProxyBase {
 
 
 class AudioTrackStub extends bindings.Stub {
-  AudioTrack _impl = null;
+  AudioTrack _impl;
 
   AudioTrackStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [AudioTrack impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  AudioTrackStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  AudioTrackStub.fromHandle(
+      core.MojoHandle handle, [AudioTrack impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   AudioTrackStub.unbound() : super.unbound();
 
@@ -774,7 +779,9 @@ class AudioTrackStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _audioTrackMethodDescribeName:
         var response = _impl.describe(_audioTrackDescribeResponseParamsFactory);
@@ -820,8 +827,21 @@ class AudioTrackStub extends bindings.Stub {
 
   AudioTrack get impl => _impl;
   set impl(AudioTrack d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

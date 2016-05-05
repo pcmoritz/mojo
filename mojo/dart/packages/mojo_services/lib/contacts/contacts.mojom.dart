@@ -989,14 +989,19 @@ class ContactsServiceProxy implements bindings.ProxyBase {
 
 
 class ContactsServiceStub extends bindings.Stub {
-  ContactsService _impl = null;
+  ContactsService _impl;
 
   ContactsServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ContactsService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ContactsServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ContactsServiceStub.fromHandle(
+      core.MojoHandle handle, [ContactsService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ContactsServiceStub.unbound() : super.unbound();
 
@@ -1034,7 +1039,9 @@ class ContactsServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _contactsServiceMethodGetCountName:
         var params = _ContactsServiceGetCountParams.deserialize(
@@ -1133,8 +1140,21 @@ class ContactsServiceStub extends bindings.Stub {
 
   ContactsService get impl => _impl;
   set impl(ContactsService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

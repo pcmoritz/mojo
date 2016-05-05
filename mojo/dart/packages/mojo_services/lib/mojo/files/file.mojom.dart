@@ -2878,14 +2878,19 @@ class FileProxy implements bindings.ProxyBase {
 
 
 class FileStub extends bindings.Stub {
-  File _impl = null;
+  File _impl;
 
   FileStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [File impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  FileStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  FileStub.fromHandle(
+      core.MojoHandle handle, [File impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   FileStub.unbound() : super.unbound();
 
@@ -2980,7 +2985,9 @@ class FileStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _fileMethodCloseName:
         var response = _impl.close(_fileCloseResponseParamsFactory);
@@ -3291,8 +3298,21 @@ class FileStub extends bindings.Stub {
 
   File get impl => _impl;
   set impl(File d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

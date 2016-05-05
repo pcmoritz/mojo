@@ -727,14 +727,19 @@ class SpeechRecognizerListenerProxy implements bindings.ProxyBase {
 
 
 class SpeechRecognizerListenerStub extends bindings.Stub {
-  SpeechRecognizerListener _impl = null;
+  SpeechRecognizerListener _impl;
 
   SpeechRecognizerListenerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SpeechRecognizerListener impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SpeechRecognizerListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SpeechRecognizerListenerStub.fromHandle(
+      core.MojoHandle handle, [SpeechRecognizerListener impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SpeechRecognizerListenerStub.unbound() : super.unbound();
 
@@ -752,7 +757,9 @@ class SpeechRecognizerListenerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _speechRecognizerListenerMethodOnRecognizerErrorName:
         var params = _SpeechRecognizerListenerOnRecognizerErrorParams.deserialize(
@@ -778,8 +785,21 @@ class SpeechRecognizerListenerStub extends bindings.Stub {
 
   SpeechRecognizerListener get impl => _impl;
   set impl(SpeechRecognizerListener d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -937,14 +957,19 @@ class SpeechRecognizerServiceProxy implements bindings.ProxyBase {
 
 
 class SpeechRecognizerServiceStub extends bindings.Stub {
-  SpeechRecognizerService _impl = null;
+  SpeechRecognizerService _impl;
 
   SpeechRecognizerServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SpeechRecognizerService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SpeechRecognizerServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SpeechRecognizerServiceStub.fromHandle(
+      core.MojoHandle handle, [SpeechRecognizerService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SpeechRecognizerServiceStub.unbound() : super.unbound();
 
@@ -962,7 +987,9 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _speechRecognizerServiceMethodListenName:
         var params = _SpeechRecognizerServiceListenParams.deserialize(
@@ -981,8 +1008,21 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
 
   SpeechRecognizerService get impl => _impl;
   set impl(SpeechRecognizerService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

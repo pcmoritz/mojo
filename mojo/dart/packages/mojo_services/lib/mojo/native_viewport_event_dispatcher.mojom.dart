@@ -290,14 +290,19 @@ class NativeViewportEventDispatcherProxy implements bindings.ProxyBase {
 
 
 class NativeViewportEventDispatcherStub extends bindings.Stub {
-  NativeViewportEventDispatcher _impl = null;
+  NativeViewportEventDispatcher _impl;
 
   NativeViewportEventDispatcherStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NativeViewportEventDispatcher impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NativeViewportEventDispatcherStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NativeViewportEventDispatcherStub.fromHandle(
+      core.MojoHandle handle, [NativeViewportEventDispatcher impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NativeViewportEventDispatcherStub.unbound() : super.unbound();
 
@@ -319,7 +324,9 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _nativeViewportEventDispatcherMethodOnEventName:
         var params = _NativeViewportEventDispatcherOnEventParams.deserialize(
@@ -352,8 +359,21 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
 
   NativeViewportEventDispatcher get impl => _impl;
   set impl(NativeViewportEventDispatcher d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

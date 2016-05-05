@@ -365,14 +365,19 @@ class ViewManagerProxy implements bindings.ProxyBase {
 
 
 class ViewManagerStub extends bindings.Stub {
-  ViewManager _impl = null;
+  ViewManager _impl;
 
   ViewManagerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ViewManager impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ViewManagerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ViewManagerStub.fromHandle(
+      core.MojoHandle handle, [ViewManager impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ViewManagerStub.unbound() : super.unbound();
 
@@ -390,7 +395,9 @@ class ViewManagerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _viewManagerMethodCreateViewName:
         var params = _ViewManagerCreateViewParams.deserialize(
@@ -411,8 +418,21 @@ class ViewManagerStub extends bindings.Stub {
 
   ViewManager get impl => _impl;
   set impl(ViewManager d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

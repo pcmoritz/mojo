@@ -210,14 +210,19 @@ class SharingServiceProxy implements bindings.ProxyBase {
 
 
 class SharingServiceStub extends bindings.Stub {
-  SharingService _impl = null;
+  SharingService _impl;
 
   SharingServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SharingService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SharingServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SharingServiceStub.fromHandle(
+      core.MojoHandle handle, [SharingService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SharingServiceStub.unbound() : super.unbound();
 
@@ -235,7 +240,9 @@ class SharingServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sharingServiceMethodShareTextName:
         var params = _SharingServiceShareTextParams.deserialize(
@@ -251,8 +258,21 @@ class SharingServiceStub extends bindings.Stub {
 
   SharingService get impl => _impl;
   set impl(SharingService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

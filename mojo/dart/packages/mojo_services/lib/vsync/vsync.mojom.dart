@@ -287,14 +287,19 @@ class VSyncProviderProxy implements bindings.ProxyBase {
 
 
 class VSyncProviderStub extends bindings.Stub {
-  VSyncProvider _impl = null;
+  VSyncProvider _impl;
 
   VSyncProviderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [VSyncProvider impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  VSyncProviderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  VSyncProviderStub.fromHandle(
+      core.MojoHandle handle, [VSyncProvider impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   VSyncProviderStub.unbound() : super.unbound();
 
@@ -317,7 +322,9 @@ class VSyncProviderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _vSyncProviderMethodAwaitVSyncName:
         var response = _impl.awaitVSync(_vSyncProviderAwaitVSyncResponseParamsFactory);
@@ -348,8 +355,21 @@ class VSyncProviderStub extends bindings.Stub {
 
   VSyncProvider get impl => _impl;
   set impl(VSyncProvider d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

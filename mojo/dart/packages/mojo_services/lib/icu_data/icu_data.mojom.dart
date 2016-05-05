@@ -301,14 +301,19 @@ class IcuDataProxy implements bindings.ProxyBase {
 
 
 class IcuDataStub extends bindings.Stub {
-  IcuData _impl = null;
+  IcuData _impl;
 
   IcuDataStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [IcuData impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  IcuDataStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  IcuDataStub.fromHandle(
+      core.MojoHandle handle, [IcuData impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   IcuDataStub.unbound() : super.unbound();
 
@@ -331,7 +336,9 @@ class IcuDataStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _icuDataMethodMapName:
         var params = _IcuDataMapParams.deserialize(
@@ -364,8 +371,21 @@ class IcuDataStub extends bindings.Stub {
 
   IcuData get impl => _impl;
   set impl(IcuData d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

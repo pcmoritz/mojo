@@ -1600,14 +1600,19 @@ class UdpSocketProxy implements bindings.ProxyBase {
 
 
 class UdpSocketStub extends bindings.Stub {
-  UdpSocket _impl = null;
+  UdpSocket _impl;
 
   UdpSocketStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UdpSocket impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UdpSocketStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UdpSocketStub.fromHandle(
+      core.MojoHandle handle, [UdpSocket impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UdpSocketStub.unbound() : super.unbound();
 
@@ -1664,7 +1669,9 @@ class UdpSocketStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _udpSocketMethodAllowAddressReuseName:
         var response = _impl.allowAddressReuse(_udpSocketAllowAddressReuseResponseParamsFactory);
@@ -1832,8 +1839,21 @@ class UdpSocketStub extends bindings.Stub {
 
   UdpSocket get impl => _impl;
   set impl(UdpSocket d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1983,14 +2003,19 @@ class UdpSocketReceiverProxy implements bindings.ProxyBase {
 
 
 class UdpSocketReceiverStub extends bindings.Stub {
-  UdpSocketReceiver _impl = null;
+  UdpSocketReceiver _impl;
 
   UdpSocketReceiverStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UdpSocketReceiver impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UdpSocketReceiverStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UdpSocketReceiverStub.fromHandle(
+      core.MojoHandle handle, [UdpSocketReceiver impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UdpSocketReceiverStub.unbound() : super.unbound();
 
@@ -2008,7 +2033,9 @@ class UdpSocketReceiverStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _udpSocketReceiverMethodOnReceivedName:
         var params = _UdpSocketReceiverOnReceivedParams.deserialize(
@@ -2024,8 +2051,21 @@ class UdpSocketReceiverStub extends bindings.Stub {
 
   UdpSocketReceiver get impl => _impl;
   set impl(UdpSocketReceiver d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

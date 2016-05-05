@@ -402,14 +402,19 @@ class SceneSchedulerProxy implements bindings.ProxyBase {
 
 
 class SceneSchedulerStub extends bindings.Stub {
-  SceneScheduler _impl = null;
+  SceneScheduler _impl;
 
   SceneSchedulerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SceneScheduler impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SceneSchedulerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SceneSchedulerStub.fromHandle(
+      core.MojoHandle handle, [SceneScheduler impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SceneSchedulerStub.unbound() : super.unbound();
 
@@ -432,7 +437,9 @@ class SceneSchedulerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sceneSchedulerMethodScheduleFrameName:
         var response = _impl.scheduleFrame(_sceneSchedulerScheduleFrameResponseParamsFactory);
@@ -463,8 +470,21 @@ class SceneSchedulerStub extends bindings.Stub {
 
   SceneScheduler get impl => _impl;
   set impl(SceneScheduler d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

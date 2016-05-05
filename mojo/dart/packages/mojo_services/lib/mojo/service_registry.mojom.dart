@@ -239,14 +239,19 @@ class ServiceRegistryProxy implements bindings.ProxyBase {
 
 
 class ServiceRegistryStub extends bindings.Stub {
-  ServiceRegistry _impl = null;
+  ServiceRegistry _impl;
 
   ServiceRegistryStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ServiceRegistry impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ServiceRegistryStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ServiceRegistryStub.fromHandle(
+      core.MojoHandle handle, [ServiceRegistry impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ServiceRegistryStub.unbound() : super.unbound();
 
@@ -264,7 +269,9 @@ class ServiceRegistryStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _serviceRegistryMethodAddServicesName:
         var params = _ServiceRegistryAddServicesParams.deserialize(
@@ -280,8 +287,21 @@ class ServiceRegistryStub extends bindings.Stub {
 
   ServiceRegistry get impl => _impl;
   set impl(ServiceRegistry d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

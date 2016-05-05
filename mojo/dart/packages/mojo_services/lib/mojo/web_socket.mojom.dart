@@ -1083,14 +1083,19 @@ class WebSocketProxy implements bindings.ProxyBase {
 
 
 class WebSocketStub extends bindings.Stub {
-  WebSocket _impl = null;
+  WebSocket _impl;
 
   WebSocketStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [WebSocket impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  WebSocketStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  WebSocketStub.fromHandle(
+      core.MojoHandle handle, [WebSocket impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   WebSocketStub.unbound() : super.unbound();
 
@@ -1108,7 +1113,9 @@ class WebSocketStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _webSocketMethodConnectName:
         var params = _WebSocketConnectParams.deserialize(
@@ -1139,8 +1146,21 @@ class WebSocketStub extends bindings.Stub {
 
   WebSocket get impl => _impl;
   set impl(WebSocket d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1338,14 +1358,19 @@ class WebSocketClientProxy implements bindings.ProxyBase {
 
 
 class WebSocketClientStub extends bindings.Stub {
-  WebSocketClient _impl = null;
+  WebSocketClient _impl;
 
   WebSocketClientStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [WebSocketClient impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  WebSocketClientStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  WebSocketClientStub.fromHandle(
+      core.MojoHandle handle, [WebSocketClient impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   WebSocketClientStub.unbound() : super.unbound();
 
@@ -1363,7 +1388,9 @@ class WebSocketClientStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _webSocketClientMethodDidConnectName:
         var params = _WebSocketClientDidConnectParams.deserialize(
@@ -1399,8 +1426,21 @@ class WebSocketClientStub extends bindings.Stub {
 
   WebSocketClient get impl => _impl;
   set impl(WebSocketClient d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

@@ -620,14 +620,19 @@ class NotificationClientProxy implements bindings.ProxyBase {
 
 
 class NotificationClientStub extends bindings.Stub {
-  NotificationClient _impl = null;
+  NotificationClient _impl;
 
   NotificationClientStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NotificationClient impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NotificationClientStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NotificationClientStub.fromHandle(
+      core.MojoHandle handle, [NotificationClient impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NotificationClientStub.unbound() : super.unbound();
 
@@ -645,7 +650,9 @@ class NotificationClientStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _notificationClientMethodOnSelectedName:
         _impl.onSelected();
@@ -662,8 +669,21 @@ class NotificationClientStub extends bindings.Stub {
 
   NotificationClient get impl => _impl;
   set impl(NotificationClient d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -821,14 +841,19 @@ class NotificationProxy implements bindings.ProxyBase {
 
 
 class NotificationStub extends bindings.Stub {
-  Notification _impl = null;
+  Notification _impl;
 
   NotificationStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Notification impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NotificationStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NotificationStub.fromHandle(
+      core.MojoHandle handle, [Notification impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NotificationStub.unbound() : super.unbound();
 
@@ -846,7 +871,9 @@ class NotificationStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _notificationMethodUpdateName:
         var params = _NotificationUpdateParams.deserialize(
@@ -865,8 +892,21 @@ class NotificationStub extends bindings.Stub {
 
   Notification get impl => _impl;
   set impl(Notification d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1016,14 +1056,19 @@ class NotificationServiceProxy implements bindings.ProxyBase {
 
 
 class NotificationServiceStub extends bindings.Stub {
-  NotificationService _impl = null;
+  NotificationService _impl;
 
   NotificationServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [NotificationService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  NotificationServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  NotificationServiceStub.fromHandle(
+      core.MojoHandle handle, [NotificationService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   NotificationServiceStub.unbound() : super.unbound();
 
@@ -1041,7 +1086,9 @@ class NotificationServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _notificationServiceMethodPostName:
         var params = _NotificationServicePostParams.deserialize(
@@ -1057,8 +1104,21 @@ class NotificationServiceStub extends bindings.Stub {
 
   NotificationService get impl => _impl;
   set impl(NotificationService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

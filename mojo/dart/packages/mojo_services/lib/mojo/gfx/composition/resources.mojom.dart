@@ -555,14 +555,19 @@ class MailboxTextureCallbackProxy implements bindings.ProxyBase {
 
 
 class MailboxTextureCallbackStub extends bindings.Stub {
-  MailboxTextureCallback _impl = null;
+  MailboxTextureCallback _impl;
 
   MailboxTextureCallbackStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MailboxTextureCallback impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MailboxTextureCallbackStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MailboxTextureCallbackStub.fromHandle(
+      core.MojoHandle handle, [MailboxTextureCallback impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MailboxTextureCallbackStub.unbound() : super.unbound();
 
@@ -580,7 +585,9 @@ class MailboxTextureCallbackStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mailboxTextureCallbackMethodOnMailboxTextureReleasedName:
         _impl.onMailboxTextureReleased();
@@ -594,8 +601,21 @@ class MailboxTextureCallbackStub extends bindings.Stub {
 
   MailboxTextureCallback get impl => _impl;
   set impl(MailboxTextureCallback d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

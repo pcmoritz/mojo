@@ -374,14 +374,19 @@ class LocationServiceProxy implements bindings.ProxyBase {
 
 
 class LocationServiceStub extends bindings.Stub {
-  LocationService _impl = null;
+  LocationService _impl;
 
   LocationServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [LocationService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  LocationServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  LocationServiceStub.fromHandle(
+      core.MojoHandle handle, [LocationService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   LocationServiceStub.unbound() : super.unbound();
 
@@ -404,7 +409,9 @@ class LocationServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _locationServiceMethodGetNextLocationName:
         var params = _LocationServiceGetNextLocationParams.deserialize(
@@ -437,8 +444,21 @@ class LocationServiceStub extends bindings.Stub {
 
   LocationService get impl => _impl;
   set impl(LocationService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

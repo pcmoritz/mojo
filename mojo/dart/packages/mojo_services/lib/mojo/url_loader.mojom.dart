@@ -713,14 +713,19 @@ class UrlLoaderProxy implements bindings.ProxyBase {
 
 
 class UrlLoaderStub extends bindings.Stub {
-  UrlLoader _impl = null;
+  UrlLoader _impl;
 
   UrlLoaderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UrlLoader impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UrlLoaderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UrlLoaderStub.fromHandle(
+      core.MojoHandle handle, [UrlLoader impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UrlLoaderStub.unbound() : super.unbound();
 
@@ -753,7 +758,9 @@ class UrlLoaderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _urlLoaderMethodStartName:
         var params = _UrlLoaderStartParams.deserialize(
@@ -826,8 +833,21 @@ class UrlLoaderStub extends bindings.Stub {
 
   UrlLoader get impl => _impl;
   set impl(UrlLoader d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

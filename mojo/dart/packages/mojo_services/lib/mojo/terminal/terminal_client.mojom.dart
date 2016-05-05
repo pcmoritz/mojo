@@ -210,14 +210,19 @@ class TerminalClientProxy implements bindings.ProxyBase {
 
 
 class TerminalClientStub extends bindings.Stub {
-  TerminalClient _impl = null;
+  TerminalClient _impl;
 
   TerminalClientStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TerminalClient impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TerminalClientStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TerminalClientStub.fromHandle(
+      core.MojoHandle handle, [TerminalClient impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TerminalClientStub.unbound() : super.unbound();
 
@@ -235,7 +240,9 @@ class TerminalClientStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _terminalClientMethodConnectToTerminalName:
         var params = _TerminalClientConnectToTerminalParams.deserialize(
@@ -251,8 +258,21 @@ class TerminalClientStub extends bindings.Stub {
 
   TerminalClient get impl => _impl;
   set impl(TerminalClient d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

@@ -1644,14 +1644,19 @@ class KeyboardClientProxy implements bindings.ProxyBase {
 
 
 class KeyboardClientStub extends bindings.Stub {
-  KeyboardClient _impl = null;
+  KeyboardClient _impl;
 
   KeyboardClientStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [KeyboardClient impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  KeyboardClientStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  KeyboardClientStub.fromHandle(
+      core.MojoHandle handle, [KeyboardClient impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   KeyboardClientStub.unbound() : super.unbound();
 
@@ -1669,7 +1674,9 @@ class KeyboardClientStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _keyboardClientMethodCommitCompletionName:
         var params = _KeyboardClientCommitCompletionParams.deserialize(
@@ -1720,8 +1727,21 @@ class KeyboardClientStub extends bindings.Stub {
 
   KeyboardClient get impl => _impl;
   set impl(KeyboardClient d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1913,14 +1933,19 @@ class KeyboardServiceProxy implements bindings.ProxyBase {
 
 
 class KeyboardServiceStub extends bindings.Stub {
-  KeyboardService _impl = null;
+  KeyboardService _impl;
 
   KeyboardServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [KeyboardService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  KeyboardServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  KeyboardServiceStub.fromHandle(
+      core.MojoHandle handle, [KeyboardService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   KeyboardServiceStub.unbound() : super.unbound();
 
@@ -1938,7 +1963,9 @@ class KeyboardServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _keyboardServiceMethodShowName:
         var params = _KeyboardServiceShowParams.deserialize(
@@ -1970,8 +1997,21 @@ class KeyboardServiceStub extends bindings.Stub {
 
   KeyboardService get impl => _impl;
   set impl(KeyboardService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2120,14 +2160,19 @@ class KeyboardServiceFactoryProxy implements bindings.ProxyBase {
 
 
 class KeyboardServiceFactoryStub extends bindings.Stub {
-  KeyboardServiceFactory _impl = null;
+  KeyboardServiceFactory _impl;
 
   KeyboardServiceFactoryStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [KeyboardServiceFactory impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  KeyboardServiceFactoryStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  KeyboardServiceFactoryStub.fromHandle(
+      core.MojoHandle handle, [KeyboardServiceFactory impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   KeyboardServiceFactoryStub.unbound() : super.unbound();
 
@@ -2145,7 +2190,9 @@ class KeyboardServiceFactoryStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _keyboardServiceFactoryMethodCreateKeyboardServiceName:
         var params = _KeyboardServiceFactoryCreateKeyboardServiceParams.deserialize(
@@ -2161,8 +2208,21 @@ class KeyboardServiceFactoryStub extends bindings.Stub {
 
   KeyboardServiceFactory get impl => _impl;
   set impl(KeyboardServiceFactory d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

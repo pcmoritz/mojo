@@ -395,14 +395,19 @@ class RendererProxy implements bindings.ProxyBase {
 
 
 class RendererStub extends bindings.Stub {
-  Renderer _impl = null;
+  Renderer _impl;
 
   RendererStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Renderer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  RendererStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  RendererStub.fromHandle(
+      core.MojoHandle handle, [Renderer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   RendererStub.unbound() : super.unbound();
 
@@ -420,7 +425,9 @@ class RendererStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _rendererMethodSetRootSceneName:
         var params = _RendererSetRootSceneParams.deserialize(
@@ -444,8 +451,21 @@ class RendererStub extends bindings.Stub {
 
   Renderer get impl => _impl;
   set impl(Renderer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

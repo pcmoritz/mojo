@@ -1844,14 +1844,19 @@ class ActivityProxy implements bindings.ProxyBase {
 
 
 class ActivityStub extends bindings.Stub {
-  Activity _impl = null;
+  Activity _impl;
 
   ActivityStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Activity impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ActivityStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ActivityStub.fromHandle(
+      core.MojoHandle handle, [Activity impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ActivityStub.unbound() : super.unbound();
 
@@ -1869,7 +1874,9 @@ class ActivityStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _activityMethodGetUserFeedbackName:
         var params = _ActivityGetUserFeedbackParams.deserialize(
@@ -1908,8 +1915,21 @@ class ActivityStub extends bindings.Stub {
 
   Activity get impl => _impl;
   set impl(Activity d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2136,14 +2156,19 @@ class PathServiceProxy implements bindings.ProxyBase {
 
 
 class PathServiceStub extends bindings.Stub {
-  PathService _impl = null;
+  PathService _impl;
 
   PathServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [PathService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  PathServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  PathServiceStub.fromHandle(
+      core.MojoHandle handle, [PathService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   PathServiceStub.unbound() : super.unbound();
 
@@ -2176,7 +2201,9 @@ class PathServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _pathServiceMethodGetAppDataDirName:
         var response = _impl.getAppDataDir(_pathServiceGetAppDataDirResponseParamsFactory);
@@ -2247,8 +2274,21 @@ class PathServiceStub extends bindings.Stub {
 
   PathService get impl => _impl;
   set impl(PathService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2407,14 +2447,19 @@ class UserFeedbackProxy implements bindings.ProxyBase {
 
 
 class UserFeedbackStub extends bindings.Stub {
-  UserFeedback _impl = null;
+  UserFeedback _impl;
 
   UserFeedbackStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [UserFeedback impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  UserFeedbackStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  UserFeedbackStub.fromHandle(
+      core.MojoHandle handle, [UserFeedback impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   UserFeedbackStub.unbound() : super.unbound();
 
@@ -2432,7 +2477,9 @@ class UserFeedbackStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _userFeedbackMethodPerformHapticFeedbackName:
         var params = _UserFeedbackPerformHapticFeedbackParams.deserialize(
@@ -2453,8 +2500,21 @@ class UserFeedbackStub extends bindings.Stub {
 
   UserFeedback get impl => _impl;
   set impl(UserFeedback d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

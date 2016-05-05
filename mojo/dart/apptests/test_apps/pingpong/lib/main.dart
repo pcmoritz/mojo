@@ -100,6 +100,23 @@ class PingPongServiceImpl implements PingPongService {
     targetServiceProxy.close();
   }
 
+  getPingPongServiceDelayed(PingPongServiceStub serviceStub) {
+    Timer.run(() {
+      var endpoint = serviceStub.unbind();
+      new Timer(const Duration(milliseconds: 10), () {
+        var targetServiceProxy = new PingPongServiceProxy.unbound();
+        _application.connectToService(
+            "mojo:dart_pingpong_target", targetServiceProxy);
+
+        // Pass along the interface request to another implementation of the
+        // service.
+        serviceStub.bind(endpoint);
+        targetServiceProxy.ptr.getPingPongService(serviceStub);
+        targetServiceProxy.close();
+      });
+    });
+  }
+
   void quit() {}
 }
 

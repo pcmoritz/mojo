@@ -348,14 +348,19 @@ class TcpServerSocketProxy implements bindings.ProxyBase {
 
 
 class TcpServerSocketStub extends bindings.Stub {
-  TcpServerSocket _impl = null;
+  TcpServerSocket _impl;
 
   TcpServerSocketStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TcpServerSocket impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TcpServerSocketStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TcpServerSocketStub.fromHandle(
+      core.MojoHandle handle, [TcpServerSocket impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TcpServerSocketStub.unbound() : super.unbound();
 
@@ -379,7 +384,9 @@ class TcpServerSocketStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _tcpServerSocketMethodAcceptName:
         var params = _TcpServerSocketAcceptParams.deserialize(
@@ -412,8 +419,21 @@ class TcpServerSocketStub extends bindings.Stub {
 
   TcpServerSocket get impl => _impl;
   set impl(TcpServerSocket d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

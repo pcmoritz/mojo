@@ -454,14 +454,19 @@ class MediaTypeConverterProxy implements bindings.ProxyBase {
 
 
 class MediaTypeConverterStub extends bindings.Stub {
-  MediaTypeConverter _impl = null;
+  MediaTypeConverter _impl;
 
   MediaTypeConverterStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaTypeConverter impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaTypeConverterStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaTypeConverterStub.fromHandle(
+      core.MojoHandle handle, [MediaTypeConverter impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaTypeConverterStub.unbound() : super.unbound();
 
@@ -484,7 +489,9 @@ class MediaTypeConverterStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaTypeConverterMethodGetOutputTypeName:
         var response = _impl.getOutputType(_mediaTypeConverterGetOutputTypeResponseParamsFactory);
@@ -525,8 +532,21 @@ class MediaTypeConverterStub extends bindings.Stub {
 
   MediaTypeConverter get impl => _impl;
   set impl(MediaTypeConverter d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

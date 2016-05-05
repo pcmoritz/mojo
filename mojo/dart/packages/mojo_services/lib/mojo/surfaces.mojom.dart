@@ -1372,14 +1372,19 @@ class ResourceReturnerProxy implements bindings.ProxyBase {
 
 
 class ResourceReturnerStub extends bindings.Stub {
-  ResourceReturner _impl = null;
+  ResourceReturner _impl;
 
   ResourceReturnerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ResourceReturner impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ResourceReturnerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ResourceReturnerStub.fromHandle(
+      core.MojoHandle handle, [ResourceReturner impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ResourceReturnerStub.unbound() : super.unbound();
 
@@ -1397,7 +1402,9 @@ class ResourceReturnerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _resourceReturnerMethodReturnResourcesName:
         var params = _ResourceReturnerReturnResourcesParams.deserialize(
@@ -1413,8 +1420,21 @@ class ResourceReturnerStub extends bindings.Stub {
 
   ResourceReturner get impl => _impl;
   set impl(ResourceReturner d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1646,14 +1666,19 @@ class SurfaceProxy implements bindings.ProxyBase {
 
 
 class SurfaceStub extends bindings.Stub {
-  Surface _impl = null;
+  Surface _impl;
 
   SurfaceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Surface impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SurfaceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SurfaceStub.fromHandle(
+      core.MojoHandle handle, [Surface impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SurfaceStub.unbound() : super.unbound();
 
@@ -1680,7 +1705,9 @@ class SurfaceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _surfaceMethodGetIdNamespaceName:
         var response = _impl.getIdNamespace(_surfaceGetIdNamespaceResponseParamsFactory);
@@ -1748,8 +1775,21 @@ class SurfaceStub extends bindings.Stub {
 
   Surface get impl => _impl;
   set impl(Surface d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

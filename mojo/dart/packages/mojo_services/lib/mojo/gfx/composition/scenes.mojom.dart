@@ -868,14 +868,19 @@ class SceneProxy implements bindings.ProxyBase {
 
 
 class SceneStub extends bindings.Stub {
-  Scene _impl = null;
+  Scene _impl;
 
   SceneStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [Scene impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SceneStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SceneStub.fromHandle(
+      core.MojoHandle handle, [Scene impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SceneStub.unbound() : super.unbound();
 
@@ -893,7 +898,9 @@ class SceneStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sceneMethodSetListenerName:
         var params = _SceneSetListenerParams.deserialize(
@@ -924,8 +931,21 @@ class SceneStub extends bindings.Stub {
 
   Scene get impl => _impl;
   set impl(Scene d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1093,14 +1113,19 @@ class SceneListenerProxy implements bindings.ProxyBase {
 
 
 class SceneListenerStub extends bindings.Stub {
-  SceneListener _impl = null;
+  SceneListener _impl;
 
   SceneListenerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SceneListener impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SceneListenerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SceneListenerStub.fromHandle(
+      core.MojoHandle handle, [SceneListener impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SceneListenerStub.unbound() : super.unbound();
 
@@ -1122,7 +1147,9 @@ class SceneListenerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _sceneListenerMethodOnResourceUnavailableName:
         var params = _SceneListenerOnResourceUnavailableParams.deserialize(
@@ -1155,8 +1182,21 @@ class SceneListenerStub extends bindings.Stub {
 
   SceneListener get impl => _impl;
   set impl(SceneListener d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

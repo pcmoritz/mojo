@@ -121,5 +121,34 @@ pingpongApptests(Application application, String url) {
       await targetServiceProxy.close();
       await pingPongServiceProxy.close();
     });
+
+    // Verify that Dart can implement an interface "request" parameter that
+    // isn't hooked up to an actual service implementation until after some
+    // delay.
+    test('Get Target Service Delayed', () async {
+      var pingPongServiceProxy = new PingPongServiceProxy.unbound();
+      pingPongServiceProxy.errorFuture.then((e) => fail('$e'));
+      application.connectToService(
+          "mojo:dart_pingpong", pingPongServiceProxy);
+
+      var targetServiceProxy = new PingPongServiceProxy.unbound();
+      targetServiceProxy.errorFuture.then((e) => fail('$e'));
+      pingPongServiceProxy.ptr.getPingPongServiceDelayed(targetServiceProxy);
+
+      var pingPongClient = new _TestingPingPongClient.unbound();
+      targetServiceProxy.ptr.setClient(pingPongClient.stub);
+
+      targetServiceProxy.ptr.ping(1);
+      var pongValue = await pingPongClient.waitForPong();
+      expect(pongValue, equals(2));
+
+      targetServiceProxy.ptr.ping(100);
+      pongValue = await pingPongClient.waitForPong();
+      expect(pongValue, equals(101));
+
+      await pingPongClient.stub.close();
+      await targetServiceProxy.close();
+      await pingPongServiceProxy.close();
+    });
   });
 }

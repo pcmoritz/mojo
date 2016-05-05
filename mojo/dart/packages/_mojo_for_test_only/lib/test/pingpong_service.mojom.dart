@@ -543,6 +543,77 @@ class _PingPongServiceGetPingPongServiceParams extends bindings.Struct {
 }
 
 
+class _PingPongServiceGetPingPongServiceDelayedParams extends bindings.Struct {
+  static const List<bindings.StructDataHeader> kVersions = const [
+    const bindings.StructDataHeader(16, 0)
+  ];
+  Object service = null;
+
+  _PingPongServiceGetPingPongServiceDelayedParams() : super(kVersions.last.size);
+
+  static _PingPongServiceGetPingPongServiceDelayedParams deserialize(bindings.Message message) {
+    var decoder = new bindings.Decoder(message);
+    var result = decode(decoder);
+    if (decoder.excessHandles != null) {
+      decoder.excessHandles.forEach((h) => h.close());
+    }
+    return result;
+  }
+
+  static _PingPongServiceGetPingPongServiceDelayedParams decode(bindings.Decoder decoder0) {
+    if (decoder0 == null) {
+      return null;
+    }
+    _PingPongServiceGetPingPongServiceDelayedParams result = new _PingPongServiceGetPingPongServiceDelayedParams();
+
+    var mainDataHeader = decoder0.decodeStructDataHeader();
+    if (mainDataHeader.version <= kVersions.last.version) {
+      // Scan in reverse order to optimize for more recent versions.
+      for (int i = kVersions.length - 1; i >= 0; --i) {
+        if (mainDataHeader.version >= kVersions[i].version) {
+          if (mainDataHeader.size == kVersions[i].size) {
+            // Found a match.
+            break;
+          }
+          throw new bindings.MojoCodecError(
+              'Header size doesn\'t correspond to known version size.');
+        }
+      }
+    } else if (mainDataHeader.size < kVersions.last.size) {
+      throw new bindings.MojoCodecError(
+        'Message newer than the last known version cannot be shorter than '
+        'required by the last known version.');
+    }
+    if (mainDataHeader.version >= 0) {
+      
+      result.service = decoder0.decodeInterfaceRequest(8, false, PingPongServiceStub.newFromEndpoint);
+    }
+    return result;
+  }
+
+  void encode(bindings.Encoder encoder) {
+    var encoder0 = encoder.getStructEncoderAtOffset(kVersions.last);
+    try {
+      encoder0.encodeInterfaceRequest(service, 8, false);
+    } on bindings.MojoCodecError catch(e) {
+      e.message = "Error encountered while encoding field "
+          "service of struct _PingPongServiceGetPingPongServiceDelayedParams: $e";
+      rethrow;
+    }
+  }
+
+  String toString() {
+    return "_PingPongServiceGetPingPongServiceDelayedParams("
+           "service: $service" ")";
+  }
+
+  Map toJson() {
+    throw new bindings.MojoCodecError(
+        'Object containing handles cannot be encoded to JSON.');
+  }
+}
+
+
 class _PingPongServiceQuitParams extends bindings.Struct {
   static const List<bindings.StructDataHeader> kVersions = const [
     const bindings.StructDataHeader(8, 0)
@@ -677,7 +748,8 @@ const int _pingPongServiceMethodPingName = 1;
 const int _pingPongServiceMethodPingTargetUrlName = 2;
 const int _pingPongServiceMethodPingTargetServiceName = 3;
 const int _pingPongServiceMethodGetPingPongServiceName = 4;
-const int _pingPongServiceMethodQuitName = 5;
+const int _pingPongServiceMethodGetPingPongServiceDelayedName = 5;
+const int _pingPongServiceMethodQuitName = 6;
 
 class _PingPongServiceServiceDescription implements service_describer.ServiceDescription {
   dynamic getTopLevelInterface([Function responseFactory]){
@@ -700,6 +772,7 @@ abstract class PingPongService {
   dynamic pingTargetUrl(String url,int count,[Function responseFactory = null]);
   dynamic pingTargetService(Object service,int count,[Function responseFactory = null]);
   void getPingPongService(Object service);
+  void getPingPongServiceDelayed(Object service);
   void quit();
 }
 
@@ -829,6 +902,15 @@ class _PingPongServiceProxyCalls implements PingPongService {
       params.service = service;
       _proxyImpl.sendMessage(params, _pingPongServiceMethodGetPingPongServiceName);
     }
+    void getPingPongServiceDelayed(Object service) {
+      if (!_proxyImpl.isBound) {
+        _proxyImpl.proxyError("The Proxy is closed.");
+        return;
+      }
+      var params = new _PingPongServiceGetPingPongServiceDelayedParams();
+      params.service = service;
+      _proxyImpl.sendMessage(params, _pingPongServiceMethodGetPingPongServiceDelayedName);
+    }
     void quit() {
       if (!_proxyImpl.isBound) {
         _proxyImpl.proxyError("The Proxy is closed.");
@@ -900,14 +982,19 @@ class PingPongServiceProxy implements bindings.ProxyBase {
 
 
 class PingPongServiceStub extends bindings.Stub {
-  PingPongService _impl = null;
+  PingPongService _impl;
 
   PingPongServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [PingPongService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  PingPongServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  PingPongServiceStub.fromHandle(
+      core.MojoHandle handle, [PingPongService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   PingPongServiceStub.unbound() : super.unbound();
 
@@ -935,7 +1022,9 @@ class PingPongServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _pingPongServiceMethodSetClientName:
         var params = _PingPongServiceSetClientParams.deserialize(
@@ -996,6 +1085,11 @@ class PingPongServiceStub extends bindings.Stub {
             message.payload);
         _impl.getPingPongService(params.service);
         break;
+      case _pingPongServiceMethodGetPingPongServiceDelayedName:
+        var params = _PingPongServiceGetPingPongServiceDelayedParams.deserialize(
+            message.payload);
+        _impl.getPingPongServiceDelayed(params.service);
+        break;
       case _pingPongServiceMethodQuitName:
         _impl.quit();
         break;
@@ -1008,8 +1102,21 @@ class PingPongServiceStub extends bindings.Stub {
 
   PingPongService get impl => _impl;
   set impl(PingPongService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1157,14 +1264,19 @@ class PingPongClientProxy implements bindings.ProxyBase {
 
 
 class PingPongClientStub extends bindings.Stub {
-  PingPongClient _impl = null;
+  PingPongClient _impl;
 
   PingPongClientStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [PingPongClient impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  PingPongClientStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  PingPongClientStub.fromHandle(
+      core.MojoHandle handle, [PingPongClient impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   PingPongClientStub.unbound() : super.unbound();
 
@@ -1182,7 +1294,9 @@ class PingPongClientStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _pingPongClientMethodPongName:
         var params = _PingPongClientPongParams.deserialize(
@@ -1198,8 +1312,21 @@ class PingPongClientStub extends bindings.Stub {
 
   PingPongClient get impl => _impl;
   set impl(PingPongClient d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1231,7 +1358,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xZT1PTThhOUuDXH1j+KEgFhKrocJEwoweGU2eU8aDjVMURTjVT1hptk5g/nD3yEfgIfgQ+iscePXL0prv0Xd1udtOESZPgsDOvcbeku8+z7/s+726rSr/NwvMYnvz4NtNXsZWhfxvbAjYfef7OTsO02g3bar9B7pHZQoK/vw/v7B00dpvPdw92yIub4ff4+R1mXRozvgXPdWwr0u990jGR5SeZf4OZp8Sth/S/jvX7GzBeU7imDnbr3Mdb3PgvaA1F3G5im8bGI1rGYzeAfwHcEI+r2CaxNbG9w6Z/tLtId4NDu2tayNW79idb99xW/z+HhuvrhuOQb/d08m8T9zzdtHzkfjBayNMdPKeD52x6fe42yYvd0Ly0f42jhvcPns+ehA8ZnwrDJ/t9fCPrIFtI6BLxtAb7P2qeahw/FO9PNT5O0rYkOOcBK8H50EVfArw2EV7aRo2X3++6IL8ozOfDWlw/kPFzHeLhfKlHRidA4vy3BvGXNT9VLqXMSuLEAX85luQdyu8JPL9x/nMq4YdfT02gD/8x4yQXTWGDTPrS6KJYOrGIbYbJb/STFfBhSZoO7VM5o/w2DA+/Lna/Jpj91EBPSC4ah32aYPz1tNR/foeX9iuwr/Mwvij2hx8jipc5bP+f76/PqEwY72RO+ZPi3teS5c9tCd5bgPkPXjaJFjyPEn86SzmPyvR0Gvy2BU4h8oflDP1B4eavDamj4taPF83PPUl5GId3NU4dY4rrmMq/VseYV3VMZB1jRtcxlYLXMTR/b8P5SkvAjxbBzwJgJ/6zZ7ht5L99/ULAz1zOulUtpaNbtD4ZwMsETl5xw5/fa6o8ftQM9WsK6rDA7QjjZg5q1CziJqp+H5ZXyhfgJUpfKlBHtOzA8iW83Ms5n2hMXxZXSXVIFlerUEPwceXhNXuo+HqkZBRPtP63PyvSeHpUYB2ieecEdKiUgJcSw7vsPPHXf5jDrICnhZz0iOJ3EupRXYL7DmAP4S7IeYrXJUctxrlqBu5XYLVC/1gvwLlKdn8T97696DpHeH5cYJ07Y/8ohXi9i21JEq9U6y7D+asoekf85+kl0DvaxhLwMhahd0twNn2GfMHtrSL8nShPvXufcvyEcQ8K3tX9YTydI/0HGfqFNiKdS+v+cDwB7+Mx7g9fBabwPm055/vDnpLu/SHBWYT7w7Lk97WqpM75HQAA///pZoNCqCEAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xZz1PTThRPUgr9wpdfarX8nILo4AHCjB4YTswIIzM6TlU8cGJiWUswbWqSMuqJI38CR4/+CR79M/wzOHrTXfoWt5vdNumEduN0Zx5ht033vc++9z5vdwtas03B8xye/Pgm09ex5KC/gCWPJUB+sLVVsmuVklurvEHeqV1Ggu8/gHf2D0q7h893D7bIi+vh9/j564xeBjO+Ac8VLPPS333q2KgWxJl/lZknw+lD+j+Gmv1VGC9qrW1Kb+1vc59vcOO/oZU0cbuLZQILb9EcHrsN+AvMDeG4hGUUywmWd1jMhu+Zjlu2HLPiuhUHmcduFZlfPMusuieu6Xvl5j9HlheYVr1OJvJN8vcQ93zTrgXIe2+VkW/W8fR1PP2h34RxnbxYFfsT7f8P/qFJ/IvH91KCjwxfjcGX/T2+ET3IkhL4RPougz/0Grcihxe1v2BEt5u0DYndd8B2Yveahz42sIIi+2nrtf28P2wL8pHGfN6pRfUTGV63IH6u9D21nAYS+/cyxGu/8SowuuuMfnxcnUEQXkjyFsX7Ap7fOP/6LsGL16co4JcRZpzksjEskIlfWlUUiWfuYZlk8iP9ZB58XJLmQ+uW61N+7GQfryfLeyPM+hrATySXZbEMM+s4wqzjZQbG4eXiRPN5nIffnwE8FsT+8uuG4msay39X6x8wLBa2f1SRfExx+BQzH29K7J8BDK7tZ5NyyvJyVuPIPYG8LOPvCfD1MjiNyF/m+ugvGqdPsUNdF7We7Tbf83WUHmMd9Ch1lC2uo8b/9TrKHtRRseoou30dNZ6yOuqaD2B/aMTAy2iDVx6wIP61b3kVFLx9/UKA17RivLiXSYYXaX3UYj8TaKrEWeh8QpfHm95DfhyDurDhOcI4m4Yauh9x1m6/0Skv5brAqR1/jUPdUnYbtUCC033F8pHB9GVxWEioPl2EmoWPQx8r7qP08Z2m9Sb+6H7F/aBJ4+9xiniO5q2fwHOZGDhlmHWQ7X/++hezWRfglleE7ygeX2Py3bYEhyXAIoSDovtBnvfOdDX2hZNw7gEqC/1nRcF9oew8K+r9heo8SnB/kiIepf5aNJKJb3I+PCuJb8qladw/qsKnxL92UsintA3FwGmoDZ/Owl77GQoEp9/iezmV+PQs4XgL49BKqIPz1e54lPQf9tFvjBvi0W7jOcetSzbGOmQF3+PrwrAf7yDH+oyOJHXhnCJxTXE5jxnXexI8HgEmUjwG9yeJxDfxn7VBfEvvT4ZjrMNwhPuTVw1beH+wqNj9yaWW7P0JsVvF+5Oc1rm+Y7/3JwAA///Y0/jDWCcAAA==";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

@@ -36,6 +36,10 @@ class PingPongServiceImpl implements PingPongService {
   dynamic pingTargetService(
       Object service, int count, [Function responseFactory]) =>
       throw "Unimplemented";
+  dynamic getPingPongServiceDelayed(
+      Object service, [Function responseFactory]) =>
+      throw "Unimplemented";
+
   void getPingPongService(Object service) {
     new PingPongServiceImpl.fromStub(service);
   }

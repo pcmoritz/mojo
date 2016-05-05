@@ -3468,14 +3468,19 @@ class InterfaceAProxy implements bindings.ProxyBase {
 
 
 class InterfaceAStub extends bindings.Stub {
-  InterfaceA _impl = null;
+  InterfaceA _impl;
 
   InterfaceAStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [InterfaceA impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  InterfaceAStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  InterfaceAStub.fromHandle(
+      core.MojoHandle handle, [InterfaceA impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   InterfaceAStub.unbound() : super.unbound();
 
@@ -3493,7 +3498,9 @@ class InterfaceAStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       default:
         throw new bindings.MojoCodecError("Unexpected message name");
@@ -3504,8 +3511,21 @@ class InterfaceAStub extends bindings.Stub {
 
   InterfaceA get impl => _impl;
   set impl(InterfaceA d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -3687,14 +3707,19 @@ class BoundsCheckTestInterfaceProxy implements bindings.ProxyBase {
 
 
 class BoundsCheckTestInterfaceStub extends bindings.Stub {
-  BoundsCheckTestInterface _impl = null;
+  BoundsCheckTestInterface _impl;
 
   BoundsCheckTestInterfaceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [BoundsCheckTestInterface impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  BoundsCheckTestInterfaceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  BoundsCheckTestInterfaceStub.fromHandle(
+      core.MojoHandle handle, [BoundsCheckTestInterface impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   BoundsCheckTestInterfaceStub.unbound() : super.unbound();
 
@@ -3717,7 +3742,9 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _boundsCheckTestInterfaceMethodMethod0Name:
         var params = _BoundsCheckTestInterfaceMethod0Params.deserialize(
@@ -3755,8 +3782,21 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
 
   BoundsCheckTestInterface get impl => _impl;
   set impl(BoundsCheckTestInterface d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -4095,14 +4135,19 @@ class ConformanceTestInterfaceProxy implements bindings.ProxyBase {
 
 
 class ConformanceTestInterfaceStub extends bindings.Stub {
-  ConformanceTestInterface _impl = null;
+  ConformanceTestInterface _impl;
 
   ConformanceTestInterfaceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ConformanceTestInterface impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ConformanceTestInterfaceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ConformanceTestInterfaceStub.fromHandle(
+      core.MojoHandle handle, [ConformanceTestInterface impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ConformanceTestInterfaceStub.unbound() : super.unbound();
 
@@ -4125,7 +4170,9 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _conformanceTestInterfaceMethodMethod0Name:
         var params = _ConformanceTestInterfaceMethod0Params.deserialize(
@@ -4233,8 +4280,21 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
 
   ConformanceTestInterface get impl => _impl;
   set impl(ConformanceTestInterface d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -4402,14 +4462,19 @@ class IntegrationTestInterfaceProxy implements bindings.ProxyBase {
 
 
 class IntegrationTestInterfaceStub extends bindings.Stub {
-  IntegrationTestInterface _impl = null;
+  IntegrationTestInterface _impl;
 
   IntegrationTestInterfaceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [IntegrationTestInterface impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  IntegrationTestInterfaceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  IntegrationTestInterfaceStub.fromHandle(
+      core.MojoHandle handle, [IntegrationTestInterface impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   IntegrationTestInterfaceStub.unbound() : super.unbound();
 
@@ -4432,7 +4497,9 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _integrationTestInterfaceMethodMethod0Name:
         var params = _IntegrationTestInterfaceMethod0Params.deserialize(
@@ -4465,8 +4532,21 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
 
   IntegrationTestInterface get impl => _impl;
   set impl(IntegrationTestInterface d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -4498,7 +4578,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "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";
+  var serializedRuntimeTypeInfo = "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";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);

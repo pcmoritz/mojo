@@ -125,14 +125,19 @@ class TcpConnectedSocketProxy implements bindings.ProxyBase {
 
 
 class TcpConnectedSocketStub extends bindings.Stub {
-  TcpConnectedSocket _impl = null;
+  TcpConnectedSocket _impl;
 
   TcpConnectedSocketStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TcpConnectedSocket impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TcpConnectedSocketStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TcpConnectedSocketStub.fromHandle(
+      core.MojoHandle handle, [TcpConnectedSocket impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TcpConnectedSocketStub.unbound() : super.unbound();
 
@@ -150,7 +155,9 @@ class TcpConnectedSocketStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       default:
         throw new bindings.MojoCodecError("Unexpected message name");
@@ -161,8 +168,21 @@ class TcpConnectedSocketStub extends bindings.Stub {
 
   TcpConnectedSocket get impl => _impl;
   set impl(TcpConnectedSocket d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

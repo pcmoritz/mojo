@@ -1433,14 +1433,19 @@ class MediaProducerProxy implements bindings.ProxyBase {
 
 
 class MediaProducerStub extends bindings.Stub {
-  MediaProducer _impl = null;
+  MediaProducer _impl;
 
   MediaProducerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaProducer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaProducerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaProducerStub.fromHandle(
+      core.MojoHandle handle, [MediaProducer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaProducerStub.unbound() : super.unbound();
 
@@ -1462,7 +1467,9 @@ class MediaProducerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaProducerMethodConnectName:
         var params = _MediaProducerConnectParams.deserialize(
@@ -1498,8 +1505,21 @@ class MediaProducerStub extends bindings.Stub {
 
   MediaProducer get impl => _impl;
   set impl(MediaProducer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -1708,14 +1728,19 @@ class MediaPullModeProducerProxy implements bindings.ProxyBase {
 
 
 class MediaPullModeProducerStub extends bindings.Stub {
-  MediaPullModeProducer _impl = null;
+  MediaPullModeProducer _impl;
 
   MediaPullModeProducerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaPullModeProducer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaPullModeProducerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaPullModeProducerStub.fromHandle(
+      core.MojoHandle handle, [MediaPullModeProducer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaPullModeProducerStub.unbound() : super.unbound();
 
@@ -1743,7 +1768,9 @@ class MediaPullModeProducerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaPullModeProducerMethodGetBufferName:
         var response = _impl.getBuffer(_mediaPullModeProducerGetBufferResponseParamsFactory);
@@ -1801,8 +1828,21 @@ class MediaPullModeProducerStub extends bindings.Stub {
 
   MediaPullModeProducer get impl => _impl;
   set impl(MediaPullModeProducer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -2114,14 +2154,19 @@ class MediaConsumerProxy implements bindings.ProxyBase {
 
 
 class MediaConsumerStub extends bindings.Stub {
-  MediaConsumer _impl = null;
+  MediaConsumer _impl;
 
   MediaConsumerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [MediaConsumer impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  MediaConsumerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  MediaConsumerStub.fromHandle(
+      core.MojoHandle handle, [MediaConsumer impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   MediaConsumerStub.unbound() : super.unbound();
 
@@ -2156,7 +2201,9 @@ class MediaConsumerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _mediaConsumerMethodSetBufferName:
         var params = _MediaConsumerSetBufferParams.deserialize(
@@ -2251,8 +2298,21 @@ class MediaConsumerStub extends bindings.Stub {
 
   MediaConsumer get impl => _impl;
   set impl(MediaConsumer d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

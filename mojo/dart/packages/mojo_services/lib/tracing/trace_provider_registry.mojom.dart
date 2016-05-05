@@ -210,14 +210,19 @@ class TraceProviderRegistryProxy implements bindings.ProxyBase {
 
 
 class TraceProviderRegistryStub extends bindings.Stub {
-  TraceProviderRegistry _impl = null;
+  TraceProviderRegistry _impl;
 
   TraceProviderRegistryStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TraceProviderRegistry impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TraceProviderRegistryStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TraceProviderRegistryStub.fromHandle(
+      core.MojoHandle handle, [TraceProviderRegistry impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TraceProviderRegistryStub.unbound() : super.unbound();
 
@@ -235,7 +240,9 @@ class TraceProviderRegistryStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _traceProviderRegistryMethodRegisterTraceProviderName:
         var params = _TraceProviderRegistryRegisterTraceProviderParams.deserialize(
@@ -251,8 +258,21 @@ class TraceProviderRegistryStub extends bindings.Stub {
 
   TraceProviderRegistry get impl => _impl;
   set impl(TraceProviderRegistry d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

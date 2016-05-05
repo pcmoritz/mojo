@@ -512,14 +512,19 @@ class SeekingReaderProxy implements bindings.ProxyBase {
 
 
 class SeekingReaderStub extends bindings.Stub {
-  SeekingReader _impl = null;
+  SeekingReader _impl;
 
   SeekingReaderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [SeekingReader impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  SeekingReaderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  SeekingReaderStub.fromHandle(
+      core.MojoHandle handle, [SeekingReader impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   SeekingReaderStub.unbound() : super.unbound();
 
@@ -550,7 +555,9 @@ class SeekingReaderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _seekingReaderMethodDescribeName:
         var response = _impl.describe(_seekingReaderDescribeResponseParamsFactory);
@@ -603,8 +610,21 @@ class SeekingReaderStub extends bindings.Stub {
 
   SeekingReader get impl => _impl;
   set impl(SeekingReader d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

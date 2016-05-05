@@ -505,14 +505,19 @@ class TraceProviderProxy implements bindings.ProxyBase {
 
 
 class TraceProviderStub extends bindings.Stub {
-  TraceProvider _impl = null;
+  TraceProvider _impl;
 
   TraceProviderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TraceProvider impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TraceProviderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TraceProviderStub.fromHandle(
+      core.MojoHandle handle, [TraceProvider impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TraceProviderStub.unbound() : super.unbound();
 
@@ -530,7 +535,9 @@ class TraceProviderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _traceProviderMethodStartTracingName:
         var params = _TraceProviderStartTracingParams.deserialize(
@@ -549,8 +556,21 @@ class TraceProviderStub extends bindings.Stub {
 
   TraceProvider get impl => _impl;
   set impl(TraceProvider d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -698,14 +718,19 @@ class TraceRecorderProxy implements bindings.ProxyBase {
 
 
 class TraceRecorderStub extends bindings.Stub {
-  TraceRecorder _impl = null;
+  TraceRecorder _impl;
 
   TraceRecorderStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TraceRecorder impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TraceRecorderStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TraceRecorderStub.fromHandle(
+      core.MojoHandle handle, [TraceRecorder impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TraceRecorderStub.unbound() : super.unbound();
 
@@ -723,7 +748,9 @@ class TraceRecorderStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _traceRecorderMethodRecordName:
         var params = _TraceRecorderRecordParams.deserialize(
@@ -739,8 +766,21 @@ class TraceRecorderStub extends bindings.Stub {
 
   TraceRecorder get impl => _impl;
   set impl(TraceRecorder d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -899,14 +939,19 @@ class TraceCollectorProxy implements bindings.ProxyBase {
 
 
 class TraceCollectorStub extends bindings.Stub {
-  TraceCollector _impl = null;
+  TraceCollector _impl;
 
   TraceCollectorStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [TraceCollector impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  TraceCollectorStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  TraceCollectorStub.fromHandle(
+      core.MojoHandle handle, [TraceCollector impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   TraceCollectorStub.unbound() : super.unbound();
 
@@ -924,7 +969,9 @@ class TraceCollectorStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _traceCollectorMethodStartName:
         var params = _TraceCollectorStartParams.deserialize(
@@ -943,8 +990,21 @@ class TraceCollectorStub extends bindings.Stub {
 
   TraceCollector get impl => _impl;
   set impl(TraceCollector d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

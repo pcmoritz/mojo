@@ -226,14 +226,19 @@ class ContentHandlerProxy implements bindings.ProxyBase {
 
 
 class ContentHandlerStub extends bindings.Stub {
-  ContentHandler _impl = null;
+  ContentHandler _impl;
 
   ContentHandlerStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [ContentHandler impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  ContentHandlerStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  ContentHandlerStub.fromHandle(
+      core.MojoHandle handle, [ContentHandler impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   ContentHandlerStub.unbound() : super.unbound();
 
@@ -251,7 +256,9 @@ class ContentHandlerStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _contentHandlerMethodStartApplicationName:
         var params = _ContentHandlerStartApplicationParams.deserialize(
@@ -267,8 +274,21 @@ class ContentHandlerStub extends bindings.Stub {
 
   ContentHandler get impl => _impl;
   set impl(ContentHandler d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {

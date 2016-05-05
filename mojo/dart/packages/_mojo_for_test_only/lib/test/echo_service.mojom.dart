@@ -636,14 +636,19 @@ class EchoServiceProxy implements bindings.ProxyBase {
 
 
 class EchoServiceStub extends bindings.Stub {
-  EchoService _impl = null;
+  EchoService _impl;
 
   EchoServiceStub.fromEndpoint(
-      core.MojoMessagePipeEndpoint endpoint, [this._impl])
-      : super.fromEndpoint(endpoint);
+      core.MojoMessagePipeEndpoint endpoint, [EchoService impl])
+      : super.fromEndpoint(endpoint, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
-  EchoServiceStub.fromHandle(core.MojoHandle handle, [this._impl])
-      : super.fromHandle(handle);
+  EchoServiceStub.fromHandle(
+      core.MojoHandle handle, [EchoService impl])
+      : super.fromHandle(handle, autoBegin: impl != null) {
+    _impl = impl;
+  }
 
   EchoServiceStub.unbound() : super.unbound();
 
@@ -671,7 +676,9 @@ class EchoServiceStub extends bindings.Stub {
                                                           0,
                                                           message);
     }
-    assert(_impl != null);
+    if (_impl == null) {
+      throw new core.MojoApiError("$this has no implementation set");
+    }
     switch (message.header.type) {
       case _echoServiceMethodEchoStringName:
         var params = _EchoServiceEchoStringParams.deserialize(
@@ -732,8 +739,21 @@ class EchoServiceStub extends bindings.Stub {
 
   EchoService get impl => _impl;
   set impl(EchoService d) {
-    assert(_impl == null);
+    if (d == null) {
+      throw new core.MojoApiError("$this: Cannot set a null implementation");
+    }
+    if (isBound && (_impl == null)) {
+      beginHandlingEvents();
+    }
     _impl = d;
+  }
+
+  @override
+  void bind(core.MojoMessagePipeEndpoint endpoint) {
+    super.bind(endpoint);
+    if (!isOpen && (_impl != null)) {
+      beginHandlingEvents();
+    }
   }
 
   String toString() {
@@ -765,7 +785,7 @@ mojom_types.RuntimeTypeInfo  _initRuntimeTypeInfo() {
   // serializedRuntimeTypeInfo contains the bytes of the Mojo serialization of
   // a mojom_types.RuntimeTypeInfo struct describing the Mojom types in this
   // file. The string contains the base64 encoding of the gzip-compressed bytes.
-  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xYS28TMRDeR4HQBlReUngcAqdwoOZYRULKgUiVkFBRuVQcolViyKLsA3u3iBtHfgJHjhz5ST1y5B+AzY7BmdiRFzUsQRlpOvE2s/b3+ZvxbjpeZbsQP0DE1/e1sS+8BeObwq8ILygv+v3heJodUXYSj6nl+3ch5/nx4XD0ZHjcl4l7i3l4/sEZ3M+H/FDL70HsQpz6VXwP0UPzKx4+QvwM8TvYF89seN1dA84L2vVrwneEA4qnUUKd+FZ5+D8dmAPTg3mW69sW/kLOLZxMs4QSVk6yJE4pI0n2OiOcjasPk4gVJMpzeVdO5N+RGHESpwVlL6Mx5YSKuUa8mmxPJiVOOPC6dL624LPkM4D97MF19b1P56p40K7i4WXzfn9VOgjN+63sIRrLvTZdV3YVePyJrGBx+sqM6yJgWDXfWG8Kdytwxytt34L3FmD+jfcBo29KsUIzbmWrxo3rbmDpZ988N3PVRc+Sf0m4lOZJNCupRQ83/hIvqoZMPHW0NfuWOlyFjm5DD5vTEc+zlNONjmrqqPcP6wj3YcXbwdb8/Vx48rV9wKbOmcd0Fr2jE9yOF3jbbqgfK/zdsF4dDSy41XPRAu75ttxYPXWA5199xV+PupL6uNNAXZl48WCtJmv9AS/+El7k49N54Uk8m8XczMv9Bvqw3l8CbWyrr93gbOrrHjzzmOpLO64251WNunq0RufVKcIX1OApWMJTG95jjt5GuUk/Ow2dT6coutaP7f3oOmCVOPUjqal6aTnowVvyuwHWQ1iDp9BBD8/K2MhP+z/Tg8S5jnr4EQAA//+qos9XSBMAAA==";
+  var serializedRuntimeTypeInfo = "H4sIAAAJbogC/+xYvY4TMRDenwPCXUD8SstPEahCwZkyioSUglRICHQ01xBZe75k0W52WW8OwRPwCJSUlJQ8Ao9yJSUd2OwYnIkdNtGR1Z5upLmJfZnY3+dvxpsETmlXIH6AiOd72tgV3oLxLeFXhReMF/3+MJykeyw/ikJmef89yHm5/3w4ejrc78vE3cU8vP7gBD7PhXxfy+9C7EDMXOABooPWVzx8hPgZ4k+wL47Z8L47BpwXtPnrwneEA4pnNGGV+FZ5+D8BrIHpwTzL/W0LPxT+SjiZ8ZzEaUhjMk7TcczIJE0YeZ9TkqSvU8LzsHxxQPOC0CyTC3Ai/47EiJNoWrD8kIaMEyaWHfFy3V2ZlPwbD96fztsWvJa8enCuXZhX7/t2royf2mX8etl87t/VOfvmc1f2CI3lmZvmlV0DPn8jK/JoOjbjuggYNsU71p/CH3jVcUvrWXDfBux/cT/M2ZuZ2J4Zv7JN4cf1OLD0uR9ONauqk64l/5JwKdUjGs+YRR83N8yPqi1T/wq0vbuW+vwfuroDPW5OVzxLp5yd6WpNXXUboCvcrxV/k635z6vCl6udBzZ1Hz1hMX3HDnDbXuBvu+a+rXjo+avV18CCXz1PLeCfb9+111kAvP/Rh9uMepN6uVtjvZn4cWDPJmutwY+7hB/5+HVeeBLFccTN/DyosV/r/cfTxra663gnU3f34ZnJVHfa9XZ2v61Rb48beL8dI5zeCnx5S/hqw/ejvbc0M+lpp+b77BjFqnVl+/51AzBLvPoVVncdtSrow1nyOwXWh78CX34FfbyYRUae2qdUHxJvk/XxKwAA///0GO/NyBMAAA==";
 
   // Deserialize RuntimeTypeInfo
   var bytes = BASE64.decode(serializedRuntimeTypeInfo);
