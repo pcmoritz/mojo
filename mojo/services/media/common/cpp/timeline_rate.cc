@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "mojo/public/cpp/environment/logging.h"
-#include "mojo/services/media/common/cpp/ratio.h"
+#include "mojo/services/media/common/cpp/timeline_rate.h"
 
 namespace mojo {
 namespace media {
@@ -56,7 +56,7 @@ T BinaryGcd(T a, T b) {
   return a << twos;
 }
 
-// Reduces the ration of *numerator and *denominator.
+// Reduces the ratio of *numerator and *denominator.
 template <typename T>
 void ReduceRatio(T* numerator, T* denominator) {
   MOJO_DCHECK(numerator != nullptr);
@@ -85,39 +85,40 @@ template void ReduceRatio<uint32_t>(uint32_t* numerator, uint32_t* denominator);
 // true, the result is rounded up rather than down. overflow is set to indicate
 // overflow.
 uint64_t ScaleUInt64(uint64_t value,
-                     uint32_t numerator,
-                     uint32_t denominator,
+                     uint32_t subject_delta,
+                     uint32_t reference_delta,
                      bool round_up,
                      bool* overflow) {
-  MOJO_DCHECK(denominator != 0u);
+  MOJO_DCHECK(reference_delta != 0u);
   MOJO_DCHECK(overflow != nullptr);
 
   constexpr uint64_t kLow32Bits = 0xffffffffu;
   constexpr uint64_t kHigh32Bits = kLow32Bits << 32u;
 
-  // high and low are the product of the numerator and the high and low halves
+  // high and low are the product of the subject_delta and the high and low
+  // halves
   // (respectively) of value.
-  uint64_t high = numerator * (value >> 32u);
-  uint64_t low = numerator * (value & kLow32Bits);
+  uint64_t high = subject_delta * (value >> 32u);
+  uint64_t low = subject_delta * (value & kLow32Bits);
   // Ignoring overflow and remainder, the result we want is:
-  // ((high << 32) + low) / denominator.
+  // ((high << 32) + low) / reference_delta.
 
   // Move the high end of low into the low end of high.
   high += low >> 32u;
   low = low & kLow32Bits;
   // Ignoring overflow and remainder, the result we want is still:
-  // ((high << 32) + low) / denominator.
+  // ((high << 32) + low) / reference_delta.
 
-  // When we divide high by denominator, there'll be a remainder. Make
+  // When we divide high by reference_delta, there'll be a remainder. Make
   // that the high end of low, which is currently all zeroes.
-  low |= (high % denominator) << 32u;
+  low |= (high % reference_delta) << 32u;
 
   // Determine if we need to round up when we're done:
-  round_up = round_up && (low % denominator) != 0;
+  round_up = round_up && (low % reference_delta) != 0;
 
   // Do the division.
-  high /= denominator;
-  low /= denominator;
+  high /= reference_delta;
+  low /= reference_delta;
 
   // If high's top 32 bits aren't all zero, we have overflow.
   if (high & kHigh32Bits) {
@@ -141,75 +142,79 @@ uint64_t ScaleUInt64(uint64_t value,
 }  // namespace
 
 // static
-void Ratio::Reduce(uint32_t* numerator, uint32_t* denominator) {
-  ReduceRatio(numerator, denominator);
+void TimelineRate::Reduce(uint32_t* subject_delta, uint32_t* reference_delta) {
+  ReduceRatio(subject_delta, reference_delta);
 }
 
 // static
-void Ratio::Product(uint32_t a_numerator,
-                    uint32_t a_denominator,
-                    uint32_t b_numerator,
-                    uint32_t b_denominator,
-                    uint32_t* product_numerator,
-                    uint32_t* product_denominator,
-                    bool exact) {
-  MOJO_DCHECK(a_denominator != 0);
-  MOJO_DCHECK(b_denominator != 0);
-  MOJO_DCHECK(product_numerator != nullptr);
-  MOJO_DCHECK(product_denominator != nullptr);
+void TimelineRate::Product(uint32_t a_subject_delta,
+                           uint32_t a_reference_delta,
+                           uint32_t b_subject_delta,
+                           uint32_t b_reference_delta,
+                           uint32_t* product_subject_delta,
+                           uint32_t* product_reference_delta,
+                           bool exact) {
+  MOJO_DCHECK(a_reference_delta != 0);
+  MOJO_DCHECK(b_reference_delta != 0);
+  MOJO_DCHECK(product_subject_delta != nullptr);
+  MOJO_DCHECK(product_reference_delta != nullptr);
 
-  uint64_t numerator = static_cast<uint64_t>(a_numerator) * b_numerator;
-  uint64_t denominator = static_cast<uint64_t>(a_denominator) * b_denominator;
+  uint64_t subject_delta =
+      static_cast<uint64_t>(a_subject_delta) * b_subject_delta;
+  uint64_t reference_delta =
+      static_cast<uint64_t>(a_reference_delta) * b_reference_delta;
 
-  ReduceRatio(&numerator, &denominator);
+  ReduceRatio(&subject_delta, &reference_delta);
 
-  if (numerator > std::numeric_limits<uint32_t>::max() ||
-      denominator > std::numeric_limits<uint32_t>::max()) {
+  if (subject_delta > std::numeric_limits<uint32_t>::max() ||
+      reference_delta > std::numeric_limits<uint32_t>::max()) {
     MOJO_DCHECK(!exact);
 
     do {
-      numerator >>= 1;
-      denominator >>= 1;
-    } while (numerator > std::numeric_limits<uint32_t>::max() ||
-             denominator > std::numeric_limits<uint32_t>::max());
+      subject_delta >>= 1;
+      reference_delta >>= 1;
+    } while (subject_delta > std::numeric_limits<uint32_t>::max() ||
+             reference_delta > std::numeric_limits<uint32_t>::max());
 
-    if (denominator == 0) {
+    if (reference_delta == 0) {
       // Product is larger than we can represent. Return the largest value we
       // can represent.
-      *product_numerator = std::numeric_limits<uint32_t>::max();
-      *product_denominator = 1;
+      *product_subject_delta = std::numeric_limits<uint32_t>::max();
+      *product_reference_delta = 1;
       return;
     }
   }
 
-  *product_numerator = static_cast<uint32_t>(numerator);
-  *product_denominator = static_cast<uint32_t>(denominator);
+  *product_subject_delta = static_cast<uint32_t>(subject_delta);
+  *product_reference_delta = static_cast<uint32_t>(reference_delta);
 }
 
 // static
-int64_t Ratio::Scale(int64_t value, uint32_t numerator, uint32_t denominator) {
+int64_t TimelineRate::Scale(int64_t value,
+                            uint32_t subject_delta,
+                            uint32_t reference_delta) {
   static constexpr uint64_t abs_of_min_int64 =
       static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1;
 
-  MOJO_DCHECK(denominator != 0u);
+  MOJO_DCHECK(reference_delta != 0u);
 
   bool overflow;
 
   uint64_t abs_result;
 
   if (value >= 0) {
-    abs_result = ScaleUInt64(static_cast<uint64_t>(value), numerator,
-                             denominator, false, &overflow);
+    abs_result = ScaleUInt64(static_cast<uint64_t>(value), subject_delta,
+                             reference_delta, false, &overflow);
   } else if (value == std::numeric_limits<int64_t>::min()) {
-    abs_result = ScaleUInt64(abs_of_min_int64, numerator, denominator,
+    abs_result = ScaleUInt64(abs_of_min_int64, subject_delta, reference_delta,
                              true, &overflow);
   } else {
-    abs_result = ScaleUInt64(static_cast<uint64_t>(-value), numerator,
-                             denominator, true, &overflow);
+    abs_result = ScaleUInt64(static_cast<uint64_t>(-value), subject_delta,
+                             reference_delta, true, &overflow);
   }
 
   if (overflow) {
-    return Ratio::kOverflow;
+    return TimelineRate::kOverflow;
   }
 
   // Make sure we won't overflow when we cast to int64_t.
@@ -217,7 +222,7 @@ int64_t Ratio::Scale(int64_t value, uint32_t numerator, uint32_t denominator) {
     if (value < 0 && abs_result == abs_of_min_int64) {
       return std::numeric_limits<int64_t>::min();
     }
-    return Ratio::kOverflow;
+    return TimelineRate::kOverflow;
   }
 
   return value >= 0 ? static_cast<int64_t>(abs_result)

@@ -26,9 +26,9 @@ mojo_native_application("apptests") {
   testonly = true
 
   sources = [
-    "test/linear_function_test.cc",
-    "test/ratio_test.cc",
     "test/test_base.h",
+    "test/timeline_function_test.cc",
+    "test/timeline_rate_test.cc",
   ]
 
   deps = [

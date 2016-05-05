@@ -12,17 +12,17 @@ mojo_sdk_source_set("cpp") {
     "circular_buffer_media_pipe_adapter.h",
     "fifo_allocator.cc",
     "fifo_allocator.h",
-    "linear_function.cc",
-    "linear_function.h",
     "linear_transform.cc",
     "linear_transform.h",
     "local_time.h",
     "mapped_shared_buffer.cc",
     "mapped_shared_buffer.h",
-    "ratio.cc",
-    "ratio.h",
     "shared_media_buffer_allocator.cc",
     "shared_media_buffer_allocator.h",
+    "timeline_function.cc",
+    "timeline_function.h",
+    "timeline_rate.cc",
+    "timeline_rate.h",
   ]
 
   if (is_posix) {
