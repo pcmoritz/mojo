@@ -93,7 +93,7 @@ MediaSinkImpl::MediaSinkImpl(const String& destination_url,
 
   // TODO(dalesat): Once we have c++14, get rid of this shared pointer hack.
   std::shared_ptr<StreamType> captured_stream_type(
-      Convert(media_type).release());
+      media_type.To<std::unique_ptr<StreamType>>().release());
 
   // An AudioTrackController knows how to talk to an audio track, interrogating
   // it for supported stream types and configuring it for the chosen stream

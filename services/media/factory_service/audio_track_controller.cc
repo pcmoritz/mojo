@@ -31,7 +31,8 @@ void AudioTrackController::GetSupportedMediaTypes(
     const GetSupportedMediaTypesCallback& callback) {
   // Query the track's format capabilities.
   audio_track_->Describe([this, callback](AudioTrackDescriptorPtr descriptor) {
-    callback(Convert(descriptor->supported_media_types));
+    callback(descriptor->supported_media_types.To<std::unique_ptr<
+                 std::vector<std::unique_ptr<media::StreamTypeSet>>>>());
   });
 }
 
@@ -39,7 +40,7 @@ void AudioTrackController::Configure(
     const std::unique_ptr<StreamType>& stream_type,
     const ConfigureCallback& callback) {
   AudioTrackConfigurationPtr config = AudioTrackConfiguration::New();
-  config->media_type = Convert(stream_type);
+  config->media_type = MediaType::From(stream_type);
 
   MediaConsumerPtr consumer;
   audio_track_->Configure(config.Pass(), GetProxy(&consumer));

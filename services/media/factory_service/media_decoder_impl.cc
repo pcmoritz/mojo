@@ -30,7 +30,8 @@ MediaDecoderImpl::MediaDecoderImpl(MediaTypePtr input_media_type,
   // Go away when the client is no longer connected.
   binding_.set_connection_error_handler([this]() { ReleaseFromOwner(); });
 
-  std::unique_ptr<StreamType> input_stream_type = Convert(input_media_type);
+  std::unique_ptr<StreamType> input_stream_type =
+      input_media_type.To<std::unique_ptr<StreamType>>();
 
   if (Decoder::Create(*input_stream_type, &decoder_) != Result::kOk) {
     LOG(WARNING) << "Couldn't find decoder for stream type";
@@ -66,7 +67,7 @@ MediaDecoderImpl::~MediaDecoderImpl() {}
 
 void MediaDecoderImpl::GetOutputType(const GetOutputTypeCallback& callback) {
   DCHECK(decoder_);
-  callback.Run(Convert(decoder_->output_stream_type()));
+  callback.Run(MediaType::From(decoder_->output_stream_type()));
 }
 
 void MediaDecoderImpl::GetConsumer(

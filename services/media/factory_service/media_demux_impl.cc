@@ -34,7 +34,8 @@ MediaDemuxImpl::MediaDemuxImpl(InterfaceHandle<SeekingReader> reader,
 
   metadata_publisher_.SetCallbackRunner(
       [this](const GetMetadataCallback& callback, uint64_t version) {
-        callback.Run(version, demux_ ? Convert(demux_->metadata()) : nullptr);
+        callback.Run(version, demux_ ? MediaMetadata::From(demux_->metadata())
+                                     : nullptr);
       });
 
   // Go away when the client is no longer connected.
@@ -167,7 +168,7 @@ MediaDemuxImpl::Stream::Stream(OutputRef output,
 MediaDemuxImpl::Stream::~Stream() {}
 
 MediaTypePtr MediaDemuxImpl::Stream::media_type() const {
-  return Convert(stream_type_);
+  return MediaType::From(stream_type_);
 }
 
 void MediaDemuxImpl::Stream::GetProducer(

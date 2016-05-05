@@ -43,7 +43,8 @@ MediaSourceImpl::MediaSourceImpl(
       [this](const GetStatusCallback& callback, uint64_t version) {
         MediaSourceStatusPtr status = MediaSourceStatus::New();
         status->state = state_;
-        status->metadata = demux_ ? Convert(demux_->metadata()) : nullptr;
+        status->metadata =
+            demux_ ? MediaMetadata::From(demux_->metadata()) : nullptr;
         callback.Run(version, status.Pass());
       });
 
@@ -80,7 +81,9 @@ void MediaSourceImpl::OnDemuxInitialized(Result result) {
   for (Demux::DemuxStream* demux_stream : demux_streams) {
     streams_.push_back(std::unique_ptr<Stream>(new Stream(
         demux_part_.output(demux_stream->index()), demux_stream->stream_type(),
-        Convert(allowed_media_types_), &graph_)));
+        allowed_media_types_.To<std::unique_ptr<
+            std::vector<std::unique_ptr<media::StreamTypeSet>>>>(),
+        &graph_)));
   }
 
   allowed_media_types_.reset();
@@ -211,11 +214,11 @@ MediaSourceImpl::Stream::Stream(
 MediaSourceImpl::Stream::~Stream() {}
 
 MediaTypePtr MediaSourceImpl::Stream::media_type() const {
-  return Convert(stream_type_);
+  return MediaType::From(stream_type_);
 }
 
 MediaTypePtr MediaSourceImpl::Stream::original_media_type() const {
-  return Convert(original_stream_type_);
+  return MediaType::From(original_stream_type_);
 }
 
 void MediaSourceImpl::Stream::GetProducer(
