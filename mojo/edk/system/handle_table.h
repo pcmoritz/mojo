@@ -56,10 +56,9 @@ class HandleTable {
   // marked as busy.
   MojoResult GetHandle(MojoHandle handle_value, Handle* handle);
 
-  // Like |GetDispatcher()|, but on success also removes the handle value from
-  // the handle table.
-  MojoResult GetAndRemoveDispatcher(MojoHandle handle_value,
-                                    util::RefPtr<Dispatcher>* dispatcher);
+  // Like |GetHandle()|, but on success also removes the handle value from the
+  // handle table.
+  MojoResult GetAndRemoveHandle(MojoHandle handle_value, Handle* handle);
 
   // Adds a handle (which must have a dispatcher), returning the handle value
   // for it. Returns |MOJO_HANDLE_INVALID| on failure (if the handle table is

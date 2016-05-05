@@ -37,6 +37,9 @@ struct HandleSignalsState;
 
 // |Core| is an object that implements the Mojo system calls. All public methods
 // are thread-safe.
+//
+// Convention: |MojoHandle|s are referred to as |handle| or |foo_handle|,
+// whereas |Handle|s are just |h|.
 class Core {
  public:
   // ---------------------------------------------------------------------------
@@ -50,19 +53,19 @@ class Core {
   // Adds |handle| (which must have a dispatcher) to the handle table, returning
   // the handle value for it. Returns |MOJO_HANDLE_INVALID| on failure, namely
   // if the handle table is full.
-  MojoHandle AddHandle(Handle&& handle);
+  MojoHandle AddHandle(Handle&& h);
 
   // Looks up the dispatcher for the given handle value. On success, gets the
   // dispatcher for a given handle value. On failure, returns an appropriate
   // result and leaves |dispatcher| alone), namely
   // |MOJO_RESULT_INVALID_ARGUMENT| if the handle value is invalid or
   // |MOJO_RESULT_BUSY| if the handle is marked as busy.
-  MojoResult GetDispatcher(MojoHandle handle_value,
+  MojoResult GetDispatcher(MojoHandle handle,
                            util::RefPtr<Dispatcher>* dispatcher);
 
   // Like |GetDispatcher()|, but on success also removes the handle from the
   // handle table.
-  MojoResult GetAndRemoveDispatcher(MojoHandle handle_value,
+  MojoResult GetAndRemoveDispatcher(MojoHandle handle,
                                     util::RefPtr<Dispatcher>* dispatcher);
 
   // Watches on the given handle for the given signals, calling |callback| when

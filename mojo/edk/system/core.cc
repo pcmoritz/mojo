@@ -98,26 +98,30 @@ MojoHandle Core::AddHandle(Handle&& handle) {
   return handle_table_.AddHandle(std::move(handle));
 }
 
-MojoResult Core::GetDispatcher(MojoHandle handle_value,
+MojoResult Core::GetDispatcher(MojoHandle handle,
                                RefPtr<Dispatcher>* dispatcher) {
-  if (handle_value == MOJO_HANDLE_INVALID)
+  if (handle == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
-  Handle handle;
-  MojoResult rv = handle_table_.GetHandle(handle_value, &handle);
+  Handle h;
+  MojoResult rv = handle_table_.GetHandle(handle, &h);
   if (rv == MOJO_RESULT_OK)
-    *dispatcher = std::move(handle.dispatcher);
+    *dispatcher = std::move(h.dispatcher);
   return rv;
 }
 
-MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle_value,
+MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
                                         RefPtr<Dispatcher>* dispatcher) {
-  if (handle_value == MOJO_HANDLE_INVALID)
+  if (handle == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
-  return handle_table_.GetAndRemoveDispatcher(handle_value, dispatcher);
+  Handle h;
+  MojoResult rv = handle_table_.GetAndRemoveHandle(handle, &h);
+  if (rv == MOJO_RESULT_OK)
+    *dispatcher = std::move(h.dispatcher);
+  return rv;
 }
 
 MojoResult Core::AsyncWait(MojoHandle handle,
@@ -143,11 +147,10 @@ MojoResult Core::Close(MojoHandle handle) {
   if (handle == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
-  RefPtr<Dispatcher> dispatcher;
+  Handle h;
   {
     MutexLocker locker(&handle_table_mutex_);
-    MojoResult result =
-        handle_table_.GetAndRemoveDispatcher(handle, &dispatcher);
+    MojoResult result = handle_table_.GetAndRemoveHandle(handle, &h);
     if (result != MOJO_RESULT_OK)
       return result;
   }
@@ -156,7 +159,7 @@ MojoResult Core::Close(MojoHandle handle) {
   // Note: This is done outside of |handle_table_mutex_|. As a result, there's a
   // race condition that the dispatcher must handle; see the comment in
   // |Dispatcher| in dispatcher.h.
-  return dispatcher->Close();
+  return h.dispatcher->Close();
 }
 
 MojoResult Core::Wait(MojoHandle handle,

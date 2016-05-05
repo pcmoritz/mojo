@@ -49,17 +49,17 @@ MojoResult HandleTable::GetHandle(MojoHandle handle_value, Handle* handle) {
   return MOJO_RESULT_OK;
 }
 
-MojoResult HandleTable::GetAndRemoveDispatcher(MojoHandle handle_value,
-                                               RefPtr<Dispatcher>* dispatcher) {
+MojoResult HandleTable::GetAndRemoveHandle(MojoHandle handle_value,
+                                           Handle* handle) {
   DCHECK_NE(handle_value, MOJO_HANDLE_INVALID);
-  DCHECK(dispatcher);
+  DCHECK(handle);
 
   HandleToEntryMap::iterator it = handle_to_entry_map_.find(handle_value);
   if (it == handle_to_entry_map_.end())
     return MOJO_RESULT_INVALID_ARGUMENT;
   if (it->second.busy)
     return MOJO_RESULT_BUSY;
-  *dispatcher = std::move(it->second.handle.dispatcher);
+  *handle = std::move(it->second.handle);
   handle_to_entry_map_.erase(it);
 
   return MOJO_RESULT_OK;
