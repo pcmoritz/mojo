@@ -52,17 +52,17 @@ class Core {
   // if the handle table is full.
   MojoHandle AddHandle(Handle&& handle);
 
-  // Looks up the dispatcher for the given handle. On success, gets the
-  // dispatcher for a given handle. On failure, returns an appropriate result
-  // and leaves |dispatcher| alone), namely |MOJO_RESULT_INVALID_ARGUMENT| if
-  // the handle is invalid or |MOJO_RESULT_BUSY| if the handle is marked as
-  // busy.
-  MojoResult GetDispatcher(MojoHandle handle,
+  // Looks up the dispatcher for the given handle value. On success, gets the
+  // dispatcher for a given handle value. On failure, returns an appropriate
+  // result and leaves |dispatcher| alone), namely
+  // |MOJO_RESULT_INVALID_ARGUMENT| if the handle value is invalid or
+  // |MOJO_RESULT_BUSY| if the handle is marked as busy.
+  MojoResult GetDispatcher(MojoHandle handle_value,
                            util::RefPtr<Dispatcher>* dispatcher);
 
   // Like |GetDispatcher()|, but on success also removes the handle from the
   // handle table.
-  MojoResult GetAndRemoveDispatcher(MojoHandle handle,
+  MojoResult GetAndRemoveDispatcher(MojoHandle handle_value,
                                     util::RefPtr<Dispatcher>* dispatcher);
 
   // Watches on the given handle for the given signals, calling |callback| when

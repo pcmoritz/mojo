@@ -23,8 +23,8 @@ TEST(HandleTableTest, Basic) {
 
   RefPtr<Dispatcher> d = MakeRefCounted<test::MockSimpleDispatcher>();
 
-  MojoHandle h = ht.AddHandle(Handle(d.Clone(), MOJO_HANDLE_RIGHT_NONE));
-  ASSERT_NE(h, MOJO_HANDLE_INVALID);
+  MojoHandle hv = ht.AddHandle(Handle(d.Clone(), MOJO_HANDLE_RIGHT_NONE));
+  ASSERT_NE(hv, MOJO_HANDLE_INVALID);
 
   // Save the pointer value (without taking a ref), so we can check that we get
   // the same object back.
@@ -32,18 +32,19 @@ TEST(HandleTableTest, Basic) {
   // Reset this, to make sure that the handle table takes a ref.
   d = nullptr;
 
-  EXPECT_EQ(MOJO_RESULT_OK, ht.GetDispatcher(h, &d));
-  EXPECT_EQ(d.get(), dv);
+  Handle h;
+  EXPECT_EQ(MOJO_RESULT_OK, ht.GetHandle(hv, &h));
+  EXPECT_EQ(dv, h.dispatcher.get());
 
   d = nullptr;
-  ASSERT_EQ(MOJO_RESULT_OK, ht.GetAndRemoveDispatcher(h, &d));
-  ASSERT_EQ(d.get(), dv);
+  ASSERT_EQ(MOJO_RESULT_OK, ht.GetAndRemoveDispatcher(hv, &d));
+  ASSERT_EQ(dv, d.get());
 
   EXPECT_EQ(MOJO_RESULT_OK, d->Close());
 
-  // We removed |h|, so it should no longer be valid.
-  d = nullptr;
-  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, ht.GetDispatcher(h, &d));
+  // We removed |hv|, so it should no longer be valid.
+  h.reset();
+  EXPECT_EQ(MOJO_RESULT_INVALID_ARGUMENT, ht.GetHandle(hv, &h));
 }
 
 TEST(HandleTableTest, AddHandlePair) {

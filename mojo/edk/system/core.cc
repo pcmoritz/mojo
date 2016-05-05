@@ -39,10 +39,11 @@ namespace system {
 // Implementation notes
 //
 // Mojo primitives are implemented by the singleton |Core| object. Most calls
-// are for a "primary" handle (the first argument). |Core::GetDispatcher()| is
-// used to look up a |Dispatcher| object for a given handle. That object
-// implements most primitives for that object. The wait primitives are not
-// attached to objects and are implemented by |Core| itself.
+// are for a "primary" handle (the first argument). |Core::GetHandle()| is used
+// to look up a |Handle| (in particular, a |Dispatcher| object) for a given
+// handle value. The |Dispatcher| object implements most primitives for that
+// (conceptual/logical) object. The wait primitives are not attached to objects
+// and are implemented by |Core| itself.
 //
 // Some objects have multiple handles associated to them, e.g., message pipes
 // (which have two). In such a case, there is still a |Dispatcher| (e.g.,
@@ -97,22 +98,26 @@ MojoHandle Core::AddHandle(Handle&& handle) {
   return handle_table_.AddHandle(std::move(handle));
 }
 
-MojoResult Core::GetDispatcher(MojoHandle handle,
+MojoResult Core::GetDispatcher(MojoHandle handle_value,
                                RefPtr<Dispatcher>* dispatcher) {
-  if (handle == MOJO_HANDLE_INVALID)
+  if (handle_value == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
-  return handle_table_.GetDispatcher(handle, dispatcher);
+  Handle handle;
+  MojoResult rv = handle_table_.GetHandle(handle_value, &handle);
+  if (rv == MOJO_RESULT_OK)
+    *dispatcher = std::move(handle.dispatcher);
+  return rv;
 }
 
-MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
+MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle_value,
                                         RefPtr<Dispatcher>* dispatcher) {
-  if (handle == MOJO_HANDLE_INVALID)
+  if (handle_value == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
-  return handle_table_.GetAndRemoveDispatcher(handle, dispatcher);
+  return handle_table_.GetAndRemoveDispatcher(handle_value, dispatcher);
 }
 
 MojoResult Core::AsyncWait(MojoHandle handle,
@@ -651,13 +656,13 @@ MojoResult Core::WaitManyInternal(const MojoHandle* handles,
         return MOJO_RESULT_INVALID_ARGUMENT;
       }
 
-      RefPtr<Dispatcher> dispatcher;
-      MojoResult result = handle_table_.GetDispatcher(handles[i], &dispatcher);
+      Handle handle;
+      MojoResult result = handle_table_.GetHandle(handles[i], &handle);
       if (result != MOJO_RESULT_OK) {
         *result_index = i;
         return result;
       }
-      dispatchers.push_back(std::move(dispatcher));
+      dispatchers.push_back(std::move(handle.dispatcher));
     }
   }
 

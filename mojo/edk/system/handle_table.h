@@ -49,13 +49,12 @@ class HandleTable {
   // convenient for there to be a "GetDispatcher()" that automatically does
   // rights-checking.)
 
-  // On success, gets the dispatcher for a given handle value (which should not
-  // be |MOJO_HANDLE_INVALID|). On failure, returns an appropriate result (and
-  // leaves |dispatcher| alone), namely |MOJO_RESULT_INVALID_ARGUMENT| if
-  // there's no dispatcher for the given handle value or |MOJO_RESULT_BUSY| if
-  // the handle value is marked as busy.
-  MojoResult GetDispatcher(MojoHandle handle_value,
-                           util::RefPtr<Dispatcher>* dispatcher);
+  // On success, gets the handle for the given handle value (which should not be
+  // |MOJO_HANDLE_INVALID|). On failure, returns an appropriate result (and
+  // leaves |*handle| alone), namely |MOJO_RESULT_INVALID_ARGUMENT| if there's
+  // no handle for the given handle value or |MOJO_RESULT_BUSY| if the handle is
+  // marked as busy.
+  MojoResult GetHandle(MojoHandle handle_value, Handle* handle);
 
   // Like |GetDispatcher()|, but on success also removes the handle value from
   // the handle table.
