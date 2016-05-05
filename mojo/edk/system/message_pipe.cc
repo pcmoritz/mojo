@@ -168,16 +168,27 @@ MojoResult MessagePipe::WriteMessage(unsigned port,
 MojoResult MessagePipe::ReadMessage(unsigned port,
                                     UserPointer<void> bytes,
                                     UserPointer<uint32_t> num_bytes,
-                                    DispatcherVector* dispatchers,
-                                    uint32_t* num_dispatchers,
+                                    HandleVector* handles,
+                                    uint32_t* num_handles,
                                     MojoReadMessageFlags flags) {
   DCHECK(port == 0 || port == 1);
 
   MutexLocker locker(&mutex_);
   DCHECK(endpoints_[port]);
 
-  return endpoints_[port]->ReadMessage(bytes, num_bytes, dispatchers,
-                                       num_dispatchers, flags);
+  // TODO(vtl): The code below is temporary scaffolding, until I can update the
+  // endpoint code. This should be just:
+  //   return endpoints_[port]->ReadMessage(bytes, num_bytes, handles,
+  //                                        num_handles, flags);
+  DispatcherVector dispatchers;
+  MojoResult rv = endpoints_[port]->ReadMessage(bytes, num_bytes, &dispatchers,
+                                                num_handles, flags);
+  for (size_t i = 0; i < dispatchers.size(); i++) {
+    // We're not enforcing handle rights yet, so "none" is OK.
+    handles->push_back(
+        Handle(std::move(dispatchers[i]), MOJO_HANDLE_RIGHT_NONE));
+  }
+  return rv;
 }
 
 HandleSignalsState MessagePipe::GetHandleSignalsState(unsigned port) const {

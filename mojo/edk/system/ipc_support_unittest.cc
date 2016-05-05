@@ -113,17 +113,17 @@ RefPtr<MessagePipeDispatcher> SendMessagePipeDispatcher(
   read_mp->RemoveAwakable(&waiter, nullptr);
 
   // Read the message from the read end.
-  DispatcherVector dispatchers;
-  uint32_t num_dispatchers = 10;
-  CHECK_EQ(
-      read_mp->ReadMessage(NullUserPointer(), NullUserPointer(), &dispatchers,
-                           &num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE),
-      MOJO_RESULT_OK);
-  CHECK_EQ(dispatchers.size(), 1u);
-  CHECK_EQ(num_dispatchers, 1u);
-  CHECK_EQ(dispatchers[0]->GetType(), Dispatcher::Type::MESSAGE_PIPE);
+  HandleVector handles;
+  uint32_t num_handles = 10;
+  CHECK_EQ(read_mp->ReadMessage(NullUserPointer(), NullUserPointer(), &handles,
+                                &num_handles, MOJO_READ_MESSAGE_FLAG_NONE),
+           MOJO_RESULT_OK);
+  CHECK_EQ(handles.size(), 1u);
+  CHECK_EQ(num_handles, 1u);
+  CHECK_EQ(handles[0].dispatcher->GetType(), Dispatcher::Type::MESSAGE_PIPE);
+  // TODO(vtl): Also check the rights here once they're actually preserved?
   return RefPtr<MessagePipeDispatcher>(
-      static_cast<MessagePipeDispatcher*>(dispatchers[0].get()));
+      static_cast<MessagePipeDispatcher*>(handles[0].dispatcher.get()));
 }
 
 class TestMasterProcessDelegate : public embedder::MasterProcessDelegate {

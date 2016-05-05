@@ -343,31 +343,30 @@ MojoResult Core::ReadMessage(MojoHandle message_pipe_handle,
     result = dispatcher->ReadMessage(bytes, num_bytes, nullptr,
                                      &num_handles_value, flags);
   } else {
-    DispatcherVector dispatchers;
-    result = dispatcher->ReadMessage(bytes, num_bytes, &dispatchers,
-                                     &num_handles_value, flags);
-    if (!dispatchers.empty()) {
+    HandleVector hs;
+    result = dispatcher->ReadMessage(bytes, num_bytes, &hs, &num_handles_value,
+                                     flags);
+    if (!hs.empty()) {
       DCHECK_EQ(result, MOJO_RESULT_OK);
       DCHECK(!num_handles.IsNull());
-      DCHECK_LE(dispatchers.size(), static_cast<size_t>(num_handles_value));
+      DCHECK_LE(hs.size(), static_cast<size_t>(num_handles_value));
 
       bool success;
-      UserPointer<MojoHandle>::Writer handles_writer(handles,
-                                                     dispatchers.size());
+      UserPointer<MojoHandle>::Writer handles_writer(handles, hs.size());
       {
         MutexLocker locker(&handle_table_mutex_);
-        success = handle_table_.AddDispatcherVector(
-            dispatchers, handles_writer.GetPointer());
+        success =
+            handle_table_.AddHandleVector(&hs, handles_writer.GetPointer());
       }
       if (success) {
         handles_writer.Commit();
       } else {
-        LOG(ERROR) << "Received message with " << dispatchers.size()
+        LOG(ERROR) << "Received message with " << hs.size()
                    << " handles, but handle table full";
         // Close dispatchers (outside the lock).
-        for (size_t i = 0; i < dispatchers.size(); i++) {
-          if (dispatchers[i])
-            dispatchers[i]->Close();
+        for (size_t i = 0; i < hs.size(); i++) {
+          if (hs[i])
+            hs[i].dispatcher->Close();
         }
         if (result == MOJO_RESULT_OK)
           result = MOJO_RESULT_RESOURCE_EXHAUSTED;

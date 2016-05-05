@@ -238,20 +238,21 @@ MOJO_MULTIPROCESS_TEST_CHILD_MAIN(CheckSharedBuffer) {
   // It should have a shared buffer.
   std::string read_buffer(100, '\0');
   uint32_t num_bytes = static_cast<uint32_t>(read_buffer.size());
-  DispatcherVector dispatchers;
-  uint32_t num_dispatchers = 10;  // Maximum number to receive.
+  HandleVector handles;
+  uint32_t num_handles = 10;  // Maximum number to receive.
   CHECK_EQ(mp->ReadMessage(0, UserPointer<void>(&read_buffer[0]),
-                           MakeUserPointer(&num_bytes), &dispatchers,
-                           &num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE),
+                           MakeUserPointer(&num_bytes), &handles, &num_handles,
+                           MOJO_READ_MESSAGE_FLAG_NONE),
            MOJO_RESULT_OK);
   read_buffer.resize(num_bytes);
   CHECK_EQ(read_buffer, std::string("go 1"));
-  CHECK_EQ(num_dispatchers, 1u);
+  CHECK_EQ(num_handles, 1u);
 
-  CHECK_EQ(dispatchers[0]->GetType(), Dispatcher::Type::SHARED_BUFFER);
+  CHECK_EQ(handles[0].dispatcher->GetType(), Dispatcher::Type::SHARED_BUFFER);
+  // TODO(vtl): Also check the rights here once they're actually preserved?
 
   RefPtr<SharedBufferDispatcher> dispatcher(
-      static_cast<SharedBufferDispatcher*>(dispatchers[0].get()));
+      static_cast<SharedBufferDispatcher*>(handles[0].dispatcher.get()));
 
   // Make a mapping.
   std::unique_ptr<PlatformSharedBufferMapping> mapping;
@@ -417,26 +418,30 @@ MOJO_MULTIPROCESS_TEST_CHILD_MAIN(CheckPlatformHandleFile) {
 
   std::string read_buffer(100, '\0');
   uint32_t num_bytes = static_cast<uint32_t>(read_buffer.size());
-  DispatcherVector dispatchers;
-  uint32_t num_dispatchers = 255;  // Maximum number to receive.
+  HandleVector read_handles;
+  uint32_t num_read_handles = 255;  // Maximum number to receive.
   CHECK_EQ(mp->ReadMessage(0, UserPointer<void>(&read_buffer[0]),
-                           MakeUserPointer(&num_bytes), &dispatchers,
-                           &num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE),
+                           MakeUserPointer(&num_bytes), &read_handles,
+                           &num_read_handles, MOJO_READ_MESSAGE_FLAG_NONE),
            MOJO_RESULT_OK);
   mp->Close(0);
 
   read_buffer.resize(num_bytes);
   char hello[32];
-  int num_handles = 0;
-  sscanf(read_buffer.c_str(), "%s %d", hello, &num_handles);
+  unsigned num_handles = 0;
+  sscanf(read_buffer.c_str(), "%s %u", hello, &num_handles);
   CHECK_EQ(std::string("hello"), std::string(hello));
-  CHECK_GT(num_handles, 0);
+  CHECK_GT(num_handles, 0u);
+  CHECK_EQ(num_read_handles, num_handles);
 
-  for (int i = 0; i < num_handles; ++i) {
-    CHECK_EQ(dispatchers[i]->GetType(), Dispatcher::Type::PLATFORM_HANDLE);
+  for (size_t i = 0; i < num_read_handles; ++i) {
+    CHECK_EQ(read_handles[i].dispatcher->GetType(),
+             Dispatcher::Type::PLATFORM_HANDLE);
+    // TODO(vtl): Also check the rights here once they're actually preserved?
 
     RefPtr<PlatformHandleDispatcher> dispatcher(
-        static_cast<PlatformHandleDispatcher*>(dispatchers[i].get()));
+        static_cast<PlatformHandleDispatcher*>(
+            read_handles[i].dispatcher.get()));
     ScopedPlatformHandle h = dispatcher->PassPlatformHandle();
     CHECK(h.is_valid());
     dispatcher->Close();
@@ -487,7 +492,7 @@ TEST_P(MultiprocessMessagePipeTestWithPipeCount, PlatformHandlePassing) {
   }
 
   char message[128];
-  sprintf(message, "hello %d", static_cast<int>(pipe_count));
+  sprintf(message, "hello %u", static_cast<unsigned>(pipe_count));
   EXPECT_EQ(MOJO_RESULT_OK,
             mp->WriteMessage(0, UserPointer<const void>(message),
                              static_cast<uint32_t>(strlen(message)),

@@ -24,8 +24,6 @@ class Core;
 class Dispatcher;
 class HandleTransport;
 
-using DispatcherVector = std::vector<util::RefPtr<Dispatcher>>;
-
 // Test-only function (defined/used in embedder/test_embedder.cc). Declared here
 // so it can be friended.
 namespace internal {
@@ -43,11 +41,6 @@ class HandleTable {
  public:
   explicit HandleTable(size_t max_handle_table_size);
   ~HandleTable();
-
-  // TODO(vtl): Replace the dispatcher-only methods with ones that either take a
-  // handle, or ones that deal in dispatchers *and* rights. (E.g., it might be
-  // convenient for there to be a "GetDispatcher()" that automatically does
-  // rights-checking.)
 
   // On success, gets the handle for the given handle value (which should not be
   // |MOJO_HANDLE_INVALID|). On failure, returns an appropriate result (and
@@ -80,9 +73,6 @@ class HandleTable {
   // the handle table is full), in which case it leaves all |handles->at(...)||
   // (and all the handles unadded) and |handle_values[...]| untouched.
   bool AddHandleVector(HandleVector* handles, MojoHandle* handle_values);
-  // TODO(vtl): Delete this version (use |AddHandleVector()| instead).
-  bool AddDispatcherVector(const DispatcherVector& dispatchers,
-                           MojoHandle* handle_values);
 
   // Tries to mark the given handle values as busy and start transport on them
   // (i.e., take their dispatcher locks); |transports| must be sized to contain
@@ -130,7 +120,6 @@ class HandleTable {
     ~Entry();
 
     Handle handle;
-    util::RefPtr<Dispatcher> dispatcher;
     bool busy;
   };
   using HandleToEntryMap = std::unordered_map<MojoHandle, Entry>;

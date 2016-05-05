@@ -675,23 +675,24 @@ TEST_F(RemoteMessagePipeTest, HandlePassing) {
   // Read from MP 1, port 1.
   char read_buffer[100] = {0};
   uint32_t read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  DispatcherVector read_dispatchers;
-  uint32_t read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp1->ReadMessage(1, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  HandleVector read_handles;
+  uint32_t read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp1->ReadMessage(1, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kHello), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kHello, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE, read_dispatchers[0]->GetType());
+  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
   dispatcher = RefPtr<MessagePipeDispatcher>(
-      static_cast<MessagePipeDispatcher*>(read_dispatchers[0].get()));
+      static_cast<MessagePipeDispatcher*>(read_handles[0].dispatcher.get()));
 
   // Add the waiter now, before it becomes readable to avoid a race.
   waiter.Init();
@@ -863,23 +864,24 @@ TEST_F(RemoteMessagePipeTest, HandlePassingHalfClosed) {
   // Read from MP 1, port 1.
   char read_buffer[100] = {0};
   uint32_t read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  DispatcherVector read_dispatchers;
-  uint32_t read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp1->ReadMessage(1, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  HandleVector read_handles;
+  uint32_t read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp1->ReadMessage(1, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kHello), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kHello, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE, read_dispatchers[0]->GetType());
+  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
   dispatcher = RefPtr<MessagePipeDispatcher>(
-      static_cast<MessagePipeDispatcher*>(read_dispatchers[0].get()));
+      static_cast<MessagePipeDispatcher*>(read_handles[0].dispatcher.get()));
 
   // |dispatcher| should already be readable and not writable.
   hss = dispatcher->GetHandleSignalsState();
@@ -995,23 +997,24 @@ TEST_F(RemoteMessagePipeTest, SharedBufferPassing) {
   // Read from MP 1, port 1.
   char read_buffer[100] = {0};
   uint32_t read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  DispatcherVector read_dispatchers;
-  uint32_t read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp1->ReadMessage(1, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  HandleVector read_handles;
+  uint32_t read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp1->ReadMessage(1, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kHello), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kHello, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::SHARED_BUFFER, read_dispatchers[0]->GetType());
+  EXPECT_EQ(Dispatcher::Type::SHARED_BUFFER,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
   dispatcher = RefPtr<SharedBufferDispatcher>(
-      static_cast<SharedBufferDispatcher*>(read_dispatchers[0].get()));
+      static_cast<SharedBufferDispatcher*>(read_handles[0].dispatcher.get()));
 
   // Make another mapping.
   std::unique_ptr<PlatformSharedBufferMapping> mapping1;
@@ -1108,23 +1111,24 @@ TEST_F(RemoteMessagePipeTest, PlatformHandlePassing) {
   // Read from MP 1, port 1.
   char read_buffer[100] = {0};
   uint32_t read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  DispatcherVector read_dispatchers;
-  uint32_t read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp1->ReadMessage(1, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  HandleVector read_handles;
+  uint32_t read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp1->ReadMessage(1, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kWorld), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kWorld, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE, read_dispatchers[0]->GetType());
+  EXPECT_EQ(Dispatcher::Type::PLATFORM_HANDLE,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
   dispatcher = RefPtr<PlatformHandleDispatcher>(
-      static_cast<PlatformHandleDispatcher*>(read_dispatchers[0].get()));
+      static_cast<PlatformHandleDispatcher*>(read_handles[0].dispatcher.get()));
 
   ScopedPlatformHandle h = dispatcher->PassPlatformHandle();
   EXPECT_TRUE(h.is_valid());
@@ -1246,27 +1250,24 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
   // Read from MP 1, port 1.
   char read_buffer[100] = {0};
   uint32_t read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  DispatcherVector read_dispatchers;
-  uint32_t read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp1->ReadMessage(1, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  HandleVector read_handles;
+  uint32_t read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp1->ReadMessage(1, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kHello), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kHello, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE, read_dispatchers[0]->GetType());
-  dispatcher = RefPtr<MessagePipeDispatcher>(
-      static_cast<MessagePipeDispatcher*>(read_dispatchers[0].get()));
-  read_dispatchers.clear();
-  // TODO(vtl): We should really get |handle| from |ReadMessage()|.
-  handle = Handle(std::move(dispatcher),
-                  MessagePipeDispatcher::kDefaultHandleRights);
+  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
+  handle = std::move(read_handles[0]);
+  read_handles.clear();
 
   // Now pass it back.
 
@@ -1309,23 +1310,24 @@ TEST_F(RemoteMessagePipeTest, PassMessagePipeHandleAcrossAndBack) {
 
   // Read from MP 0, port 0.
   read_buffer_size = static_cast<uint32_t>(sizeof(read_buffer));
-  read_num_dispatchers = 10;  // Maximum to get.
-  EXPECT_EQ(
-      MOJO_RESULT_OK,
-      mp0->ReadMessage(0, UserPointer<void>(read_buffer),
-                       MakeUserPointer(&read_buffer_size), &read_dispatchers,
-                       &read_num_dispatchers, MOJO_READ_MESSAGE_FLAG_NONE));
+  read_num_handles = 10;  // Maximum to get.
+  EXPECT_EQ(MOJO_RESULT_OK,
+            mp0->ReadMessage(0, UserPointer<void>(read_buffer),
+                             MakeUserPointer(&read_buffer_size), &read_handles,
+                             &read_num_handles, MOJO_READ_MESSAGE_FLAG_NONE));
   EXPECT_EQ(sizeof(kWorld), static_cast<size_t>(read_buffer_size));
   EXPECT_STREQ(kWorld, read_buffer);
-  EXPECT_EQ(1u, read_dispatchers.size());
-  EXPECT_EQ(1u, read_num_dispatchers);
-  ASSERT_TRUE(read_dispatchers[0]);
-  EXPECT_TRUE(read_dispatchers[0]->HasOneRef());
+  EXPECT_EQ(1u, read_handles.size());
+  EXPECT_EQ(1u, read_num_handles);
+  ASSERT_TRUE(read_handles[0]);
+  EXPECT_TRUE(read_handles[0].dispatcher->HasOneRef());
 
-  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE, read_dispatchers[0]->GetType());
+  EXPECT_EQ(Dispatcher::Type::MESSAGE_PIPE,
+            read_handles[0].dispatcher->GetType());
+  // TODO(vtl): Also check the rights here once they're actually preserved.
   dispatcher = RefPtr<MessagePipeDispatcher>(
-      static_cast<MessagePipeDispatcher*>(read_dispatchers[0].get()));
-  read_dispatchers.clear();
+      static_cast<MessagePipeDispatcher*>(read_handles[0].dispatcher.get()));
+  read_handles.clear();
 
   // Add the waiter now, before it becomes readable to avoid a race.
   waiter.Init();

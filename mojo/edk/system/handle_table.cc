@@ -108,33 +108,6 @@ bool HandleTable::AddHandleVector(HandleVector* handles,
   return true;
 }
 
-// TODO(vtl): Delete this.
-bool HandleTable::AddDispatcherVector(const DispatcherVector& dispatchers,
-                                      MojoHandle* handles) {
-  size_t max_message_num_handles = GetConfiguration().max_message_num_handles;
-
-  DCHECK_LE(dispatchers.size(), max_message_num_handles);
-  DCHECK(handles);
-  DCHECK_LT(
-      static_cast<uint64_t>(max_handle_table_size_) + max_message_num_handles,
-      std::numeric_limits<size_t>::max())
-      << "Addition may overflow";
-
-  if (handle_to_entry_map_.size() + dispatchers.size() > max_handle_table_size_)
-    return false;
-
-  for (size_t i = 0; i < dispatchers.size(); i++) {
-    if (dispatchers[i]) {
-      handles[i] = AddHandleNoSizeCheck(
-          Handle(dispatchers[i].Clone(), MOJO_HANDLE_RIGHT_TRANSFER));
-    } else {
-      LOG(WARNING) << "Invalid dispatcher at index " << i;
-      handles[i] = MOJO_HANDLE_INVALID;
-    }
-  }
-  return true;
-}
-
 MojoResult HandleTable::MarkBusyAndStartTransport(
     MojoHandle disallowed_handle,
     const MojoHandle* handle_values,

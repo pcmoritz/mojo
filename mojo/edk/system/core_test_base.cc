@@ -74,17 +74,17 @@ class MockDispatcher : public Dispatcher {
 
   MojoResult ReadMessageImplNoLock(UserPointer<void> bytes,
                                    UserPointer<uint32_t> num_bytes,
-                                   DispatcherVector* dispatchers,
-                                   uint32_t* num_dispatchers,
+                                   HandleVector* handles,
+                                   uint32_t* num_handles,
                                    MojoReadMessageFlags /*flags*/) override {
     info_->IncrementReadMessageCallCount();
     mutex().AssertHeld();
 
-    if (num_dispatchers) {
-      *num_dispatchers = 1;
-      if (dispatchers) {
-        // Okay to leave an invalid dispatcher.
-        dispatchers->resize(1);
+    if (num_handles) {
+      *num_handles = 1;
+      if (handles) {
+        // Okay to leave an invalid handle.
+        handles->resize(1);
       }
     }
 

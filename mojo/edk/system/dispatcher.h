@@ -14,6 +14,7 @@
 
 #include "mojo/edk/platform/scoped_platform_handle.h"
 #include "mojo/edk/system/entrypoint_class.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_signals_state.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/util/mutex.h"
@@ -108,13 +109,13 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
                           uint32_t num_bytes,
                           std::vector<HandleTransport>* transports,
                           MojoWriteMessageFlags flags);
-  // |dispatchers| must be non-null but empty, if |num_dispatchers| is non-null
-  // and nonzero. On success, it will be set to the dispatchers to be received
-  // (and assigned handles) as part of the message.
+  // |handles| must be non-null but empty if |num_handles| is non-null and
+  // nonzero. On success, it will be set to the handles to be received (and
+  // assigned handle values) as part of the message.
   MojoResult ReadMessage(UserPointer<void> bytes,
                          UserPointer<uint32_t> num_bytes,
-                         DispatcherVector* dispatchers,
-                         uint32_t* num_dispatchers,
+                         HandleVector* handles,
+                         uint32_t* num_handles,
                          MojoReadMessageFlags flags);
 
   // |EntrypointClass::DATA_PIPE_PRODUCER|:
@@ -281,8 +282,8 @@ class Dispatcher : public util::RefCountedThreadSafe<Dispatcher> {
       MojoWriteMessageFlags flags) MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   virtual MojoResult ReadMessageImplNoLock(UserPointer<void> bytes,
                                            UserPointer<uint32_t> num_bytes,
-                                           DispatcherVector* dispatchers,
-                                           uint32_t* num_dispatchers,
+                                           HandleVector* handles,
+                                           uint32_t* num_handles,
                                            MojoReadMessageFlags flags)
       MOJO_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
   virtual MojoResult SetDataPipeProducerOptionsImplNoLock(

@@ -125,18 +125,16 @@ MojoResult Dispatcher::WriteMessage(UserPointer<const void> bytes,
 
 MojoResult Dispatcher::ReadMessage(UserPointer<void> bytes,
                                    UserPointer<uint32_t> num_bytes,
-                                   DispatcherVector* dispatchers,
-                                   uint32_t* num_dispatchers,
+                                   HandleVector* handles,
+                                   uint32_t* num_handles,
                                    MojoReadMessageFlags flags) {
-  DCHECK(!num_dispatchers || *num_dispatchers == 0 ||
-         (dispatchers && dispatchers->empty()));
+  DCHECK(!num_handles || *num_handles == 0 || (handles && handles->empty()));
 
   MutexLocker locker(&mutex_);
   if (is_closed_)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
-  return ReadMessageImplNoLock(bytes, num_bytes, dispatchers, num_dispatchers,
-                               flags);
+  return ReadMessageImplNoLock(bytes, num_bytes, handles, num_handles, flags);
 }
 
 MojoResult Dispatcher::SetDataPipeProducerOptions(
@@ -334,8 +332,8 @@ MojoResult Dispatcher::WriteMessageImplNoLock(
 MojoResult Dispatcher::ReadMessageImplNoLock(
     UserPointer<void> /*bytes*/,
     UserPointer<uint32_t> /*num_bytes*/,
-    DispatcherVector* /*dispatchers*/,
-    uint32_t* /*num_dispatchers*/,
+    HandleVector* /*handles*/,
+    uint32_t* /*num_handles*/,
     MojoReadMessageFlags /*flags*/) {
   mutex_.AssertHeld();
   DCHECK(!is_closed_);

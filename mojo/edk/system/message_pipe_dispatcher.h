@@ -91,8 +91,8 @@ class MessagePipeDispatcher final : public Dispatcher {
                                     MojoWriteMessageFlags flags) override;
   MojoResult ReadMessageImplNoLock(UserPointer<void> bytes,
                                    UserPointer<uint32_t> num_bytes,
-                                   DispatcherVector* dispatchers,
-                                   uint32_t* num_dispatchers,
+                                   HandleVector* handles,
+                                   uint32_t* num_handles,
                                    MojoReadMessageFlags flags) override;
   HandleSignalsState GetHandleSignalsStateImplNoLock() const override;
   MojoResult AddAwakableImplNoLock(Awakable* awakable,

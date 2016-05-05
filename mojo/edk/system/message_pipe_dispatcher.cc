@@ -183,12 +183,12 @@ MojoResult MessagePipeDispatcher::WriteMessageImplNoLock(
 MojoResult MessagePipeDispatcher::ReadMessageImplNoLock(
     UserPointer<void> bytes,
     UserPointer<uint32_t> num_bytes,
-    DispatcherVector* dispatchers,
-    uint32_t* num_dispatchers,
+    HandleVector* handles,
+    uint32_t* num_handles,
     MojoReadMessageFlags flags) {
   mutex().AssertHeld();
-  return message_pipe_->ReadMessage(port_, bytes, num_bytes, dispatchers,
-                                    num_dispatchers, flags);
+  return message_pipe_->ReadMessage(port_, bytes, num_bytes, handles,
+                                    num_handles, flags);
 }
 
 HandleSignalsState MessagePipeDispatcher::GetHandleSignalsStateImplNoLock()

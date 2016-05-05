@@ -14,6 +14,7 @@
 #include "mojo/edk/platform/scoped_platform_handle.h"
 #include "mojo/edk/system/channel_endpoint_client.h"
 #include "mojo/edk/system/dispatcher.h"
+#include "mojo/edk/system/handle.h"
 #include "mojo/edk/system/handle_signals_state.h"
 #include "mojo/edk/system/memory.h"
 #include "mojo/edk/system/message_in_transit.h"
@@ -94,8 +95,8 @@ class MessagePipe final : public ChannelEndpointClient {
   MojoResult ReadMessage(unsigned port,
                          UserPointer<void> bytes,
                          UserPointer<uint32_t> num_bytes,
-                         DispatcherVector* dispatchers,
-                         uint32_t* num_dispatchers,
+                         HandleVector* handles,
+                         uint32_t* num_handles,
                          MojoReadMessageFlags flags);
   HandleSignalsState GetHandleSignalsState(unsigned port) const;
   MojoResult AddAwakable(unsigned port,
