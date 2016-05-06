@@ -77,6 +77,7 @@ mojo_native_application("js_apptests") {
     "//mojo/public/cpp/bindings",
     "//mojo/public/cpp/system",
     "//services/js/test:echo_service",
+    "//services/js/test:echo_service_sync",
     "//services/js/test:js_application_test_base",
     "//services/js/test:network_test_service",
     "//services/js/test:pingpong_service",
