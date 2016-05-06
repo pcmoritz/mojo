@@ -70,14 +70,14 @@ void LocalMessagePipeEndpoint::CancelAllAwakables() {
 MojoResult LocalMessagePipeEndpoint::ReadMessage(
     UserPointer<void> bytes,
     UserPointer<uint32_t> num_bytes,
-    DispatcherVector* dispatchers,
-    uint32_t* num_dispatchers,
+    HandleVector* handles,
+    uint32_t* num_handles,
     MojoReadMessageFlags flags) {
   DCHECK(is_open_);
-  DCHECK(!dispatchers || dispatchers->empty());
+  DCHECK(!handles || handles->empty());
 
   const uint32_t max_bytes = num_bytes.IsNull() ? 0 : num_bytes.Get();
-  const uint32_t max_num_dispatchers = num_dispatchers ? *num_dispatchers : 0;
+  const uint32_t max_num_handles = num_handles ? *num_handles : 0;
 
   if (message_queue_.IsEmpty()) {
     return is_peer_open_ ? MOJO_RESULT_SHOULD_WAIT
@@ -96,21 +96,30 @@ MojoResult LocalMessagePipeEndpoint::ReadMessage(
     enough_space = false;
 
   if (DispatcherVector* queued_dispatchers = message->dispatchers()) {
-    if (num_dispatchers)
-      *num_dispatchers = static_cast<uint32_t>(queued_dispatchers->size());
+    if (num_handles)
+      *num_handles = static_cast<uint32_t>(queued_dispatchers->size());
     if (enough_space) {
       if (queued_dispatchers->empty()) {
         // Nothing to do.
-      } else if (queued_dispatchers->size() <= max_num_dispatchers) {
-        DCHECK(dispatchers);
-        dispatchers->swap(*queued_dispatchers);
+      } else if (queued_dispatchers->size() <= max_num_handles) {
+        DCHECK(handles);
+        // TODO(vtl): The rest of this code in this block is temporary, until I
+        // plumb |Handle|s into |MessageInTransit|. This should really just be
+        // something like:
+        //   handles->swap(*queued_handles);
+        handles->reserve(queued_dispatchers->size());
+        for (size_t i = 0; i < queued_dispatchers->size(); i++) {
+          // We're not enforcing handle rights yet, so "none" is OK.
+          handles->push_back(Handle(std::move(queued_dispatchers->at(i)),
+                                    MOJO_HANDLE_RIGHT_NONE));
+        }
       } else {
         enough_space = false;
       }
     }
   } else {
-    if (num_dispatchers)
-      *num_dispatchers = 0;
+    if (num_handles)
+      *num_handles = 0;
   }
 
   message = nullptr;
