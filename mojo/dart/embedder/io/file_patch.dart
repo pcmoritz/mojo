@@ -604,6 +604,32 @@ patch class FileSystemEntity {
 patch class _Link {
 }
 
+patch class _RandomAccessFileOps {
+  /* patch */ factory _RandomAccessFileOps(int pointer)
+      => new _RandomAccessFileOpsImpl(pointer);
+}
+
+class _RandomAccessFileOpsImpl implements _RandomAccessFileOps {
+  int _pointer;
+
+  _RandomAccessFileOpsImpl(this._pointer);
+
+  int getPointer() => _pointer;
+  int close() => throw new UnimplementedError();
+  readByte() => throw new UnimplementedError();
+  read(int bytes) => throw new UnimplementedError();
+  readInto(List<int> buffer, int start, int end)
+      => throw new UnimplementedError();
+  writeByte(int value) => throw new UnimplementedError();
+  writeFrom(List<int> buffer, int start, int end)
+      => throw new UnimplementedError();
+  position() => throw new UnimplementedError();
+  setPosition(int position) => throw new UnimplementedError();
+  truncate(int length) => throw new UnimplementedError();
+  length() => throw new UnimplementedError();
+  flush() => throw new UnimplementedError();
+  lock(int lock, int start, int end) => throw new UnimplementedError();
+}
 
 patch class _RandomAccessFile {
   FileProxy _proxy;
@@ -625,7 +651,7 @@ patch class _RandomAccessFile {
     await _proxy.responseOrError(_proxy.ptr.close());
     await _proxy.close(immediate: true);
     _proxy = null;
-    _id = 0;
+    closed = true;
     _maybePerformCleanup();
     return this;
   }
@@ -809,12 +835,12 @@ patch class _RandomAccessFile {
   }
 
   /* patch */ Future<RandomAccessFile> lock(
-      [FileLock mode = FileLock.EXCLUSIVE, int start = 0, int end]) {
+      [FileLock mode = FileLock.EXCLUSIVE, int start = 0, int end = -1]) {
     throw new UnsupportedError(
         "File locking is not supported by this embedder");
   }
 
-  /* patch */ Future<RandomAccessFile> unlock([int start = 0, int end]) {
+  /* patch */ Future<RandomAccessFile> unlock([int start = 0, int end = -1]) {
     throw new UnsupportedError(
         "File locking is not supported by this embedder");
   }
@@ -826,59 +852,5 @@ patch class _RandomAccessFile {
 
   /* patch */ void unlockSync([int start = 0, int end]) {
     _onSyncOperation();
-  }
-
-  /* patch */ bool get closed => _id == 0;
-
-  /* patch */ static int _close(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static int _getFD(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _readByte(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _read(int id, int bytes) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _readInto(int id, List<int> buffer, int start, int end) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _writeByte(int id, int value) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _writeFrom(int id, List<int> buffer, int start, int end) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _position(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _setPosition(int id, int position) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _truncate(int id, int length) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _length(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _flush(int id) {
-    throw new UnimplementedError();
-  }
-
-  /* patch */ static _lock(int id, int lock, int start, int end) {
-    throw new UnimplementedError();
   }
 }
