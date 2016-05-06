@@ -21,13 +21,13 @@ module mojo;
 //   (s - subject_time) * reference_delta / subject_delta + reference_time
 //
 struct TimelineTransform {
-  // A value from the reference timeline that correlates to timeline_time.
+  // A value from the reference timeline that correlates to subject_time.
   int64 reference_time = 0;
 
   // A value from the subject timeline that correlates to reference_time.
   int64 subject_time = 0;
 
-  // The change in the reference timeline corresponding to timeline_delta.
+  // The change in the reference timeline corresponding to subject_delta.
   // Cannnot be zero.
   uint32 reference_delta = 1;
 
