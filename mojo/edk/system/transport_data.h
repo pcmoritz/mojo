@@ -86,6 +86,8 @@ class TransportData {
   // The maximum total number of platform handles that may be attached.
   static size_t GetMaxPlatformHandles();
 
+  TransportData(std::unique_ptr<HandleVector> handles, Channel* channel);
+  // TODO(vtl): Remove this, once |TransportData| really supports handles.
   TransportData(std::unique_ptr<DispatcherVector> dispatchers,
                 Channel* channel);
 

@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "base/logging.h"
-#include "mojo/edk/system/dispatcher.h"
 #include "mojo/edk/system/message_in_transit.h"
 
 namespace mojo {
@@ -95,24 +94,15 @@ MojoResult LocalMessagePipeEndpoint::ReadMessage(
   else
     enough_space = false;
 
-  if (DispatcherVector* queued_dispatchers = message->dispatchers()) {
+  if (HandleVector* queued_handles = message->handles()) {
     if (num_handles)
-      *num_handles = static_cast<uint32_t>(queued_dispatchers->size());
+      *num_handles = static_cast<uint32_t>(queued_handles->size());
     if (enough_space) {
-      if (queued_dispatchers->empty()) {
+      if (queued_handles->empty()) {
         // Nothing to do.
-      } else if (queued_dispatchers->size() <= max_num_handles) {
+      } else if (queued_handles->size() <= max_num_handles) {
         DCHECK(handles);
-        // TODO(vtl): The rest of this code in this block is temporary, until I
-        // plumb |Handle|s into |MessageInTransit|. This should really just be
-        // something like:
-        //   handles->swap(*queued_handles);
-        handles->reserve(queued_dispatchers->size());
-        for (size_t i = 0; i < queued_dispatchers->size(); i++) {
-          // We're not enforcing handle rights yet, so "none" is OK.
-          handles->push_back(Handle(std::move(queued_dispatchers->at(i)),
-                                    MOJO_HANDLE_RIGHT_NONE));
-        }
+        handles->swap(*queued_handles);
       } else {
         enough_space = false;
       }

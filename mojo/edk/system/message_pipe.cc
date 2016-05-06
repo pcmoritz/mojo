@@ -356,24 +356,22 @@ MojoResult MessagePipe::AttachTransportsNoLock(
     unsigned port,
     MessageInTransit* message,
     std::vector<HandleTransport>* transports) {
-  DCHECK(!message->has_dispatchers());
+  DCHECK(!message->has_handles());
 
-  // Clone the dispatchers and attach them to the message. (This must be done as
-  // a separate loop, since we want to leave the dispatchers alone on failure.)
-  std::unique_ptr<DispatcherVector> dispatchers(new DispatcherVector());
-  dispatchers->reserve(transports->size());
+  // Clone the handles and attach them to the message. (This must be done as a
+  // separate loop, since we want to leave the handles alone on failure.)
+  std::unique_ptr<HandleVector> handles(new HandleVector());
+  handles->reserve(transports->size());
   for (size_t i = 0; i < transports->size(); i++) {
     if ((*transports)[i].is_valid()) {
-      // TODO(vtl): Plumb this into |MessageInTransit|. (I.e., |dispatchers| ->
-      // |handles|, etc.)
-      Handle h = (*transports)[i].CreateEquivalentHandleAndClose(this, port);
-      dispatchers->push_back(std::move(h.dispatcher));
+      handles->push_back(
+          transports->at(i).CreateEquivalentHandleAndClose(this, port));
     } else {
       LOG(WARNING) << "Enqueueing null dispatcher";
-      dispatchers->push_back(nullptr);
+      handles->push_back(Handle());
     }
   }
-  message->SetDispatchers(std::move(dispatchers));
+  message->SetHandles(std::move(handles));
   return MOJO_RESULT_OK;
 }
 
