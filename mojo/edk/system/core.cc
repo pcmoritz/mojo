@@ -105,15 +105,6 @@ MojoResult Core::GetHandle(MojoHandle handle, Handle* h) {
   return handle_table_.GetHandle(handle, h);
 }
 
-MojoResult Core::GetDispatcher(MojoHandle handle,
-                               RefPtr<Dispatcher>* dispatcher) {
-  Handle h;
-  MojoResult result = GetHandle(handle, &h);
-  if (result == MOJO_RESULT_OK)
-    *dispatcher = std::move(h.dispatcher);
-  return result;
-}
-
 MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
                                         RefPtr<Dispatcher>* dispatcher) {
   if (handle == MOJO_HANDLE_INVALID)
@@ -140,7 +131,7 @@ MojoResult Core::GetDispatcherAndCheckRights(
   if (result != MOJO_RESULT_OK)
     return result;
 
-  if ((h.rights & required_handle_rights) != required_handle_rights) {
+  if (!h.has_all_rights(required_handle_rights)) {
     return h.dispatcher->SupportsEntrypointClass(entrypoint_class)
                ? MOJO_RESULT_PERMISSION_DENIED
                : MOJO_RESULT_INVALID_ARGUMENT;
@@ -624,7 +615,7 @@ MojoResult Core::DuplicateBufferHandle(
   if (result != MOJO_RESULT_OK)
     return result;
 
-  if (!(h.rights & MOJO_HANDLE_RIGHT_DUPLICATE)) {
+  if (!h.has_all_rights(MOJO_HANDLE_RIGHT_DUPLICATE)) {
     return h.dispatcher->SupportsEntrypointClass(EntrypointClass::BUFFER)
                ? MOJO_RESULT_PERMISSION_DENIED
                : MOJO_RESULT_INVALID_ARGUMENT;

@@ -62,9 +62,6 @@ class Core {
   // handle value is invalid or |MOJO_RESULT_BUSY| if the handle is marked as
   // busy.
   MojoResult GetHandle(MojoHandle handle, Handle* h);
-  // TODO(vtl): Remove this.
-  MojoResult GetDispatcher(MojoHandle handle,
-                           util::RefPtr<Dispatcher>* dispatcher);
 
   // TODO(vtl): Convert this to |GetAndRemoveHandle()|.
   // Like |GetDispatcher()|, but on success also removes the handle from the
