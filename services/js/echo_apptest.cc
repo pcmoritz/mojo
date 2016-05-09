@@ -73,14 +73,5 @@ TEST_F(JSEchoTest, EchoNullString) {
   echo_service_->Quit();
 }
 
-// Verify that a JS app's ServiceProvider can request and provide services.
-// This test exercises the same code paths as examples/js/share_echo.js.
-TEST_F(JSEchoTest, ShareEchoService) {
-  bool returned_value = false;
-  EXPECT_TRUE(echo_service_->ShareEchoService(&returned_value));
-  EXPECT_TRUE(returned_value);
-  echo_service_->Quit();
-}
-
 } // namespace
 } // namespace js
