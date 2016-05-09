@@ -322,3 +322,42 @@ For examples of interesting sets of graphs see:
    startup](https://chromeperf.appspot.com/report?sid=4848464df5ca8467770d80b309740ef56fbff00e773c2c53816fd8bff1fda1e0)
  - [ipc
    performance](https://chromeperf.appspot.com/report?sid=9abc20b46f6f8d908b0f07847f1d42eab54c7025a098336e6dc2d3e2030d66f8)
+
+## Development Tools
+
+These are some helpful tools for use during development.
+
+### Atom IDE plugins
+
+Here are some useful plugins for Atom IDE during Mojo development.
+
+ - `language-mojom`: provides syntax highlighting for `*.mojom` files.
+ - `clang-format`: auto-formats C and C++ code in the editor (make sure to configure the path to the executable in the plugin settings).
+
+### Vim plugins
+
+The `//tools/vim` directory contains the following plugins, refer to each script for installation instructions.
+
+ - `mojom`: provides syntax highlighting for `*.mojom` files.
+ - `clang_format.vim`: binds keyboard shortcuts to invoke `clang-format`.
+ - `filetypes.vim`: provides syntax highlighting for `*.gyp`, `*.gypi`, and `DEPS` files.
+ - `ninja-build.vim`: binds keyboard shortcuts to invoke the `ninja` build tool.
+
+### Address Sanitizer (ASAN)
+
+Use ASAN to help find misuse of heap memory such as use-after-free errors.
+
+```
+$ mojo/tools/mojob.py gn --asan
+$ mojo/tools/mojob.py build --asan
+```
+
+Use `//tools/valgrind/asan/asan_symbolize.py` to decode stack traces when ASAN detects an error at runtime.
+
+This tool is not supported on Android.
+
+### Android Stack Parser
+
+Use `//mojo/devtools/common/android_stack_parser/stack` to decode stack traces from Mojo programs running on Android.
+
+Make sure to include the lines containing `Caching mojo app XXX at YYY` which are printed while the program starts up so that the stack tool can locate the necessary symbols on the host machine.
