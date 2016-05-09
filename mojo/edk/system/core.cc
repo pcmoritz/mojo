@@ -105,17 +105,12 @@ MojoResult Core::GetHandle(MojoHandle handle, Handle* h) {
   return handle_table_.GetHandle(handle, h);
 }
 
-MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
-                                        RefPtr<Dispatcher>* dispatcher) {
+MojoResult Core::GetAndRemoveHandle(MojoHandle handle, Handle* h) {
   if (handle == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
-  Handle h;
-  MojoResult result = handle_table_.GetAndRemoveHandle(handle, &h);
-  if (result == MOJO_RESULT_OK)
-    *dispatcher = std::move(h.dispatcher);
-  return result;
+  return handle_table_.GetAndRemoveHandle(handle, h);
 }
 
 MojoResult Core::GetDispatcherAndCheckRights(

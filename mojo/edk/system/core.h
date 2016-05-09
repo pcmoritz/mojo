@@ -63,11 +63,9 @@ class Core {
   // busy.
   MojoResult GetHandle(MojoHandle handle, Handle* h);
 
-  // TODO(vtl): Convert this to |GetAndRemoveHandle()|.
-  // Like |GetDispatcher()|, but on success also removes the handle from the
+  // Like |GetHandle()|, but on success also removes the handle from the
   // handle table.
-  MojoResult GetAndRemoveDispatcher(MojoHandle handle,
-                                    util::RefPtr<Dispatcher>* dispatcher);
+  MojoResult GetAndRemoveHandle(MojoHandle handle, Handle* h);
 
   // Gets the dispatcher for the given handle value, which must have (all of)
   // the rights in |required_handle_rights|.
