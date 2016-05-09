@@ -90,25 +90,28 @@ Core::Core(embedder::PlatformSupport* platform_support)
     : platform_support_(platform_support),
       handle_table_(GetConfiguration().max_handle_table_size) {}
 
-Core::~Core() {
-}
+Core::~Core() {}
 
 MojoHandle Core::AddHandle(Handle&& handle) {
   MutexLocker locker(&handle_table_mutex_);
   return handle_table_.AddHandle(std::move(handle));
 }
 
-MojoResult Core::GetDispatcher(MojoHandle handle,
-                               RefPtr<Dispatcher>* dispatcher) {
+MojoResult Core::GetHandle(MojoHandle handle, Handle* h) {
   if (handle == MOJO_HANDLE_INVALID)
     return MOJO_RESULT_INVALID_ARGUMENT;
 
   MutexLocker locker(&handle_table_mutex_);
+  return handle_table_.GetHandle(handle, h);
+}
+
+MojoResult Core::GetDispatcher(MojoHandle handle,
+                               RefPtr<Dispatcher>* dispatcher) {
   Handle h;
-  MojoResult rv = handle_table_.GetHandle(handle, &h);
-  if (rv == MOJO_RESULT_OK)
+  MojoResult result = GetHandle(handle, &h);
+  if (result == MOJO_RESULT_OK)
     *dispatcher = std::move(h.dispatcher);
-  return rv;
+  return result;
 }
 
 MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
@@ -118,17 +121,41 @@ MojoResult Core::GetAndRemoveDispatcher(MojoHandle handle,
 
   MutexLocker locker(&handle_table_mutex_);
   Handle h;
-  MojoResult rv = handle_table_.GetAndRemoveHandle(handle, &h);
-  if (rv == MOJO_RESULT_OK)
+  MojoResult result = handle_table_.GetAndRemoveHandle(handle, &h);
+  if (result == MOJO_RESULT_OK)
     *dispatcher = std::move(h.dispatcher);
-  return rv;
+  return result;
+}
+
+MojoResult Core::GetDispatcherAndCheckRights(
+    MojoHandle handle,
+    MojoHandleRights required_handle_rights,
+    EntrypointClass entrypoint_class,
+    util::RefPtr<Dispatcher>* dispatcher) {
+  if (handle == MOJO_HANDLE_INVALID)
+    return MOJO_RESULT_INVALID_ARGUMENT;
+
+  Handle h;
+  MojoResult result = GetHandle(handle, &h);
+  if (result != MOJO_RESULT_OK)
+    return result;
+
+  if ((h.rights & required_handle_rights) != required_handle_rights) {
+    return h.dispatcher->SupportsEntrypointClass(entrypoint_class)
+               ? MOJO_RESULT_PERMISSION_DENIED
+               : MOJO_RESULT_INVALID_ARGUMENT;
+  }
+
+  *dispatcher = std::move(h.dispatcher);
+  return MOJO_RESULT_OK;
 }
 
 MojoResult Core::AsyncWait(MojoHandle handle,
                            MojoHandleSignals signals,
                            const std::function<void(MojoResult)>& callback) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      handle, MOJO_HANDLE_RIGHT_NONE, EntrypointClass::NONE, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -265,7 +292,9 @@ MojoResult Core::WriteMessage(MojoHandle message_pipe_handle,
                               uint32_t num_handles,
                               MojoWriteMessageFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(message_pipe_handle, &dispatcher);
+  MojoResult result =
+      GetDispatcherAndCheckRights(message_pipe_handle, MOJO_HANDLE_RIGHT_WRITE,
+                                  EntrypointClass::MESSAGE_PIPE, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -332,7 +361,9 @@ MojoResult Core::ReadMessage(MojoHandle message_pipe_handle,
                              UserPointer<uint32_t> num_handles,
                              MojoReadMessageFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(message_pipe_handle, &dispatcher);
+  MojoResult result =
+      GetDispatcherAndCheckRights(message_pipe_handle, MOJO_HANDLE_RIGHT_READ,
+                                  EntrypointClass::MESSAGE_PIPE, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -423,7 +454,9 @@ MojoResult Core::SetDataPipeProducerOptions(
     MojoHandle data_pipe_producer_handle,
     UserPointer<const MojoDataPipeProducerOptions> options) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_producer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -435,7 +468,9 @@ MojoResult Core::GetDataPipeProducerOptions(
     UserPointer<MojoDataPipeProducerOptions> options,
     uint32_t options_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_producer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_READ,
+      EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -447,7 +482,9 @@ MojoResult Core::WriteData(MojoHandle data_pipe_producer_handle,
                            UserPointer<uint32_t> num_bytes,
                            MojoWriteDataFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_producer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -459,7 +496,9 @@ MojoResult Core::BeginWriteData(MojoHandle data_pipe_producer_handle,
                                 UserPointer<uint32_t> buffer_num_bytes,
                                 MojoWriteDataFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_producer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -469,7 +508,9 @@ MojoResult Core::BeginWriteData(MojoHandle data_pipe_producer_handle,
 MojoResult Core::EndWriteData(MojoHandle data_pipe_producer_handle,
                               uint32_t num_bytes_written) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_producer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -480,7 +521,9 @@ MojoResult Core::SetDataPipeConsumerOptions(
     MojoHandle data_pipe_consumer_handle,
     UserPointer<const MojoDataPipeConsumerOptions> options) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_consumer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -492,7 +535,9 @@ MojoResult Core::GetDataPipeConsumerOptions(
     UserPointer<MojoDataPipeConsumerOptions> options,
     uint32_t options_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_consumer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_READ,
+      EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -504,7 +549,9 @@ MojoResult Core::ReadData(MojoHandle data_pipe_consumer_handle,
                           UserPointer<uint32_t> num_bytes,
                           MojoReadDataFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_consumer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_READ,
+      EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -516,7 +563,9 @@ MojoResult Core::BeginReadData(MojoHandle data_pipe_consumer_handle,
                                UserPointer<uint32_t> buffer_num_bytes,
                                MojoReadDataFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_consumer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_READ,
+      EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -526,7 +575,9 @@ MojoResult Core::BeginReadData(MojoHandle data_pipe_consumer_handle,
 MojoResult Core::EndReadData(MojoHandle data_pipe_consumer_handle,
                              uint32_t num_bytes_read) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(data_pipe_consumer_handle, &dispatcher);
+  MojoResult result = GetDispatcherAndCheckRights(
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_READ,
+      EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -566,20 +617,26 @@ MojoResult Core::DuplicateBufferHandle(
     MojoHandle buffer_handle,
     UserPointer<const MojoDuplicateBufferHandleOptions> options,
     UserPointer<MojoHandle> new_buffer_handle) {
-  RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(buffer_handle, &dispatcher);
+  // TODO(vtl): This is a big ugly and duplicates some code, but the plan is to
+  // remove this method anyway.
+  Handle h;
+  MojoResult result = GetHandle(buffer_handle, &h);
   if (result != MOJO_RESULT_OK)
     return result;
+
+  if (!(h.rights & MOJO_HANDLE_RIGHT_DUPLICATE)) {
+    return h.dispatcher->SupportsEntrypointClass(EntrypointClass::BUFFER)
+               ? MOJO_RESULT_PERMISSION_DENIED
+               : MOJO_RESULT_INVALID_ARGUMENT;
+  }
 
   // Don't verify |options| here; that's the dispatcher's job.
   RefPtr<Dispatcher> new_dispatcher;
-  result = dispatcher->DuplicateBufferHandle(options, &new_dispatcher);
+  result = h.dispatcher->DuplicateBufferHandle(options, &new_dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
-  // TODO(vtl): This should be done with the original handle's rights.
-  MojoHandle new_handle = AddHandle(Handle(
-      new_dispatcher.Clone(), SharedBufferDispatcher::kDefaultHandleRights));
+  MojoHandle new_handle = AddHandle(Handle(new_dispatcher.Clone(), h.rights));
   if (new_handle == MOJO_HANDLE_INVALID) {
     LOG(ERROR) << "Handle table full";
     new_dispatcher->Close();
@@ -594,7 +651,9 @@ MojoResult Core::GetBufferInformation(MojoHandle buffer_handle,
                                       UserPointer<MojoBufferInformation> info,
                                       uint32_t info_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(buffer_handle, &dispatcher);
+  MojoResult result =
+      GetDispatcherAndCheckRights(buffer_handle, MOJO_HANDLE_RIGHT_READ,
+                                  EntrypointClass::BUFFER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
@@ -607,7 +666,11 @@ MojoResult Core::MapBuffer(MojoHandle buffer_handle,
                            UserPointer<void*> buffer,
                            MojoMapBufferFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  MojoResult result = GetDispatcher(buffer_handle, &dispatcher);
+  // TODO(vtl): Is this right? Or should there be a "map" right? Probably I need
+  // to rethink rights for buffers.
+  MojoResult result =
+      GetDispatcherAndCheckRights(buffer_handle, MOJO_HANDLE_RIGHT_WRITE,
+                                  EntrypointClass::BUFFER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 

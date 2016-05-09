@@ -102,7 +102,8 @@ Dispatcher::Type SharedBufferDispatcher::GetType() const {
 
 bool SharedBufferDispatcher::SupportsEntrypointClass(
     EntrypointClass entrypoint_class) const {
-  return (entrypoint_class == EntrypointClass::BUFFER);
+  return (entrypoint_class == EntrypointClass::NONE ||
+          entrypoint_class == EntrypointClass::BUFFER);
 }
 
 // static

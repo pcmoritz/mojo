@@ -191,6 +191,7 @@ TEST_F(SharedBufferDispatcherTest, SupportsEntrypointClass) {
   ASSERT_TRUE(d);
   EXPECT_EQ(MOJO_RESULT_OK, result);
 
+  EXPECT_TRUE(d->SupportsEntrypointClass(EntrypointClass::NONE));
   EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::MESSAGE_PIPE));
   EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_PRODUCER));
   EXPECT_FALSE(d->SupportsEntrypointClass(EntrypointClass::DATA_PIPE_CONSUMER));

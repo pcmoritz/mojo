@@ -52,7 +52,7 @@ Dispatcher::Type MockSimpleDispatcher::GetType() const {
 
 bool MockSimpleDispatcher::SupportsEntrypointClass(
     EntrypointClass entrypoint_class) const {
-  return false;
+  return (entrypoint_class == EntrypointClass::NONE);
 }
 
 MockSimpleDispatcher::MockSimpleDispatcher(
