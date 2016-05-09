@@ -16,7 +16,6 @@
 #include "mojo/public/cpp/application/application_impl.h"
 #include "mojo/public/cpp/application/connect.h"
 #include "mojo/public/cpp/application/interface_factory.h"
-#include "mojo/public/cpp/application/service_provider_impl.h"
 #include "mojo/public/cpp/bindings/strong_binding.h"
 #include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "shell/application_manager/application_loader.h"
@@ -265,10 +264,6 @@ class TestAImpl : public TestA {
     b_->B(base::Bind(&TestAImpl::Quit, base::Unretained(this)));
   }
 
-  void CallCFromB() override {
-    b_->CallC(base::Bind(&TestAImpl::Quit, base::Unretained(this)));
-  }
-
   void Quit() {
     base::MessageLoop::current()->Quit();
     test_context_->set_a_called_quit();
@@ -285,9 +280,7 @@ class TestBImpl : public TestB {
   TestBImpl(ApplicationConnection* connection,
             TesterContext* test_context,
             InterfaceRequest<TestB> request)
-      : test_context_(test_context), binding_(this, request.Pass()) {
-    connection->ConnectToService(&c_);
-  }
+      : test_context_(test_context), binding_(this, request.Pass()) {}
 
   ~TestBImpl() override {
     test_context_->IncrementNumBDeletes();
@@ -302,40 +295,14 @@ class TestBImpl : public TestB {
     callback.Run();
   }
 
-  void CallC(const Callback<void()>& callback) override {
-    test_context_->IncrementNumBCalls();
-    c_->C(callback);
-  }
-
   TesterContext* test_context_;
-  TestCPtr c_;
   StrongBinding<TestB> binding_;
-};
-
-class TestCImpl : public TestC {
- public:
-  TestCImpl(ApplicationConnection* connection,
-            TesterContext* test_context,
-            InterfaceRequest<TestC> request)
-      : test_context_(test_context), binding_(this, request.Pass()) {}
-
-  ~TestCImpl() override { test_context_->IncrementNumCDeletes(); }
-
- private:
-  void C(const Callback<void()>& callback) override {
-    test_context_->IncrementNumCCalls();
-    callback.Run();
-  }
-
-  TesterContext* test_context_;
-  StrongBinding<TestC> binding_;
 };
 
 class Tester : public ApplicationDelegate,
                public ApplicationLoader,
                public InterfaceFactory<TestA>,
-               public InterfaceFactory<TestB>,
-               public InterfaceFactory<TestC> {
+               public InterfaceFactory<TestB> {
  public:
   Tester(TesterContext* context, const std::string& requestor_url)
       : context_(context), requestor_url_(requestor_url) {}
@@ -366,16 +333,8 @@ class Tester : public ApplicationDelegate,
   void Create(ApplicationConnection* connection,
               InterfaceRequest<TestA> request) override {
     mojo::InterfaceHandle<mojo::ServiceProvider> incoming_sp_handle;
-    mojo::InterfaceHandle<mojo::ServiceProvider> outgoing_sp_handle;
-    mojo::InterfaceRequest<mojo::ServiceProvider> outgoing_sp_request =
-        GetProxy(&outgoing_sp_handle);
     app_->shell()->ConnectToApplication(kTestBURLString,
-                                        GetProxy(&incoming_sp_handle),
-                                        outgoing_sp_handle.Pass());
-    std::unique_ptr<mojo::ServiceProviderImpl> outgoing_sp_impl(
-        new mojo::ServiceProviderImpl(outgoing_sp_request.Pass()));
-    outgoing_sp_impl->AddService<TestC>(this);
-    outgoing_sp_impls_for_b_.push_back(std::move(outgoing_sp_impl));
+                                        GetProxy(&incoming_sp_handle), nullptr);
     a_bindings_.push_back(
         new TestAImpl(incoming_sp_handle.Pass(), context_, request.Pass()));
   }
@@ -385,16 +344,9 @@ class Tester : public ApplicationDelegate,
     new TestBImpl(connection, context_, request.Pass());
   }
 
-  void Create(ApplicationConnection* connection,
-              InterfaceRequest<TestC> request) override {
-    new TestCImpl(connection, context_, request.Pass());
-  }
-
   TesterContext* context_;
   scoped_ptr<ApplicationImpl> app_;
   std::string requestor_url_;
-  std::vector<std::unique_ptr<mojo::ServiceProviderImpl>>
-      outgoing_sp_impls_for_b_;
   ScopedVector<TestAImpl> a_bindings_;
 };
 
@@ -720,24 +672,6 @@ TEST_F(ApplicationManagerTest, ACallB) {
   a->CallB();
   loop_.Run();
   EXPECT_EQ(1, tester_context_.num_b_calls());
-  EXPECT_TRUE(tester_context_.a_called_quit());
-}
-
-// A calls B which calls C.
-TEST_F(ApplicationManagerTest, BCallC) {
-  // Any url can load a.
-  AddLoaderForURL(GURL(kTestAURLString), std::string());
-
-  // Only a can load b.
-  AddLoaderForURL(GURL(kTestBURLString), kTestAURLString);
-
-  TestAPtr a;
-  application_manager_->ConnectToService(GURL(kTestAURLString), &a);
-  a->CallCFromB();
-  loop_.Run();
-
-  EXPECT_EQ(1, tester_context_.num_b_calls());
-  EXPECT_EQ(1, tester_context_.num_c_calls());
   EXPECT_TRUE(tester_context_.a_called_quit());
 }
 
