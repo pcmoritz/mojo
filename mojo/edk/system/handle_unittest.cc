@@ -118,6 +118,7 @@ TEST(HandleTest, HasAllRights) {
   {
     Handle h;
 
+    EXPECT_TRUE(h.has_all_rights(MOJO_HANDLE_RIGHT_NONE));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_DUPLICATE));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_TRANSFER));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_READ));
@@ -128,6 +129,7 @@ TEST(HandleTest, HasAllRights) {
     Handle h(MakeRefCounted<test::MockSimpleDispatcher>(),
              MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_READ);
 
+    EXPECT_TRUE(h.has_all_rights(MOJO_HANDLE_RIGHT_NONE));
     EXPECT_TRUE(h.has_all_rights(MOJO_HANDLE_RIGHT_DUPLICATE));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_TRANSFER));
     EXPECT_TRUE(h.has_all_rights(MOJO_HANDLE_RIGHT_READ));
