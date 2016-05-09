@@ -311,7 +311,7 @@ bool Context::InitWithPaths(
   ServiceProviderPtr tracing_services;
   application_manager_.ConnectToApplication(GURL("mojo:tracing"), GURL(""),
                                             GetProxy(&tracing_services),
-                                            nullptr, base::Closure());
+                                            base::Closure());
   if (tracer_) {
     tracing::TraceProviderRegistryPtr registry;
     mojo::ConnectToService(tracing_services.get(), GetProxy(&registry));
@@ -358,11 +358,10 @@ void Context::OnSlaveDisconnect(mojo::embedder::SlaveInfo slave_info) {
 
 void Context::Run(const GURL& url) {
   ServiceProviderPtr services;
-  ServiceProviderPtr exposed_services;
 
   app_urls_.insert(url);
   application_manager_.ConnectToApplication(
-      url, GURL(), mojo::GetProxy(&services), exposed_services.Pass(),
+      url, GURL(), mojo::GetProxy(&services),
       base::Bind(&Context::OnApplicationEnd, base::Unretained(this), url));
 }
 

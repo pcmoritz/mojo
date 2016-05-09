@@ -64,8 +64,7 @@ class ApplicationManager::ContentHandlerConnection {
       : manager_(manager), identity_(identity) {
     ServiceProviderPtr services;
     manager->ConnectToApplication(identity_.url, GURL(),
-                                  mojo::GetProxy(&services), nullptr,
-                                  base::Closure());
+                                  mojo::GetProxy(&services), base::Closure());
     mojo::MessagePipe pipe;
     content_handler_.Bind(
         mojo::InterfaceHandle<mojo::ContentHandler>(pipe.handle0.Pass(), 0u));
@@ -128,18 +127,16 @@ void ApplicationManager::ConnectToApplication(
     const GURL& requested_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    mojo::InterfaceHandle<ServiceProvider> exposed_services,
     const base::Closure& on_application_end) {
-  ConnectToApplicationWithParameters(
-      requested_url, requestor_url, services.Pass(), exposed_services.Pass(),
-      on_application_end, std::vector<std::string>());
+  ConnectToApplicationWithParameters(requested_url, requestor_url,
+                                     services.Pass(), on_application_end,
+                                     std::vector<std::string>());
 }
 
 void ApplicationManager::ConnectToApplicationWithParameters(
     const GURL& requested_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& pre_redirect_parameters) {
   TRACE_EVENT_INSTANT2(
@@ -152,43 +149,36 @@ void ApplicationManager::ConnectToApplicationWithParameters(
   // external applications can be registered for the unresolved mojo:foo urls.
 
   GURL mapped_url = delegate_->ResolveMappings(requested_url);
-  if (ConnectToRunningApplication(mapped_url, requestor_url, &services,
-                                  &exposed_services)) {
+  if (ConnectToRunningApplication(mapped_url, requestor_url, &services))
     return;
-  }
 
   GURL resolved_url = delegate_->ResolveMojoURL(mapped_url);
-  if (ConnectToRunningApplication(resolved_url, requestor_url, &services,
-                                  &exposed_services)) {
+  if (ConnectToRunningApplication(resolved_url, requestor_url, &services))
     return;
-  }
 
   // The application is not running, let's compute the parameters.
   std::vector<std::string> parameters =
       Concatenate(pre_redirect_parameters, GetArgsForURL(resolved_url));
 
   if (ConnectToApplicationWithLoader(mapped_url, requestor_url, &services,
-                                     &exposed_services, on_application_end,
-                                     parameters, GetLoaderForURL(mapped_url))) {
+                                     on_application_end, parameters,
+                                     GetLoaderForURL(mapped_url)))
     return;
-  }
-
-  if (ConnectToApplicationWithLoader(
-          resolved_url, requestor_url, &services, &exposed_services,
-          on_application_end, parameters, GetLoaderForURL(resolved_url))) {
-    return;
-  }
 
   if (ConnectToApplicationWithLoader(resolved_url, requestor_url, &services,
-                                     &exposed_services, on_application_end,
-                                     parameters, default_loader_.get())) {
+                                     on_application_end, parameters,
+                                     GetLoaderForURL(resolved_url)))
     return;
-  }
 
-  auto callback = base::Bind(
-      &ApplicationManager::HandleFetchCallback, weak_ptr_factory_.GetWeakPtr(),
-      requestor_url, base::Passed(services.Pass()),
-      base::Passed(exposed_services.Pass()), on_application_end, parameters);
+  if (ConnectToApplicationWithLoader(resolved_url, requestor_url, &services,
+                                     on_application_end, parameters,
+                                     default_loader_.get()))
+    return;
+
+  auto callback =
+      base::Bind(&ApplicationManager::HandleFetchCallback,
+                 weak_ptr_factory_.GetWeakPtr(), requestor_url,
+                 base::Passed(services.Pass()), on_application_end, parameters);
 
   if (resolved_url.SchemeIsFile()) {
     new LocalFetcher(resolved_url, GetBaseURLAndQuery(resolved_url, nullptr),
@@ -242,8 +232,7 @@ void ApplicationManager::ConnectToApplicationWithParameters(
 bool ApplicationManager::ConnectToRunningApplication(
     const GURL& resolved_url,
     const GURL& requestor_url,
-    InterfaceRequest<ServiceProvider>* services,
-    mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services) {
+    InterfaceRequest<ServiceProvider>* services) {
   GURL application_url = GetBaseURLAndQuery(resolved_url, nullptr);
   ShellImpl* shell_impl = GetShellImpl(application_url);
   if (!shell_impl)
@@ -252,8 +241,7 @@ bool ApplicationManager::ConnectToRunningApplication(
   DCHECK(!GetNativeApplicationOptionsForURL(application_url)
               ->new_process_per_connection);
 
-  ConnectToClient(shell_impl, resolved_url, requestor_url, services->Pass(),
-                  exposed_services->Pass());
+  ConnectToClient(shell_impl, resolved_url, requestor_url, services->Pass());
   return true;
 }
 
@@ -261,17 +249,15 @@ bool ApplicationManager::ConnectToApplicationWithLoader(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider>* services,
-    mojo::InterfaceHandle<mojo::ServiceProvider>* exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters,
     ApplicationLoader* loader) {
   if (!loader)
     return false;
 
-  loader->Load(
-      resolved_url,
-      RegisterShell(resolved_url, requestor_url, services->Pass(),
-                    exposed_services->Pass(), on_application_end, parameters));
+  loader->Load(resolved_url,
+               RegisterShell(resolved_url, requestor_url, services->Pass(),
+                             on_application_end, parameters));
   return true;
 }
 
@@ -292,7 +278,6 @@ InterfaceRequest<Application> ApplicationManager::RegisterShell(
     const GURL& resolved_url,
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters) {
   Identity app_identity = MakeApplicationIdentity(resolved_url);
@@ -304,8 +289,7 @@ InterfaceRequest<Application> ApplicationManager::RegisterShell(
       new ShellImpl(application.Pass(), this, app_identity, on_application_end);
   identity_to_shell_impl_[app_identity] = make_scoped_ptr(shell);
   shell->InitializeApplication(mojo::Array<mojo::String>::From(parameters));
-  ConnectToClient(shell, resolved_url, requestor_url, services.Pass(),
-                  exposed_services.Pass());
+  ConnectToClient(shell, resolved_url, requestor_url, services.Pass());
   return application_request;
 }
 
@@ -324,16 +308,13 @@ void ApplicationManager::ConnectToClient(
     ShellImpl* shell_impl,
     const GURL& resolved_url,
     const GURL& requestor_url,
-    InterfaceRequest<ServiceProvider> services,
-    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services) {
-  shell_impl->ConnectToClient(resolved_url, requestor_url, services.Pass(),
-                              exposed_services.Pass());
+    InterfaceRequest<ServiceProvider> services) {
+  shell_impl->ConnectToClient(resolved_url, requestor_url, services.Pass());
 }
 
 void ApplicationManager::HandleFetchCallback(
     const GURL& requestor_url,
     InterfaceRequest<ServiceProvider> services,
-    mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services,
     const base::Closure& on_application_end,
     const std::vector<std::string>& parameters,
     scoped_ptr<Fetcher> fetcher) {
@@ -346,8 +327,8 @@ void ApplicationManager::HandleFetchCallback(
   if (!redirect_url.is_empty()) {
     // And around we go again... Whee!
     ConnectToApplicationWithParameters(redirect_url, requestor_url,
-                                       services.Pass(), exposed_services.Pass(),
-                                       on_application_end, parameters);
+                                       services.Pass(), on_application_end,
+                                       parameters);
     return;
   }
 
@@ -357,14 +338,12 @@ void ApplicationManager::HandleFetchCallback(
   //
   // Also, it's possible the original URL was redirected to an app that is
   // already running.
-  if (ConnectToRunningApplication(fetcher->GetURL(), requestor_url, &services,
-                                  &exposed_services)) {
+  if (ConnectToRunningApplication(fetcher->GetURL(), requestor_url, &services))
     return;
-  }
 
   InterfaceRequest<Application> request(
       RegisterShell(fetcher->GetURL(), requestor_url, services.Pass(),
-                    exposed_services.Pass(), on_application_end, parameters));
+                    on_application_end, parameters));
 
   // If the response begins with a #!mojo <content-handler-url>, use it.
   GURL content_handler_url;
@@ -538,7 +517,7 @@ mojo::ScopedMessagePipeHandle ApplicationManager::ConnectToServiceByName(
     const std::string& interface_name) {
   ServiceProviderPtr services;
   ConnectToApplication(application_url, GURL(), mojo::GetProxy(&services),
-                       nullptr, base::Closure());
+                       base::Closure());
   mojo::MessagePipe pipe;
   services->ConnectToService(interface_name, pipe.handle1.Pass());
   return pipe.handle0.Pass();

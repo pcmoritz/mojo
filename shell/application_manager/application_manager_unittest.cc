@@ -789,7 +789,7 @@ TEST_F(ApplicationManagerTest, TestEndApplicationClosure) {
 
   bool called = false;
   application_manager_->ConnectToApplication(
-      GURL("test:test"), GURL(), nullptr, nullptr,
+      GURL("test:test"), GURL(), nullptr,
       base::Bind(&QuitClosure, base::Unretained(&called)));
   loop_.Run();
   EXPECT_TRUE(called);

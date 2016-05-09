@@ -35,11 +35,9 @@ class ShellImpl : public mojo::Shell {
 
   void InitializeApplication(mojo::Array<mojo::String> args);
 
-  void ConnectToClient(
-      const GURL& requested_url,
-      const GURL& requestor_url,
-      mojo::InterfaceRequest<mojo::ServiceProvider> services,
-      mojo::InterfaceHandle<mojo::ServiceProvider> exposed_services);
+  void ConnectToClient(const GURL& requested_url,
+                       const GURL& requestor_url,
+                       mojo::InterfaceRequest<mojo::ServiceProvider> services);
 
   mojo::Application* application() { return application_.get(); }
   const Identity& identity() const { return identity_; }

@@ -69,14 +69,12 @@ void ShellImpl::InitializeApplication(Array<String> args) {
                            identity_.url.spec());
 }
 
-void ShellImpl::ConnectToClient(
-    const GURL& requested_url,
-    const GURL& requestor_url,
-    InterfaceRequest<ServiceProvider> services,
-    InterfaceHandle<ServiceProvider> exposed_services) {
-  application_->AcceptConnection(
-      String::From(requestor_url), std::move(services),
-      std::move(exposed_services), requested_url.spec());
+void ShellImpl::ConnectToClient(const GURL& requested_url,
+                                const GURL& requestor_url,
+                                InterfaceRequest<ServiceProvider> services) {
+  application_->AcceptConnection(String::From(requestor_url),
+                                 std::move(services), nullptr,
+                                 requested_url.spec());
 }
 
 void ShellImpl::ConnectToApplication(
@@ -88,8 +86,9 @@ void ShellImpl::ConnectToApplication(
     LOG(ERROR) << "Error: invalid URL: " << app_url;
     return;
   }
+  LOG_IF(ERROR, exposed_services) << "exposed_services no longer supported!";
   manager_->ConnectToApplication(app_gurl, identity_.url, std::move(services),
-                                 std::move(exposed_services), base::Closure());
+                                 base::Closure());
 }
 
 void ShellImpl::CreateApplicationConnector(

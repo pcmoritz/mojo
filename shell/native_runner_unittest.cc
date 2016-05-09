@@ -88,10 +88,8 @@ TEST_F(NativeApplicationLoaderTest, DoesNotExist) {
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
   base::FilePath nonexistent_file(FILE_PATH_LITERAL("nonexistent.txt"));
   GURL url(FilePathToFileURL(temp_dir.path().Append(nonexistent_file)));
-  mojo::InterfaceRequest<mojo::ServiceProvider> services;
-  mojo::ServiceProviderPtr service_provider;
-  application_manager_.ConnectToApplication(
-      url, GURL(), services.Pass(), service_provider.Pass(), base::Closure());
+  application_manager_.ConnectToApplication(url, GURL(), nullptr,
+                                            base::Closure());
   EXPECT_FALSE(state_.runner_was_created);
   EXPECT_FALSE(state_.runner_was_started);
   EXPECT_FALSE(state_.runner_was_destroyed);

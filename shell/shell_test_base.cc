@@ -28,11 +28,9 @@ void QuitIfRunning() {
 
 }  // namespace
 
-ShellTestBase::ShellTestBase() {
-}
+ShellTestBase::ShellTestBase() {}
 
-ShellTestBase::~ShellTestBase() {
-}
+ShellTestBase::~ShellTestBase() {}
 
 void ShellTestBase::SetUp() {
   CHECK(shell_context_.Init());
@@ -48,7 +46,7 @@ mojo::ScopedMessagePipeHandle ShellTestBase::ConnectToService(
     const std::string& service_name) {
   mojo::ServiceProviderPtr services;
   shell_context_.application_manager()->ConnectToApplication(
-      application_url, GURL(), mojo::GetProxy(&services), nullptr,
+      application_url, GURL(), mojo::GetProxy(&services),
       base::Bind(&QuitIfRunning));
   mojo::MessagePipe pipe;
   services->ConnectToService(service_name, pipe.handle1.Pass());
