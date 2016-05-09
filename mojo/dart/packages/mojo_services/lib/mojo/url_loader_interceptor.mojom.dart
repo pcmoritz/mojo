@@ -729,7 +729,7 @@ class UrlLoaderInterceptorFactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UrlLoaderInterceptorFactoryStub.unbound() : super.unbound();
+  UrlLoaderInterceptorFactoryStub.unbound([this._impl]) : super.unbound();
 
   static UrlLoaderInterceptorFactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1020,7 +1020,7 @@ class UrlLoaderInterceptorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UrlLoaderInterceptorStub.unbound() : super.unbound();
+  UrlLoaderInterceptorStub.unbound([this._impl]) : super.unbound();
 
   static UrlLoaderInterceptorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

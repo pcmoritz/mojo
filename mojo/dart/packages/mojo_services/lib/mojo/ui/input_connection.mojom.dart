@@ -369,7 +369,7 @@ class InputConnectionStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InputConnectionStub.unbound() : super.unbound();
+  InputConnectionStub.unbound([this._impl]) : super.unbound();
 
   static InputConnectionStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -599,7 +599,7 @@ class InputListenerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InputListenerStub.unbound() : super.unbound();
+  InputListenerStub.unbound([this._impl]) : super.unbound();
 
   static InputListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

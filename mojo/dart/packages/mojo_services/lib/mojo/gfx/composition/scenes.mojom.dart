@@ -882,7 +882,7 @@ class SceneStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SceneStub.unbound() : super.unbound();
+  SceneStub.unbound([this._impl]) : super.unbound();
 
   static SceneStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1127,7 +1127,7 @@ class SceneListenerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SceneListenerStub.unbound() : super.unbound();
+  SceneListenerStub.unbound([this._impl]) : super.unbound();
 
   static SceneListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

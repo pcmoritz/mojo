@@ -569,7 +569,7 @@ class MailboxTextureCallbackStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MailboxTextureCallbackStub.unbound() : super.unbound();
+  MailboxTextureCallbackStub.unbound([this._impl]) : super.unbound();
 
   static MailboxTextureCallbackStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

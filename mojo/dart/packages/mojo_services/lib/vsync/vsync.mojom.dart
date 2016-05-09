@@ -301,7 +301,7 @@ class VSyncProviderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  VSyncProviderStub.unbound() : super.unbound();
+  VSyncProviderStub.unbound([this._impl]) : super.unbound();
 
   static VSyncProviderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

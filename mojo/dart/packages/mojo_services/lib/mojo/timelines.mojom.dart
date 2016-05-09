@@ -491,7 +491,7 @@ class TimelineConsumerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TimelineConsumerStub.unbound() : super.unbound();
+  TimelineConsumerStub.unbound([this._impl]) : super.unbound();
 
   static TimelineConsumerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

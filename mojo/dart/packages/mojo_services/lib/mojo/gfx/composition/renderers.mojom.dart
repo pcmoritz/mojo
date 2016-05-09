@@ -409,7 +409,7 @@ class RendererStub extends bindings.Stub {
     _impl = impl;
   }
 
-  RendererStub.unbound() : super.unbound();
+  RendererStub.unbound([this._impl]) : super.unbound();
 
   static RendererStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

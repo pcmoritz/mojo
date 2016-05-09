@@ -379,7 +379,7 @@ class ViewManagerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewManagerStub.unbound() : super.unbound();
+  ViewManagerStub.unbound([this._impl]) : super.unbound();
 
   static ViewManagerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

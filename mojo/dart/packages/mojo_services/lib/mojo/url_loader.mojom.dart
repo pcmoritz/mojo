@@ -727,7 +727,7 @@ class UrlLoaderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UrlLoaderStub.unbound() : super.unbound();
+  UrlLoaderStub.unbound([this._impl]) : super.unbound();
 
   static UrlLoaderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

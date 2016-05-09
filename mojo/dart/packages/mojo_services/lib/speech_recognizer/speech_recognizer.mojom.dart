@@ -741,7 +741,7 @@ class SpeechRecognizerListenerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SpeechRecognizerListenerStub.unbound() : super.unbound();
+  SpeechRecognizerListenerStub.unbound([this._impl]) : super.unbound();
 
   static SpeechRecognizerListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -971,7 +971,7 @@ class SpeechRecognizerServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SpeechRecognizerServiceStub.unbound() : super.unbound();
+  SpeechRecognizerServiceStub.unbound([this._impl]) : super.unbound();
 
   static SpeechRecognizerServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

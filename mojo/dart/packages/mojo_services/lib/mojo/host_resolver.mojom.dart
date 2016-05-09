@@ -370,7 +370,7 @@ class HostResolverStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HostResolverStub.unbound() : super.unbound();
+  HostResolverStub.unbound([this._impl]) : super.unbound();
 
   static HostResolverStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

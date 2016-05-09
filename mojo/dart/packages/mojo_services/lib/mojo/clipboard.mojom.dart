@@ -925,7 +925,7 @@ class ClipboardStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ClipboardStub.unbound() : super.unbound();
+  ClipboardStub.unbound([this._impl]) : super.unbound();
 
   static ClipboardStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

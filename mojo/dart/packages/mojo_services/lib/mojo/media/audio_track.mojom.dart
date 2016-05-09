@@ -758,7 +758,7 @@ class AudioTrackStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AudioTrackStub.unbound() : super.unbound();
+  AudioTrackStub.unbound([this._impl]) : super.unbound();
 
   static AudioTrackStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

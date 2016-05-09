@@ -1447,7 +1447,7 @@ class MediaProducerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaProducerStub.unbound() : super.unbound();
+  MediaProducerStub.unbound([this._impl]) : super.unbound();
 
   static MediaProducerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1742,7 +1742,7 @@ class MediaPullModeProducerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaPullModeProducerStub.unbound() : super.unbound();
+  MediaPullModeProducerStub.unbound([this._impl]) : super.unbound();
 
   static MediaPullModeProducerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2168,7 +2168,7 @@ class MediaConsumerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaConsumerStub.unbound() : super.unbound();
+  MediaConsumerStub.unbound([this._impl]) : super.unbound();
 
   static MediaConsumerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

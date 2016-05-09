@@ -757,7 +757,7 @@ class CameraRollServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CameraRollServiceStub.unbound() : super.unbound();
+  CameraRollServiceStub.unbound([this._impl]) : super.unbound();
 
   static CameraRollServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1036,7 +1036,7 @@ class CameraServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CameraServiceStub.unbound() : super.unbound();
+  CameraServiceStub.unbound([this._impl]) : super.unbound();
 
   static CameraServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

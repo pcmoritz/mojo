@@ -634,7 +634,7 @@ class NotificationClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NotificationClientStub.unbound() : super.unbound();
+  NotificationClientStub.unbound([this._impl]) : super.unbound();
 
   static NotificationClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -855,7 +855,7 @@ class NotificationStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NotificationStub.unbound() : super.unbound();
+  NotificationStub.unbound([this._impl]) : super.unbound();
 
   static NotificationStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1070,7 +1070,7 @@ class NotificationServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NotificationServiceStub.unbound() : super.unbound();
+  NotificationServiceStub.unbound([this._impl]) : super.unbound();
 
   static NotificationServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

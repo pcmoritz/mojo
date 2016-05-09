@@ -6152,7 +6152,7 @@ class SomeInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SomeInterfaceStub.unbound() : super.unbound();
+  SomeInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static SomeInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

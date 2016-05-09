@@ -240,7 +240,7 @@ class ContentHandlerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ContentHandlerStub.unbound() : super.unbound();
+  ContentHandlerStub.unbound([this._impl]) : super.unbound();
 
   static ContentHandlerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

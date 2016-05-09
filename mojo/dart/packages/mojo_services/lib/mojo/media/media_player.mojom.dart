@@ -660,7 +660,7 @@ class MediaPlayerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaPlayerStub.unbound() : super.unbound();
+  MediaPlayerStub.unbound([this._impl]) : super.unbound();
 
   static MediaPlayerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -3124,7 +3124,7 @@ class SmallCacheStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SmallCacheStub.unbound() : super.unbound();
+  SmallCacheStub.unbound([this._impl]) : super.unbound();
 
   static SmallCacheStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -3379,7 +3379,7 @@ class UnionInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UnionInterfaceStub.unbound() : super.unbound();
+  UnionInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static UnionInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

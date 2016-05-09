@@ -1634,7 +1634,7 @@ class ProviderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ProviderStub.unbound() : super.unbound();
+  ProviderStub.unbound([this._impl]) : super.unbound();
 
   static ProviderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2006,7 +2006,7 @@ class IntegerAccessorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  IntegerAccessorStub.unbound() : super.unbound();
+  IntegerAccessorStub.unbound([this._impl]) : super.unbound();
 
   static IntegerAccessorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2283,7 +2283,7 @@ class SampleInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SampleInterfaceStub.unbound() : super.unbound();
+  SampleInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static SampleInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

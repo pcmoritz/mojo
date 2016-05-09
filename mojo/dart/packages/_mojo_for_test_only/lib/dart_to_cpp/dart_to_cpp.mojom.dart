@@ -1042,7 +1042,7 @@ class CppSideStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CppSideStub.unbound() : super.unbound();
+  CppSideStub.unbound([this._impl]) : super.unbound();
 
   static CppSideStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1283,7 +1283,7 @@ class DartSideStub extends bindings.Stub {
     _impl = impl;
   }
 
-  DartSideStub.unbound() : super.unbound();
+  DartSideStub.unbound([this._impl]) : super.unbound();
 
   static DartSideStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

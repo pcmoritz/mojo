@@ -1060,7 +1060,7 @@ class MediaDemuxStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaDemuxStub.unbound() : super.unbound();
+  MediaDemuxStub.unbound([this._impl]) : super.unbound();
 
   static MediaDemuxStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

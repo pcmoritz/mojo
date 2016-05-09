@@ -239,7 +239,7 @@ class AuthenticatingUrlLoaderInterceptorMetaFactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AuthenticatingUrlLoaderInterceptorMetaFactoryStub.unbound() : super.unbound();
+  AuthenticatingUrlLoaderInterceptorMetaFactoryStub.unbound([this._impl]) : super.unbound();
 
   static AuthenticatingUrlLoaderInterceptorMetaFactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

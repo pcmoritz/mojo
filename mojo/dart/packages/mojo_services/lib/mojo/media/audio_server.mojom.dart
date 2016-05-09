@@ -224,7 +224,7 @@ class AudioServerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AudioServerStub.unbound() : super.unbound();
+  AudioServerStub.unbound([this._impl]) : super.unbound();
 
   static AudioServerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

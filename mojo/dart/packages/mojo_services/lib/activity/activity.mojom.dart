@@ -1858,7 +1858,7 @@ class ActivityStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ActivityStub.unbound() : super.unbound();
+  ActivityStub.unbound([this._impl]) : super.unbound();
 
   static ActivityStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2170,7 +2170,7 @@ class PathServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  PathServiceStub.unbound() : super.unbound();
+  PathServiceStub.unbound([this._impl]) : super.unbound();
 
   static PathServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2461,7 +2461,7 @@ class UserFeedbackStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UserFeedbackStub.unbound() : super.unbound();
+  UserFeedbackStub.unbound([this._impl]) : super.unbound();
 
   static UserFeedbackStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

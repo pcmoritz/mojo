@@ -1136,7 +1136,7 @@ class MediaTimelineControllerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaTimelineControllerStub.unbound() : super.unbound();
+  MediaTimelineControllerStub.unbound([this._impl]) : super.unbound();
 
   static MediaTimelineControllerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1438,7 +1438,7 @@ class MediaTimelineControlSiteStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaTimelineControlSiteStub.unbound() : super.unbound();
+  MediaTimelineControlSiteStub.unbound([this._impl]) : super.unbound();
 
   static MediaTimelineControlSiteStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

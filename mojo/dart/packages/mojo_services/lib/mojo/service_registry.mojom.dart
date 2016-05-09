@@ -253,7 +253,7 @@ class ServiceRegistryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceRegistryStub.unbound() : super.unbound();
+  ServiceRegistryStub.unbound([this._impl]) : super.unbound();
 
   static ServiceRegistryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

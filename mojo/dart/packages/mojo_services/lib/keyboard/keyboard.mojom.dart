@@ -1658,7 +1658,7 @@ class KeyboardClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  KeyboardClientStub.unbound() : super.unbound();
+  KeyboardClientStub.unbound([this._impl]) : super.unbound();
 
   static KeyboardClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1947,7 +1947,7 @@ class KeyboardServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  KeyboardServiceStub.unbound() : super.unbound();
+  KeyboardServiceStub.unbound([this._impl]) : super.unbound();
 
   static KeyboardServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2174,7 +2174,7 @@ class KeyboardServiceFactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  KeyboardServiceFactoryStub.unbound() : super.unbound();
+  KeyboardServiceFactoryStub.unbound([this._impl]) : super.unbound();
 
   static KeyboardServiceFactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

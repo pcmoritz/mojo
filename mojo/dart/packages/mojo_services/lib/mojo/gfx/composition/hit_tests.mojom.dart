@@ -869,7 +869,7 @@ class HitTesterStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HitTesterStub.unbound() : super.unbound();
+  HitTesterStub.unbound([this._impl]) : super.unbound();
 
   static HitTesterStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -1003,7 +1003,7 @@ class ProcessStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ProcessStub.unbound() : super.unbound();
+  ProcessStub.unbound([this._impl]) : super.unbound();
 
   static ProcessStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1312,7 +1312,7 @@ class ProcessControllerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ProcessControllerStub.unbound() : super.unbound();
+  ProcessControllerStub.unbound([this._impl]) : super.unbound();
 
   static ProcessControllerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

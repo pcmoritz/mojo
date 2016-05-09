@@ -224,7 +224,7 @@ class TraceProviderRegistryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TraceProviderRegistryStub.unbound() : super.unbound();
+  TraceProviderRegistryStub.unbound([this._impl]) : super.unbound();
 
   static TraceProviderRegistryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

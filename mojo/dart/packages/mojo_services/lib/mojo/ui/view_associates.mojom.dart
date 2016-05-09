@@ -995,7 +995,7 @@ class ViewAssociateStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewAssociateStub.unbound() : super.unbound();
+  ViewAssociateStub.unbound([this._impl]) : super.unbound();
 
   static ViewAssociateStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1289,7 +1289,7 @@ class ViewInspectorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewInspectorStub.unbound() : super.unbound();
+  ViewInspectorStub.unbound([this._impl]) : super.unbound();
 
   static ViewInspectorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

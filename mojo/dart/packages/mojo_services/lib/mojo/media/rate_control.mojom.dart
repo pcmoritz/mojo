@@ -1078,7 +1078,7 @@ class RateControlStub extends bindings.Stub {
     _impl = impl;
   }
 
-  RateControlStub.unbound() : super.unbound();
+  RateControlStub.unbound([this._impl]) : super.unbound();
 
   static RateControlStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -224,7 +224,7 @@ class SharingServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SharingServiceStub.unbound() : super.unbound();
+  SharingServiceStub.unbound([this._impl]) : super.unbound();
 
   static SharingServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

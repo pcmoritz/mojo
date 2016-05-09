@@ -772,7 +772,7 @@ class MediaFactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaFactoryStub.unbound() : super.unbound();
+  MediaFactoryStub.unbound([this._impl]) : super.unbound();
 
   static MediaFactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

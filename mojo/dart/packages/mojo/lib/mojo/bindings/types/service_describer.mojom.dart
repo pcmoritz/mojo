@@ -700,7 +700,7 @@ class ServiceDescriberStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceDescriberStub.unbound() : super.unbound();
+  ServiceDescriberStub.unbound([this._impl]) : super.unbound();
 
   static ServiceDescriberStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -990,7 +990,7 @@ class ServiceDescriptionStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceDescriptionStub.unbound() : super.unbound();
+  ServiceDescriptionStub.unbound([this._impl]) : super.unbound();
 
   static ServiceDescriptionStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

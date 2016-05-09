@@ -887,7 +887,7 @@ class UrlResponseDiskCacheStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UrlResponseDiskCacheStub.unbound() : super.unbound();
+  UrlResponseDiskCacheStub.unbound([this._impl]) : super.unbound();
 
   static UrlResponseDiskCacheStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

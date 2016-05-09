@@ -522,7 +522,7 @@ class PredictionServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  PredictionServiceStub.unbound() : super.unbound();
+  PredictionServiceStub.unbound([this._impl]) : super.unbound();
 
   static PredictionServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

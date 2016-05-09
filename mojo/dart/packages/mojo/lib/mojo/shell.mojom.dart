@@ -335,7 +335,7 @@ class ShellStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ShellStub.unbound() : super.unbound();
+  ShellStub.unbound([this._impl]) : super.unbound();
 
   static ShellStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -996,7 +996,7 @@ class PingPongServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  PingPongServiceStub.unbound() : super.unbound();
+  PingPongServiceStub.unbound([this._impl]) : super.unbound();
 
   static PingPongServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1278,7 +1278,7 @@ class PingPongClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  PingPongClientStub.unbound() : super.unbound();
+  PingPongClientStub.unbound([this._impl]) : super.unbound();
 
   static PingPongClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

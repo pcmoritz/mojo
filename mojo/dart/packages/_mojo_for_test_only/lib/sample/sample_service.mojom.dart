@@ -1917,7 +1917,7 @@ class ServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceStub.unbound() : super.unbound();
+  ServiceStub.unbound([this._impl]) : super.unbound();
 
   static ServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2155,7 +2155,7 @@ class PortStub extends bindings.Stub {
     _impl = impl;
   }
 
-  PortStub.unbound() : super.unbound();
+  PortStub.unbound([this._impl]) : super.unbound();
 
   static PortStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

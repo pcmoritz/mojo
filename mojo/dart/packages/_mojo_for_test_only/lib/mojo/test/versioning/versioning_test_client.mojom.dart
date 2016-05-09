@@ -1038,7 +1038,7 @@ class HumanResourceDatabaseStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HumanResourceDatabaseStub.unbound() : super.unbound();
+  HumanResourceDatabaseStub.unbound([this._impl]) : super.unbound();
 
   static HumanResourceDatabaseStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

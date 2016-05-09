@@ -358,7 +358,7 @@ class InputClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InputClientStub.unbound() : super.unbound();
+  InputClientStub.unbound([this._impl]) : super.unbound();
 
   static InputClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -587,7 +587,7 @@ class InputServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InputServiceStub.unbound() : super.unbound();
+  InputServiceStub.unbound([this._impl]) : super.unbound();
 
   static InputServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

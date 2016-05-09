@@ -226,7 +226,7 @@ class InputDispatcherStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InputDispatcherStub.unbound() : super.unbound();
+  InputDispatcherStub.unbound([this._impl]) : super.unbound();
 
   static InputDispatcherStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -667,7 +667,7 @@ class SensorListenerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SensorListenerStub.unbound() : super.unbound();
+  SensorListenerStub.unbound([this._impl]) : super.unbound();
 
   static SensorListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -883,7 +883,7 @@ class SensorServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SensorServiceStub.unbound() : super.unbound();
+  SensorServiceStub.unbound([this._impl]) : super.unbound();
 
   static SensorServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

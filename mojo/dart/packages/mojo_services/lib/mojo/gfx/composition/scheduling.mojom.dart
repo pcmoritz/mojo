@@ -416,7 +416,7 @@ class SceneSchedulerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SceneSchedulerStub.unbound() : super.unbound();
+  SceneSchedulerStub.unbound([this._impl]) : super.unbound();
 
   static SceneSchedulerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

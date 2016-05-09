@@ -374,7 +374,7 @@ class ViewOwnerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewOwnerStub.unbound() : super.unbound();
+  ViewOwnerStub.unbound([this._impl]) : super.unbound();
 
   static ViewOwnerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

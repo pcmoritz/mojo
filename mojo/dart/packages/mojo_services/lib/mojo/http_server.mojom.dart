@@ -238,7 +238,7 @@ class HttpServerDelegateStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HttpServerDelegateStub.unbound() : super.unbound();
+  HttpServerDelegateStub.unbound([this._impl]) : super.unbound();
 
   static HttpServerDelegateStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

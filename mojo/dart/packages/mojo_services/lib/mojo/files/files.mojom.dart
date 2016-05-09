@@ -335,7 +335,7 @@ class FilesStub extends bindings.Stub {
     _impl = impl;
   }
 
-  FilesStub.unbound() : super.unbound();
+  FilesStub.unbound([this._impl]) : super.unbound();
 
   static FilesStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

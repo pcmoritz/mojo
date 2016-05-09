@@ -462,7 +462,7 @@ class ApplicationStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ApplicationStub.unbound() : super.unbound();
+  ApplicationStub.unbound([this._impl]) : super.unbound();
 
   static ApplicationStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

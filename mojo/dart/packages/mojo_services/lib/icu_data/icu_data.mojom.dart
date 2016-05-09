@@ -315,7 +315,7 @@ class IcuDataStub extends bindings.Stub {
     _impl = impl;
   }
 
-  IcuDataStub.unbound() : super.unbound();
+  IcuDataStub.unbound([this._impl]) : super.unbound();
 
   static IcuDataStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

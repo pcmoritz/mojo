@@ -526,7 +526,7 @@ class SeekingReaderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SeekingReaderStub.unbound() : super.unbound();
+  SeekingReaderStub.unbound([this._impl]) : super.unbound();
 
   static SeekingReaderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

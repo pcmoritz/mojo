@@ -240,7 +240,7 @@ class HttpServerFactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HttpServerFactoryStub.unbound() : super.unbound();
+  HttpServerFactoryStub.unbound([this._impl]) : super.unbound();
 
   static HttpServerFactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

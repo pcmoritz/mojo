@@ -627,7 +627,7 @@ class NfcTransmissionStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NfcTransmissionStub.unbound() : super.unbound();
+  NfcTransmissionStub.unbound([this._impl]) : super.unbound();
 
   static NfcTransmissionStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -835,7 +835,7 @@ class NfcReceiverStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NfcReceiverStub.unbound() : super.unbound();
+  NfcReceiverStub.unbound([this._impl]) : super.unbound();
 
   static NfcReceiverStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1086,7 +1086,7 @@ class NfcStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NfcStub.unbound() : super.unbound();
+  NfcStub.unbound([this._impl]) : super.unbound();
 
   static NfcStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

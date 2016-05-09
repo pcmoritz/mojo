@@ -506,7 +506,7 @@ class CookieStoreStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CookieStoreStub.unbound() : super.unbound();
+  CookieStoreStub.unbound([this._impl]) : super.unbound();
 
   static CookieStoreStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -1614,7 +1614,7 @@ class UdpSocketStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UdpSocketStub.unbound() : super.unbound();
+  UdpSocketStub.unbound([this._impl]) : super.unbound();
 
   static UdpSocketStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2017,7 +2017,7 @@ class UdpSocketReceiverStub extends bindings.Stub {
     _impl = impl;
   }
 
-  UdpSocketReceiverStub.unbound() : super.unbound();
+  UdpSocketReceiverStub.unbound([this._impl]) : super.unbound();
 
   static UdpSocketReceiverStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

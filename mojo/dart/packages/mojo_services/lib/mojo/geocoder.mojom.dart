@@ -1280,7 +1280,7 @@ class GeocoderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  GeocoderStub.unbound() : super.unbound();
+  GeocoderStub.unbound([this._impl]) : super.unbound();
 
   static GeocoderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

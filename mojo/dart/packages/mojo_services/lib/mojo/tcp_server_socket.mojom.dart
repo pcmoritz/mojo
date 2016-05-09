@@ -362,7 +362,7 @@ class TcpServerSocketStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TcpServerSocketStub.unbound() : super.unbound();
+  TcpServerSocketStub.unbound([this._impl]) : super.unbound();
 
   static TcpServerSocketStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

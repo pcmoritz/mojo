@@ -1097,7 +1097,7 @@ class WebSocketStub extends bindings.Stub {
     _impl = impl;
   }
 
-  WebSocketStub.unbound() : super.unbound();
+  WebSocketStub.unbound([this._impl]) : super.unbound();
 
   static WebSocketStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1372,7 +1372,7 @@ class WebSocketClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  WebSocketClientStub.unbound() : super.unbound();
+  WebSocketClientStub.unbound([this._impl]) : super.unbound();
 
   static WebSocketClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

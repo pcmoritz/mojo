@@ -484,7 +484,7 @@ class ImportedInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ImportedInterfaceStub.unbound() : super.unbound();
+  ImportedInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static ImportedInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

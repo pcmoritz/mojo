@@ -468,7 +468,7 @@ class MediaTypeConverterStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaTypeConverterStub.unbound() : super.unbound();
+  MediaTypeConverterStub.unbound([this._impl]) : super.unbound();
 
   static MediaTypeConverterStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

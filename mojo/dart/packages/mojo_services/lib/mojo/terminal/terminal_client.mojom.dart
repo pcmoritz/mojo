@@ -224,7 +224,7 @@ class TerminalClientStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TerminalClientStub.unbound() : super.unbound();
+  TerminalClientStub.unbound([this._impl]) : super.unbound();
 
   static TerminalClientStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

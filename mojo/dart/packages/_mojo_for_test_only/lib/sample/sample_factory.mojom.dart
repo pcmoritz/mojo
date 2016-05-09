@@ -1255,7 +1255,7 @@ class NamedObjectStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NamedObjectStub.unbound() : super.unbound();
+  NamedObjectStub.unbound([this._impl]) : super.unbound();
 
   static NamedObjectStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1615,7 +1615,7 @@ class FactoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  FactoryStub.unbound() : super.unbound();
+  FactoryStub.unbound([this._impl]) : super.unbound();
 
   static FactoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

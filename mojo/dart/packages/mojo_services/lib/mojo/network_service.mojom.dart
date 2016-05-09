@@ -1287,7 +1287,7 @@ class NetworkServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NetworkServiceStub.unbound() : super.unbound();
+  NetworkServiceStub.unbound([this._impl]) : super.unbound();
 
   static NetworkServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

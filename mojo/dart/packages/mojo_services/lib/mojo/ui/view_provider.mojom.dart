@@ -253,7 +253,7 @@ class ViewProviderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewProviderStub.unbound() : super.unbound();
+  ViewProviderStub.unbound([this._impl]) : super.unbound();
 
   static ViewProviderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

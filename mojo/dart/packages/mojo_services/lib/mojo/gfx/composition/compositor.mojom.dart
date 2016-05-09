@@ -445,7 +445,7 @@ class CompositorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CompositorStub.unbound() : super.unbound();
+  CompositorStub.unbound([this._impl]) : super.unbound();
 
   static CompositorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

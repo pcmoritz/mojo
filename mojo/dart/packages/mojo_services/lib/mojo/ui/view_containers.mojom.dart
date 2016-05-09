@@ -880,7 +880,7 @@ class ViewContainerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewContainerStub.unbound() : super.unbound();
+  ViewContainerStub.unbound([this._impl]) : super.unbound();
 
   static ViewContainerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1157,7 +1157,7 @@ class ViewContainerListenerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ViewContainerListenerStub.unbound() : super.unbound();
+  ViewContainerListenerStub.unbound([this._impl]) : super.unbound();
 
   static ViewContainerListenerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -3482,7 +3482,7 @@ class InterfaceAStub extends bindings.Stub {
     _impl = impl;
   }
 
-  InterfaceAStub.unbound() : super.unbound();
+  InterfaceAStub.unbound([this._impl]) : super.unbound();
 
   static InterfaceAStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -3721,7 +3721,7 @@ class BoundsCheckTestInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  BoundsCheckTestInterfaceStub.unbound() : super.unbound();
+  BoundsCheckTestInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static BoundsCheckTestInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -4149,7 +4149,7 @@ class ConformanceTestInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ConformanceTestInterfaceStub.unbound() : super.unbound();
+  ConformanceTestInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static ConformanceTestInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -4476,7 +4476,7 @@ class IntegrationTestInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  IntegrationTestInterfaceStub.unbound() : super.unbound();
+  IntegrationTestInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static IntegrationTestInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

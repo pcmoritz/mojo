@@ -324,7 +324,7 @@ class EchoStub extends bindings.Stub {
     _impl = impl;
   }
 
-  EchoStub.unbound() : super.unbound();
+  EchoStub.unbound([this._impl]) : super.unbound();
 
   static EchoStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

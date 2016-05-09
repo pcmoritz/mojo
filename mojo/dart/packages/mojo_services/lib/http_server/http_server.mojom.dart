@@ -635,7 +635,7 @@ class HttpServerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HttpServerStub.unbound() : super.unbound();
+  HttpServerStub.unbound([this._impl]) : super.unbound();
 
   static HttpServerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -912,7 +912,7 @@ class HttpHandlerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  HttpHandlerStub.unbound() : super.unbound();
+  HttpHandlerStub.unbound([this._impl]) : super.unbound();
 
   static HttpHandlerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

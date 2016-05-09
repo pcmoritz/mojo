@@ -656,7 +656,7 @@ class CalculatorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CalculatorStub.unbound() : super.unbound();
+  CalculatorStub.unbound([this._impl]) : super.unbound();
 
   static CalculatorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

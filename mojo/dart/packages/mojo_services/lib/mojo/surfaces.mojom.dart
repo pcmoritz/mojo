@@ -1386,7 +1386,7 @@ class ResourceReturnerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ResourceReturnerStub.unbound() : super.unbound();
+  ResourceReturnerStub.unbound([this._impl]) : super.unbound();
 
   static ResourceReturnerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -1680,7 +1680,7 @@ class SurfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  SurfaceStub.unbound() : super.unbound();
+  SurfaceStub.unbound([this._impl]) : super.unbound();
 
   static SurfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

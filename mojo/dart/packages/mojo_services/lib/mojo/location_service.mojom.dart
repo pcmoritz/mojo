@@ -388,7 +388,7 @@ class LocationServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  LocationServiceStub.unbound() : super.unbound();
+  LocationServiceStub.unbound([this._impl]) : super.unbound();
 
   static LocationServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

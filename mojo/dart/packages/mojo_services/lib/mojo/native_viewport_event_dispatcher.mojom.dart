@@ -304,7 +304,7 @@ class NativeViewportEventDispatcherStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NativeViewportEventDispatcherStub.unbound() : super.unbound();
+  NativeViewportEventDispatcherStub.unbound([this._impl]) : super.unbound();
 
   static NativeViewportEventDispatcherStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

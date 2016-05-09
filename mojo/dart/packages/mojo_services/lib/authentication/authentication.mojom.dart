@@ -1053,7 +1053,7 @@ class AuthenticationServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AuthenticationServiceStub.unbound() : super.unbound();
+  AuthenticationServiceStub.unbound([this._impl]) : super.unbound();
 
   static AuthenticationServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

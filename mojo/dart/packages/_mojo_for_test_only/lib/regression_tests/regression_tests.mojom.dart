@@ -2115,7 +2115,7 @@ class CheckMethodWithEmptyResponseStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CheckMethodWithEmptyResponseStub.unbound() : super.unbound();
+  CheckMethodWithEmptyResponseStub.unbound([this._impl]) : super.unbound();
 
   static CheckMethodWithEmptyResponseStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2391,7 +2391,7 @@ class CheckNameCollisionStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CheckNameCollisionStub.unbound() : super.unbound();
+  CheckNameCollisionStub.unbound([this._impl]) : super.unbound();
 
   static CheckNameCollisionStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2624,7 +2624,7 @@ class CheckEnumCapsStub extends bindings.Stub {
     _impl = impl;
   }
 
-  CheckEnumCapsStub.unbound() : super.unbound();
+  CheckEnumCapsStub.unbound([this._impl]) : super.unbound();
 
   static CheckEnumCapsStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -2833,7 +2833,7 @@ class TestInterfaceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TestInterfaceStub.unbound() : super.unbound();
+  TestInterfaceStub.unbound([this._impl]) : super.unbound();
 
   static TestInterfaceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -3061,7 +3061,7 @@ class Regression551Stub extends bindings.Stub {
     _impl = impl;
   }
 
-  Regression551Stub.unbound() : super.unbound();
+  Regression551Stub.unbound([this._impl]) : super.unbound();
 
   static Regression551Stub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -3312,7 +3312,7 @@ class ServiceNameStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceNameStub.unbound() : super.unbound();
+  ServiceNameStub.unbound([this._impl]) : super.unbound();
 
   static ServiceNameStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -1003,7 +1003,7 @@ class ContactsServiceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ContactsServiceStub.unbound() : super.unbound();
+  ContactsServiceStub.unbound([this._impl]) : super.unbound();
 
   static ContactsServiceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

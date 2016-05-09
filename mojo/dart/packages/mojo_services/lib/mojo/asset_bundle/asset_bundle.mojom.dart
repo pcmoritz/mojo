@@ -399,7 +399,7 @@ class AssetBundleStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AssetBundleStub.unbound() : super.unbound();
+  AssetBundleStub.unbound([this._impl]) : super.unbound();
 
   static AssetBundleStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -632,7 +632,7 @@ class AssetUnpackerStub extends bindings.Stub {
     _impl = impl;
   }
 
-  AssetUnpackerStub.unbound() : super.unbound();
+  AssetUnpackerStub.unbound([this._impl]) : super.unbound();
 
   static AssetUnpackerStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

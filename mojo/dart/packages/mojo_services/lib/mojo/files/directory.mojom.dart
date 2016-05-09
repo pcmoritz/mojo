@@ -1514,7 +1514,7 @@ class DirectoryStub extends bindings.Stub {
     _impl = impl;
   }
 
-  DirectoryStub.unbound() : super.unbound();
+  DirectoryStub.unbound([this._impl]) : super.unbound();
 
   static DirectoryStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

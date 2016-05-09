@@ -519,7 +519,7 @@ class TraceProviderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TraceProviderStub.unbound() : super.unbound();
+  TraceProviderStub.unbound([this._impl]) : super.unbound();
 
   static TraceProviderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -732,7 +732,7 @@ class TraceRecorderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TraceRecorderStub.unbound() : super.unbound();
+  TraceRecorderStub.unbound([this._impl]) : super.unbound();
 
   static TraceRecorderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
@@ -953,7 +953,7 @@ class TraceCollectorStub extends bindings.Stub {
     _impl = impl;
   }
 
-  TraceCollectorStub.unbound() : super.unbound();
+  TraceCollectorStub.unbound([this._impl]) : super.unbound();
 
   static TraceCollectorStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

@@ -392,7 +392,7 @@ class DeviceInfoStub extends bindings.Stub {
     _impl = impl;
   }
 
-  DeviceInfoStub.unbound() : super.unbound();
+  DeviceInfoStub.unbound([this._impl]) : super.unbound();
 
   static DeviceInfoStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

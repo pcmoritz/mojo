@@ -468,7 +468,7 @@ class NavigatorHostStub extends bindings.Stub {
     _impl = impl;
   }
 
-  NavigatorHostStub.unbound() : super.unbound();
+  NavigatorHostStub.unbound([this._impl]) : super.unbound();
 
   static NavigatorHostStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

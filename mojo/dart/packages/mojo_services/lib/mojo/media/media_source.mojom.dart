@@ -1496,7 +1496,7 @@ class MediaSourceStub extends bindings.Stub {
     _impl = impl;
   }
 
-  MediaSourceStub.unbound() : super.unbound();
+  MediaSourceStub.unbound([this._impl]) : super.unbound();
 
   static MediaSourceStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {

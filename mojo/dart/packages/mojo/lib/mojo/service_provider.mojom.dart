@@ -237,7 +237,7 @@ class ServiceProviderStub extends bindings.Stub {
     _impl = impl;
   }
 
-  ServiceProviderStub.unbound() : super.unbound();
+  ServiceProviderStub.unbound([this._impl]) : super.unbound();
 
   static ServiceProviderStub newFromEndpoint(
       core.MojoMessagePipeEndpoint endpoint) {
