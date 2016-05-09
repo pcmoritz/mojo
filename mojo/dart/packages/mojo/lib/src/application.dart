@@ -97,9 +97,8 @@ abstract class Application implements bindings.ServiceConnector {
   // Returns a connection to the app at |url|.
   ApplicationConnection connectToApplication(String url) {
     var proxy = new ServiceProviderProxy.unbound();
-    var stub = new ServiceProviderStub.unbound();
-    _applicationImpl.shell.ptr.connectToApplication(url, proxy, stub);
-    var connection = new ApplicationConnection(stub, proxy);
+    _applicationImpl.shell.ptr.connectToApplication(url, proxy, null);
+    var connection = new ApplicationConnection(null, proxy);
     _applicationConnections.add(connection);
     return connection;
   }

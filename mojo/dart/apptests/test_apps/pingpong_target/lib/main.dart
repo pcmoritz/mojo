@@ -56,9 +56,6 @@ class PingPongApplication extends Application {
     // Provide the service implemented by PingPongServiceImpl.
     connection.provideService(PingPongService.serviceName,
         (endpoint) => new PingPongServiceImpl(this, endpoint));
-
-    // No services are required from the remote end.
-    connection.remoteServiceProvider.close();
   }
 
   Future closeApplication() async {

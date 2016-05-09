@@ -62,6 +62,9 @@ class LocalServiceProvider implements ServiceProvider {
 /// To handle requests for services beyond those set up with [provideService],
 /// set [fallbackServiceFactory] to a function that instantiates a service as in
 /// the [provideService] case, or closes the pipe.
+// TODO(vtl): Once "exposed_services" is removed from Shell's
+// ConnectToApplication() (and Application's AcceptConnection(), etc.), this
+// class will be a bit of overkill. https://github.com/domokit/mojo/issues/762
 class ApplicationConnection {
   ServiceProviderProxy remoteServiceProvider;
   LocalServiceProvider _localServiceProvider;

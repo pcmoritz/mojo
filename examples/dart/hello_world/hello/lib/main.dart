@@ -29,7 +29,7 @@ class Hello extends Application {
     // app has a chance to come up. Instead, we wait to close this app until
     // the "world" app comes up, does its print, and closes its end of the
     // connection.
-    c.onError = closeApplication;
+    c.remoteServiceProvider.impl.onError = closeApplication;
   }
 
   Future closeApplication(e) async {
