@@ -64,7 +64,7 @@ func (test *singleFileTest) addTestCase(moduleNameSpace, contents string) {
 	test.expectedFile().ModuleNamespace = &moduleNameSpace
 
 	test.expectedGraph().ResolvedTypes = make(map[string]mojom_types.UserDefinedType)
-	test.expectedGraph().ResolvedValues = make(map[string]mojom_types.UserDefinedValue)
+	test.expectedGraph().ResolvedConstants = make(map[string]mojom_types.DeclaredConstant)
 }
 
 // endTestCase() should be invoked at the end of a case in
@@ -530,48 +530,33 @@ func TestSingleFileSerialization(t *testing.T) {
 		// DeclaredMojomObjects
 		test.expectedFile().DeclaredMojomObjects.TopLevelEnums = &[]string{"TYPE_KEY:Foo"}
 
-		// Resolved Values
-
-		// Foo.X0
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X0"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("X0", "Foo.X0"),
-			EnumTypeKey: "TYPE_KEY:Foo",
-			IntValue:    0,
-		}}
-
-		// Foo.X1
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X1"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:         test.newDeclData("X1", "Foo.X1"),
-			EnumTypeKey:      "TYPE_KEY:Foo",
-			InitializerValue: &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{42}},
-			IntValue:         42,
-		}}
-
-		// Foo.X2
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X2"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("X2", "Foo.X2"),
-			EnumTypeKey: "TYPE_KEY:Foo",
-			InitializerValue: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "X1",
-				ValueKey:   stringPointer("TYPE_KEY:Foo.X1"),
-			}},
-			IntValue: 42,
-		}}
-
 		// ResolvedTypes
 
 		// enum Foo
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Foo"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
 			DeclData: test.newDeclData("Foo", "Foo"),
 			Values: []mojom_types.EnumValue{
-				// Note(rudominer) It is a bug that we need to copy the enum values here.
-				// See https://github.com/domokit/mojo/issues/513.
 				// value X1
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X0"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("X0", "Foo.X0"),
+					IntValue: 0,
+				},
 				// value X1
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X1"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData:         test.newDeclData("X1", "Foo.X1"),
+					InitializerValue: &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{42}},
+					IntValue:         42,
+				},
 				// value X2
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Foo.X2"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("X2", "Foo.X2"),
+					InitializerValue: &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+						Identifier:     "X1",
+						EnumTypeKey:    "TYPE_KEY:Foo",
+						EnumValueIndex: 1,
+					}},
+					IntValue: 42,
+				},
 			},
 		}}
 
@@ -600,32 +585,19 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedFile().DeclaredMojomObjects.TopLevelEnums = &[]string{"TYPE_KEY:Color"}
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:MyStruct"}
 
-		// Resolved Values
-
-		// Color.RED
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Color.RED"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("RED", "Color.RED"),
-			EnumTypeKey: "TYPE_KEY:Color",
-			IntValue:    0,
-		}}
-
-		// Color.BLUE
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Color.BLUE"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("BLUE", "Color.BLUE"),
-			EnumTypeKey: "TYPE_KEY:Color",
-			IntValue:    1,
-		}}
+		// Resolved Constants
 
 		// MyStruct.RED
-		test.expectedGraph().ResolvedValues["TYPE_KEY:MyStruct.RED"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:MyStruct.RED"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newContainedDeclData("RED", "MyStruct.RED", stringPointer("TYPE_KEY:MyStruct")),
 			Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 				false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
-			Value: &mojom_types.ValueUserValueReference{
-				mojom_types.UserValueReference{
-					Identifier: "BLUE",
-					ValueKey:   stringPointer("TYPE_KEY:Color.BLUE")}},
-		}}
+			Value: &mojom_types.ValueEnumValueReference{
+				mojom_types.EnumValueReference{
+					Identifier:     "BLUE",
+					EnumTypeKey:    "TYPE_KEY:Color",
+					EnumValueIndex: 1}},
+		}
 
 		// ResolvedTypes
 
@@ -633,12 +605,16 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Color"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
 			DeclData: test.newDeclData("Color", "Color"),
 			Values: []mojom_types.EnumValue{
-				// Note(rudominer) It is a bug that we need to copy the enum values here.
-				// See https://github.com/domokit/mojo/issues/513.
 				// value RED
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Color.RED"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("RED", "Color.RED"),
+					IntValue: 0,
+				},
 				// value BLUE
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Color.BLUE"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("BLUE", "Color.BLUE"),
+					IntValue: 1,
+				},
 			},
 		}}
 
@@ -661,10 +637,10 @@ func TestSingleFileSerialization(t *testing.T) {
 					DeclData: test.newShortDeclDataO(0, -1, "a_color"),
 					Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 						false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
-					DefaultValue: &mojom_types.DefaultFieldValueValue{&mojom_types.ValueUserValueReference{
-						mojom_types.UserValueReference{
-							Identifier: "RED",
-							ValueKey:   stringPointer("TYPE_KEY:MyStruct.RED")}}}, // Note this refers to MyStruct.RED and not Color.RED.
+					DefaultValue: &mojom_types.DefaultFieldValueValue{&mojom_types.ValueConstantReference{
+						mojom_types.ConstantReference{
+							Identifier:  "RED",
+							ConstantKey: "TYPE_KEY:MyStruct.RED"}}}, // Note this refers to MyStruct.RED and not Color.RED.
 				},
 			},
 		}}
@@ -869,60 +845,60 @@ func TestSingleFileSerialization(t *testing.T) {
 		// Resolved Values
 
 		// xu8
-		test.expectedGraph().ResolvedValues["TYPE_KEY:xu8"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:xu8"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu8", "xu8"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint8},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint8Value{255}},
-		}}
+		}
 
 		// x8
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x8"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x8"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x8", "x8"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int8},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{-127}},
-		}}
+		}
 
 		// xu16
-		test.expectedGraph().ResolvedValues["TYPE_KEY:xu16"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:xu16"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu16", "xu16"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint16Value{0xFFFF}},
-		}}
+		}
 
 		// x16
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x16"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x16"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x16", "x16"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt16Value{-0x7FFF}},
-		}}
+		}
 
 		// xu32
-		test.expectedGraph().ResolvedValues["TYPE_KEY:xu32"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:xu32"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu32", "xu32"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint32},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint32Value{4294967295}},
-		}}
+		}
 
 		// x32
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x32"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x32"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x32", "x32"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt32Value{-2147483647}},
-		}}
+		}
 
 		// xu64
-		test.expectedGraph().ResolvedValues["TYPE_KEY:xu64"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:xu64"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("xu64", "xu64"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint64},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueUint64Value{0xFFFFFFFFFFFFFFFF}},
-		}}
+		}
 
 		// x64
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x64"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x64"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x64", "x64"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int64},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt64Value{-0x7FFFFFFFFFFFFFFF}},
-		}}
+		}
 
 		test.endTestCase()
 	}
@@ -950,46 +926,46 @@ func TestSingleFileSerialization(t *testing.T) {
 		// Resolved Values
 
 		// f1
-		test.expectedGraph().ResolvedValues["TYPE_KEY:f1"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:f1"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("f1", "f1"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Float},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_FloatInfinity},
-		}}
+		}
 
 		// f2
-		test.expectedGraph().ResolvedValues["TYPE_KEY:f2"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:f2"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("f2", "f2"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Float},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_FloatNegativeInfinity},
-		}}
+		}
 
 		// f3
-		test.expectedGraph().ResolvedValues["TYPE_KEY:f3"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:f3"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("f3", "f3"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Float},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_FloatNan},
-		}}
+		}
 
 		// d1
-		test.expectedGraph().ResolvedValues["TYPE_KEY:d1"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:d1"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("d1", "d1"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Double},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_DoubleInfinity},
-		}}
+		}
 
 		// d2
-		test.expectedGraph().ResolvedValues["TYPE_KEY:d2"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:d2"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("d2", "d2"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Double},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_DoubleNegativeInfinity},
-		}}
+		}
 
 		// d3
-		test.expectedGraph().ResolvedValues["TYPE_KEY:d3"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:d3"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("d3", "d3"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Double},
 			Value:    &mojom_types.ValueBuiltinValue{mojom_types.BuiltinConstantValue_DoubleNan},
-		}}
+		}
 
 		test.endTestCase()
 	}
@@ -1019,82 +995,71 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedFile().DeclaredMojomObjects.TopLevelConstants = &[]string{"TYPE_KEY:x1", "TYPE_KEY:x2",
 			"TYPE_KEY:x3", "TYPE_KEY:c1", "TYPE_KEY:c2", "TYPE_KEY:c3"}
 
-		// Resolved Values
-
-		// Color.RED
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Color.RED"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("RED", "Color.RED"),
-			EnumTypeKey: "TYPE_KEY:Color",
-			IntValue:    0,
-		}}
-
-		// Color.BLUE
-		test.expectedGraph().ResolvedValues["TYPE_KEY:Color.BLUE"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("BLUE", "Color.BLUE"),
-			EnumTypeKey: "TYPE_KEY:Color",
-			IntValue:    1,
-		}}
+		// Resolved Constants
 
 		// x1
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x1"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x1"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x1", "x1"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{42}},
-		}}
+		}
 
 		// x2
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x2"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x2"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x2", "x2"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
-			Value: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "x1",
-				ValueKey:   stringPointer("TYPE_KEY:x1")}},
+			Value: &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+				Identifier:  "x1",
+				ConstantKey: "TYPE_KEY:x1"}},
 			ResolvedConcreteValue: &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{42}},
-		}}
+		}
 
 		// x3
-		test.expectedGraph().ResolvedValues["TYPE_KEY:x3"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:x3"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("x3", "x3"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Int32},
-			Value: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "x2",
-				ValueKey:   stringPointer("TYPE_KEY:x2")}},
+			Value: &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+				Identifier:  "x2",
+				ConstantKey: "TYPE_KEY:x2"}},
 			ResolvedConcreteValue: &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{42}},
-		}}
+		}
 
 		// c1
-		test.expectedGraph().ResolvedValues["TYPE_KEY:c1"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:c1"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("c1", "c1"),
 			Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 				false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
-			Value: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "RED",
-				ValueKey:   stringPointer("TYPE_KEY:Color.RED")}},
-		}}
+			Value: &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+				Identifier:     "RED",
+				EnumTypeKey:    "TYPE_KEY:Color",
+				EnumValueIndex: 0}},
+		}
 
 		// c2
-		test.expectedGraph().ResolvedValues["TYPE_KEY:c2"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:c2"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("c2", "c2"),
 			Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 				false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
-			Value: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "c1",
-				ValueKey:   stringPointer("TYPE_KEY:c1")}},
-			ResolvedConcreteValue: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				ValueKey: stringPointer("TYPE_KEY:Color.RED")}},
-		}}
+			Value: &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+				Identifier:  "c1",
+				ConstantKey: "TYPE_KEY:c1"}},
+			ResolvedConcreteValue: &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+				EnumTypeKey:    "TYPE_KEY:Color",
+				EnumValueIndex: 0}},
+		}
 
 		// c3
-		test.expectedGraph().ResolvedValues["TYPE_KEY:c3"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:c3"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("c3", "c3"),
 			Type: &mojom_types.TypeTypeReference{mojom_types.TypeReference{
 				false, false, stringPointer("Color"), stringPointer("TYPE_KEY:Color")}},
-			Value: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "c2",
-				ValueKey:   stringPointer("TYPE_KEY:c2")}},
-			ResolvedConcreteValue: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				ValueKey: stringPointer("TYPE_KEY:Color.RED")}},
-		}}
+			Value: &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+				Identifier:  "c2",
+				ConstantKey: "TYPE_KEY:c2"}},
+			ResolvedConcreteValue: &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+				EnumTypeKey:    "TYPE_KEY:Color",
+				EnumValueIndex: 0}},
+		}
 
 		// ResolvedTypes
 
@@ -1102,12 +1067,16 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:Color"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
 			DeclData: test.newDeclData("Color", "Color"),
 			Values: []mojom_types.EnumValue{
-				// Note(rudominer) It is a bug that we need to copy the enum values here.
-				// See https://github.com/domokit/mojo/issues/513.
 				// value RED
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Color.RED"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("RED", "Color.RED"),
+					IntValue: 0,
+				},
 				// value BLUE
-				test.expectedGraph().ResolvedValues["TYPE_KEY:Color.BLUE"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("BLUE", "Color.BLUE"),
+					IntValue: 1,
+				},
 			},
 		}}
 
@@ -1161,39 +1130,14 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedFile().DeclaredMojomObjects.Structs = &[]string{"TYPE_KEY:mojom.test.Foo"}
 		test.expectedFile().DeclaredMojomObjects.TopLevelConstants = &[]string{"TYPE_KEY:mojom.test.NUM_MAGI"}
 
-		// Resolved Values
+		// Resolved Constants
 
 		// NUM_MAGI
-		test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.NUM_MAGI"] = &mojom_types.UserDefinedValueDeclaredConstant{mojom_types.DeclaredConstant{
+		test.expectedGraph().ResolvedConstants["TYPE_KEY:mojom.test.NUM_MAGI"] = mojom_types.DeclaredConstant{
 			DeclData: *test.newDeclData("NUM_MAGI", "mojom.test.NUM_MAGI"),
 			Type:     &mojom_types.TypeSimpleType{mojom_types.SimpleType_Uint16},
 			Value:    &mojom_types.ValueLiteralValue{&mojom_types.LiteralValueInt8Value{3}},
-		}}
-
-		// Hats.TOP
-		test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.TOP"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("TOP", "mojom.test.Foo.Hats.TOP"),
-			EnumTypeKey: "TYPE_KEY:mojom.test.Foo.Hats",
-			IntValue:    0,
-		}}
-
-		// Hats.COWBOY
-		test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.COWBOY"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("COWBOY", "mojom.test.Foo.Hats.COWBOY"),
-			EnumTypeKey: "TYPE_KEY:mojom.test.Foo.Hats",
-			IntValue:    3,
-			InitializerValue: &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-				Identifier: "NUM_MAGI",
-				ValueKey:   stringPointer("TYPE_KEY:mojom.test.NUM_MAGI"),
-			}},
-		}}
-
-		// Hats.HARD
-		test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.HARD"] = &mojom_types.UserDefinedValueEnumValue{mojom_types.EnumValue{
-			DeclData:    test.newDeclData("HARD", "mojom.test.Foo.Hats.HARD"),
-			EnumTypeKey: "TYPE_KEY:mojom.test.Foo.Hats",
-			IntValue:    4,
-		}}
+		}
 
 		// ResolvedTypes
 
@@ -1234,14 +1178,25 @@ func TestSingleFileSerialization(t *testing.T) {
 		test.expectedGraph().ResolvedTypes["TYPE_KEY:mojom.test.Foo.Hats"] = &mojom_types.UserDefinedTypeEnumType{mojom_types.MojomEnum{
 			DeclData: test.newContainedDeclData("Hats", "mojom.test.Foo.Hats", stringPointer("TYPE_KEY:mojom.test.Foo")),
 			Values: []mojom_types.EnumValue{
-				// Note(rudominer) It is a bug that we need to copy the enum values here.
-				// See https://github.com/domokit/mojo/issues/513.
 				// value TOP
-				test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.TOP"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("TOP", "mojom.test.Foo.Hats.TOP"),
+					IntValue: 0,
+				},
 				// value COWBOY
-				test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.COWBOY"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("COWBOY", "mojom.test.Foo.Hats.COWBOY"),
+					IntValue: 3,
+					InitializerValue: &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+						Identifier:  "NUM_MAGI",
+						ConstantKey: "TYPE_KEY:mojom.test.NUM_MAGI",
+					}},
+				},
 				// value HARD
-				test.expectedGraph().ResolvedValues["TYPE_KEY:mojom.test.Foo.Hats.HARD"].(*mojom_types.UserDefinedValueEnumValue).Value,
+				mojom_types.EnumValue{
+					DeclData: test.newDeclData("HARD", "mojom.test.Foo.Hats.HARD"),
+					IntValue: 4,
+				},
 			},
 		}}
 
@@ -2645,7 +2600,7 @@ func (test *twoFileTest) addTestCase(moduleNameSpace, contentsA, contentsB strin
 	}
 
 	test.expectedGraph().ResolvedTypes = make(map[string]mojom_types.UserDefinedType)
-	test.expectedGraph().ResolvedValues = make(map[string]mojom_types.UserDefinedValue)
+	test.expectedGraph().ResolvedConstants = make(map[string]mojom_types.DeclaredConstant)
 }
 
 // endTestCase() should be invoked at the end of a case in

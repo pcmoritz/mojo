@@ -87,10 +87,20 @@ func translateDescriptor(d *mojom.MojomDescriptor) *mojom_files.MojomFileGraph {
 		fileGraph.ResolvedTypes[key] = translateUserDefinedType(userDefinedType)
 	}
 
-	// Add |resolved_values| field.
-	fileGraph.ResolvedValues = make(map[string]mojom_types.UserDefinedValue)
+	// Add |resolved_constants| field.
+	fileGraph.ResolvedConstants = make(map[string]mojom_types.DeclaredConstant)
 	for key, userDefinedValue := range d.ValuesByKey {
-		fileGraph.ResolvedValues[key] = translateUserDefinedValue(userDefinedValue)
+		switch c := userDefinedValue.(type) {
+		// Note that our representation of values in mojom_types.mojom is a little different than our
+		// pure Go representation. In the latter we use value keys to refer to both constants and
+		// enum values but in the former we only use value keys to refer to constants. Enum values
+		// are stored as part of their enum types and they are are referred to  not directly using
+		// value keyes but rather via the type key of their enum and an index into the |values| array
+		// of that enum. For this reason we are only looking for the constants here and ignoring the
+		// enum values. Thos will get translated when the
+		case *mojom.UserDefinedConstant:
+			fileGraph.ResolvedConstants[key] = translateUserDefinedConstant(c)
+		}
 	}
 
 	// Add |files| field.
@@ -407,45 +417,23 @@ func translateUnionField(unionField *mojom.UnionField) mojom_types.UnionField {
 	return outUnionField
 }
 
-// WARNING: Do not invoke this function on a UserDefinedValue of type BuiltInConstantValue because
-// objects of those types do not have a type_key and do not correspond to a mojom_types.UserDefinedValue.
-func translateUserDefinedValue(v mojom.UserDefinedValue) mojom_types.UserDefinedValue {
-	switch t := v.(type) {
-	case *mojom.UserDefinedConstant:
-		return translateUserDefinedConstant(t)
-	case *mojom.EnumValue:
-		return &mojom_types.UserDefinedValueEnumValue{translateEnumValue(t)}
-	case *mojom.BuiltInConstantValue:
-		panic("Do not invoke translateUserDefinedValue on BuiltInConstantValue.")
-	default:
-		panic(fmt.Sprintf("Unexpected UserDefinedValue type %T", v))
-
-	}
-}
-
-func translateUserDefinedConstant(t *mojom.UserDefinedConstant) *mojom_types.UserDefinedValueDeclaredConstant {
-	declaredConstant := mojom_types.UserDefinedValueDeclaredConstant{}
-	declaredConstant.Value.Type = translateTypeRef(t.DeclaredType())
-	declaredConstant.Value.DeclData = *translateDeclarationData(&t.DeclarationData)
-	declaredConstant.Value.Value = translateValueRef(t.ValueRef())
-	// We set the |resolved_concrete_value| field only in the following situation.
-	// See the comments in mojom_types.mojom.
-	if _, ok := declaredConstant.Value.Value.(*mojom_types.ValueUserValueReference); ok {
-		// If the type of the |value| field is a UserValueReference...
-		userValueRef := t.ValueRef().(*mojom.UserValueRef)
-		if _, ok := userValueRef.ResolvedDeclaredValue().(*mojom.UserDefinedConstant); ok {
-			// and if that reference resolves to a user-defined constant.
-			declaredConstant.Value.ResolvedConcreteValue = translateConcreteValue(t.ValueRef().ResolvedConcreteValue())
-		}
+func translateUserDefinedConstant(t *mojom.UserDefinedConstant) mojom_types.DeclaredConstant {
+	declaredConstant := mojom_types.DeclaredConstant{}
+	declaredConstant.Type = translateTypeRef(t.DeclaredType())
+	declaredConstant.DeclData = *translateDeclarationData(&t.DeclarationData)
+	declaredConstant.Value = translateValueRef(t.ValueRef())
+	// We set the |resolved_concrete_value| field only in the case that the |value| field is a ConstantReference.
+	// See the comments for this field in mojom_types.mojom.
+	if _, ok := declaredConstant.Value.(*mojom_types.ValueConstantReference); ok {
+		declaredConstant.ResolvedConcreteValue = translateConcreteValue(t.ValueRef().ResolvedConcreteValue())
 	}
 
-	return &declaredConstant
+	return declaredConstant
 }
 
 func translateEnumValue(v *mojom.EnumValue) mojom_types.EnumValue {
 	enumValue := mojom_types.EnumValue{}
 	enumValue.DeclData = translateDeclarationData(&v.DeclarationData)
-	enumValue.EnumTypeKey = v.EnumType().TypeKey()
 	if v.ValueRef() != nil {
 		enumValue.InitializerValue = translateValueRef(v.ValueRef())
 	}
@@ -573,13 +561,13 @@ func translateConcreteValue(cv mojom.ConcreteValue) mojom_types.Value {
 	// value, not a value reference. In the case of a LiteralValue or a
 	// BuiltInConstantValue the distinction is immaterial. But in the case of an
 	// enum value the distinction is important. Here we are building and returning
-	// a synthetic mojom_types.UserValueReference to represent the enum value.
-	// It is only the |value_key| field that needs to be populated. It does not
-	// make sense to populate the |identifier| field for example because we
+	// a synthetic mojom_types.EnumValueReference to represent the enum value.
+	// It does not make sense to populate the |identifier| field for because we
 	// aren't representing any actual occrence in the .mojom file.
 	case *mojom.EnumValue:
-		return &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-			ValueKey: stringPointer(cv.ValueKey())}}
+		return &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+			EnumTypeKey:    cv.EnumType().TypeKey(),
+			EnumValueIndex: cv.ValueIndex()}}
 	case mojom.BuiltInConstantValue:
 		return translateBuiltInConstantValue(cv)
 	default:
@@ -642,14 +630,20 @@ func translateBuiltInConstantValue(t mojom.BuiltInConstantValue) *mojom_types.Va
 }
 
 func translateUserValueRef(r *mojom.UserValueRef) mojom_types.Value {
-	switch t := r.ResolvedConcreteValue().(type) {
+	switch t := r.ResolvedDeclaredValue().(type) {
 	case mojom.BuiltInConstantValue:
 		return translateBuiltInConstantValue(t)
+	case *mojom.UserDefinedConstant:
+		return &mojom_types.ValueConstantReference{mojom_types.ConstantReference{
+			Identifier:  r.Identifier(),
+			ConstantKey: t.ValueKey()}}
+	case *mojom.EnumValue:
+		return &mojom_types.ValueEnumValueReference{mojom_types.EnumValueReference{
+			Identifier:     r.Identifier(),
+			EnumTypeKey:    t.EnumType().TypeKey(),
+			EnumValueIndex: t.ValueIndex()}}
 	default:
-		valueKey := stringPointer(r.ResolvedDeclaredValue().ValueKey())
-		return &mojom_types.ValueUserValueReference{mojom_types.UserValueReference{
-			Identifier: r.Identifier(),
-			ValueKey:   valueKey}}
+		panic(fmt.Sprintf("Unrecognized UserDefinedValueType %T", r.ResolvedDeclaredValue()))
 	}
 }
 

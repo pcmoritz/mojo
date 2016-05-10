@@ -453,8 +453,7 @@ testValidateEnumType() {
     Expect.isNotNull(ev.declData);
     Expect.isNotNull(labelMap[ev.declData.shortName]);
 
-    // Check that the enumTypeKey matches the enumID.
-    Expect.equals(ev.enumTypeKey, enumID);
+    // Check that the enum value's intValue is as expected.
     Expect.equals(ev.intValue, labelMap[ev.declData.shortName]);
   });
 }

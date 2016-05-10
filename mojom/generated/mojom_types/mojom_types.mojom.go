@@ -20,7 +20,7 @@ import (
 type SimpleType int32
 
 const (
-	SimpleType_Bool = 0
+	SimpleType_Bool SimpleType = 0
 	SimpleType_Double = SimpleType_Bool + 1;
 	SimpleType_Float = SimpleType_Double + 1;
 	SimpleType_Int8 = SimpleType_Float + 1;
@@ -37,7 +37,7 @@ const (
 type BuiltinConstantValue int32
 
 const (
-	BuiltinConstantValue_DoubleInfinity = 0
+	BuiltinConstantValue_DoubleInfinity BuiltinConstantValue = 0
 	BuiltinConstantValue_DoubleNegativeInfinity = BuiltinConstantValue_DoubleInfinity + 1;
 	BuiltinConstantValue_DoubleNan = BuiltinConstantValue_DoubleNegativeInfinity + 1;
 	BuiltinConstantValue_FloatInfinity = BuiltinConstantValue_DoubleNan + 1;
@@ -49,7 +49,7 @@ const (
 type HandleType_Kind int32
 
 const (
-	HandleType_Kind_Unspecified = 0
+	HandleType_Kind_Unspecified HandleType_Kind = 0
 	HandleType_Kind_MessagePipe = HandleType_Kind_Unspecified + 1;
 	HandleType_Kind_DataPipeConsumer = HandleType_Kind_MessagePipe + 1;
 	HandleType_Kind_DataPipeProducer = HandleType_Kind_DataPipeConsumer + 1;
@@ -1075,14 +1075,13 @@ func (s *MojomUnion) Decode(decoder *bindings.Decoder) error {
 
 type EnumValue struct {
 	DeclData *DeclarationData
-	EnumTypeKey string
 	InitializerValue Value
 	IntValue int32
 }
 
 
 func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
-	encoder.StartStruct(40, 0)
+	encoder.StartStruct(32, 0)
 	if s.DeclData == nil {
 		encoder.WriteNullPointer()
 	} else {
@@ -1092,12 +1091,6 @@ func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
 		if err := (*s.DeclData).Encode(encoder); err != nil {
 			return err
 		}
-	}
-	if err := encoder.WritePointer(); err != nil {
-		return err
-	}
-	if err := encoder.WriteString(s.EnumTypeKey); err != nil {
-		return err
 	}
 	if s.InitializerValue == nil {
 		encoder.WriteNullUnion()
@@ -1116,7 +1109,7 @@ func (s *EnumValue) Encode(encoder *bindings.Encoder) error {
 }
 
 var enumValue_Versions []bindings.DataHeader = []bindings.DataHeader{
-	bindings.DataHeader{48, 0},
+	bindings.DataHeader{40, 0},
 }
 
 func (s *EnumValue) Decode(decoder *bindings.Decoder) error {
@@ -1150,21 +1143,6 @@ func (s *EnumValue) Decode(decoder *bindings.Decoder) error {
 			if err := (*s.DeclData).Decode(decoder); err != nil {
 				return err
 			}
-		}
-	}
-	if header.ElementsOrVersion >= 0 {
-		pointer0, err := decoder.ReadPointer()
-		if err != nil {
-			return err
-		}
-		if pointer0 == 0 {
-			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-		} else {
-			value0, err := decoder.ReadString()
-			if err != nil {
-				return err
-			}
-			s.EnumTypeKey = value0
 		}
 	}
 	if header.ElementsOrVersion >= 0 {
@@ -1676,13 +1654,13 @@ func (s *MojomInterface) Decode(decoder *bindings.Decoder) error {
 	return nil
 }
 
-type UserValueReference struct {
+type ConstantReference struct {
 	Identifier string
-	ValueKey *string
+	ConstantKey string
 }
 
 
-func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
+func (s *ConstantReference) Encode(encoder *bindings.Encoder) error {
 	encoder.StartStruct(16, 0)
 	if err := encoder.WritePointer(); err != nil {
 		return err
@@ -1690,15 +1668,11 @@ func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
 	if err := encoder.WriteString(s.Identifier); err != nil {
 		return err
 	}
-	if s.ValueKey == nil {
-		encoder.WriteNullPointer()
-	} else {
-		if err := encoder.WritePointer(); err != nil {
-			return err
-		}
-		if err := encoder.WriteString((*s.ValueKey)); err != nil {
-			return err
-		}
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	if err := encoder.WriteString(s.ConstantKey); err != nil {
+		return err
 	}
 	if err := encoder.Finish(); err != nil {
 		return err
@@ -1706,23 +1680,23 @@ func (s *UserValueReference) Encode(encoder *bindings.Encoder) error {
 	return nil
 }
 
-var userValueReference_Versions []bindings.DataHeader = []bindings.DataHeader{
+var constantReference_Versions []bindings.DataHeader = []bindings.DataHeader{
 	bindings.DataHeader{24, 0},
 }
 
-func (s *UserValueReference) Decode(decoder *bindings.Decoder) error {
+func (s *ConstantReference) Decode(decoder *bindings.Decoder) error {
 	header, err := decoder.StartStruct()
 	if err != nil {
 		return err
 	}
-	index := sort.Search(len(userValueReference_Versions), func(i int) bool {
-		return userValueReference_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
+	index := sort.Search(len(constantReference_Versions), func(i int) bool {
+		return constantReference_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
 	})
-	if index < len(userValueReference_Versions) {
-		if userValueReference_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
+	if index < len(constantReference_Versions) {
+		if constantReference_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
 			index--
 		}
-		expectedSize := userValueReference_Versions[index].Size
+		expectedSize := constantReference_Versions[index].Size
 		if expectedSize != header.Size {
 			return &bindings.ValidationError{bindings.UnexpectedStructHeader,
 				fmt.Sprintf("invalid struct header size: should be %d, but was %d", expectedSize, header.Size),
@@ -1750,15 +1724,110 @@ func (s *UserValueReference) Decode(decoder *bindings.Decoder) error {
 			return err
 		}
 		if pointer0 == 0 {
-			s.ValueKey = nil
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
 		} else {
-			s.ValueKey = new(string)
 			value0, err := decoder.ReadString()
 			if err != nil {
 				return err
 			}
-			(*s.ValueKey) = value0
+			s.ConstantKey = value0
 		}
+	}
+	if err := decoder.Finish(); err != nil {
+		return err
+	}
+	return nil
+}
+
+type EnumValueReference struct {
+	Identifier string
+	EnumTypeKey string
+	EnumValueIndex uint32
+}
+
+
+func (s *EnumValueReference) Encode(encoder *bindings.Encoder) error {
+	encoder.StartStruct(24, 0)
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	if err := encoder.WriteString(s.Identifier); err != nil {
+		return err
+	}
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	if err := encoder.WriteString(s.EnumTypeKey); err != nil {
+		return err
+	}
+	if err := encoder.WriteUint32(s.EnumValueIndex); err != nil {
+		return err
+	}
+	if err := encoder.Finish(); err != nil {
+		return err
+	}
+	return nil
+}
+
+var enumValueReference_Versions []bindings.DataHeader = []bindings.DataHeader{
+	bindings.DataHeader{32, 0},
+}
+
+func (s *EnumValueReference) Decode(decoder *bindings.Decoder) error {
+	header, err := decoder.StartStruct()
+	if err != nil {
+		return err
+	}
+	index := sort.Search(len(enumValueReference_Versions), func(i int) bool {
+		return enumValueReference_Versions[i].ElementsOrVersion >= header.ElementsOrVersion
+	})
+	if index < len(enumValueReference_Versions) {
+		if enumValueReference_Versions[index].ElementsOrVersion > header.ElementsOrVersion {
+			index--
+		}
+		expectedSize := enumValueReference_Versions[index].Size
+		if expectedSize != header.Size {
+			return &bindings.ValidationError{bindings.UnexpectedStructHeader,
+				fmt.Sprintf("invalid struct header size: should be %d, but was %d", expectedSize, header.Size),
+			}
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			value0, err := decoder.ReadString()
+			if err != nil {
+				return err
+			}
+			s.Identifier = value0
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		pointer0, err := decoder.ReadPointer()
+		if err != nil {
+			return err
+		}
+		if pointer0 == 0 {
+			return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+		} else {
+			value0, err := decoder.ReadString()
+			if err != nil {
+				return err
+			}
+			s.EnumTypeKey = value0
+		}
+	}
+	if header.ElementsOrVersion >= 0 {
+		value0, err := decoder.ReadUint32()
+		if err != nil {
+			return err
+		}
+		s.EnumValueIndex = value0
 	}
 	if err := decoder.Finish(); err != nil {
 		return err
@@ -3442,7 +3511,8 @@ type Value interface {
 
 type __ValueReflect struct {
 	LiteralValue LiteralValue
-	UserValueReference UserValueReference
+	ConstantReference ConstantReference
+	EnumValueReference EnumValueReference
 	BuiltinValue BuiltinConstantValue
 }
 
@@ -3466,13 +3536,20 @@ func DecodeValue(decoder *bindings.Decoder) (Value, error) {
 		decoder.FinishReadingUnionValue()
 		return &value, nil
 	case 1:
-		var value ValueUserValueReference
+		var value ValueConstantReference
 		if err := value.decodeInternal(decoder); err != nil {
 			return nil, err
 		}
 		decoder.FinishReadingUnionValue()
 		return &value, nil
 	case 2:
+		var value ValueEnumValueReference
+		if err := value.decodeInternal(decoder); err != nil {
+			return nil, err
+		}
+		decoder.FinishReadingUnionValue()
+		return &value, nil
+	case 3:
 		var value ValueBuiltinValue
 		if err := value.decodeInternal(decoder); err != nil {
 			return nil, err
@@ -3546,12 +3623,12 @@ func (u *ValueLiteralValue) decodeInternal(decoder *bindings.Decoder) error {
 
 
 
-type ValueUserValueReference struct { Value UserValueReference }
-func (u *ValueUserValueReference) Tag() uint32 { return 1 }
-func (u *ValueUserValueReference) Interface() interface{} { return u.Value }
-func (u *ValueUserValueReference) __Reflect(__ValueReflect) {}
+type ValueConstantReference struct { Value ConstantReference }
+func (u *ValueConstantReference) Tag() uint32 { return 1 }
+func (u *ValueConstantReference) Interface() interface{} { return u.Value }
+func (u *ValueConstantReference) __Reflect(__ValueReflect) {}
 
-func (u *ValueUserValueReference) Encode(encoder *bindings.Encoder) error {
+func (u *ValueConstantReference) Encode(encoder *bindings.Encoder) error {
 	encoder.WriteUnionHeader(u.Tag())
 	if err := encoder.WritePointer(); err != nil {
 		return err
@@ -3564,7 +3641,43 @@ func (u *ValueUserValueReference) Encode(encoder *bindings.Encoder) error {
 	return nil
 }
 
-func (u *ValueUserValueReference) decodeInternal(decoder *bindings.Decoder) error {
+func (u *ValueConstantReference) decodeInternal(decoder *bindings.Decoder) error {
+	pointer0, err := decoder.ReadPointer()
+	if err != nil {
+		return err
+	}
+	if pointer0 == 0 {
+		return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+	} else {
+		if err := u.Value.Decode(decoder); err != nil {
+			return err
+		}
+	}
+	
+	return nil
+}
+
+
+
+type ValueEnumValueReference struct { Value EnumValueReference }
+func (u *ValueEnumValueReference) Tag() uint32 { return 2 }
+func (u *ValueEnumValueReference) Interface() interface{} { return u.Value }
+func (u *ValueEnumValueReference) __Reflect(__ValueReflect) {}
+
+func (u *ValueEnumValueReference) Encode(encoder *bindings.Encoder) error {
+	encoder.WriteUnionHeader(u.Tag())
+	if err := encoder.WritePointer(); err != nil {
+		return err
+	}
+	if err := u.Value.Encode(encoder); err != nil {
+		return err
+	}
+	
+	encoder.FinishWritingUnionValue()
+	return nil
+}
+
+func (u *ValueEnumValueReference) decodeInternal(decoder *bindings.Decoder) error {
 	pointer0, err := decoder.ReadPointer()
 	if err != nil {
 		return err
@@ -3583,7 +3696,7 @@ func (u *ValueUserValueReference) decodeInternal(decoder *bindings.Decoder) erro
 
 
 type ValueBuiltinValue struct { Value BuiltinConstantValue }
-func (u *ValueBuiltinValue) Tag() uint32 { return 2 }
+func (u *ValueBuiltinValue) Tag() uint32 { return 3 }
 func (u *ValueBuiltinValue) Interface() interface{} { return u.Value }
 func (u *ValueBuiltinValue) __Reflect(__ValueReflect) {}
 
@@ -4074,134 +4187,6 @@ func (u *LiteralValueUint64Value) decodeInternal(decoder *bindings.Decoder) erro
 		return err
 	}
 	u.Value = value0
-	
-	return nil
-}
-
-
-
-
-type UserDefinedValue interface {
-	Tag() uint32
-	Interface() interface{}
-	__Reflect(__UserDefinedValueReflect)
-	Encode(encoder *bindings.Encoder) error
-}
-
-
-
-type __UserDefinedValueReflect struct {
-	EnumValue EnumValue
-	DeclaredConstant DeclaredConstant
-}
-
-func DecodeUserDefinedValue(decoder *bindings.Decoder) (UserDefinedValue, error) {
-	size, tag, err := decoder.ReadUnionHeader()
-	if err != nil {
-		return nil, err
-	}
-
-	if size == 0 {
-		decoder.SkipUnionValue()
-		return nil, nil
-	}
-
-	switch tag {
-	case 0:
-		var value UserDefinedValueEnumValue
-		if err := value.decodeInternal(decoder); err != nil {
-			return nil, err
-		}
-		decoder.FinishReadingUnionValue()
-		return &value, nil
-	case 1:
-		var value UserDefinedValueDeclaredConstant
-		if err := value.decodeInternal(decoder); err != nil {
-			return nil, err
-		}
-		decoder.FinishReadingUnionValue()
-		return &value, nil
-	}
-
-	decoder.SkipUnionValue()
-	return &UserDefinedValueUnknown{tag: tag}, nil
-}
-
-type UserDefinedValueUnknown struct { tag uint32 }
-func (u *UserDefinedValueUnknown) Tag() uint32 { return u.tag }
-func (u *UserDefinedValueUnknown) Interface() interface{} { return nil }
-func (u *UserDefinedValueUnknown) __Reflect(__UserDefinedValueReflect) {}
-
-func (u *UserDefinedValueUnknown) Encode(encoder *bindings.Encoder) error {
-	return fmt.Errorf("Trying to serialize an unknown UserDefinedValue. There is no sane way to do that!");
-}
-
-type UserDefinedValueEnumValue struct { Value EnumValue }
-func (u *UserDefinedValueEnumValue) Tag() uint32 { return 0 }
-func (u *UserDefinedValueEnumValue) Interface() interface{} { return u.Value }
-func (u *UserDefinedValueEnumValue) __Reflect(__UserDefinedValueReflect) {}
-
-func (u *UserDefinedValueEnumValue) Encode(encoder *bindings.Encoder) error {
-	encoder.WriteUnionHeader(u.Tag())
-	if err := encoder.WritePointer(); err != nil {
-		return err
-	}
-	if err := u.Value.Encode(encoder); err != nil {
-		return err
-	}
-	
-	encoder.FinishWritingUnionValue()
-	return nil
-}
-
-func (u *UserDefinedValueEnumValue) decodeInternal(decoder *bindings.Decoder) error {
-	pointer0, err := decoder.ReadPointer()
-	if err != nil {
-		return err
-	}
-	if pointer0 == 0 {
-		return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-	} else {
-		if err := u.Value.Decode(decoder); err != nil {
-			return err
-		}
-	}
-	
-	return nil
-}
-
-
-
-type UserDefinedValueDeclaredConstant struct { Value DeclaredConstant }
-func (u *UserDefinedValueDeclaredConstant) Tag() uint32 { return 1 }
-func (u *UserDefinedValueDeclaredConstant) Interface() interface{} { return u.Value }
-func (u *UserDefinedValueDeclaredConstant) __Reflect(__UserDefinedValueReflect) {}
-
-func (u *UserDefinedValueDeclaredConstant) Encode(encoder *bindings.Encoder) error {
-	encoder.WriteUnionHeader(u.Tag())
-	if err := encoder.WritePointer(); err != nil {
-		return err
-	}
-	if err := u.Value.Encode(encoder); err != nil {
-		return err
-	}
-	
-	encoder.FinishWritingUnionValue()
-	return nil
-}
-
-func (u *UserDefinedValueDeclaredConstant) decodeInternal(decoder *bindings.Decoder) error {
-	pointer0, err := decoder.ReadPointer()
-	if err != nil {
-		return err
-	}
-	if pointer0 == 0 {
-		return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
-	} else {
-		if err := u.Value.Decode(decoder); err != nil {
-			return err
-		}
-	}
 	
 	return nil
 }

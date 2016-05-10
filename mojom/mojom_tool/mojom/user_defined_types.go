@@ -1123,6 +1123,7 @@ func (e *MojomEnum) InitAsScope(parentScope *Scope) *Scope {
 func (e *MojomEnum) AddEnumValue(declData DeclarationData, valueRef ValueRef) DuplicateNameError {
 	enumValue := new(EnumValue)
 	enumValue.Init(declData, UserDefinedValueKindEnumValue, enumValue, valueRef)
+	enumValue.valueIndex = uint32(len(e.Values))
 	e.Values = append(e.Values, enumValue)
 	e.DeclaredObjects = append(e.DeclaredObjects, enumValue)
 	enumValue.enumType = e
@@ -1154,6 +1155,8 @@ type EnumValue struct {
 	UserDefinedValueBase
 
 	enumType *MojomEnum
+	// The 0-based index of this EnumValue in the |values| slice of |enumType|.
+	valueIndex uint32
 
 	// After all values in the MojomDescriptor have been resolved,
 	// MojomDescriptor.ComputeEnumValueIntegers() should be invoked. This
@@ -1166,6 +1169,10 @@ type EnumValue struct {
 
 func (ev *EnumValue) EnumType() *MojomEnum {
 	return ev.enumType
+}
+
+func (ev *EnumValue) ValueIndex() uint32 {
+	return ev.valueIndex
 }
 
 // EnumValue implements ConcreteValue

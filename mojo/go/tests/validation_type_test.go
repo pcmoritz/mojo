@@ -71,22 +71,6 @@ func TestEnumType(t *testing.T) {
 		if _, ok := labelMap[*label.DeclData.ShortName]; !ok {
 			t.Fatalf("Declaration Data's ShortName for BasicEnum's label %s is unknown ", *label.DeclData.ShortName)
 		}
-		// label's EnumTypeKey must be correct.
-		if label.EnumTypeKey == "" {
-			t.Fatalf("EnumTypeKey for BasicEnum's label %s was empty.", *label.DeclData.ShortName)
-		}
-		userDefinedType := test.GetAllMojomTypeDefinitions()[label.EnumTypeKey]
-		if userDefinedType == nil {
-			t.Fatalf("EnumTypeKey for BasicEnum's label %s was invalid:.", *label.DeclData.ShortName, label.EnumTypeKey)
-		}
-		enumType, ok := userDefinedType.(*mojom_types.UserDefinedTypeEnumType)
-		if !ok {
-			t.Fatalf("UserDefinedType for the EnumTypeKey for BasicEnum's label %s was not a EnumType", *label.DeclData.ShortName)
-		}
-		if *enumType.Value.DeclData.FullIdentifier != fullIdentifier {
-			t.Fatalf("EnumTypeKey for BasicEnum's label %s was %s.", *label.DeclData.ShortName, label.EnumTypeKey)
-		}
-
 		// Check that the label's IntValue matches the expected one.
 		if expectedOrdinal := labelMap[*label.DeclData.ShortName]; label.IntValue != expectedOrdinal {
 			t.Fatalf("IntValue for Enum BasicEnum's label %s was %d but expected %d",

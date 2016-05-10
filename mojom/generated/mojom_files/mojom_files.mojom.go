@@ -287,9 +287,9 @@ func (s *MojomFile) Decode(decoder *bindings.Decoder) error {
 }
 
 type MojomFileGraph struct {
-	Files          map[string]MojomFile
-	ResolvedTypes  map[string]mojom_types.UserDefinedType
-	ResolvedValues map[string]mojom_types.UserDefinedValue
+	Files             map[string]MojomFile
+	ResolvedTypes     map[string]mojom_types.UserDefinedType
+	ResolvedConstants map[string]mojom_types.DeclaredConstant
 }
 
 func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
@@ -412,18 +412,18 @@ func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
 	encoder.StartMap()
 	{
 		var keys0 []string
-		var values0 []mojom_types.UserDefinedValue
+		var values0 []mojom_types.DeclaredConstant
 		if encoder.Deterministic() {
-			for key0, _ := range s.ResolvedValues {
+			for key0, _ := range s.ResolvedConstants {
 				keys0 = append(keys0, key0)
 			}
 			bindings.SortMapKeys(&keys0)
-			values0 = make([]mojom_types.UserDefinedValue, len(keys0))
+			values0 = make([]mojom_types.DeclaredConstant, len(keys0))
 			for i, key := range keys0 {
-				values0[i] = s.ResolvedValues[key]
+				values0[i] = s.ResolvedConstants[key]
 			}
 		} else {
-			for key0, value0 := range s.ResolvedValues {
+			for key0, value0 := range s.ResolvedConstants {
 				keys0 = append(keys0, key0)
 				values0 = append(values0, value0)
 			}
@@ -446,10 +446,10 @@ func (s *MojomFileGraph) Encode(encoder *bindings.Encoder) error {
 		if err := encoder.WritePointer(); err != nil {
 			return err
 		}
-		encoder.StartArray(uint32(len(values0)), 128)
+		encoder.StartArray(uint32(len(values0)), 64)
 		for _, elem1 := range values0 {
-			if elem1 == nil {
-				return &bindings.ValidationError{bindings.UnexpectedNullUnion, "unexpected null union"}
+			if err := encoder.WritePointer(); err != nil {
+				return err
 			}
 			if err := elem1.Encode(encoder); err != nil {
 				return err
@@ -719,7 +719,7 @@ func (s *MojomFileGraph) Decode(decoder *bindings.Decoder) error {
 					}
 				}
 			}
-			var values0 []mojom_types.UserDefinedValue
+			var values0 []mojom_types.DeclaredConstant
 			{
 				pointer1, err := decoder.ReadPointer()
 				if err != nil {
@@ -728,19 +728,22 @@ func (s *MojomFileGraph) Decode(decoder *bindings.Decoder) error {
 				if pointer1 == 0 {
 					return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
 				} else {
-					len1, err := decoder.StartArray(128)
+					len1, err := decoder.StartArray(64)
 					if err != nil {
 						return err
 					}
-					values0 = make([]mojom_types.UserDefinedValue, len1)
+					values0 = make([]mojom_types.DeclaredConstant, len1)
 					for i1 := uint32(0); i1 < len1; i1++ {
-						var err error
-						values0[i1], err = mojom_types.DecodeUserDefinedValue(decoder)
+						pointer2, err := decoder.ReadPointer()
 						if err != nil {
 							return err
 						}
-						if values0[i1] == nil {
-							return &bindings.ValidationError{bindings.UnexpectedNullUnion, "unexpected null union"}
+						if pointer2 == 0 {
+							return &bindings.ValidationError{bindings.UnexpectedNullPointer, "unexpected null pointer"}
+						} else {
+							if err := values0[i1].Decode(decoder); err != nil {
+								return err
+							}
 						}
 					}
 					if err := decoder.Finish(); err != nil {
@@ -757,11 +760,11 @@ func (s *MojomFileGraph) Decode(decoder *bindings.Decoder) error {
 				return err
 			}
 			len0 := len(keys0)
-			map0 := make(map[string]mojom_types.UserDefinedValue)
+			map0 := make(map[string]mojom_types.DeclaredConstant)
 			for i0 := 0; i0 < len0; i0++ {
 				map0[keys0[i0]] = values0[i0]
 			}
-			s.ResolvedValues = map0
+			s.ResolvedConstants = map0
 		}
 	}
 	if err := decoder.Finish(); err != nil {
