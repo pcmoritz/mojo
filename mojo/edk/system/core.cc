@@ -638,7 +638,7 @@ MojoResult Core::GetBufferInformation(MojoHandle buffer_handle,
                                       uint32_t info_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
   MojoResult result =
-      GetDispatcherAndCheckRights(buffer_handle, MOJO_HANDLE_RIGHT_READ,
+      GetDispatcherAndCheckRights(buffer_handle, MOJO_HANDLE_RIGHT_GET_OPTIONS,
                                   EntrypointClass::BUFFER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
@@ -652,11 +652,13 @@ MojoResult Core::MapBuffer(MojoHandle buffer_handle,
                            UserPointer<void*> buffer,
                            MojoMapBufferFlags flags) {
   RefPtr<Dispatcher> dispatcher;
-  // TODO(vtl): Is this right? Or should there be a "map" right? Probably I need
-  // to rethink rights for buffers.
-  MojoResult result =
-      GetDispatcherAndCheckRights(buffer_handle, MOJO_HANDLE_RIGHT_WRITE,
-                                  EntrypointClass::BUFFER, &dispatcher);
+  // TODO(vtl): Currently we can only map read/write. So both
+  // |MOJO_HANDLE_RIGHT_MAP_READABLE| and |MOJO_HANDLE_RIGHT_MAP_WRITABLE| are
+  // required.
+  MojoResult result = GetDispatcherAndCheckRights(
+      buffer_handle,
+      MOJO_HANDLE_RIGHT_MAP_READABLE | MOJO_HANDLE_RIGHT_MAP_WRITABLE,
+      EntrypointClass::BUFFER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
 
