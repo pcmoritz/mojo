@@ -37,7 +37,6 @@ class TestApplicationConnection : public ApplicationConnection {
     return kRemoteApplicationURL;
   }
 
-  ServiceProvider* GetServiceProvider() override { return nullptr; }
   void SetServiceConnectorForName(ServiceConnector* service_connector,
                                   const std::string& name) override {}
 };
