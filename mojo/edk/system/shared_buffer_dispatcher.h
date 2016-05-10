@@ -36,8 +36,7 @@ class SharedBufferDispatcher final : public SimpleDispatcher {
   // duplicable by default.
   static constexpr MojoHandleRights kDefaultHandleRights =
       MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_TRANSFER |
-      MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE |
-      MOJO_HANDLE_RIGHT_EXECUTE;
+      MOJO_HANDLE_RIGHT_READ | MOJO_HANDLE_RIGHT_WRITE;
 
   // The default options to use for |MojoCreateSharedBuffer()|. (Real uses
   // should obtain this via |ValidateCreateOptions()| with a null |in_options|;

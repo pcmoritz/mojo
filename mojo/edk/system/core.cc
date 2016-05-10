@@ -441,7 +441,7 @@ MojoResult Core::SetDataPipeProducerOptions(
     UserPointer<const MojoDataPipeProducerOptions> options) {
   RefPtr<Dispatcher> dispatcher;
   MojoResult result = GetDispatcherAndCheckRights(
-      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_SET_OPTIONS,
       EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
@@ -455,7 +455,7 @@ MojoResult Core::GetDataPipeProducerOptions(
     uint32_t options_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
   MojoResult result = GetDispatcherAndCheckRights(
-      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_READ,
+      data_pipe_producer_handle, MOJO_HANDLE_RIGHT_GET_OPTIONS,
       EntrypointClass::DATA_PIPE_PRODUCER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
@@ -508,7 +508,7 @@ MojoResult Core::SetDataPipeConsumerOptions(
     UserPointer<const MojoDataPipeConsumerOptions> options) {
   RefPtr<Dispatcher> dispatcher;
   MojoResult result = GetDispatcherAndCheckRights(
-      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_WRITE,
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_SET_OPTIONS,
       EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;
@@ -522,7 +522,7 @@ MojoResult Core::GetDataPipeConsumerOptions(
     uint32_t options_num_bytes) {
   RefPtr<Dispatcher> dispatcher;
   MojoResult result = GetDispatcherAndCheckRights(
-      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_READ,
+      data_pipe_consumer_handle, MOJO_HANDLE_RIGHT_GET_OPTIONS,
       EntrypointClass::DATA_PIPE_CONSUMER, &dispatcher);
   if (result != MOJO_RESULT_OK)
     return result;

@@ -123,6 +123,8 @@ TEST(HandleTest, HasAllRights) {
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_TRANSFER));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_READ));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_WRITE));
+    EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_GET_OPTIONS));
+    EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_SET_OPTIONS));
   }
 
   {
@@ -134,6 +136,8 @@ TEST(HandleTest, HasAllRights) {
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_TRANSFER));
     EXPECT_TRUE(h.has_all_rights(MOJO_HANDLE_RIGHT_READ));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_WRITE));
+    EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_GET_OPTIONS));
+    EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_SET_OPTIONS));
 
     EXPECT_TRUE(
         h.has_all_rights(MOJO_HANDLE_RIGHT_DUPLICATE | MOJO_HANDLE_RIGHT_READ));
@@ -142,6 +146,8 @@ TEST(HandleTest, HasAllRights) {
                                   MOJO_HANDLE_RIGHT_WRITE));
     EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_DUPLICATE |
                                   MOJO_HANDLE_RIGHT_WRITE));
+    EXPECT_FALSE(h.has_all_rights(MOJO_HANDLE_RIGHT_GET_OPTIONS |
+                                  MOJO_HANDLE_RIGHT_SET_OPTIONS));
 
     EXPECT_EQ(MOJO_RESULT_OK, h.dispatcher->Close());
   }
