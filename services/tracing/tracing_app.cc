@@ -18,18 +18,6 @@ TracingApp::~TracingApp() {}
 bool TracingApp::ConfigureIncomingConnection(
     mojo::ApplicationConnection* connection) {
   connection->AddService<TraceCollector>(this);
-
-  // If someone connects to us they may want to use the TraceCollector
-  // interface and/or they may want to expose themselves to be traced. Attempt
-  // to connect to the TraceProvider interface to see if the application
-  // connecting to us wants to be traced. They can refuse the connection or
-  // close the pipe if not.
-  // TODO(vtl): Remove this once we remove the "wrong way" ServiceProvider.
-  TraceProviderPtr provider_ptr;
-  connection->ConnectToService(&provider_ptr);
-  if (provider_ptr)
-    RegisterTraceProvider(provider_ptr.PassInterfaceHandle());
-
   return true;
 }
 
