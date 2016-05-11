@@ -4,6 +4,9 @@
 
 """Python utils."""
 
+import os
+import sys
+
 
 def overrides(parent_class):
   """Inherits the docstring from the method of the same name in the indicated
@@ -14,3 +17,11 @@ def overrides(parent_class):
     method.__doc__ = getattr(parent_class, method.__name__).__doc__
     return method
   return overriding
+
+
+def disable_output_buffering():
+  """Disables the buffering of the stdout. Devtools command line scripts should
+  do so, so that their stdout is consistent when not directly attached to a
+  terminal (e.g. because another script runs devtools in a subprocess).
+  """
+  sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

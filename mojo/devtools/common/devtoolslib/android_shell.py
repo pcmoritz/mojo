@@ -395,7 +395,6 @@ class AndroidShell(Shell):
           host_port = self._forward_host_port_to_device(0, device_port)
           print ('Dart observatory available at the host at http://127.0.0.1:%d'
                  % host_port)
-          sys.stdout.flush()
 
     logcat_watch_thread = threading.Thread(
         target=_forward_observatories_as_needed)
