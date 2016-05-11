@@ -20,17 +20,12 @@
 vars = {
   'chromium_git': 'https://chromium.googlesource.com',
   'skia_revision': 'db284c52e62e8d16708e2065495a3b693b238771',
-  'v8_revision': '3f036fc0ba4ca4483fe77822f8605c277d37ee24',
   'base_revision': 'f613c71b2ed7fe4b4eff33fb7fd3b53e640b4359',
   'angle_revision': '46ccef1992a8ede16a596c3dd73cff13c047267d',
   'buildtools_revision': '222bd42ce39d1bd8f08fe089b066f49c469e1cdf',
-  'dart_revision': 'e4db01fdd43f019988a901eb51c72790652760a4',
-  'dart_root_certificates_revision': 'aed07942ce98507d2be28cbd29e879525410c7fc',
-  'dart_observatory_packages_revision': 'cf90eb9077177d3d6b3fd5e8289477c2385c026a',
   'pdfium_revision': 'ae4256f45df69bbfdf722a6ec17e1e851911ae4e',
   'boringssl_revision': '642f1498d056dbba3e50ed5a232ab2f482626dec',
   'lss_revision': '6f97298fe3794e92c8c896a6bc06e0b36e4c3de3',
-  'nacl_revision': 'f5bc68c59b147b66d553dc6fc17426682cf138e2',
   'tonic_revision': 'e41f72c684e0da61304ebd6f3147d0fe23ffbb56',
   'gurl_revision': '561639dfb664ee4c14371f569213b9d41f4fe110',
 }
@@ -128,9 +123,6 @@ deps = {
 
   'src/third_party/snappy/src':
     Var('chromium_git') + '/external/snappy.git' + '@' + '762bb32f0c9d2f31ba4958c7c0933d22e80c20bf',
-
-  'src/third_party/ffmpeg':
-     Var('chromium_git') + '/chromium/third_party/ffmpeg.git' + '@' + '6f7f37e8c16db3bad5624c7504e710c54bdb7bf5',
 
   'src/third_party/libcxx/libcxx':
      Var('chromium_git') + '/chromium/llvm-project/libcxx.git' + '@' + '2dcc9a932e33ac4228eedcb6e026ac480daa8e45',
