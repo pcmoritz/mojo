@@ -63,16 +63,6 @@ deps = {
   'src/tonic':
     Var('chromium_git') + '/external/github.com/domokit/tonic' + '@' + Var('tonic_revision'),
 
-  'src/dart/third_party/observatory_pub_packages':
-    Var('chromium_git') +
-    '/external/github.com/dart-lang/observatory_pub_packages' + '@' +
-    Var('dart_observatory_packages_revision'),
-
-  'src/dart/third_party/root_certificates':
-    Var('chromium_git') +
-    '/external/github.com/dart-lang/root_certificates' + '@' +
-    Var('dart_root_certificates_revision'),
-
   'src/third_party/skia':
    Var('chromium_git') + '/skia.git' + '@' +  Var('skia_revision'),
 
