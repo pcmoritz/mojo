@@ -167,12 +167,6 @@ hooks = [
     'action': ['python', 'src/tools/clang/scripts/update.py', '--if-needed'],
   },
   {
-    # Pull dart sdk if needed
-    'name': 'dart',
-    'pattern': '.',
-    'action': ['python', 'src/tools/dart/update.py'],
-  },
-  {
     # This downloads android_tools according to tools/android/VERSION_*.
     'name': 'android_tools',
     'pattern': '.',
