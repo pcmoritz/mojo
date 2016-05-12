@@ -5,8 +5,5 @@
 group("benchmarks") {
   testonly = true
 
-  deps = [
-    "//benchmarks/mojo_rtt_benchmark",
-    "//benchmarks/startup",
-  ]
+  deps = []
 }
