@@ -60,12 +60,6 @@ deps = {
   'src/tools/grit':
     Var('chromium_git') + '/external/grit-i18n.git' + '@' + 'c1b1591a05209c1ad467e845ba8543c22f9072af', # from svn revision 189
 
-  'src/v8':
-    Var('chromium_git') + '/v8/v8.git' + '@' +  Var('v8_revision'),
-
-  'src/dart':
-    Var('chromium_git') + '/external/github.com/dart-lang/sdk.git' + '@' + Var('dart_revision'),
-
   'src/tonic':
     Var('chromium_git') + '/external/github.com/domokit/tonic' + '@' + Var('tonic_revision'),
 
