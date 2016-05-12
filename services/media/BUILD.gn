@@ -9,7 +9,6 @@ group("media") {
     "//services/media/factory_service",
     "//services/media/framework",
     "//services/media/framework_create",
-    "//services/media/framework_ffmpeg",
     "//services/media/framework_mojo",
   ]
 }

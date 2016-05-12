@@ -13,6 +13,5 @@ source_set("framework_create") {
 
   deps = [
     "//services/media/framework",
-    "//services/media/framework_ffmpeg",
   ]
 }

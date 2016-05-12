@@ -48,7 +48,6 @@ mojo_native_application("media_factory") {
     "//mojo/services/network/interfaces",
     "//services/media/framework",
     "//services/media/framework_create",
-    "//services/media/framework_ffmpeg",
     "//services/media/framework_mojo",
     "//url",
   ]
