@@ -49,11 +49,6 @@ group("examples") {
     "//examples/ui/tile",
   ]
 
-  # TODO(cstout) - javascript/v8 build support for fnl/musl
-  if (!is_android && !is_fnl) {
-    deps += [ "//examples/ui/pdf_viewer" ]
-  }
-
   if (is_android) {
     deps += [
       "//examples/device_name",
