@@ -90,9 +90,6 @@ deps = {
   'src/third_party/requests/src':
     Var('chromium_git') + '/external/github.com/kennethreitz/requests.git' + '@' + 'f172b30356d821d180fa4ecfa3e71c7274a32de4',
 
-  'src/native_client':
-    Var('chromium_git') + '/native_client/src/native_client.git' + '@' + Var('nacl_revision'),
-
   'src/third_party/pyelftools':
     Var('chromium_git') + '/chromiumos/third_party/pyelftools.git' + '@' + '19b3e610c86fcadb837d252c794cb5e8008826ae',
 
@@ -296,18 +293,6 @@ hooks = [
         'python',
         'src/tools/remove_stale_pyc_files.py',
         'src/tools',
-    ],
-  },
-  {
-    # This downloads binaries for Native Client's newlib toolchain.
-    # Done in lieu of building the toolchain from scratch as it can take
-    # anywhere from 30 minutes to 4 hours depending on platform to build.
-    'name': 'nacltools',
-    'pattern': '.',
-    'action': [
-        'python', 'src/build/download_nacl_toolchains.py',
-        '--packages', 'pnacl_newlib,pnacl_translator',
-        'sync', '--extract',
     ],
   },
   {
