@@ -15,7 +15,6 @@ group("portable_examples") {
     "//examples/audio_play_test",
     "//examples/authentication_demo",
     "//examples/content_handler_demo",
-    "//examples/dart",
     "//examples/echo",
     "//examples/echo_terminal",
     "//examples/forwarding_content_handler",

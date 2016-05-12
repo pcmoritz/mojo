@@ -429,7 +429,6 @@ if (is_android) {
       sources += [
         "$root_out_dir/authenticating_url_loader_interceptor.mojo",
         "$root_out_dir/compositor_service.mojo",
-        "$root_out_dir/dart_content_handler.mojo",
         "$root_out_dir/files.mojo",
         "$root_out_dir/icu_data.mojo",
         "$root_out_dir/input_manager_service.mojo",
@@ -442,7 +441,6 @@ if (is_android) {
 
       deps += [
         "//services/authenticating_url_loader_interceptor",
-        "//services/dart:dart_content_handler",
         "//services/files",
         "//services/gfx/compositor",
         "//services/icu_data",
