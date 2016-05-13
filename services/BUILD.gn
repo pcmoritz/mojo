@@ -12,7 +12,6 @@ group("services") {
     "//services/authentication",
     "//services/clipboard",
     "//services/debugger",
-    "//services/gles2:lib",
     "//services/http_server",
     "//services/icu_data",
     "//services/log",
@@ -53,7 +52,6 @@ group("services") {
       "//services/files",
       "//services/gfx",
       "//services/native_viewport",
-      "//services/ui",
       "//services/url_response_disk_cache",
     ]
   }
