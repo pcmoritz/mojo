@@ -50,7 +50,6 @@ group("services") {
     deps += [
       "//services/device_info",
       "//services/files",
-      "//services/native_viewport",
       "//services/url_response_disk_cache",
     ]
   }
