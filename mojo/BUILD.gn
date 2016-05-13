@@ -68,13 +68,8 @@ group("tests") {
     "//mojo/public/platform/native:tests",
     "//mojo/services/files/c:apptests",
     "//mojo/services/files/cpp:files_impl_apptests",
-    "//mojo/services/gfx/composition/cpp:apptests",
-    "//mojo/services/gfx/images/cpp:image_pipe_apptest",
-    "//mojo/services/gfx/images/cpp:image_pipe_apptest",
     "//mojo/services/log/cpp:log_client_apptests",
     "//mojo/tools:message_generator",
-    "//mojo/ui:apptests",
-    "//mojo/ui/associates:apptests",
   ]
 
   if (mojo_use_prebuilt_network_service) {
