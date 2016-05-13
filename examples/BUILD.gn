@@ -21,7 +21,6 @@ group("portable_examples") {
     "//examples/hello_mojo",
     "//examples/http_handler",
     "//examples/indirect_service",
-    "//examples/media_test",
     "//examples/native_run_app",
     "//examples/notification_generator",
     "//examples/recursive_content_handler",
