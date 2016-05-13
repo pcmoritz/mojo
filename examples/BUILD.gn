@@ -24,7 +24,6 @@ group("portable_examples") {
     "//examples/notification_generator",
     "//examples/recursive_content_handler",
     "//examples/serialization",
-    "//examples/spinning_cube",
     "//examples/tiny",
     "//examples/trace_me",
     "//examples/wget",
@@ -35,9 +34,7 @@ group("examples") {
   testonly = true
 
   deps = [
-    ":portable_examples",
-    "//examples/moterm_example_app",
-    "//examples/shadows",
+    ":portable_examples"
   ]
 
   if (is_android) {
