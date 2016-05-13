@@ -276,9 +276,6 @@ source_set("native_application_support") {
 
   deps = [
     "//base",
-    "//mojo/gles2:control_thunks",
-    "//mojo/gles2:gles2",
-    "//mojo/gles2:mgl",
     "//mojo/public/platform/native:platform_handle_api",
   ]
 
@@ -447,9 +444,6 @@ if (is_android) {
         "//services/java_handler",
         "//services/speech_recognizer",
         "//services/tracing",
-        "//services/ui/input_manager",
-        "//services/ui/launcher",
-        "//services/ui/view_manager",
       ]
     }
   }
