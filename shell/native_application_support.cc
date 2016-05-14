@@ -7,10 +7,6 @@
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/logging.h"
-#include "mojo/public/platform/native/mgl_echo_thunks.h"
-#include "mojo/public/platform/native/mgl_onscreen_thunks.h"
-#include "mojo/public/platform/native/mgl_signal_sync_point_thunks.h"
-#include "mojo/public/platform/native/mgl_thunks.h"
 #include "mojo/public/platform/native/platform_handle_private_thunks.h"
 #include "mojo/public/platform/native/system_impl_private_thunks.h"
 #include "mojo/public/platform/native/system_thunks.h"
@@ -71,18 +67,6 @@ bool RunNativeApplication(
             "MojoSetSystemImplControlThunksPrivate", app_library);
   SetThunks(&MojoMakeSystemImplThunksPrivate, "MojoSetSystemImplThunksPrivate",
             app_library);
-
-  if (SetThunks(MojoMakeMGLThunks, "MojoSetMGLThunks", app_library)) {
-    SetThunks(MojoMakeMGLEchoThunks, "MojoSetMGLEchoThunks", app_library);
-
-    // TODO(jamesr): We should only need to expose the onscreen thunks to apps
-    // that need to draw to the screen like the system compositor.
-    SetThunks(MojoMakeMGLOnscreenThunks, "MojoSetMGLOnscreenThunks",
-              app_library);
-
-    SetThunks(MojoMakeMGLSignalSyncPointThunks,
-              "MojoSetMGLSignalSyncPointThunks", app_library);
-  }
 
   typedef MojoResult (*MojoMainFunction)(MojoHandle);
   MojoMainFunction main_function = reinterpret_cast<MojoMainFunction>(
