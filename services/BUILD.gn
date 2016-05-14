@@ -16,7 +16,6 @@ group("services") {
     "//services/icu_data",
     "//services/log",
     "//services/native_support",
-    "//services/prediction",
     "//services/test_service:bindings",
     "//services/tracing",
   ]
@@ -68,7 +67,6 @@ group("tests") {
     "//services/clipboard:apptests",
     "//services/http_server:apptests",
     "//services/native_support:apptests",
-    "//services/prediction:apptests",
   ]
 
   if (!is_android) {
