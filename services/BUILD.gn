@@ -8,6 +8,7 @@ group("services") {
   deps = [
     ":tests",
     "//services/asset_bundle",
+    "//services/authenticating_url_loader_interceptor",
     "//services/debugger",
     "//services/http_server",
     "//services/icu_data",
@@ -59,6 +60,7 @@ group("tests") {
 
   deps = [
     "//services/asset_bundle:apptests",
+    "//services/authenticating_url_loader_interceptor:apptests",
     # "//services/http_server:apptests",
     "//services/native_support:apptests",
   ]
