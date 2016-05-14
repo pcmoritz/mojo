@@ -246,7 +246,6 @@ source_set("parent_lib") {
       "//mojo/services/content_handler/interfaces",
       "//mojo/services/gpu/interfaces",
       "//mojo/services/native_viewport/interfaces",
-      "//services/gles2",
       "//services/native_viewport:lib",
     ]
   }
