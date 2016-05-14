@@ -8,9 +8,6 @@ group("services") {
   deps = [
     ":tests",
     "//services/asset_bundle",
-    "//services/authenticating_url_loader_interceptor",
-    "//services/authentication",
-    "//services/clipboard",
     "//services/debugger",
     "//services/http_server",
     "//services/icu_data",
@@ -30,7 +27,6 @@ group("services") {
       "//services/notifications",
       "//services/sensors",
       "//services/sharing:android_sharing",
-      "//services/speech_recognizer",
     ]
     if (defined(go_build_tool) && go_build_tool != "") {
       deps += [ "//services/vanadium/security:principal_service" ]
@@ -63,9 +59,7 @@ group("tests") {
 
   deps = [
     "//services/asset_bundle:apptests",
-    "//services/authenticating_url_loader_interceptor:apptests",
-    "//services/clipboard:apptests",
-    "//services/http_server:apptests",
+    # "//services/http_server:apptests",
     "//services/native_support:apptests",
   ]
 
@@ -86,7 +80,6 @@ group("tests") {
     deps += [
       "//services/files:apptests",
       "//services/log:apptests",
-      "//services/url_response_disk_cache:tests",
     ]
   }
 }
