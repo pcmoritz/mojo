@@ -166,22 +166,6 @@ hooks = [
     'pattern': '.',
     'action': ['python', 'src/tools/clang/scripts/update.py', '--if-needed'],
   },
-  {
-    # This downloads android_tools according to tools/android/VERSION_*.
-    'name': 'android_tools',
-    'pattern': '.',
-    'action': ['python', 'src/tools/android/download_android_tools.py'],
-  },
-  {
-    # This downloads SDK extras and puts them in the
-    # third_party/android_tools/sdk/extras directory on the bots. Developers
-    # need to manually install these packages and accept the ToS.
-    'name': 'sdkextras',
-    'pattern': '.',
-    # When adding a new sdk extras package to download, add the package
-    # directory and zip file to .gitignore in third_party/android_tools.
-    'action': ['python', 'src/build/download_sdk_extras.py'],
-  },
   # Pull GN binaries. This needs to be before running GYP below.
   {
     'name': 'gn_linux64',

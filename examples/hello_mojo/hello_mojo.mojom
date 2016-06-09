@@ -7,4 +7,5 @@ module examples;
 [ServiceName="examples.HelloMojo"]
 interface HelloMojo {
   Say(string request) => (string response);
+  Register(string name) => (handle<shared_buffer> buffer);
 };

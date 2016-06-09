@@ -30,6 +30,9 @@ class HelloMojoClientApp : public mojo::ApplicationDelegate {
                            GetProxy(&hello_mojo_));
 
     DoIt("hello");
+
+    GetHandle("test");
+
     DoIt("goodbye");
   }
 
@@ -37,6 +40,15 @@ class HelloMojoClientApp : public mojo::ApplicationDelegate {
   void DoIt(const std::string& request) {
     hello_mojo_->Say(request, [request](const mojo::String& response) {
       printf("%s --> %s\n", request.c_str(), response.get().c_str());
+    });
+  }
+
+  void GetHandle(const std::string& request) {
+    hello_mojo_->Register(request, [request](const mojo::ScopedSharedBufferHandle& response) {
+      void* pointer = nullptr;
+      assert(MOJO_RESULT_OK == mojo::MapBuffer(response.get(), 0, sizeof(int), &pointer, MOJO_MAP_BUFFER_FLAG_NONE));
+      int* int_pointer = reinterpret_cast<int*>(pointer);
+      printf("got handle %d, value is %d\n", response.get().value(), *int_pointer);
     });
   }
 
@@ -48,7 +60,12 @@ class HelloMojoClientApp : public mojo::ApplicationDelegate {
 }  // namespace
 
 MojoResult MojoMain(MojoHandle application_request) {
-  return mojo::ApplicationRunner(std::unique_ptr<mojo::ApplicationDelegate>(
-                                     new HelloMojoClientApp()))
-      .Run(application_request);
+  printf("mojo handle is %d\n", application_request);
+  //return mojo::ApplicationRunner(std::unique_ptr<mojo::ApplicationDelegate>(
+  //                                   new HelloMojoClientApp()))
+  //    .Run(application_request);
+  // while (true) {
+
+  // }
+  return 0;
 }
