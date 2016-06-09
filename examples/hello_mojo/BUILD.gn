@@ -6,9 +6,13 @@ import("//mojo/public/mojo_application.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
 group("hello_mojo") {
+testonly = true
+
   deps = [
     ":hello_mojo_client",
     ":hello_mojo_server",
+    ":hello_mojo_lib",
+    ":hello_mojo_slave",
   ]
 }
 
@@ -39,6 +43,59 @@ mojo_native_application("hello_mojo_server") {
 
   sources = [
     "hello_mojo_server.cc",
+  ]
+}
+
+executable("hello_mojo_lib") {
+  sources = [
+    "hello_mojo_lib.cc",
+    "../../shell/task_runners.cc", # TODO(pcm): copy and adapt this file
+    "exchange_file_descriptor.cc",
+  ]
+
+  deps = [
+    ":hello_mojo_interface",
+    "//base",
+    "//mojo/public/c/system",
+    "//mojo/public/cpp/environment:standalone",
+    "//mojo/public/cpp/application:standalone",
+    "//mojo/public/cpp/bindings",
+    "//mojo/edk/base_edk",
+    "//mojo/edk/system",
+    "//mojo/edk/platform",
+    "//mojo/edk/embedder",
+    "//mojo/edk/util",
+  ]
+}
+
+executable("hello_mojo_slave") {
+  testonly = true
+
+  sources = [
+    "hello_mojo_slave.cc",
+    "../../mojo/edk/test/multiprocess_test_helper.cc", # TODO(pcm): copy and adapt this file
+    "../../mojo/edk/system/test/test_io_thread.cc", # TODO(pcm): copy and adapt this file
+    "../../mojo/edk/test/scoped_ipc_support.cc", # TODO(pcm): copy and adapt this file
+    "../../base/test/multiprocess_test.cc", # TODO(pcm): copy and adapt this file
+    "../../base/test/test_timeouts.cc", # TODO(pcm): copy and adapt this file
+    "../../base/test/test_switches.cc", # TODO(pcm): copy and adapt this file
+    "exchange_file_descriptor.cc",
+  ]
+
+  deps = [
+    ":hello_mojo_interface",
+    "//base",
+    "//testing/gtest",
+    "//mojo/public/c/system",
+    "//mojo/public/cpp/environment:standalone",
+    "//mojo/public/cpp/application:standalone",
+    "//mojo/public/cpp/bindings",
+    "//mojo/edk/base_edk",
+    "//mojo/edk/system",
+    "//mojo/edk/platform",
+    "//mojo/edk/embedder",
+    "//mojo/edk/util",
+    "//mojo/message_pump",
   ]
 }
 
